@@ -428,6 +428,7 @@
       if ($("#root_files_button").hasClass("clicked")){
         formDataObject.exclusions = excluded;
       }
+      delete formDataObject.root_path
       console.log(excluded);
       console.log(formDataObject);
       // Format the plain form data as JSON
@@ -650,10 +651,10 @@
       let checked = ""
       let dpath = value.path;
       let filename = key;
+      if (value.excluded){
+        checked = "checked"
+      }
       if (value.dir){
-        if (value.excluded){
-          checked = "checked"
-        }
         text += `<li class="tree-item" data-path="${dpath}">
                             \n<div id="${dpath}" data-path="${dpath}" data-name="${filename}" class="tree-caret tree-ctx-item tree-folder">
                             <input type="checkbox" class="checkBoxClass excluded" value="${dpath}" ${checked}>
