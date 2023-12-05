@@ -529,6 +529,10 @@ class Controller:
             server_host=monitoring_host,
             server_type=monitoring_type,
         )
+        self.management.set_backup_config(
+            new_server_id,
+            backup_path,
+        )
         if data["create_type"] == "minecraft_java":
             if root_create_data["create_type"] == "download_jar":
                 # modded update urls from server jars will only update the installer
