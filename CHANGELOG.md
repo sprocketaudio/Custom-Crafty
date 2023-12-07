@@ -14,6 +14,7 @@
 - Fix stack in API error handling ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/674))
 - Fix bug where you cannot select "do not monitor mounts" from `config.json` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/678))
 - Fix support log 'x' button still downloading logs ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/679))
+- Fix bug where servers are created without bu dir ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/682))
 ### Tweaks
 - Homogenize Panel logos/branding ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/666))
 - Retain previous tab when revisiting server details page (#272)([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/667))
