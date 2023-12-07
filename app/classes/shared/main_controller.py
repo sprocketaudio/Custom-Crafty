@@ -85,7 +85,7 @@ class Controller:
                 encoding="utf-8",
             ) as f:
                 self.auth_tracker = json.load(f)
-        except:
+        except (FileNotFoundError, json.JSONDecodeError):
             self.auth_tracker = {}
 
     def log_attempt(self, remote_ip, username):

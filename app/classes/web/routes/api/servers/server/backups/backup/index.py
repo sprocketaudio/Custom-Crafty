@@ -72,9 +72,9 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
             FileHelpers.del_file(
                 os.path.join(backup_conf["backup_path"], data["filename"])
             )
-        except Exception:
+        except Exception as e:
             return self.finish_json(
-                400, {"status": "error", "error": "NO BACKUP FOUND"}
+                400, {"status": "error", "error": f"DELETE FAILED with error {e}"}
             )
         self.controller.management.add_to_audit_log(
             auth_data[4]["user_id"],
