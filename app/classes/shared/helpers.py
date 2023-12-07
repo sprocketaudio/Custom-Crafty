@@ -370,7 +370,7 @@ class Helpers:
         digits = string.digits
         locase = string.ascii_lowercase
         upcase = string.ascii_uppercase
-        symbols = string.punctuation
+        symbols = "!@#$%^&*" # Reducing to avoid issues with ([]{}<>,'`) etc
 
         # Combine all the character strings above to form one string
         combo = digits + upcase + locase + symbols
