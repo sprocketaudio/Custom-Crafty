@@ -37,7 +37,15 @@ class WebSocketManager(metaclass=Singleton):
 
     def broadcast_to_admins(self, event_type: str, data):
         def filter_fn(client):
-            if client.get_user_id in HelperUsers.get_super_user_list():
+            if str(client.get_user_id()) in str(HelperUsers.get_super_user_list()):
+                return True
+            return False
+
+        self.broadcast_with_fn(filter_fn, event_type, data)
+
+    def broadcast_to_non_admins(self, event_type: str, data):
+        def filter_fn(client):
+            if str(client.get_user_id()) not in str(HelperUsers.get_super_user_list()):
                 return True
             return False
 
