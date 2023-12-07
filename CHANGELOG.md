@@ -9,6 +9,7 @@
 - Remove webhook `custom` option from webook provider list as it's not currently an option ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/664))
 - Bump cryptography for CVE-2023-49083 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/680))
 - Fix bug where su cannot edit general user password ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/676))
+- Fix bug where no file error on import root dir ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/677))
 ### Tweaks
 - Homogenize Panel logos/branding ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/666))
 - Retain previous tab when revisiting server details page (#272)([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/667))
