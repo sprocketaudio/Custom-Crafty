@@ -52,19 +52,6 @@ if not (sys.version_info.major == 3 and sys.version_info.minor >= 9):
     Console.info("Crafty stopped. Exiting...")
     sys.exit(0)
 
-# Determine the environment we're running in and set path accordingly
-if getattr(sys, "frozen", False):
-    app_path = os.path.dirname(sys.executable)
-    RUN_MODE = "Frozen/executable"
-else:
-    try:
-        app_full_path = os.path.realpath(__file__)
-        app_path = os.path.dirname(app_full_path)
-        RUN_MODE = "Non-interactive (e.g. 'python main.py')"
-    except NameError:
-        app_path = os.getcwd()
-        RUN_MODE = "Interactive"
-
 # pylint: disable=wrong-import-position
 try:
     from app.classes.models.base_model import database_proxy
@@ -283,7 +270,7 @@ def setup_logging(debug=True):
         os.path.join(APPLICATION_PATH, "logs", "auth_tracker.log")
     ):
         open(
-            os.path.join(app_path, "logs", "auth_tracker.log"),
+            os.path.join(APPLICATION_PATH, "logs", "auth_tracker.log"),
             "a",
             encoding="utf-8",
         ).close()
@@ -354,12 +341,6 @@ if __name__ == "__main__":
     user_helper = HelperUsers(database, helper)
     management_helper = HelpersManagement(database, helper)
     installer = DatabaseBuilder(database, helper, user_helper, management_helper)
-    file_helper = FileHelpers(helper)
-    import_helper = ImportHelpers(helper, file_helper)
-    controller = Controller(database, helper, file_helper, import_helper)
-    controller.set_project_root(APPLICATION_PATH)
-    tasks_manager = TasksManager(helper, controller, file_helper)
-    import3 = Import3(helper, controller)
     FRESH_INSTALL = installer.is_fresh_install()
 
     if FRESH_INSTALL:
@@ -373,14 +354,16 @@ if __name__ == "__main__":
         PASSWORD = helper.create_pass()
         installer.default_settings(PASSWORD)
         with open(
-            os.path.join(app_path, "app", "config", "default-creds.txt"),
+            os.path.join(APPLICATION_PATH, "app", "config", "default-creds.txt"),
             "w",
             encoding="utf-8",
         ) as cred_file:
             cred_file.write(
                 json.dumps({"username": "admin", "password": PASSWORD}, indent=4)
             )
-        os.chmod(os.path.join(app_path, "app", "config", "default-creds.txt"), 0o600)
+        os.chmod(
+            os.path.join(APPLICATION_PATH, "app", "config", "default-creds.txt"), 0o600
+        )
     else:
         Console.debug("Existing install detected")
     Console.info("Checking for reset secret flag")
@@ -391,6 +374,15 @@ if __name__ == "__main__":
         helper.set_setting("reset_secrets_on_next_boot", False)
     else:
         Console.info("No flag found. Secrets are staying")
+
+    # now we've initialized our database for fresh install we
+    # can finishing initializing our controllers/modules
+    file_helper = FileHelpers(helper)
+    import_helper = ImportHelpers(helper, file_helper)
+    controller = Controller(database, helper, file_helper, import_helper)
+    controller.set_project_root(APPLICATION_PATH)
+    tasks_manager = TasksManager(helper, controller, file_helper)
+    import3 = Import3(helper, controller)
 
     # Check to see if client config.json version is different than the
     # Master config.json in helpers.py
