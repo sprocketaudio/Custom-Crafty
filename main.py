@@ -276,9 +276,11 @@ def setup_logging(debug=True):
     one optional (defaulted to True) parameter which
     determines whether or not the logging level is "debug" or verbose.
     """
-    logging_config_file = os.path.join(os.path.curdir, "app", "config", "logging.json")
+    logging_config_file = os.path.join(
+        APPLICATION_PATH, "app", "config", "logging.json"
+    )
     if not helper.check_file_exists(
-        os.path.join(os.path.curdir, "logs", "auth_tracker.log")
+        os.path.join(APPLICATION_PATH, "logs", "auth_tracker.log")
     ):
         open(
             os.path.join(app_path, "logs", "auth_tracker.log"),
