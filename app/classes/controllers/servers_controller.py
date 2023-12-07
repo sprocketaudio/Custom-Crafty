@@ -22,6 +22,7 @@ from app.classes.models.server_permissions import (
     PermissionsServers,
     EnumPermissionsServer,
 )
+from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,8 @@ class ServersController(metaclass=Singleton):
         self.management_helper = management_helper
         self.servers_list = []
         self.stats = Stats(self.helper, self)
+        self.web_sock = WebSocketManager()
+        self.server_subpage = {}
 
     # **********************************************************************************
     #                                   Generic Servers Methods
@@ -107,9 +110,9 @@ class ServersController(metaclass=Singleton):
 
         return ret
 
-    def get_history_stats(self, server_id, days):
+    def get_history_stats(self, server_id, hours):
         srv = ServersController().get_server_instance_by_id(server_id)
-        return srv.stats_helper.get_history_stats(server_id, days)
+        return srv.stats_helper.get_history_stats(server_id, hours)
 
     @staticmethod
     def update_unloaded_server(server_obj):
@@ -171,8 +174,15 @@ class ServersController(metaclass=Singleton):
     def init_all_servers(self):
         servers = self.get_all_defined_servers()
         self.failed_servers = []
-
         for server in servers:
+            self.web_sock.broadcast_to_admins(
+                "update",
+                {"section": "server", "server": server["server_name"]},
+            )
+            self.web_sock.broadcast_to_non_admins(
+                "update",
+                {"section": "init"},
+            )
             server_id = server.get("server_id")
 
             # if we have already initialized this server, let's skip it.

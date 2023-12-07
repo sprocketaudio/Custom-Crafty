@@ -8,11 +8,11 @@ import time
 import json
 import logging
 import threading
+from zoneinfo import ZoneInfoNotFoundError
 from peewee import DoesNotExist
 
 # TZLocal is set as a hidden import on win pipeline
 from tzlocal import get_localzone
-from tzlocal.utils import ZoneInfoNotFoundError
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from app.classes.models.server_permissions import EnumPermissionsServer
@@ -33,7 +33,9 @@ from app.classes.shared.helpers import Helpers
 from app.classes.shared.file_helpers import FileHelpers
 from app.classes.shared.import_helper import ImportHelpers
 from app.classes.minecraft.serverjars import ServerJars
+from app.classes.shared.websocket_manager import WebSocketManager
 from app.classes.steamcmd.serverapps import SteamApps
+
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +81,37 @@ class Controller:
         self.first_login = False
         self.cached_login = self.management.get_login_image()
         self.support_scheduler.start()
+        try:
+            with open(
+                os.path.join(os.path.curdir, "logs", "auth_tracker.log"),
+                "r",
+                encoding="utf-8",
+            ) as f:
+                self.auth_tracker = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            self.auth_tracker = {}
+
+    def log_attempt(self, remote_ip, username):
+        remote = self.auth_tracker.get(str(remote_ip), None)
+        if remote:
+            remote["names"].append(username)
+            remote["attempts"] += 1
+            remote["times"].append(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+            self.auth_tracker[str(remote_ip)] = remote
+        else:
+            self.auth_tracker[str(remote_ip)] = {
+                "names": [username],
+                "attempts": 1,
+                "times": [datetime.now().strftime("%d/%m/%Y %H:%M:%S")],
+            }
+
+    def write_auth_tracker(self):
+        with open(
+            os.path.join(os.path.curdir, "logs", "auth_tracker.log"),
+            "w",
+            encoding="utf-8",
+        ) as f:
+            json.dump(self.auth_tracker, f, indent=4)
 
     @staticmethod
     def check_system_user():
@@ -115,7 +148,7 @@ class Controller:
                     self.del_support_file(exec_user["support_logs"])
         # pausing so on screen notifications can run for user
         time.sleep(7)
-        self.helper.websocket_helper.broadcast_user(
+        WebSocketManager().broadcast_user(
             exec_user["user_id"], "notification", "Preparing your support logs"
         )
         self.helper.ensure_dir_exists(
@@ -211,17 +244,15 @@ class Controller:
         ) as f:
             f.write(sys_info_string)
         FileHelpers.make_compressed_archive(temp_zip_storage, temp_dir, sys_info_string)
-        if len(self.helper.websocket_helper.clients) > 0:
-            self.helper.websocket_helper.broadcast_user(
+        if len(WebSocketManager().clients) > 0:
+            WebSocketManager().broadcast_user(
                 exec_user["user_id"],
                 "support_status_update",
                 Helpers.calc_percent(temp_dir, temp_zip_storage + ".zip"),
             )
 
         temp_zip_storage += ".zip"
-        self.helper.websocket_helper.broadcast_user(
-            exec_user["user_id"], "send_logs_bootbox", {}
-        )
+        WebSocketManager().broadcast_user(exec_user["user_id"], "send_logs_bootbox", {})
 
         self.users.set_support_path(exec_user["user_id"], temp_zip_storage)
 
@@ -254,8 +285,8 @@ class Controller:
         results = Helpers.calc_percent(source_path, dest_path)
         self.log_stats = results
 
-        if len(self.helper.websocket_helper.clients) > 0:
-            self.helper.websocket_helper.broadcast_user(
+        if len(WebSocketManager().clients) > 0:
+            WebSocketManager().broadcast_user(
                 exec_user["user_id"], "support_status_update", results
             )
 
@@ -511,6 +542,10 @@ class Controller:
             server_host=monitoring_host,
             server_type=monitoring_type,
         )
+        self.management.set_backup_config(
+            new_server_id,
+            backup_path,
+        )
         if data["create_type"] == "minecraft_java":
             if root_create_data["create_type"] == "download_jar":
                 # modded update urls from server jars will only update the installer
@@ -616,6 +651,66 @@ class Controller:
             return False
         return True
 
+    def restore_java_zip_server(
+        self,
+        server_name: str,
+        zip_path: str,
+        server_jar: str,
+        min_mem: int,
+        max_mem: int,
+        port: int,
+        user_id: int,
+    ):
+        server_id = Helpers.create_uuid()
+        new_server_dir = os.path.join(self.helper.servers_dir, server_id)
+        backup_path = os.path.join(self.helper.backup_path, server_id)
+        if Helpers.is_os_windows():
+            new_server_dir = Helpers.wtol_path(new_server_dir)
+            backup_path = Helpers.wtol_path(backup_path)
+            new_server_dir.replace(" ", "^ ")
+            backup_path.replace(" ", "^ ")
+
+        temp_dir = Helpers.get_os_understandable_path(zip_path)
+        Helpers.ensure_dir_exists(new_server_dir)
+        Helpers.ensure_dir_exists(backup_path)
+
+        full_jar_path = os.path.join(new_server_dir, server_jar)
+
+        if Helpers.is_os_windows():
+            server_command = (
+                f"java -Xms{Helpers.float_to_string(min_mem)}M "
+                f"-Xmx{Helpers.float_to_string(max_mem)}M "
+                f'-jar "{full_jar_path}" nogui'
+            )
+        else:
+            server_command = (
+                f"java -Xms{Helpers.float_to_string(min_mem)}M "
+                f"-Xmx{Helpers.float_to_string(max_mem)}M "
+                f"-jar {full_jar_path} nogui"
+            )
+        logger.debug("command: " + server_command)
+        server_log_file = "./logs/latest.log"
+        server_stop = "stop"
+
+        new_id = self.register_server(
+            server_name,
+            server_id,
+            new_server_dir,
+            backup_path,
+            server_command,
+            server_jar,
+            server_log_file,
+            server_stop,
+            port,
+            user_id,
+            server_type="minecraft-java",
+        )
+        ServersController.set_import(new_id)
+        self.import_helper.import_java_zip_server(
+            temp_dir, new_server_dir, port, new_id
+        )
+        return new_id
+
     # **********************************************************************************
     #                                   BEDROCK IMPORTS
     # **********************************************************************************
@@ -713,7 +808,7 @@ class Controller:
         self.import_helper.download_bedrock_server(new_server_dir, new_id)
         return new_id
 
-    def import_bedrock_zip_server(
+    def restore_bedrock_zip_server(
         self,
         server_name: str,
         zip_path: str,
@@ -860,6 +955,7 @@ class Controller:
 
                 srv_obj = server["server_obj"]
                 srv_obj.server_scheduler.shutdown()
+                srv_obj.dir_scheduler.shutdown()
                 running = srv_obj.check_running()
 
                 if running:
@@ -933,7 +1029,7 @@ class Controller:
     def t_update_master_server_dir(self, new_server_path, user_id):
         new_server_path = self.helper.wtol_path(new_server_path)
         new_server_path = os.path.join(new_server_path, "servers")
-        self.helper.websocket_helper.broadcast_page(
+        WebSocketManager().broadcast_page(
             "/panel/panel_config", "move_status", "Checking dir"
         )
         current_master = self.helper.wtol_path(
@@ -943,7 +1039,7 @@ class Controller:
             logger.info(
                 "Admin tried to change server dir to current server dir. Canceling..."
             )
-            self.helper.websocket_helper.broadcast_page(
+            WebSocketManager().broadcast_page(
                 "/panel/panel_config",
                 "move_status",
                 "done",
@@ -954,18 +1050,18 @@ class Controller:
                 "Admin tried to change server dir to be inside a sub directory of the"
                 " current server dir. This will result in a copy loop."
             )
-            self.helper.websocket_helper.broadcast_page(
+            WebSocketManager().broadcast_page(
                 "/panel/panel_config",
                 "move_status",
                 "done",
             )
             return
 
-        self.helper.websocket_helper.broadcast_page(
+        WebSocketManager().broadcast_page(
             "/panel/panel_config", "move_status", "Checking permissions"
         )
         if not self.helper.ensure_dir_exists(new_server_path):
-            self.helper.websocket_helper.broadcast_user(
+            WebSocketManager().broadcast_user(
                 user_id,
                 "send_start_error",
                 {
@@ -989,7 +1085,7 @@ class Controller:
                 new_server_path, server.get("server_uuid")
             )
             if os.path.isdir(server_path):
-                self.helper.websocket_helper.broadcast_page(
+                WebSocketManager().broadcast_page(
                     "/panel/panel_config",
                     "move_status",
                     f"Moving {server.get('server_name')}",
@@ -1030,7 +1126,7 @@ class Controller:
                 self.servers.update_unloaded_server(server_obj)
         self.servers.init_all_servers()
         self.helper.dir_migration = False
-        self.helper.websocket_helper.broadcast_page(
+        WebSocketManager().broadcast_page(
             "/panel/panel_config",
             "move_status",
             "done",

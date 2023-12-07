@@ -2,7 +2,7 @@ import logging
 import re
 import typing as t
 import orjson
-import bleach
+import nh3
 import tornado.web
 
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
@@ -11,9 +11,10 @@ from app.classes.shared.helpers import Helpers
 from app.classes.shared.file_helpers import FileHelpers
 from app.classes.shared.main_controller import Controller
 from app.classes.shared.translation import Translation
-from app.classes.models.management import DatabaseShortcuts
+from app.classes.shared.main_models import DatabaseShortcuts
 
 logger = logging.getLogger(__name__)
+auth_log = logging.getLogger("auth")
 
 bearer_pattern = re.compile(r"^Bearer ", flags=re.IGNORECASE)
 
@@ -101,7 +102,7 @@ class BaseHandler(tornado.web.RequestHandler):
         if type(text) in self.nobleach:
             logger.debug("Auto-bleaching - bypass type")
             return text
-        return bleach.clean(text)
+        return nh3.clean(text)
 
     def get_argument(
         self,
@@ -231,9 +232,16 @@ class BaseHandler(tornado.web.RequestHandler):
                     user,
                 )
             logging.debug("Auth unsuccessful")
+            auth_log.error(
+                f"Authentication attempted from {self.get_remote_ip()}. Invalid token"
+            )
             self.access_denied(None, "the user provided an invalid token")
             return None
         except Exception as auth_exception:
+            auth_log.error(
+                f"Authentication attempted from {self.get_remote_ip()}."
+                f" Error: {auth_exception}"
+            )
             logger.debug(
                 "An error occured while authenticating an API user:",
                 exc_info=auth_exception,

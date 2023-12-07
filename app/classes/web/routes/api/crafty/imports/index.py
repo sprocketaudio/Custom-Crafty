@@ -7,6 +7,7 @@ from jsonschema.exceptions import ValidationError
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.shared.helpers import Helpers
 from app.classes.web.base_api_handler import BaseApiHandler
+from app.classes.web.websocket_handler import WebSocketManager
 
 logger = logging.getLogger(__name__)
 files_get_schema = {
@@ -64,14 +65,16 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
             # JSON we need to remove this and just send
             # the path.
             if data["upload"]:
-                folder = os.path.join(self.controller.project_root, "imports", folder)
+                folder = os.path.join(
+                    self.controller.project_root, "import", "upload", folder
+                )
             if Helpers.check_file_exists(folder):
                 folder = self.file_helper.unzip_server(folder, user_id)
                 root_path = True
             else:
                 if user_id:
                     user_lang = self.controller.users.get_user_lang_by_id(user_id)
-                    self.helper.websocket_helper.broadcast_user(
+                    WebSocketManager().broadcast_user(
                         user_id,
                         "send_start_error",
                         {
@@ -83,7 +86,7 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
         else:
             if not self.helper.check_path_exists(folder) and user_id:
                 user_lang = self.controller.users.get_user_lang_by_id(user_id)
-                self.helper.websocket_helper.broadcast_user(
+                WebSocketManager().broadcast_user(
                     user_id,
                     "send_start_error",
                     {

@@ -7,7 +7,8 @@ import json
 import logging
 import threading
 import urllib.parse
-import bleach
+from zoneinfo import ZoneInfoNotFoundError
+import nh3
 import requests
 import tornado.web
 import tornado.escape
@@ -15,7 +16,6 @@ from tornado import iostream
 
 # TZLocal is set as a hidden import on win pipeline
 from tzlocal import get_localzone
-from tzlocal.utils import ZoneInfoNotFoundError
 
 from app.classes.models.servers import Servers
 from app.classes.models.server_permissions import EnumPermissionsServer
@@ -25,6 +25,7 @@ from app.classes.controllers.roles_controller import RolesController
 from app.classes.shared.helpers import Helpers
 from app.classes.shared.main_models import DatabaseShortcuts
 from app.classes.web.base_handler import BaseHandler
+from app.classes.web.webhooks.webhook_factory import WebhookFactory
 
 logger = logging.getLogger(__name__)
 
@@ -67,9 +68,7 @@ class PanelHandler(BaseHandler):
         ) in self.controller.crafty_perms.list_defined_crafty_permissions():
             argument = int(
                 float(
-                    bleach.clean(
-                        self.get_argument(f"permission_{permission.name}", "0")
-                    )
+                    nh3.clean(self.get_argument(f"permission_{permission.name}", "0"))
                 )
             )
             if argument:
@@ -78,9 +77,7 @@ class PanelHandler(BaseHandler):
                 )
 
             q_argument = int(
-                float(
-                    bleach.clean(self.get_argument(f"quantity_{permission.name}", "0"))
-                )
+                float(nh3.clean(self.get_argument(f"quantity_{permission.name}", "0")))
             )
             if q_argument:
                 server_quantity[permission.name] = q_argument
@@ -213,6 +210,8 @@ class PanelHandler(BaseHandler):
         error = self.get_argument("error", "WTF Error!")
 
         template = "panel/denied.html"
+        if self.helper.crafty_starting:
+            page = "loading"
 
         now = time.time()
         formatted_time = str(
@@ -246,9 +245,13 @@ class PanelHandler(BaseHandler):
             for r in exec_user["roles"]:
                 role = self.controller.roles.get_role(r)
                 exec_user_role.add(role["role_name"])
-            defined_servers = self.controller.servers.get_authorized_servers(
-                exec_user["user_id"]
-            )
+            # get_auth_servers will throw an exception if run while Crafty is starting
+            if not self.helper.crafty_starting:
+                defined_servers = self.controller.servers.get_authorized_servers(
+                    exec_user["user_id"]
+                )
+            else:
+                defined_servers = []
 
         user_order = self.controller.users.get_user_by_id(exec_user["user_id"])
         user_order = user_order["server_order"].split(",")
@@ -348,7 +351,9 @@ class PanelHandler(BaseHandler):
             ) as credits_default_local:
                 try:
                     remote = requests.get(
-                        "https://craftycontrol.com/credits-v2", allow_redirects=True
+                        "https://craftycontrol.com/credits-v2",
+                        allow_redirects=True,
+                        timeout=10,
                     )
                     credits_dict: dict = remote.json()
                     if not credits_dict["staff"]:
@@ -479,9 +484,15 @@ class PanelHandler(BaseHandler):
             template = "panel/dashboard.html"
 
         elif page == "server_detail":
-            subpage = bleach.clean(self.get_argument("subpage", ""))
+            subpage = nh3.clean(self.get_argument("subpage", ""))
 
             server_id = self.check_server_id()
+            # load page the user was on last
+            server_subpage = self.controller.servers.server_subpage.get(server_id, "")
+            if subpage == "" and server_subpage != "":
+                subpage = self.controller.servers.server_subpage.get(server_id, "")
+            else:
+                self.controller.servers.server_subpage[server_id] = subpage
             if server_id is None:
                 return
             if not self.failed_server:
@@ -747,8 +758,24 @@ class PanelHandler(BaseHandler):
                         0, page_data["options"].pop(page_data["options"].index(days))
                     )
                 page_data["history_stats"] = self.controller.servers.get_history_stats(
-                    server_id, days
+                    server_id, hours=(days * 24)
                 )
+            if subpage == "webhooks":
+                if (
+                    not page_data["permissions"]["Config"]
+                    in page_data["user_permissions"]
+                ):
+                    if not superuser:
+                        self.redirect(
+                            "/panel/error?error=Unauthorized access to Webhooks Config"
+                        )
+                        return
+                page_data[
+                    "webhooks"
+                ] = self.controller.management.get_webhooks_by_server(
+                    server_id, model=True
+                )
+                page_data["triggers"] = WebhookFactory.get_monitored_events()
 
             def get_banned_players_html():
                 banned_players = self.controller.servers.get_banned_players(server_id)
@@ -1015,6 +1042,110 @@ class PanelHandler(BaseHandler):
                             page_data["languages"].append(file.split(".")[0])
 
             template = "panel/panel_edit_user.html"
+
+        elif page == "add_webhook":
+            server_id = self.get_argument("id", None)
+            if server_id is None:
+                return self.redirect("/panel/error?error=Invalid Server ID")
+            server_obj = self.controller.servers.get_server_instance_by_id(server_id)
+            page_data["backup_failed"] = server_obj.last_backup_status()
+            server_obj = None
+            page_data["active_link"] = "webhooks"
+            page_data["server_data"] = self.controller.servers.get_server_data_by_id(
+                server_id
+            )
+            page_data[
+                "user_permissions"
+            ] = self.controller.server_perms.get_user_id_permissions_list(
+                exec_user["user_id"], server_id
+            )
+            page_data["permissions"] = {
+                "Commands": EnumPermissionsServer.COMMANDS,
+                "Terminal": EnumPermissionsServer.TERMINAL,
+                "Logs": EnumPermissionsServer.LOGS,
+                "Schedule": EnumPermissionsServer.SCHEDULE,
+                "Backup": EnumPermissionsServer.BACKUP,
+                "Files": EnumPermissionsServer.FILES,
+                "Config": EnumPermissionsServer.CONFIG,
+                "Players": EnumPermissionsServer.PLAYERS,
+            }
+            page_data["server_stats"] = self.controller.servers.get_server_stats_by_id(
+                server_id
+            )
+            page_data["server_stats"][
+                "server_type"
+            ] = self.controller.servers.get_server_type_by_id(server_id)
+            page_data["new_webhook"] = True
+            page_data["webhook"] = {}
+            page_data["webhook"]["webhook_type"] = "Custom"
+            page_data["webhook"]["name"] = ""
+            page_data["webhook"]["url"] = ""
+            page_data["webhook"]["bot_name"] = "Crafty Controller"
+            page_data["webhook"]["trigger"] = []
+            page_data["webhook"]["body"] = ""
+            page_data["webhook"]["color"] = "#005cd1"
+            page_data["webhook"]["enabled"] = True
+
+            page_data["providers"] = WebhookFactory.get_supported_providers()
+            page_data["triggers"] = WebhookFactory.get_monitored_events()
+
+            if not EnumPermissionsServer.CONFIG in page_data["user_permissions"]:
+                if not superuser:
+                    self.redirect("/panel/error?error=Unauthorized access To Webhooks")
+                    return
+
+            template = "panel/server_webhook_edit.html"
+
+        elif page == "webhook_edit":
+            server_id = self.get_argument("id", None)
+            webhook_id = self.get_argument("webhook_id", None)
+            if server_id is None:
+                return self.redirect("/panel/error?error=Invalid Server ID")
+            server_obj = self.controller.servers.get_server_instance_by_id(server_id)
+            page_data["backup_failed"] = server_obj.last_backup_status()
+            server_obj = None
+            page_data["active_link"] = "webhooks"
+            page_data["server_data"] = self.controller.servers.get_server_data_by_id(
+                server_id
+            )
+            page_data[
+                "user_permissions"
+            ] = self.controller.server_perms.get_user_id_permissions_list(
+                exec_user["user_id"], server_id
+            )
+            page_data["permissions"] = {
+                "Commands": EnumPermissionsServer.COMMANDS,
+                "Terminal": EnumPermissionsServer.TERMINAL,
+                "Logs": EnumPermissionsServer.LOGS,
+                "Schedule": EnumPermissionsServer.SCHEDULE,
+                "Backup": EnumPermissionsServer.BACKUP,
+                "Files": EnumPermissionsServer.FILES,
+                "Config": EnumPermissionsServer.CONFIG,
+                "Players": EnumPermissionsServer.PLAYERS,
+            }
+            page_data["server_stats"] = self.controller.servers.get_server_stats_by_id(
+                server_id
+            )
+            page_data["server_stats"][
+                "server_type"
+            ] = self.controller.servers.get_server_type_by_id(server_id)
+            page_data["new_webhook"] = False
+            page_data["webhook"] = self.controller.management.get_webhook_by_id(
+                webhook_id
+            )
+            page_data["webhook"]["trigger"] = str(
+                page_data["webhook"]["trigger"]
+            ).split(",")
+
+            page_data["providers"] = WebhookFactory.get_supported_providers()
+            page_data["triggers"] = WebhookFactory.get_monitored_events()
+
+            if not EnumPermissionsServer.CONFIG in page_data["user_permissions"]:
+                if not superuser:
+                    self.redirect("/panel/error?error=Unauthorized access To Webhooks")
+                    return
+
+            template = "panel/server_webhook_edit.html"
 
         elif page == "add_schedule":
             server_id = self.get_argument("id", None)
@@ -1284,7 +1415,7 @@ class PanelHandler(BaseHandler):
             template = "panel/panel_edit_user_apikeys.html"
 
         elif page == "remove_user":
-            user_id = bleach.clean(self.get_argument("id", None))
+            user_id = nh3.clean(self.get_argument("id", None))
 
             if (
                 not superuser
@@ -1490,7 +1621,8 @@ class PanelHandler(BaseHandler):
             logs_thread.start()
             self.redirect("/panel/dashboard")
             return
-
+        if self.helper.crafty_starting:
+            template = "panel/loading.html"
         self.render(
             template,
             data=page_data,

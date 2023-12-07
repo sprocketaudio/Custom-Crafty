@@ -5,7 +5,7 @@
 {% block content %}
 
 <div class="content-wrapper">
-  <ul class="nav nav-tabs col-md-12 tab-simple-styled " role="tablist">
+  <ul class="nav nav-pills tab-simple-styled">
     <li class="nav-item term-nav-item">
       <a class="nav-link active" href="/server/step1" role="tab" aria-selected="false">
         <i class="fas fa-file-signature"></i>Minecraft-Java</a>
@@ -846,8 +846,9 @@
         message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
         closeButton: false
       });
-      console.log("CALLING DIR")
-      getDirView();
+      setTimeout(function(){
+        getDirView();
+      }, 2000);
     } else {
       bootbox.alert("You must input a path before selecting this button");
     }
@@ -863,8 +864,9 @@
       message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
       closeButton: false
     });
-    console.log("CALLING DIR")
-    getDirView();
+    setTimeout(function(){
+        getDirView();
+      }, 2000);
   });
   var upload = false;
   var file;
@@ -1180,7 +1182,7 @@
   async function refreshCache() {
     document.getElementById("refresh-cache").classList.add("fa-spin")
     let token = getCookie("_xsrf")
-    let res = await fetch(`/api/v2/crafty/exeCache`, {
+    let res = await fetch(`/api/v2/crafty/JarCache`, {
       method: 'GET',
       headers: {
         'X-XSRFToken': token

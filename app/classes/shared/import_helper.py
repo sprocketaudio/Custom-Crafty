@@ -9,8 +9,10 @@ from app.classes.controllers.server_perms_controller import PermissionsServers
 from app.classes.controllers.servers_controller import ServersController
 from app.classes.shared.helpers import Helpers
 from app.classes.shared.file_helpers import FileHelpers
+from app.classes.shared.websocket_manager import WebSocketManager
 from app.classes.steamcmd.serverapps import SteamApps
 from app.classes.steamcmd.steamcmd import SteamCMD
+
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +70,7 @@ class ImportHelpers:
         ServersController.finish_import(new_id)
         server_users = PermissionsServers.get_server_user_list(new_id)
         for user in server_users:
-            self.helper.websocket_helper.broadcast_user(user, "send_start_reload", {})
+            WebSocketManager().broadcast_user(user, "send_start_reload", {})
 
     def import_java_zip_server(self, temp_dir, new_server_dir, port, new_id):
         import_thread = threading.Thread(
@@ -112,7 +114,7 @@ class ImportHelpers:
         server_users = PermissionsServers.get_server_user_list(new_id)
         ServersController.finish_import(new_id)
         for user in server_users:
-            self.helper.websocket_helper.broadcast_user(user, "send_start_reload", {})
+            WebSocketManager().broadcast_user(user, "send_start_reload", {})
         # deletes temp dir
         FileHelpers.del_dirs(temp_dir)
 
@@ -166,7 +168,7 @@ class ImportHelpers:
         ServersController.finish_import(new_id)
         server_users = PermissionsServers.get_server_user_list(new_id)
         for user in server_users:
-            self.helper.websocket_helper.broadcast_user(user, "send_start_reload", {})
+            WebSocketManager().broadcast_user(user, "send_start_reload", {})
 
     def import_bedrock_zip_server(
         self, temp_dir, new_server_dir, full_jar_path, port, new_id
@@ -213,7 +215,7 @@ class ImportHelpers:
         ServersController.finish_import(new_id)
         server_users = PermissionsServers.get_server_user_list(new_id)
         for user in server_users:
-            self.helper.websocket_helper.broadcast_user(user, "send_start_reload", {})
+            WebSocketManager().broadcast_user(user, "send_start_reload", {})
         if os.name != "nt":
             if Helpers.check_file_exists(full_jar_path):
                 os.chmod(full_jar_path, 0o2760)
@@ -285,4 +287,4 @@ class ImportHelpers:
         ServersController.finish_import(new_id)
         server_users = PermissionsServers.get_server_user_list(new_id)
         for user in server_users:
-            self.helper.websocket_helper.broadcast_user(user, "send_start_reload", {})
+            WebSocketManager().broadcast_user(user, "send_start_reload", {})

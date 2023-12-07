@@ -170,7 +170,7 @@
 {% block js %}
 <script>
   function replacer(key, value) {
-    if (key == "disabled_language_files") {
+    if (key == "disabled_language_files" || key == "monitored_mounts") {
       if (value == 0) {
         return []
       } else {
@@ -336,6 +336,6 @@
     });
   })
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.10/js/bootstrap-select.min.js">
+<script src="../../static/assets/vendors/js/bootstrap-select.min.js">
 </script>
 {% end %}
