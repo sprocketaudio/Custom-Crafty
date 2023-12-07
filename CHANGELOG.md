@@ -1,11 +1,13 @@
 # Changelog
 ## --- [4.2.2] - 2023/TBD
 ### New features
-TBD
+- Loading Screen for Crafty during startup ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/668))
 ### Refactor
 - Remove deprecated API V1 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/670))
+- Tidy up main.py to be  more comprehensive ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/668))
 ### Bug fixes
 - Remove webhook `custom` option from webook provider list as it's not currently an option ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/664))
+- Bump cryptography for CVE-2023-49083 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/680))
 ### Tweaks
 - Homogenize Panel logos/branding ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/666))
 - Retain previous tab when revisiting server details page (#272)([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/667))
@@ -15,7 +17,7 @@ TBD
 - Fix Unban button failing to pardon users ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/671))
 - Fix stack in API error handling ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/674))
 ### Lang
-TBD
+- pl_PL Minor fixes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/675))
 <br><br>
 
 ## --- [4.2.1] - 2023/11/01
