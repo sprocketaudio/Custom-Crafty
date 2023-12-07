@@ -12,6 +12,7 @@
 - Fix bug where no file error on import root dir ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/677))
 - Fix Unban button failing to pardon users ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/671))
 - Fix stack in API error handling ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/674))
+- Fix bug where you cannot select "do not monitor mounts" from `config.json` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/678))
 ### Tweaks
 - Homogenize Panel logos/branding ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/666))
 - Retain previous tab when revisiting server details page (#272)([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/667))
