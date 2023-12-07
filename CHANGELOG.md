@@ -9,14 +9,15 @@
 - Remove webhook `custom` option from webook provider list as it's not currently an option ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/664))
 - Bump cryptography for CVE-2023-49083 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/680))
 - Fix bug where su cannot edit general user password ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/676))
+- Fix bug where no file error on import root dir ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/677))
+- Fix Unban button failing to pardon users ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/671))
+- Fix stack in API error handling ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/674))
 ### Tweaks
 - Homogenize Panel logos/branding ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/666))
 - Retain previous tab when revisiting server details page (#272)([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/667))
 - Add server name tag in panel header (#272)([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/667))
 - Setup logging for panel authentication attempts ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/669))
 - Update minimum password length from 6 to 8, and unrestrict maximum password length ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/669))
-- Fix Unban button failing to pardon users ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/671))
-- Fix stack in API error handling ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/674))
 ### Lang
 - pl_PL Minor fixes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/675))
 <br><br>
