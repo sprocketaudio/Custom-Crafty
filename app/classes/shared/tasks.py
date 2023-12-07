@@ -95,7 +95,7 @@ class TasksManager:
     def command_watcher(self):
         while True:
             # select any commands waiting to be processed
-            command_log.info(
+            command_log.debug(
                 "Queue currently has "
                 f"{self.controller.management.command_queue.qsize()} queued commands."
             )
