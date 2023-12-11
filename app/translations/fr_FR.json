@@ -111,6 +111,7 @@
         "starting": "Démarrage retardé",
         "status": "Statut",
         "stop": "Arrêter",
+        "storage": "Stockage",
         "version": "Version",
         "welcome": "Bienvenue sur Crafty Controller"
     },
@@ -590,6 +591,15 @@
         "navigation": "Navigation",
         "newServer": "Créer un Nouveau Serveur",
         "servers": "Serveurs"
+    },
+    "startup": {
+        "almost": "Finalisation. Patienter ...",
+        "internals": "Configuration et Démarrage des composants internes de Crafty",
+        "internet": "Vérification de la connexion à Internet",
+        "server": "Initialisation ",
+        "serverInit": "Initialisation des Serveurs",
+        "starting": "Crafty Démarre ...",
+        "tasks": "Démarrage du planificateur de tâches"
     },
     "userConfig": {
         "apiKey": "Clés API",

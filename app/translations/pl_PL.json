@@ -111,6 +111,7 @@
         "starting": "Opóźniony-Start",
         "status": "Status",
         "stop": "Zatrzymaj",
+        "storage": "Przestrzeń dyskowa",
         "version": "Wersja",
         "welcome": "Witamy w Crafty Controller"
     },
@@ -589,6 +590,15 @@
         "navigation": "Nawigacja",
         "newServer": "Stwórz nowy serwer",
         "servers": "Serwery"
+    },
+    "startup": {
+        "almost": "Prawie gotowe! Jeszcze tylko chwilka...",
+        "internals": "Konfigurowanie i włączanie backendu...",
+        "internet": "Sprawdzam połączenie z internetem",
+        "server": "Włączanie ",
+        "serverInit": "Ładuje serwery...",
+        "starting": "Włączam Craftiego...",
+        "tasks": "Włączanie harmonogramu..."
     },
     "userConfig": {
         "apiKey": "Klucze API",

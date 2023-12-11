@@ -111,6 +111,7 @@
         "starting": "延迟启动",
         "status": "状态",
         "stop": "停止",
+        "storage": "存储",
         "version": "版本",
         "welcome": "欢迎来到 Crafty Controller"
     },
@@ -590,6 +591,15 @@
         "navigation": "导航栏",
         "newServer": "创建新服务器",
         "servers": "服务器"
+    },
+    "startup": {
+        "almost": "即将完成。请稍候……",
+        "internals": "正在配置并启动 Crafty 的内部组件",
+        "internet": "正在检查网络连接",
+        "server": "正在初始化 ",
+        "serverInit": "正在初始化服务器",
+        "starting": "Crafty 正在启动……",
+        "tasks": "正在启动任务计划器"
     },
     "userConfig": {
         "apiKey": "API 密钥",

@@ -112,6 +112,7 @@
         "starting": "Aizkavēts-Starts",
         "status": "Statuss",
         "stop": "Apturēt",
+        "storage": "Glabātuve",
         "version": "Versija",
         "welcome": "Esiet sveicināts Crafty Controller"
     },
@@ -591,6 +592,15 @@
         "navigation": "Navigācija",
         "newServer": "Izveidot Jaunu Serveri",
         "servers": "Serveri"
+    },
+    "startup": {
+        "almost": "Pabeidz. Vēl tik nedaudz...",
+        "internals": "Konfigurē un Startē Crafty iekšējās komponenetes",
+        "internet": "Pārbauda interneta savienojumu",
+        "server": "Inicializē ",
+        "serverInit": "Inicializē Serverus",
+        "starting": "Crafty Startējas...",
+        "tasks": "Sāknē Notikumu Plānotāju"
     },
     "userConfig": {
         "apiKey": "API Atslēgas",

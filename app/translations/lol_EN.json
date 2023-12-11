@@ -111,6 +111,7 @@
         "starting": "I WAITZ B4 I START",
         "status": "STATUZ",
         "stop": "STAHP PLZ",
+        "storage": "STASH BOX",
         "version": "VERZHUN",
         "welcome": "WELCOM 2 CWAFTY CONTROLLR"
     },
@@ -590,6 +591,15 @@
         "navigation": "NAVIGASHUN",
         "newServer": "CONSTWUCT A SERVR",
         "servers": "SERVRS"
+    },
+    "startup": {
+        "almost": "ALMOST DUN. HOLD ON TO YER WHISKERS...",
+        "internals": "SETTIN' UP AN' STARTIN' CWAFTY'S INSIDE BITZ",
+        "internet": "LOOKIN' FOR OUTER SPACE TALKY",
+        "server": "WAKIN' UPZ ",
+        "serverInit": "MAKIN' SERVERZ READY",
+        "starting": "CWAFTY WAKING UP...",
+        "tasks": "STARTIN' TASK SCHEDULERZ"
     },
     "userConfig": {
         "apiKey": "API KEYS",
