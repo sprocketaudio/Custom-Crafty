@@ -592,13 +592,13 @@
         "servers": "Servers"
     },
     "startup": {
-        "starting": "Crafty Is Starting...",
-        "serverInit": "Initializing Servers",
-        "server": "Initializing ",
+        "almost": "Finishing up. Hang on tight...",
+        "internals": "Configuring and starting Crafty's internal components",
         "internet": "Checking for internet connection",
-        "tasks": "Starting Tasks Scheduler",
-        "internals": "Configuring and starting Crafty's internal componenets",
-        "almost": "Finishing up. Hang on tight..."
+        "server": "Initializing ",
+        "serverInit": "Initializing Servers",
+        "starting": "Crafty Is Starting...",
+        "tasks": "Starting Tasks Scheduler"
     },
     "userConfig": {
         "apiKey": "API Keys",
