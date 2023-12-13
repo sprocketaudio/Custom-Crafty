@@ -23,6 +23,7 @@ from app.classes.web.tornado_handler import Webserver
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger("apscheduler")
+command_log = logging.getLogger("cmd_queue")
 scheduler_intervals = {
     "seconds",
     "minutes",
@@ -94,7 +95,15 @@ class TasksManager:
     def command_watcher(self):
         while True:
             # select any commands waiting to be processed
+            command_log.debug(
+                "Queue currently has "
+                f"{self.controller.management.command_queue.qsize()} queued commands."
+            )
             if not self.controller.management.command_queue.empty():
+                command_log.info(
+                    "Current queued commands: "
+                    f"{list(self.controller.management.command_queue.queue)}"
+                )
                 cmd = self.controller.management.command_queue.get()
                 try:
                     svr = self.controller.servers.get_server_instance_by_id(

@@ -111,6 +111,7 @@
         "starting": "Vertraagde start",
         "status": "Toestand",
         "stop": "Stoppen",
+        "storage": "Opslagruimte",
         "version": "Versie",
         "welcome": "Welkom bij Crafty Controller "
     },
@@ -590,6 +591,15 @@
         "navigation": "Navigatie",
         "newServer": "Nieuwe server maken",
         "servers": "Servers"
+    },
+    "startup": {
+        "almost": "De laatste hand leggen. Houd je vast...",
+        "internals": "Crafty's interne componenten configureren en starten",
+        "internet": "Controleren op internetverbinding",
+        "server": "Initialiseren ",
+        "serverInit": "Servers initialiseren",
+        "starting": "Crafty wordt gestart...",
+        "tasks": "Start takenplanner"
     },
     "userConfig": {
         "apiKey": "API Sleutels",
