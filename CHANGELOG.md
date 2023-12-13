@@ -23,6 +23,7 @@
 - Setup logging for panel authentication attempts ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/669))
 - Update minimum password length from 6 to 8, and unrestrict maximum password length ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/669))
 - Give better feedback when backup delete fails ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/681))
+- Add user queue debug logging ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/683))
 ### Lang
 - pl_PL Minor fixes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/675))
 <br><br>

@@ -13,6 +13,9 @@
     },
     "auth": {
       "format": "%(asctime)s - [AUTH] - %(levelname)s - %(message)s"
+    },
+    "cmd_queue": {
+      "format": "%(asctime)s - [CMD_QUEUE] - %(levelname)s - %(message)s"
     }
   },
   "handlers": {
@@ -59,6 +62,14 @@
       "maxBytes": 10485760,
       "backupCount": 20,
       "encoding": "utf8"
+    },
+    "cmd_queue_file_handler": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "formatter": "auth",
+      "filename": "logs/cmd_queue.log",
+      "maxBytes": 10485760,
+      "backupCount": 20,
+      "encoding": "utf8"
     }
   },
   "loggers": {
@@ -88,6 +99,13 @@
       "level": "INFO",
       "handlers": [
         "auth_file_handler"
+      ],
+      "propagate": false
+    },
+    "cmd_queue": {
+      "level": "INFO",
+      "handlers": [
+        "cmd_queue_file_handler"
       ],
       "propagate": false
     }
