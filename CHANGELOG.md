@@ -25,6 +25,9 @@
 - Give better feedback when backup delete fails ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/681))
 - Add user queue debug logging ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/683))
 ### Lang
+- Update `de_DE, en_EN, fr_FR, lol_EN, lv_LV, nl_BE, pl_PL, zh_CN` translations for `4.2.2` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/684))
+- Mark `es_ES` as incomplete ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/684))
+- Mark `he_IL` as active ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/684))
 - pl_PL Minor fixes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/675))
 <br><br>
 
