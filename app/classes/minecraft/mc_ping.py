@@ -12,6 +12,7 @@ from app.classes.minecraft.bedrock_ping import BedrockPing
 from app.classes.shared.console import Console
 
 logger = logging.getLogger(__name__)
+MOTD_CODES = ["bold", "italic", "underlined", "strikethrough"]
 
 
 class Server:
@@ -37,28 +38,24 @@ class Server:
                 if "text" in description.keys():
                     lines.append(description["text"])
                 if "extra" in description.keys():
-                    for e in description["extra"]:
-                        if not isinstance(e, dict):
-                            lines.append(e)
-                            continue
-                        # Conversion format code needed only for Java Version
-                        lines.append(get_code_format("reset"))
-                        if "bold" in e.keys():
-                            lines.append(get_code_format("bold"))
-                        if "italic" in e.keys():
-                            lines.append(get_code_format("italic"))
-                        if "underlined" in e.keys():
-                            lines.append(get_code_format("underlined"))
-                        if "strikethrough" in e.keys():
-                            lines.append(get_code_format("strikethrough"))
-                        if "color" in e.keys():
-                            lines.append(get_code_format(e["color"]))
-                        # Then append the text
-                        if "text" in e.keys():
-                            if e["text"] == "\n":
-                                lines.append("§§")
-                            else:
-                                lines.append(e["text"])
+                    if isinstance(description["extra"], list):
+                        for e in description["extra"]:
+                            if not isinstance(e, dict):
+                                lines.append(e)
+                                continue
+                            # Conversion format code needed only for Java Version
+                            lines.append(get_code_format("reset"))
+                            for item in MOTD_CODES:
+                                if e.get(item, False):
+                                    lines.append(get_code_format(item))
+                            if "color" in e.keys():
+                                lines.append(get_code_format(e["color"]))
+                            # Then append the text
+                            if "text" in e.keys():
+                                if e["text"] == "\n":
+                                    lines.append("§§")
+                                else:
+                                    lines.append(e["text"])
 
                 total_text = " ".join(lines)
                 self.description = total_text
