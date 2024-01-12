@@ -538,7 +538,7 @@ class Controller:
                 # modded update urls from server jars will only update the installer
                 if create_data["category"] != "modded":
                     server_obj = self.servers.get_server_obj(new_server_id)
-                    if create_data["type"] not in ServerJars.get_mineacademy_jars():
+                    if create_data["type"] not in ServerJars.get_paper_jars():
                         url = (
                             "https://serverjars.com/api/fetchJar/"
                             f"{create_data['category']}"

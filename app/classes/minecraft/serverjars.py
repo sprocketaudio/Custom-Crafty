@@ -11,18 +11,18 @@ from app.classes.models.server_permissions import PermissionsServers
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
-MINEACADEMYJARS = ["paper", "folia"]
+PAPERJARS = ["paper", "folia"]
 
 
 class ServerJars:
     def __init__(self, helper):
         self.helper = helper
         self.base_url = "https://serverjars.com"
-        self.academy = "https://mineacademy.org"
+        self.paper_base = "https://api.papermc.io"
 
     @staticmethod
-    def get_mineacademy_jars():
-        return MINEACADEMYJARS
+    def get_paper_jars():
+        return PAPERJARS
 
     def _get_api_result(self, call_url: str):
         full_url = f"{self.base_url}{call_url}"
@@ -47,7 +47,7 @@ class ServerJars:
     def get_paper_versions(self, project):
         try:
             response = requests.get(
-                f"https://api.papermc.io/v2/projects/{project}/", timeout=2
+                f"{self.paper_base}/v2/projects/{project}/", timeout=2
             )
             response.raise_for_status()
             api_data = json.loads(response.content)
@@ -60,6 +60,23 @@ class ServerJars:
         versions = api_data.get("versions", [])
         versions.reverse()
         return versions
+
+    def get_paper_build(self, project, version):
+        try:
+            response = requests.get(
+                f"{self.paper_base}/v2/projects/{project}/versions/{version}/builds/",
+                timeout=2,
+            )
+            response.raise_for_status()
+            api_data = json.loads(response.content)
+        except Exception as e:
+            logger.error(
+                f"Unable to load https://api.papermc.io/v2/projects/{project}/"
+                f"api due to error: {e}"
+            )
+            return {}
+        build = api_data.get("builds", [])[-1]
+        return build
 
     def _read_cache(self):
         cache_file = self.helper.serverjar_cache
@@ -118,7 +135,7 @@ class ServerJars:
             for j in data["types"].get(s):
                 versions = self._get_jar_details(j, s)
                 data["types"][s].update({j: versions})
-        for item in MINEACADEMYJARS:
+        for item in PAPERJARS:
             data["types"]["servers"][item] = self.get_paper_versions(item)
         # save our cache
         try:
@@ -158,7 +175,7 @@ class ServerJars:
                 for j in data["types"].get(s):
                     versions = self._get_jar_details(j, s)
                     data["types"][s].update({j: versions})
-            for item in MINEACADEMYJARS:
+            for item in PAPERJARS:
                 data["types"]["servers"][item] = self.get_paper_versions()
             # save our cache
             try:
@@ -198,11 +215,16 @@ class ServerJars:
     def a_download_jar(self, jar, server, version, path, server_id):
         # delaying download for server register to finish
         time.sleep(3)
-        if server not in MINEACADEMYJARS:
+        if server not in PAPERJARS:
             fetch_url = f"{self.base_url}/api/fetchJar/{jar}/{server}/{version}"
         else:
+            build = self.get_paper_build(server, version).get("build", None)
+            if not build:
+                return
             fetch_url = (
-                f"https://mineacademy.org/api/{server}/{str(version).replace('.', '_')}"
+                f"{self.paper_base}/v2/projects"
+                f"/{server}/versions/{version}/builds/{build}/downloads/"
+                f"{server}-{version}-{build}.jar"
             )
         server_users = PermissionsServers.get_server_user_list(server_id)
 
