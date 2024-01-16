@@ -43,6 +43,7 @@ with redirect_stderr(NullWriter()):
     from psutil import NoSuchProcess
 
 logger = logging.getLogger(__name__)
+SUCCESSMSG = "SUCCESS! Forge install completed"
 
 
 def callback(called_func):
@@ -723,7 +724,7 @@ class ServerInstance:
                             f' -jar "{file_name}" nogui'
                         )
                         server_obj.execution_command = execution_command
-                        Console.debug("SUCCESS! Forge install completed")
+                        Console.debug(SUCCESSMSG)
 
                     elif version_major <= 1 and version_minor < 20:
                         # NEW VERSION >= 1.17 and <= 1.20
@@ -771,7 +772,7 @@ class ServerInstance:
                             f" {server_command[4]}"
                         )
                         server_obj.execution_command = execution_command
-                        Console.debug("SUCCESS! Forge install completed")
+                        Console.debug(SUCCESSMSG)
                     else:
                         # NEW VERSION >= 1.20
                         # (executable jar is back in server dir)
@@ -802,7 +803,7 @@ class ServerInstance:
                             f' -jar "{file_name}" nogui'
                         )
                         server_obj.execution_command = execution_command
-                        Console.debug("SUCCESS! Forge install completed")
+                        Console.debug(SUCCESSMSG)
                 except:
                     logger.debug("Could not find run file.")
                     # TODO Use regex to get version and rebuild simple execution
