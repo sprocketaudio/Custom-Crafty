@@ -190,12 +190,23 @@
                   </div>
                   <div class="form-group">
                     <div class="custom-control custom-switch">
+                      {% if data['server_stats']['server_id']['count_players'] %}
+                      <input type="checkbox" class="custom-control-input" id="count_players" name="count_players" checked="" value="1">
+                      <label class="custom-control-label" for="count_players">&nbsp;&nbsp;{{ translate('serverConfig', 'countPlayers', data['lang']) }}</label>
+                      {% else %}
+                      <input type="checkbox" class="custom-control-input" id="count_players" name="count_players" value="1">
+                      <label class="custom-control-label" for="count_players">&nbsp;&nbsp;{{ translate('serverConfig', 'countPlayers', data['lang']) }}</label>
+                      {% end %}
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="custom-control custom-switch">
                       {% if data['super_user'] %}
                       {% if data['server_stats']['server_id']['show_status'] %}
                       <input type="checkbox" class="custom-control-input" id="show_status" name="show_status" checked="" value="1">
                       <label class="custom-control-label" for="show_status">&nbsp;&nbsp;{{ translate('serverConfig', 'showStatus', data['lang']) }}</label>
                       {% else %}
-                      <input type="checkbox" class="custom-control-input" id="show_status" name="show_status" value="1">&nbsp;&nbsp;
+                      <input type="checkbox" class="custom-control-input" id="show_status" name="show_status" value="1">
                       <label class="custom-control-label" for="show_status">&nbsp;&nbsp;{{ translate('serverConfig', 'showStatus', data['lang']) }}</label>
                       {% end %}
                       {% end %}
@@ -559,6 +570,7 @@
       formDataObject.show_status = $("#show_status").prop('checked');
       formDataObject.crash_detection = $("#crash_detection").prop('checked');
       formDataObject.auto_start = $("#auto_start").prop('checked');
+      formDataObject.count_players = $("#count_players").prop('checked');
       console.log(formDataObject);
       // Format the plain form data as JSON
       let formDataJsonString = JSON.stringify(formDataObject, replacer);

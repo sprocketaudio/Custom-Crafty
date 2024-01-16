@@ -377,7 +377,8 @@
         "timeoutExplain2": "command before it forces the process down.",
         "update": "Update Executable",
         "yesDelete": "Yes, delete",
-        "yesDeleteFiles": "Yes, delete files"
+        "yesDeleteFiles": "Yes, delete files",
+        "countPlayers": "Include server in total player count"
     },
     "serverConfigHelp": {
         "desc": "Here is where you can change the configuration of your server",

@@ -315,7 +315,7 @@
                         <br />
                         <br />
                   </td>
-                  <span class="server-player-totals" id="server_players_{{server['server_data']['server_id']}}" data-players="{{ server['stats']['online']}}" data-max="{{ server['stats']['max'] }}"></span>
+                  <span class="server-player-totals" id="server_players_{{server['server_data']['server_id']}}" data-serverId="{{server['server_data']['server_id']}}" data-players="{{ server['stats']['online']}}" data-max="{{ server['stats']['max'] }}" data-count="{{server['server_data']['count_players']}}"></span>
                 </tr>
                 {% end %}
           </div>
@@ -554,6 +554,9 @@
     display: none;
     /* for Chrome, Safari, and Opera */
   }
+  .gray {
+    color: gray !important;
+  }
 </style>
 
 
@@ -724,15 +727,20 @@
 
         server_players.setAttribute('data-players', server.online);
         server_players.setAttribute('data-max', server.max);
+        server_players.setAttribute('data-count', server.count_players)
         let servers = Array.from(document.getElementsByClassName("server-player-totals"));
         let all_total_players = 0;
         let all_total_max_players = 0;
 
         servers.forEach(server => {
           try {
-            all_total_players += parseInt(server.getAttribute('data-players'));
-            all_total_max_players += parseInt(server.getAttribute('data-max'));
-          } catch {
+            console.log(`#server_desc_${server.getAttribute("data-serverId")}`)
+            $(`#server_desc_${server.getAttribute("data-serverId")}`).toggleClass("gray", server.getAttribute('data-count') === 'false')
+            if (server.getAttribute('data-count') === 'true'){
+              all_total_players += parseInt(server.getAttribute('data-players'));
+              all_total_max_players += parseInt(server.getAttribute('data-max'));
+            }
+           } catch {
             console.log("Player totals are not of type int");
           }
         })
