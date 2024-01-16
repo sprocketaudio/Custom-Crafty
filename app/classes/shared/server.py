@@ -43,6 +43,7 @@ with redirect_stderr(NullWriter()):
     from psutil import NoSuchProcess
 
 logger = logging.getLogger(__name__)
+SUCCESSMSG = "SUCCESS! Forge install completed"
 
 
 def callback(called_func):
@@ -723,10 +724,11 @@ class ServerInstance:
                             f' -jar "{file_name}" nogui'
                         )
                         server_obj.execution_command = execution_command
-                        Console.debug("SUCCESS! Forge install completed")
+                        Console.debug(SUCCESSMSG)
 
-                    else:
-                        # NEW VERSION >= 1.17
+                    elif version_major <= 1 and version_minor < 20:
+                        # NEW VERSION >= 1.17 and <= 1.20
+                        # (no jar file in server dir, only run.bat and run.sh)
 
                         run_file_path = ""
                         if self.helper.is_os_windows():
@@ -770,7 +772,38 @@ class ServerInstance:
                             f" {server_command[4]}"
                         )
                         server_obj.execution_command = execution_command
-                        Console.debug("SUCCESS! Forge install completed")
+                        Console.debug(SUCCESSMSG)
+                    else:
+                        # NEW VERSION >= 1.20
+                        # (executable jar is back in server dir)
+
+                        # Retrieving the executable jar filename
+                        file_path = glob.glob(
+                            f"{server_obj.path}/forge-{version[0][0]}*.jar"
+                        )[0]
+                        file_name = re.findall(
+                            r"(forge-[\-0-9.]+-shim.jar)",
+                            file_path,
+                        )[0]
+
+                        # Let's set the proper server executable
+                        server_obj.executable = os.path.join(file_name)
+
+                        # Get memory values
+                        memory_values = re.findall(
+                            r"-Xms([A-Z0-9\.]+) -Xmx([A-Z0-9\.]+)",
+                            server_obj.execution_command,
+                        )
+
+                        # Now lets set up the new run command.
+                        # This is based off the run.sh/bat that
+                        # Forge uses in 1.17 and <
+                        execution_command = (
+                            f"java -Xms{memory_values[0][0]} -Xmx{memory_values[0][1]}"
+                            f' -jar "{file_name}" nogui'
+                        )
+                        server_obj.execution_command = execution_command
+                        Console.debug(SUCCESSMSG)
                 except:
                     logger.debug("Could not find run file.")
                     # TODO Use regex to get version and rebuild simple execution

@@ -536,10 +536,14 @@ class Controller:
         if data["create_type"] == "minecraft_java":
             if root_create_data["create_type"] == "download_jar":
                 # modded update urls from server jars will only update the installer
-                if create_data["category"] != "modded":
+                if (
+                    create_data["category"] != "modded"
+                    and create_data["type"] not in ServerJars.get_paper_jars()
+                ):
                     server_obj = self.servers.get_server_obj(new_server_id)
                     url = (
-                        f"https://serverjars.com/api/fetchJar/{create_data['category']}"
+                        "https://serverjars.com/api/fetchJar/"
+                        f"{create_data['category']}"
                         f"/{create_data['type']}/{create_data['version']}"
                     )
                     server_obj.executable_update_url = url

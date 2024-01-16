@@ -462,7 +462,10 @@ class ServersController(metaclass=Singleton):
 
     @staticmethod
     def server_id_exists(server_id):
-        srv = ServersController().get_server_instance_by_id(server_id)
+        try:
+            srv = ServersController().get_server_instance_by_id(server_id)
+        except ValueError:
+            return False
         return srv.stats_helper.server_id_exists()
 
     @staticmethod
