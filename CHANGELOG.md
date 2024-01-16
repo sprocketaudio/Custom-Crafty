@@ -9,6 +9,7 @@
 - Fix indent on public status check box ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/691))
 ### Tweaks
 - Refactor Forge server initialisation flow for newer versions ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/687))
+- Remove scroll bars from player management ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/693))
 ### Lang
 TBD
 <br><br>
