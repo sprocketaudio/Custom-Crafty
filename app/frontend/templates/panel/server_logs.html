@@ -192,7 +192,7 @@
     const token = getCookie("_xsrf")
     let colors = true;
     if (!$("#stop_scroll").is(':checked')) {
-      let res = await fetch(`/api/v2/servers/${serverId}/logs?colors=${colors}`, {
+      let res = await fetch(`/api/v2/servers/${serverId}/logs?colors=${colors}&file=true`, {
         method: 'GET',
         headers: {
           'X-XSRFToken': token
