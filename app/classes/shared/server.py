@@ -1,5 +1,6 @@
 from contextlib import redirect_stderr
 import os
+import io
 import re
 import shutil
 import time
@@ -116,14 +117,17 @@ class ServerOutBuf:
                 ServerOutBuf.lines[self.server_id].pop(0)
 
     def check(self):
+        text_wrapper = io.TextIOWrapper(
+            self.proc.stdout, encoding="UTF-8", errors="ignore", newline=""
+        )
         while True:
             if self.proc.poll() is None:
-                char = self.proc.stdout.read(1).decode("utf-8", "ignore")
+                char = text_wrapper.read(1)  # modified
                 # TODO: we may want to benchmark reading in blocks and userspace
                 # processing it later, reads are kind of expensive as a syscall
                 self.process_byte(char)
             else:
-                flush = self.proc.stdout.read().decode("utf-8", "ignore")
+                flush = text_wrapper.read()  # modified
                 for char in flush:
                     self.process_byte(char)
                 break
