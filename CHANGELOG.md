@@ -7,7 +7,7 @@
 - Fix bukkit and downstream fork MOTD crash ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/686))
 - Fix bug where invalid server Id leads to stack ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/690))
 - Fix indent on public status check box ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/691))
-- Fix unicode chars in terminal w/ textiowrapper ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/689))
+- Fix unicode chars in terminal & logs w/ textiowrapper ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/689))
 ### Tweaks
 - Refactor Forge server initialisation flow for newer versions ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/687))
 - Remove scroll bars from player management ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/693))
