@@ -27,6 +27,7 @@ class UsersController:
         self.users_helper = users_helper
         self.authentication = authentication
         self.scheduler = BackgroundScheduler(timezone="Etc/UTC")
+        self.scheduler.start()
 
         _permissions_props = {
             "name": {
