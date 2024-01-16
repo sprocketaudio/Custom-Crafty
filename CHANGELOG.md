@@ -5,7 +5,7 @@ TBD
 ### Bug fixes
 - Fix bukkit and downstream fork MOTD crash ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/686))
 ### Tweaks
-TBD
+- Refactor Forge server initialisation flow for newer versions ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/687))
 ### Lang
 TBD
 <br><br>
