@@ -176,7 +176,7 @@ class ServerJars:
                     versions = self._get_jar_details(j, s)
                     data["types"][s].update({j: versions})
             for item in PAPERJARS:
-                data["types"]["servers"][item] = self.get_paper_versions()
+                data["types"]["servers"][item] = self.get_paper_versions(item)
             # save our cache
             try:
                 with open(cache_file, "w", encoding="utf-8") as f:
