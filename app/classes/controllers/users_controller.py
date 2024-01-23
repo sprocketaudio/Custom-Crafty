@@ -1,8 +1,6 @@
 import logging
 import typing as t
 import datetime
-import os
-import json
 from apscheduler.schedulers.background import BackgroundScheduler
 from app.classes.models.servers import HelperServers
 
@@ -12,6 +10,7 @@ from app.classes.models.crafty_permissions import (
     PermissionsCrafty,
     EnumPermissionsCrafty,
 )
+from app.classes.shared.console import Console
 
 logger = logging.getLogger(__name__)
 
@@ -363,7 +362,7 @@ class UsersController:
     # **********************************************************************************
     #                                   Lockout Methods
     # **********************************************************************************
-    def start_anti_lockout(self, app_dir):
+    def start_anti_lockout(self):
         lockout_pass = self.helper.create_pass()
         self.users_helper.add_user(
             "anti-lockout-user",
@@ -374,18 +373,15 @@ class UsersController:
             superuser=True,
             theme="ronald",
         )
-        with open(
-            os.path.join(app_dir, "app", "config", "anti-lockout.txt"),
-            "w",
-            encoding="utf-8",
-        ) as cred_file:
-            cred_file.write(
-                json.dumps(
-                    {"username": "anti-lockout-user", "password": lockout_pass},
-                    indent=4,
-                )
-            )
-        os.chmod(os.path.join(app_dir, "app", "config", "anti-lockout.txt"), 0o600)
+
+        Console.yellow(
+            f"""
+            Anti-lockout recovery account enabled!
+            {'/' * 74}
+            Username: anti-lockout-user
+            Password: {lockout_pass}
+            {'/' * 74}"""
+        )
         self.scheduler.add_job(
             self.stop_anti_lockout,
             "interval",

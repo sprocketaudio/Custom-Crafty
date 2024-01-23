@@ -10,10 +10,10 @@ class ApiCraftyLockoutHandler(BaseApiHandler):
             return self.finish_json(
                 425, {"status": "error", "data": "Lockout recovery already in progress"}
             )
-        self.controller.users.start_anti_lockout(self.controller.project_root)
+        self.controller.users.start_anti_lockout()
         lockout_msg = (
             "Lockout account has been activated for 1 hour."
-            " Please find credentials in config/anti-lockout.txt"
+            " Please find temporary credentials in the terminal"
         )
         return self.finish_json(
             200,
