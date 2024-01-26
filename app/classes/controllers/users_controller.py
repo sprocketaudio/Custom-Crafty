@@ -1,6 +1,7 @@
 import logging
 import typing as t
 import datetime
+from datetime import timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 from app.classes.models.servers import HelperServers
 
@@ -384,12 +385,12 @@ class UsersController:
         )
         self.scheduler.add_job(
             self.stop_anti_lockout,
-            "interval",
-            hours=1,
+            "date",
             id="anti-lockout-watcher",
-            start_date=datetime.datetime.now(),
+            run_date=datetime.datetime.now() + timedelta(hours=1),
         )
 
     def stop_anti_lockout(self):
+        print("IN STOP")
         self.scheduler.remove_all_jobs()
         self.users_helper.remove_user(self.get_id_by_name("anti-lockout-user"))
