@@ -39,7 +39,7 @@ class ApiServersServerStdinHandler(BaseApiHandler):
         self.controller.management.add_to_audit_log(
             auth_data[4]["user_id"],
             f"Sent command ({decoded}) to terminal",
-            server_id=0,
+            server_id=server_id,
             source_ip=self.get_remote_ip(),
         )
         if svr.send_command(self.request.body.decode("utf-8")):
