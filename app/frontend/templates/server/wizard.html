@@ -1235,8 +1235,8 @@
     })
   }
   $("#server").change(function (){
-    console.log();
-    if($("#server :selected").text().split(".")[1] === "7"){
+    let selected_version = $("#server :selected").text().split(".");
+    if(parseInt(selected_version[0]) === 1 && parseInt(selected_version[1]) < 8 ){
       $('[data-toggle="popover"]').popover();
     if ($(window).width() < 1000) {
       $('.version-hint').attr("data-placement", "top")
