@@ -61,7 +61,11 @@ class PublicHandler(BaseHandler):
             template = "public/offline.html"
 
         elif page == "logout":
+            exec_user = self.get_current_user()
             self.clear_cookie("token")
+            # Delete anti-lockout-user on lockout...it's one time use
+            if exec_user[2]["username"] == "anti-lockout-user":
+                self.controller.users.stop_anti_lockout()
             # self.clear_cookie("user")
             # self.clear_cookie("user_data")
             self.redirect("/login")
