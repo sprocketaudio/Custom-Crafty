@@ -112,7 +112,7 @@ class Webserver:
             cookie_secret = self.helper.random_string_generator(32)
             HelpersManagement.set_cookie_secret(cookie_secret)
 
-        if not http_port:
+        if not http_port and http_port != 0:
             http_port = 8000
 
         if not https_port:
@@ -190,9 +190,12 @@ class Webserver:
             login_url="/login",
             serve_traceback=debug_errors,
         )
-
-        self.http_server = tornado.httpserver.HTTPServer(http_app)
-        self.http_server.listen(http_port)
+        print(http_port)
+        if http_port != 0:
+            self.http_server = tornado.httpserver.HTTPServer(http_app)
+            self.http_server.listen(http_port)
+        else:
+            logger.info("http port disabled by config")
 
         self.https_server = tornado.httpserver.HTTPServer(app, ssl_options=cert_objects)
         self.https_server.listen(https_port)
