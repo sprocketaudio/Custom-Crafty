@@ -327,6 +327,7 @@
         "bePatientDeleteFiles": "请耐心等待，我们正在从 Crafty 面板中移除服务器并删除所有文件。稍后此页面会关闭。",
         "bePatientUpdate": "请耐心等待，我们正在更新服务器。下载时长可能因您的网络速度而异。<br /> 稍后此页面会刷新",
         "cancel": "取消",
+        "countPlayers": "在玩家总数中包含服务器",
         "crashTime": "崩溃超时",
         "crashTimeDesc": "我们应该在考虑您的服务器已崩溃之前等待多久？",
         "deleteFilesQuestion": "从设备上删除服务器文件？",
