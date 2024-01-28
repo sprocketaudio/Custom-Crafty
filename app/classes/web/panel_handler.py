@@ -28,6 +28,7 @@ from app.classes.web.base_handler import BaseHandler
 from app.classes.web.webhooks.webhook_factory import WebhookFactory
 
 logger = logging.getLogger(__name__)
+# You must put any new subpages in here
 SUBPAGE_PERMS = {
     "term": EnumPermissionsServer.TERMINAL,
     "logs": EnumPermissionsServer.LOGS,
@@ -625,6 +626,14 @@ class PanelHandler(BaseHandler):
                 # have no perms
                 if not subpage:
                     self.redirect("/panel/error?error=Unauthorized access to Server")
+            if subpage not in SUBPAGE_PERMS.keys():
+                self.set_status(404)
+                page_data["background"] = self.controller.cached_login
+                return self.render(
+                    "public/404.html",
+                    data=page_data,
+                    translate=self.translator.translate,
+                )
             page_data["active_link"] = subpage
             logger.debug(f'Subpage: "{subpage}"')
 
