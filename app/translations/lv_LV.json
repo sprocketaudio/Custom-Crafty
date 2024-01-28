@@ -328,6 +328,7 @@
         "bePatientDeleteFiles": "Lūdzu esiet pacietīgs, kamēr mēs noņemam jūsu serveri no Crafty paneļa un izdzēšam visus failus. Šis ekrāns aizvērsies pēc maza brītiņa.",
         "bePatientUpdate": "Lūdzu esiet pacietīgi, kamēr mēs atjauninām serveri. Lejupielādes laiki var mainīties atkarībā no tīkla savienojuma ātruma.<br /> Šis ekrāns atjaunosies pēc brīža",
         "cancel": "Atcelt",
+        "countPlayers": "Pieskaitīt serveri pie kopējā spēlētāju skaita",
         "crashTime": "Avārijas Taimouts",
         "crashTimeDesc": "Cik ilgi mums nogaidīt pirms mēs uzskatām serveri kā avarējušu?",
         "deleteFilesQuestion": "Dzēst servera failus no ierīces?",

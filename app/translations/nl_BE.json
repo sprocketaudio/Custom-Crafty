@@ -327,6 +327,7 @@
         "bePatientDeleteFiles": "Even geduld terwijl we uw server uit het Crafty-paneel verwijderen, en alle bestanden verwijderen. Dit scherm wordt over enkele ogenblikken gesloten.",
         "bePatientUpdate": "Even geduld terwijl we de server updaten. De downloadtijden kunnen variëren, afhankelijk van je internetsnelheden.<br /> Dit scherm wordt zo vernieuwd",
         "cancel": "Annuleren",
+        "countPlayers": "Server opnemen in het totale spelersaantal",
         "crashTime": "Crash Timeout",
         "crashTimeDesc": "Hoe lang moet er gewacht worden voordat we uw server als gecrasht beschouwen?",
         "deleteFilesQuestion": "Serverbestanden van de machine verwijderen?",

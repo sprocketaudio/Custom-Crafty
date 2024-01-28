@@ -327,6 +327,7 @@
         "bePatientDeleteFiles": "Poczekaj, aż usuniemy twój serwer i jego pliki. Strona za chwilę się zamknie.",
         "bePatientUpdate": "Poczekaj kiedy my aktualizujemy twój serwer. Pobieranie zależy od prędkości twojego internetu.<br /> Strona się odświeży za chwile.",
         "cancel": "Anuluj",
+        "countPlayers": "Wlicz serwer do całkowitej liczby graczy",
         "crashTime": "Crash serwera wyszedł poza limit czasu",
         "crashTimeDesc": "Jak długo powinniśmy poczekać zanim uznać serwer za zcrashowany?",
         "deleteFilesQuestion": "Usuń pliki serwera z maszyny?",

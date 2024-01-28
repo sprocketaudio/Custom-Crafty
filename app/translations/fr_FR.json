@@ -327,6 +327,7 @@
         "bePatientDeleteFiles": "Merci de patienter pendant la suppression du serveur du tableau de bord de Crafty et des fichiers de la machine hôte. Cet écran se fermera dans quelques instants.",
         "bePatientUpdate": "Merci de patienter pendant la mise à jour du Serveur. La durée de téléchargement dépend de votre vitesse de connexion internet.<br /> Cet écran se mettra à jour dans quelques instants",
         "cancel": "Annuler",
+        "countPlayers": "Inclure ce serveur dans le nombre total de joueurs",
         "crashTime": "Délai de plantage",
         "crashTimeDesc": "Combien de temps attendre avant de considérer que le serveur a crash ?",
         "deleteFilesQuestion": "Supprimer les fichiers de la machine ?",

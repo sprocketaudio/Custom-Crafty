@@ -3,6 +3,8 @@
 ### New features
 - Use Papermc Group's API for `paper` & `folia` builds in server builder ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/688))
 - Allow omission of player count from Dashboard (e.g. for  proxy servers) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/692))
+### Refactor
+- Refactor subpage perm checks ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/695))
 ### Bug fixes
 - Fix bukkit and downstream fork MOTD crash ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/686))
 - Fix bug where invalid server Id leads to stack ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/690))
@@ -12,7 +14,8 @@
 - Refactor Forge server initialisation flow for newer versions ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/687))
 - Remove scroll bars from player management ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/693))
 ### Lang
-TBD
+- Update `zh_CN, pl_PL, nl_BE, lv_LV, he_IL, fr_FR, de_DE, lol_EN` translations for `4.2.3` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/696))
+- New `uk_UA, tr_TR, th_TH` translations for `4.2.3` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/696))
 <br><br>
 
 ## --- [4.2.2] - 2023/12/13

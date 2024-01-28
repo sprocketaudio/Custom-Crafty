@@ -327,6 +327,7 @@
         "bePatientDeleteFiles": "Bitte haben Sie etwas Geduld, während wir Ihren Server aus dem Crafty-Panel entfernen und alle Dateien löschen. Dieser Bildschirm wird in wenigen Augenblicken geschlossen.",
         "bePatientUpdate": "Bitte haben Sie etwas Geduld, während wir den Server aktualisieren. Die Downloadzeiten können je nach Ihrer Internetgeschwindigkeit variieren.<br /> Dieser Bildschirm wird sich in einem Moment aktualisieren",
         "cancel": "Abbrechen",
+        "countPlayers": "Server in die Gesamtspielerzahl einbeziehen",
         "crashTime": "Zeitüberschreitung nach Absturz",
         "crashTimeDesc": "Wie lange soll Crafty warten, bevor Crafty den Server als abgestürzt betrachtet?",
         "deleteFilesQuestion": "Serverdateien vom Rechner löschen?",
