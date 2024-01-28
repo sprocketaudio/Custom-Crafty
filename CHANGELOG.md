@@ -3,6 +3,8 @@
 ### New features
 - Use Papermc Group's API for `paper` & `folia` builds in server builder ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/688))
 - Allow omission of player count from Dashboard (e.g. for  proxy servers) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/692))
+### Refactor
+- Refactor subpage perm checks ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/695))
 ### Bug fixes
 - Fix bukkit and downstream fork MOTD crash ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/686))
 - Fix bug where invalid server Id leads to stack ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/690))
