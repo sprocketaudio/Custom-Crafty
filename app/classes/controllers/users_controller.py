@@ -2,6 +2,7 @@ import logging
 import typing as t
 import datetime
 from datetime import timedelta
+from zoneinfo import ZoneInfo
 from apscheduler.schedulers.background import BackgroundScheduler
 from app.classes.models.servers import HelperServers
 
@@ -387,10 +388,9 @@ class UsersController:
             self.stop_anti_lockout,
             "date",
             id="anti-lockout-watcher",
-            run_date=datetime.datetime.now() + timedelta(hours=1),
+            run_date=datetime.datetime.now(ZoneInfo("Etc/UTC")) + timedelta(hours=1),
         )
 
     def stop_anti_lockout(self):
-        print("IN STOP")
         self.scheduler.remove_all_jobs()
         self.users_helper.remove_user(self.get_id_by_name("anti-lockout-user"))
