@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ data['lang_page'] }}" class="{{data['user_data'].get('theme', 'default')}}">
+<html lang="{{ data['lang_page'] }}" class="{{data['user_data'].get('theme', 'default')}}" data-username="{{data['user_data'].get('username', None)}}">
 
 <head>
   <!-- Required meta tags -->
@@ -256,8 +256,9 @@
 
     const sendWssError = () => wsOpen || warn(
       'WebSockets are required for Crafty to work. This websocket connection has been closed. Are you using a reverse proxy?',
-      'https://docs.craftycontrol.com/pages/getting-started/proxies/',
-      'wssError'
+      link='https://docs.craftycontrol.com/pages/getting-started/proxies/',
+      link_msg="See our documentation for details",
+      className='wssError'
     )
 
     function startWebSocket() {
@@ -459,7 +460,7 @@
     }
 
 
-    function warn(message, link = null, className = null) {
+    function warn(message, link = null, link_msg=null, className = null, bg_color="#f7970f") {
       var closeEl = document.createElement('span');
       var strongEL = document.createElement('strong');
       var msgEl = document.createElement('div');
@@ -481,14 +482,14 @@
       var parentEl = document.createElement('div');
 
       parentEl.style.padding = '20px';
-      parentEl.style.backgroundColor = '#f7970f';
+      parentEl.style.backgroundColor = bg_color;
 
       parentEl.appendChild(closeEl);
       parentEl.appendChild(msgEl);
       if (link) {
         let linkEl = document.createElement('a')
         linkEl.href = link;
-        linkEl.innerHTML = "See our documentation for details.";
+        linkEl.innerHTML = link_msg;
         linkEl.style.color = 'white';
         linkEl.style.textDecoration = 'underline';
         linkEl.target = "_blank";
@@ -580,6 +581,15 @@
 
     $(document).ready(function () {
       console.log('%c[Crafty Controller] %cReady for JS!', 'font-weight: 900; color: #800080;', 'font-weight: 900; color: #eee;');
+      if ($(document.documentElement).data("username") === "anti-lockout-user"){
+        warn(
+        '⚠️You are in a recovery account. Access is limited!',
+        link='/logout',
+        link_msg="Click here to log out after you change your password. ⚠️",
+        className='anti-lockout', 
+        bg_color='#2090d6'
+        )
+      }
       $('#support_logs').click(function () {
         var dialog = bootbox.dialog({
           message: "<p class='text- center mb - 0'><i class='fa fa - spin fa - cog'></i>{{ translate('notify', 'preparingLogs', data['lang']) }}</p>",
