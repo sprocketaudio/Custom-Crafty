@@ -119,7 +119,9 @@
 				],
 				"blurb": "Silver enjoys helping others with their computer needs, writing documentation, and loving her cat.",
 				"pic": "/static/assets/images/credits/isilverfyre.png"
-			},
+			}
+		],
+		"retired": [
 			{
 				"name": "Quentin",
 				"title": "Document Curator",
@@ -146,9 +148,7 @@
 				],
 				"blurb": "Day to day I am a Network Administrator, dealing with a range of vendors and products. Outside of work my hobbies are handyman things, such as carpentry and motor mechanics having grown up around them. My home-lab consists of Linux distros ranging from Debian, Ubuntu & Centos having self taught myself Linux for the last 12+ years.",
 				"pic": null
-			}
-		],
-		"retired": [
+			},
 			{
 				"name": "Kev Dagoat",
 				"title": "Head of Development",
