@@ -121,6 +121,20 @@
 				"pic": "/static/assets/images/credits/isilverfyre.png"
 			},
 			{
+				"name": "Kornster",
+				"title": null,
+				"loc": "Victoria, Australia",
+				"tags": [
+					"Discord Mod",
+					null,
+					null
+				],
+				"blurb": "Day to day I am a Network Administrator, dealing with a range of vendors and products. Outside of work my hobbies are handyman things, such as carpentry and motor mechanics having grown up around them. My home-lab consists of Linux distros ranging from Debian, Ubuntu & Centos having self taught myself Linux for the last 12+ years.",
+				"pic": null
+			}
+		],
+		"retired": [
+			{
 				"name": "Quentin",
 				"title": "Document Curator",
 				"loc": null,
@@ -135,20 +149,6 @@
 				"blurb": "Hosts Minecraft servers for his weird friends, works for an IoT company as his dayjob. The 's' in IoT stands for 'secure'.",
 				"pic": "/static/assets/images/credits/qub3d.png"
 			},
-			{
-				"name": "Kornster",
-				"title": null,
-				"loc": "Victoria, Australia",
-				"tags": [
-					"Discord Mod",
-					null,
-					null
-				],
-				"blurb": "Day to day I am a Network Administrator, dealing with a range of vendors and products. Outside of work my hobbies are handyman things, such as carpentry and motor mechanics having grown up around them. My home-lab consists of Linux distros ranging from Debian, Ubuntu & Centos having self taught myself Linux for the last 12+ years.",
-				"pic": null
-			}
-		],
-		"retired": [
 			{
 				"name": "Kev Dagoat",
 				"title": "Head of Development",
