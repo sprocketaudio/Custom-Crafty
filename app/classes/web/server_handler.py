@@ -86,6 +86,9 @@ class ServerHandler(BaseHandler):
 
         template = "public/404.html"
 
+        if exec_user["username"] == "anti-lockout-user":
+            return self.redirect("/panel/panel_config")
+
         page_data = {
             "update_available": self.helper.update_available,
             "version_data": self.helper.get_version_string(),
