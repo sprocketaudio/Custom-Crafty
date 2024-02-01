@@ -2,10 +2,14 @@ import logging
 from app.classes.web.base_api_handler import BaseApiHandler
 
 logger = logging.getLogger(__name__)
+auth_log = logging.getLogger("auth")
 
 
 class ApiCraftyLockoutHandler(BaseApiHandler):
     def get(self):
+        auth_log.warning(f"Anti-Lockout request from {self.get_remote_ip()}")
+        self.controller.log_antilockout(self.get_remote_ip())
+
         if self.controller.users.get_id_by_name("anti-lockout-user"):
             return self.finish_json(
                 425, {"status": "error", "data": "Lockout recovery already in progress"}

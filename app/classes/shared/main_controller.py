@@ -90,14 +90,47 @@ class Controller:
 
     def log_attempt(self, remote_ip, username):
         remote = self.auth_tracker.get(str(remote_ip), None)
-        if remote:
-            remote["names"].append(username)
-            remote["attempts"] += 1
-            remote["times"].append(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+        if not remote:
+            self.auth_tracker[str(remote_ip)] = {
+                "login": {
+                    "names": [username],
+                    "attempts": 1,
+                    "times": [datetime.now().strftime("%d/%m/%Y %H:%M:%S")],
+                }
+            }
+            return
+        if remote.get("login", None):
+            remote["login"]["names"].append(username)
+            remote["login"]["attempts"] += 1
+            remote["login"]["times"].append(
+                datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            )
             self.auth_tracker[str(remote_ip)] = remote
         else:
-            self.auth_tracker[str(remote_ip)] = {
+            self.auth_tracker[str(remote_ip)]["login"] = {
                 "names": [username],
+                "attempts": 1,
+                "times": [datetime.now().strftime("%d/%m/%Y %H:%M:%S")],
+            }
+
+    def log_antilockout(self, remote_ip):
+        remote = self.auth_tracker.get(str(remote_ip), None)
+        if not remote:
+            self.auth_tracker[str(remote_ip)] = {
+                "anti-lockout": {
+                    "attempts": 1,
+                    "times": [datetime.now().strftime("%d/%m/%Y %H:%M:%S")],
+                }
+            }
+            return
+        if remote.get("anti-lockout", None):
+            remote["anti-lockout"]["attempts"] += 1
+            remote["anti-lockout"]["times"].append(
+                datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            )
+            self.auth_tracker[str(remote_ip)] = remote
+        else:
+            self.auth_tracker[str(remote_ip)]["anti-lockout"] = {
                 "attempts": 1,
                 "times": [datetime.now().strftime("%d/%m/%Y %H:%M:%S")],
             }
