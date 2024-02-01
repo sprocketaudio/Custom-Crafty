@@ -190,7 +190,7 @@ class Webserver:
             login_url="/login",
             serve_traceback=debug_errors,
         )
-        print(http_port)
+
         if http_port != 0:
             self.http_server = tornado.httpserver.HTTPServer(http_app)
             self.http_server.listen(http_port)
