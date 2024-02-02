@@ -512,6 +512,7 @@
         "cpuUsage": "שימוש במעבד",
         "description": "תיאור",
         "errorCalculatingUptime": "שגיאה בחישוב זמן פעולה",
+        "loadingMotd": "טוען MOTD",
         "memUsage": "שימוש בזיכרון",
         "offline": "לא מקוון",
         "online": "פועל",

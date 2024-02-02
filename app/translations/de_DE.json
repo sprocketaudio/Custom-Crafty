@@ -512,6 +512,7 @@
         "cpuUsage": "CPU-Nutzung",
         "description": "Beschreibung",
         "errorCalculatingUptime": "Fehler bei der Berechnung der Betriebszeit",
+        "loadingMotd": "Nachricht des Tages lädt (MOTD)",
         "memUsage": "RAM/Speicherverbrauch",
         "offline": "Offline",
         "online": "Online",

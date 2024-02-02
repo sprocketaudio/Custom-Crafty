@@ -512,6 +512,7 @@
         "cpuUsage": "Utilisation CPU",
         "description": "Description",
         "errorCalculatingUptime": "Erreur de Calcul du Temps de Disponibilité",
+        "loadingMotd": "Chargement MOTD",
         "memUsage": "Utilisation Mémoire",
         "offline": "Hors Ligne",
         "online": "En Ligne",

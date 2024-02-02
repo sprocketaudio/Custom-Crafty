@@ -512,6 +512,7 @@
         "cpuUsage": "CPU Usage",
         "description": "Description",
         "errorCalculatingUptime": "Error Calculating Uptime",
+        "loadingMotd": "Loading MOTD",
         "memUsage": "Memory Usage",
         "offline": "Offline",
         "online": "Online",

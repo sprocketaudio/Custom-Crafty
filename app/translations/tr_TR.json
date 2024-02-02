@@ -512,6 +512,7 @@
         "cpuUsage": "CPU Kullanımı",
         "description": "Açıklama",
         "errorCalculatingUptime": "Çalışma Süresi Hesaplanırken Hata",
+        "loadingMotd": "MOTD yükleniyor",
         "memUsage": "Bellek Kullanımı",
         "offline": "Çevrimdışı",
         "online": "Çevrimiçi",

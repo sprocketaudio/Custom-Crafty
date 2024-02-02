@@ -512,6 +512,7 @@
         "cpuUsage": "การใช้งานซีพียู",
         "description": "คำอธิบาย",
         "errorCalculatingUptime": "เกิดข้อผิดพลาดในการคำนวณสถานะการออนไลน์",
+        "loadingMotd": "กำลังโหลด MOTD",
         "memUsage": "การใช้งานหน่วยความจำ",
         "offline": "ออฟไลน์",
         "online": "ออนไลน์",

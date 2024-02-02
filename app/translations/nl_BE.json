@@ -512,6 +512,7 @@
         "cpuUsage": "CPU gebruik",
         "description": "Beschrijving",
         "errorCalculatingUptime": "Fout bij berekenen van uptime",
+        "loadingMotd": "MOTD laden",
         "memUsage": "Geheugengebruik",
         "offline": "Offline",
         "online": "Online",

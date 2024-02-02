@@ -21,6 +21,7 @@
 - Improve display for `th-TH` characters ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/703))
 - Improve display of white text on **wssErrors** ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/703))
 - Improve display of white text on  **Buttons** ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/703))
+- Fix dashboard motd issue #322 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/705))
 ### Lang
 - Update `zh_CN, pl_PL, nl_BE, lv_LV, he_IL, fr_FR, de_DE, lol_EN` translations for `4.2.3` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/696))
 - New `uk_UA, tr_TR, th_TH` translations for `4.2.3` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/696))

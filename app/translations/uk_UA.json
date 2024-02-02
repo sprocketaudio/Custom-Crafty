@@ -512,6 +512,7 @@
         "cpuUsage": "Використання Процесора",
         "description": "Опис",
         "errorCalculatingUptime": "Підрахунок помилок аптайму",
+        "loadingMotd": "Завантаження MOTD",
         "memUsage": "Використання ОПЗ",
         "offline": "Оффлайн",
         "online": "Онлайн",
