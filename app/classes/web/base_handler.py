@@ -106,7 +106,7 @@ class BaseHandler(tornado.web.RequestHandler):
         if type(text) in self.nobleach:
             logger.debug("Auto-bleaching - bypass type")
             return text
-        return nh3.clean(text)
+        return nh3.clean(text)  # pylint: disable=no-member
 
     def get_argument(
         self,

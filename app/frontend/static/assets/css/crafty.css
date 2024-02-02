@@ -37,16 +37,16 @@ nav.sidebar {
     width: 10px;
     height: 10px;
     border-radius: 100%;
-    border: 2px solid #fff;
+    border: 2px solid var(--white);
     display: block;
 }
 
 .toggle-handle {
-    background-color: white !important;
+    background-color: var(--white) !important;
 }
 
 .toggle-on {
-    color: black !important;
+    color: var(--dark) !important;
 }
 
 .toggle {
@@ -61,7 +61,7 @@ nav.sidebar {
     width: 10px;
     height: 10px;
     border-radius: 100%;
-    border: 2px solid #fff;
+    border: 2px solid var(--white);
     display: block;
 }
 
@@ -95,7 +95,7 @@ nav.sidebar {
 }
 
 .scrollable-element {
-    scrollbar-color: red yellow;
+    scrollbar-color: var(--red) var(--yellow);
 }
 
 .term-nav-item {
@@ -212,6 +212,14 @@ div>.input-group>.form-control {
     top: calc(-0.125rem + 1px);
 }
 
+a.btn-primary {
+    color: var(--white);
+}
+
+button.btn-primary {
+    color: var(--white);
+}
+
 /**************************************************************/
 
 /**************************************************************/
@@ -231,6 +239,32 @@ td.action {
 
 td.action .btn {
     margin-bottom: 0.2rem;
+}
+
+/**************************************************************/
+
+/**************************************************************/
+/* CSS for warnings Displays */
+/**************************************************************/
+div.warnings div.wssError {
+    color: var(--white);
+}
+
+div.warnings div.wssError a {
+    color: var(--outline);
+}
+
+div.warnings div.wssError a:hover {
+    color: var(--white-smoke);
+}
+
+/**************************************************************/
+
+/**************************************************************/
+/* CSS for Fonts Displays */
+/**************************************************************/
+*:lang(th-TH) :not(.fa, .fas, .fab, .fa-solid) {
+    font-family: 'Sarabun', 'roboto', sans-serif;
 }
 
 /**************************************************************/

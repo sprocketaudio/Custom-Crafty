@@ -96,7 +96,7 @@ function initParser(input, output) {
     var input = document.getElementById(input),
         output = document.getElementById(output);
     if (input != null && output != null) {
-        var parsed = parseStyle(input.innerHTML);
+        var parsed = parseStyle(input.innerText);
         output.innerHTML = '';
         output.appendChild(parsed);
     }

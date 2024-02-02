@@ -29,8 +29,10 @@ class PublicHandler(BaseHandler):
             # self.clear_cookie("user_data")
 
     def get(self, page=None):
+        # pylint: disable=no-member
         error = nh3.clean(self.get_argument("error", "Invalid Login!"))
         error_msg = nh3.clean(self.get_argument("error_msg", ""))
+        # pylint: enable=no-member
 
         page_data = {
             "version": self.helper.get_version_string(),
@@ -87,8 +89,10 @@ class PublicHandler(BaseHandler):
         )
 
     def post(self, page=None):
+        # pylint: disable=no-member
         error = nh3.clean(self.get_argument("error", "Invalid Login!"))
         error_msg = nh3.clean(self.get_argument("error_msg", ""))
+        # pylint: enable=no-member
 
         page_data = {
             "version": self.helper.get_version_string(),
@@ -108,10 +112,11 @@ class PublicHandler(BaseHandler):
             if self.request.query:
                 next_page = "/login?" + self.request.query
 
+            # pylint: disable=no-member
             entered_username = nh3.clean(self.get_argument("username"))
             entered_password = self.get_argument("password")
+            # pylint: enable=no-member
 
-            # pylint: disable=no-member
             try:
                 user_id = HelperUsers.get_user_id_by_name(entered_username.lower())
                 user_data = HelperUsers.get_user_model(user_id)

@@ -25,7 +25,7 @@ class HTTPHandlerPage(BaseHandler):
             backup_url = url + str(self.helper.get_setting("https_port"))
 
         try:
-            resp = requests.get(primary_url)
+            resp = requests.head(primary_url, timeout=(0.5, 5))
             resp.raise_for_status()
             url = primary_url
         except Exception:

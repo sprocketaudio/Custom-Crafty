@@ -512,6 +512,7 @@
         "cpuUsage": "שימוש במעבד",
         "description": "תיאור",
         "errorCalculatingUptime": "שגיאה בחישוב זמן פעולה",
+        "loadingMotd": "טוען MOTD",
         "memUsage": "שימוש בזיכרון",
         "offline": "לא מקוון",
         "online": "פועל",
@@ -579,6 +580,7 @@
         "serverUpload": "העלה שרת מכווץ",
         "serverVersion": "גרסת השרת",
         "sizeInGB": "גודל ב-GB",
+        "unsupported": "גרסאות מיינקראפט מתחת ל1.8 לא נתמכות על ידי קראפטי. אפשר להתקין אותם אבל הביצועים לא יהיו עקביים.",
         "uploadButton": "העלה",
         "uploadZip": "העלה קובץ Zip לייבוא שרת",
         "zipPath": "נתיב שרת"

@@ -513,6 +513,7 @@
         "cpuUsage": "CPU Lietojums",
         "description": "Apraksts",
         "errorCalculatingUptime": "Kļūda aprēķinot darbības laiku",
+        "loadingMotd": "Ielādē MOTD",
         "memUsage": "Atmiņas Lietojums",
         "offline": "Offlinā",
         "online": "Onlinā",
@@ -580,6 +581,7 @@
         "serverUpload": "Augšupielādē Saspiestu (Zipotu) Serveri",
         "serverVersion": "Servera Versija",
         "sizeInGB": "lielums, GB",
+        "unsupported": "Minecraft versijas zem 1.8 netiek atbalstītas iekš Crafty. Jūs tāpat variet tās instalēt, bet rezultāti atškirsies.",
         "uploadButton": "Augšupielādēt",
         "uploadZip": "Augšupielādē Zip Failu Priekš Serveru Importa",
         "zipPath": "Servera Ceļš"

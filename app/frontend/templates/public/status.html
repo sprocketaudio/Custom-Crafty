@@ -49,7 +49,7 @@
                   <img src="/static/assets/images/pack.png" alt="icon" style="-webkit-filter:grayscale(100%); filter:grayscale(100%)" />
                 </div>
                 <div class="col-auto">
-                  <span id="input_motd_{{ server['stats']['server_id']['server_id'] }}" class="input_motd">{{ server['stats']['desc'] }}</span>
+                  <span id="input_motd_{{ server['stats']['server_id']['server_id'] }}" class="input_motd">{{ translate('serverStats', 'loadingMotd', data['lang']) }}</span>
                 </div>
               </div>
               {% end %}
@@ -133,8 +133,7 @@
               <div class="media-body">
                 {% if server['stats']['desc'] != 'False' %}
                 <div id="m_server_motd_{{ server['stats']['server_id']['server_id'] }}">
-                  <span id="m_input_motd_{{ server['stats']['server_id']['server_id'] }}" class="input_motd">{{
-                    server['stats']['desc'] }}</span> <br />
+                  <span id="m_input_motd_{{ server['stats']['server_id']['server_id'] }}" class="input_motd">{{ translate('serverStats', 'loadingMotd', data['lang']) }}</span> <br />
                 </div>
                 {% end %}
               </div>

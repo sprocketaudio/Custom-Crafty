@@ -512,6 +512,7 @@
         "cpuUsage": "CPU USAGE",
         "description": "DESCRIPSHUN",
         "errorCalculatingUptime": "I DUN GOOF'D WEN CALCULATIN TEH TEIM AWAEK!",
+        "loadingMotd": "LOADIN' MEOWSSAGE OF DA DAY",
         "memUsage": "HOW HARD IZ THINKIN RN",
         "offline": "TURND OFF",
         "online": "TURND OAN",
@@ -579,6 +580,7 @@
         "serverUpload": "UPLOADZ ZIPPED SERVR",
         "serverVersion": "SERVR VERZHUN",
         "sizeInGB": "SIEZ IN GIGABITEZ",
+        "unsupported": "MINECRAFTZ OLDR THAN 1.8 NOT FRENDS WIF CWAFTY. U CAN STILL TRY INSTALLIN'. IT MIGHT WORKS, MIGHT NOT.",
         "uploadButton": "UPLOADZ",
         "uploadZip": "UPLOADZ ZIP FISH FOR SERVR BRING IN",
         "zipPath": "WER IZ ZIP FISH (PETH)"

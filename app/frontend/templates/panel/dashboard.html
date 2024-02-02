@@ -287,8 +287,7 @@
                     data['lang']) }} <br />
 
                     {% if server['stats']['desc'] != 'False' %}
-                    <div id="desc_id" style="overflow-wrap: break-word !important; max-width: 85px !important; overflow: scroll;">{{
-                      server['stats']['desc'] }}</div> <br />
+                    <div id="desc_id" style="overflow-wrap: break-word !important; max-width: 85px !important; overflow: scroll;">{{ translate('serverStats', 'loadingMotd', data['lang']) }}</div> <br />
                     {% end %}
 
                     {% if server['stats']['version'] != 'False' %}
@@ -554,6 +553,7 @@
     display: none;
     /* for Chrome, Safari, and Opera */
   }
+
   .gray {
     color: gray !important;
   }
@@ -736,11 +736,11 @@
           try {
             console.log(`#server_desc_${server.getAttribute("data-serverId")}`)
             $(`#server_desc_${server.getAttribute("data-serverId")}`).toggleClass("gray", server.getAttribute('data-count') === 'false')
-            if (server.getAttribute('data-count') === 'true'){
+            if (server.getAttribute('data-count') === 'true') {
               all_total_players += parseInt(server.getAttribute('data-players'));
               all_total_max_players += parseInt(server.getAttribute('data-max'));
             }
-           } catch {
+          } catch {
             console.log("Player totals are not of type int");
           }
         })
@@ -1006,24 +1006,24 @@
     async function sendOrder(id_string) {
       const token = getCookie("_xsrf")
       let res = await fetch(`/api/v2/users/@me`, {
-      method: 'PATCH',
-      headers: {
-        'X-XSRFToken': token
-      },
-      body: JSON.stringify({
+        method: 'PATCH',
+        headers: {
+          'X-XSRFToken': token
+        },
+        body: JSON.stringify({
           server_order: id_string,
         }),
-    });
-    let responseData = await res.json();
-    if (responseData.status === "ok") {
-      return
-    } else {
-
-      bootbox.alert({
-        title: responseData.status,
-        message: responseData.error
       });
-    }
+      let responseData = await res.json();
+      if (responseData.status === "ok") {
+        return
+      } else {
+
+        bootbox.alert({
+          title: responseData.status,
+          message: responseData.error
+        });
+      }
     }
     // Inits the sortable
     $("table#servers_table tbody")
