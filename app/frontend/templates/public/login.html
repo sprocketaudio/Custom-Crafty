@@ -112,8 +112,8 @@
                     <div class="form-check form-check-flat mt-0">
                       &nbsp;
                     </div>
-                    <a href="#" class="text-small forgot-password ">{{ translate('login', 'forgotPassword',
-                      data['lang']) }}</a>
+                    <button onclick="resetPass()" id="#resetPass" form="" class="btn btn-outline-primary btn-sm forgot-password ">{{ translate('login', 'forgotPassword',
+                      data['lang']) }}</button>
                   </div>
 
                   <div class="text-block text-center my-3">
@@ -146,6 +146,7 @@
   <script src="/static/assets/js/shared/misc.js"></script>
   <script src="/static/assets/js/shared/settings.js"></script>
   <script src="/static/assets/js/shared/todolist.js"></script>
+  <script src="../static/assets/vendors/js/bootbox.min.js"></script>
   <!-- endinject -->
   <script>
     $(document).ready(function () {
@@ -160,8 +161,24 @@
           });
       }
     });
+    async function resetPass(){
+      let res = await fetch(`/api/v2/crafty/resetPass/`, {
+        method: 'GET',
+      });
+      let responseData = await res.json();
+      console.log(responseData);
+      bootbox.alert(responseData.data)
+
+    }
 
   </script>
+  <style>
+    .modal-content {
+      background-color: rgb(34, 36, 55) !important;
+      color: lightgray;
+      text-align: center;
+    }
+  </style>
 </body>
 
 </html>

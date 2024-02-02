@@ -1,5 +1,9 @@
 import logging
 import typing as t
+import datetime
+from datetime import timedelta
+from zoneinfo import ZoneInfo
+from apscheduler.schedulers.background import BackgroundScheduler
 from app.classes.models.servers import HelperServers
 
 from app.classes.models.users import HelperUsers
@@ -8,6 +12,7 @@ from app.classes.models.crafty_permissions import (
     PermissionsCrafty,
     EnumPermissionsCrafty,
 )
+from app.classes.shared.console import Console
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +27,8 @@ class UsersController:
         self.helper = helper
         self.users_helper = users_helper
         self.authentication = authentication
+        self.scheduler = BackgroundScheduler(timezone="Etc/UTC")
+        self.scheduler.start()
 
         _permissions_props = {
             "name": {
@@ -169,7 +176,8 @@ class UsersController:
         # create sets to store role data
         added_roles = set()
         removed_roles = set()
-
+        if user_data.get("username", None) == "anti-lockout-user":
+            raise ValueError("Invalid Username")
         # search for changes in user data
         for key in user_data:
             if key == "user_id":
@@ -245,6 +253,8 @@ class UsersController:
         superuser: bool = False,
         theme="default",
     ):
+        if username == "anti-lockout-user":
+            raise ValueError("Username is not valid")
         return self.users_helper.add_user(
             username,
             manager,
@@ -353,3 +363,37 @@ class UsersController:
 
     def delete_user_api_key(self, key_id: str):
         return self.users_helper.delete_user_api_key(key_id)
+
+    # **********************************************************************************
+    #                                   Lockout Methods
+    # **********************************************************************************
+    def start_anti_lockout(self):
+        lockout_pass = self.helper.create_pass()
+        self.users_helper.add_user(
+            "anti-lockout-user",
+            None,
+            password=lockout_pass,
+            email="",
+            enabled=True,
+            superuser=True,
+            theme="anti-lockout",
+        )
+
+        Console.yellow(
+            f"""
+            Anti-lockout recovery account enabled!
+            {'/' * 74}
+            Username: anti-lockout-user
+            Password: {lockout_pass}
+            {'/' * 74}"""
+        )
+        self.scheduler.add_job(
+            self.stop_anti_lockout,
+            "date",
+            id="anti-lockout-watcher",
+            run_date=datetime.datetime.now(ZoneInfo("Etc/UTC")) + timedelta(hours=1),
+        )
+
+    def stop_anti_lockout(self):
+        self.scheduler.remove_all_jobs()
+        self.users_helper.remove_user(self.get_id_by_name("anti-lockout-user"))

@@ -17,7 +17,7 @@ class HTTPHandler(BaseHandler):
             url = "https://" + url
         db_port = self.helper.get_setting("https_port")
         try:
-            resp = requests.get(url + ":" + str(port))
+            resp = requests.head(url + ":" + str(port), timeout=(0.5, 5))
             resp.raise_for_status()
         except Exception:
             port = db_port
@@ -35,7 +35,7 @@ class HTTPHandlerPage(BaseHandler):
             url = "https://" + url
         db_port = self.helper.get_setting("https_port")
         try:
-            resp = requests.get(url + ":" + str(port))
+            resp = requests.head(url + ":" + str(port), timeout=(0.5, 5))
             resp.raise_for_status()
         except Exception:
             port = db_port

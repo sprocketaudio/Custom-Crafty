@@ -578,6 +578,7 @@
         "serverUpload": "Wgraj ZIP Serwera",
         "serverVersion": "Wersja serwera",
         "sizeInGB": "Wielkość w GB",
+        "unsupported": "Wersje Minecrafta poniżej 1.8 nie są wspierane przez Crafty. Mimo to możesz je zainstalować - jednakże nie jesteśmy w stanie zagwarantować ich działanie.",
         "uploadButton": "Wgraj",
         "uploadZip": "Wgraj plik Zip dla imprtowania serwera",
         "zipPath": "Server Path"

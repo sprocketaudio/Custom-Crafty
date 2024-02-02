@@ -103,7 +103,9 @@ class HelperUsers:
 
     @staticmethod
     def get_all_users():
-        query = Users.select().where(Users.username != "system")
+        query = Users.select().where(
+            Users.username != "system", Users.username != "anti-lockout-user"
+        )
         return query
 
     @staticmethod

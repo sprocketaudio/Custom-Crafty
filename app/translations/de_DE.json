@@ -579,6 +579,7 @@
         "serverUpload": "Als Zip-Datei Gepackten Server hochladen",
         "serverVersion": "Server Version",
         "sizeInGB": "Größe in GB",
+        "unsupported": "Minecraft-Versionen vor 1.8 sind nicht vollständig auf Kompatibilität getestet. Bei einer Installation verhalten diese sich möglicherweise nicht wie erwartet.",
         "uploadButton": "Hochladen",
         "uploadZip": "Zip-Datei für Serverimport hochladen",
         "zipPath": "Server Pfad"
