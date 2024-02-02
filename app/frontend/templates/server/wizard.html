@@ -107,7 +107,8 @@
                       </select>
                     </div>
                   </div>
-
+                  <span data-html="true" class="version-hint text-center"
+                    data-content="⚠️ {{ translate('serverWizard', 'unsupported', data['lang']) }} ⚠️" , data-placement="right"></span>
                   <div class="col-sm-12">
                     <div class="form-group">
                       <label for="server_name">{{ translate('serverWizard', 'serverName', data['lang']) }}</label>
@@ -1233,6 +1234,20 @@
       }
     })
   }
+  $("#server").change(function (){
+    let selected_version = $("#server :selected").text().split(".");
+    if(parseInt(selected_version[0]) === 1 && parseInt(selected_version[1]) < 8 ){
+      $('[data-toggle="popover"]').popover();
+    if ($(window).width() < 1000) {
+      $('.version-hint').attr("data-placement", "top")
+    } else {
+      $('.version-hint').attr("data-placement", "right")
+    }
+    $('.version-hint').popover("show");
+    }else{
+      $('.version-hint').popover("hide");
+    }
+  });
 
   function serverJarChange(selectObj) {
     const type_select = document.getElementById('server_jar')
