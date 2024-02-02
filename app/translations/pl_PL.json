@@ -512,6 +512,7 @@
         "cpuUsage": "Użycie procesora",
         "description": "Opis",
         "errorCalculatingUptime": "Błąd obliczania czasu pracy",
+        "loadingMotd": "Wczytywanie MOTD",
         "memUsage": "Użycie RAMu",
         "offline": "Wyłączony",
         "online": "Włączony",

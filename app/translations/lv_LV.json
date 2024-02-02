@@ -513,6 +513,7 @@
         "cpuUsage": "CPU Lietojums",
         "description": "Apraksts",
         "errorCalculatingUptime": "Kļūda aprēķinot darbības laiku",
+        "loadingMotd": "Ielādē MOTD",
         "memUsage": "Atmiņas Lietojums",
         "offline": "Offlinā",
         "online": "Onlinā",
