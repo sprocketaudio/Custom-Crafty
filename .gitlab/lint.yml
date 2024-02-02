@@ -51,8 +51,11 @@ pylint:
     - if: "$CODE_QUALITY_DISABLED"
       when: never
     - if: "$CI_COMMIT_TAG || $CI_COMMIT_BRANCH"
-  script:
+  before_script:
+    - apk update
+    - apk add gcc python3-dev linux-headers build-base
     - pip3 install --no-cache-dir -r requirements.txt
+  script:
     - pylint --exit-zero --load-plugins=pylint_gitlab --output-format=gitlab-codeclimate:codeclimate.json $(find -type f -name "*.py" ! -path "**/.venv/**" ! -path "**/app/migrations/**")
   artifacts:
     reports:
