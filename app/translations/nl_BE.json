@@ -580,6 +580,7 @@
         "serverUpload": "Gezipt bestand uploaden",
         "serverVersion": "Serverversie",
         "sizeInGB": "Grootte in GB",
+        "unsupported": "Minecraft-versies lager dan 1.8 worden niet ondersteund door Crafty. Je kunt het nog steeds installeren. De resultaten kunnen variëren.",
         "uploadButton": "Uploaden",
         "uploadZip": "Upload zip-bestand voor serverimport",
         "zipPath": "Serverpad"

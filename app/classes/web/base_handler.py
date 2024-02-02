@@ -12,6 +12,7 @@ from app.classes.shared.file_helpers import FileHelpers
 from app.classes.shared.main_controller import Controller
 from app.classes.shared.translation import Translation
 from app.classes.shared.main_models import DatabaseShortcuts
+from app.classes.models.users import DoesNotExist
 
 logger = logging.getLogger(__name__)
 auth_log = logging.getLogger("auth")
@@ -91,7 +92,10 @@ class BaseHandler(tornado.web.RequestHandler):
             t.Dict[str, t.Any]: The token's payload.
             t.Dict[str, t.Any]: The user's data from the database.
         """
-        return self.controller.authentication.check(self.get_cookie("token"))
+        try:
+            return self.controller.authentication.check(self.get_cookie("token"))
+        except DoesNotExist:
+            return None
 
     def autobleach(self, name, text):
         for r in self.redactables:
@@ -102,7 +106,7 @@ class BaseHandler(tornado.web.RequestHandler):
         if type(text) in self.nobleach:
             logger.debug("Auto-bleaching - bypass type")
             return text
-        return nh3.clean(text)
+        return nh3.clean(text)  # pylint: disable=no-member
 
     def get_argument(
         self,

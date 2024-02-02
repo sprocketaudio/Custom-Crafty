@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ data['lang_page'] }}" class="{{data['user_data'].get('theme', 'default')}}">
+<html lang="{{ data['lang_page'] }}" class="{{data['user_data'].get('theme', 'default')}}" data-username="{{data['user_data'].get('username', None)}}">
 
 <head>
   <!-- Required meta tags -->
@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="/static/assets/vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="/static/assets/vendors/typicons/typicons.css">
   <link rel="stylesheet" href="/static/assets/vendors/fontawesome6/css/all.css">
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Sarabun" media="screen">
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.22/fh-3.1.7/r-2.2.6/sc-2.0.3/sp-1.2.2/datatables.min.css" />
   <link rel="stylesheet" href="/static/assets/vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="/static/assets/css/crafty.css">
@@ -53,7 +54,6 @@
   <script src="../static/assets/vendors/js/chart.min.js"></script>
   <script src="../static/assets/vendors/js/hammer.min.js"></script>
   <script src="../static/assets/vendors/js/chartjs-plugin-zoom.min.js"></script>
-
   <!-- End Bootstrap Toggle -->
 
 </head>
@@ -256,8 +256,9 @@
 
     const sendWssError = () => wsOpen || warn(
       'WebSockets are required for Crafty to work. This websocket connection has been closed. Are you using a reverse proxy?',
-      'https://docs.craftycontrol.com/pages/getting-started/proxies/',
-      'wssError'
+      link='https://docs.craftycontrol.com/pages/getting-started/proxies/',
+      link_msg="See our documentation for details",
+      className='wssError'
     )
 
     function startWebSocket() {
@@ -394,7 +395,7 @@
             }
           },
           callback: function (result) {
-            if (result){
+            if (result) {
               location.href = "/panel/download_support_package";
             } else {
               bootbox.close();
@@ -459,7 +460,7 @@
     }
 
 
-    function warn(message, link = null, className = null) {
+    function warn(message, link = null, link_msg=null, className = null, bg_color="#f7970f") {
       var closeEl = document.createElement('span');
       var strongEL = document.createElement('strong');
       var msgEl = document.createElement('div');
@@ -481,7 +482,7 @@
       var parentEl = document.createElement('div');
 
       parentEl.style.padding = '20px';
-      parentEl.style.backgroundColor = '#f7970f';
+      parentEl.style.backgroundColor = bg_color;
 
       parentEl.appendChild(closeEl);
       parentEl.appendChild(msgEl);
@@ -489,7 +490,7 @@
         let linkEl = document.createElement('a')
         linkEl.href = link;
         linkEl.innerHTML = "See our documentation for details.";
-        linkEl.style.color = 'white';
+        //linkEl.style.color = 'white';
         linkEl.style.textDecoration = 'underline';
         linkEl.target = "_blank";
 
@@ -580,6 +581,15 @@
 
     $(document).ready(function () {
       console.log('%c[Crafty Controller] %cReady for JS!', 'font-weight: 900; color: #800080;', 'font-weight: 900; color: #eee;');
+      if ($(document.documentElement).data("username") === "anti-lockout-user"){
+        warn(
+        '⚠️You are in a recovery account. Access is limited!',
+        link='/logout',
+        link_msg="Click here to log out after you change your password. ⚠️",
+        className='anti-lockout',
+        bg_color='#6887dc'
+        )
+      }
       $('#support_logs').click(function () {
         var dialog = bootbox.dialog({
           message: "<p class='text- center mb - 0'><i class='fa fa - spin fa - cog'></i>{{ translate('notify', 'preparingLogs', data['lang']) }}</p>",

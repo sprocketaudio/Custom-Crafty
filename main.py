@@ -388,6 +388,8 @@ if __name__ == "__main__":
     # Master config.json in helpers.py
     Console.info("Checking for remote changes to config.json")
     controller.get_config_diff()
+    # Delete anti-lockout-user
+    controller.users.stop_anti_lockout()
     Console.info("Remote change complete.")
 
     # startup the web server

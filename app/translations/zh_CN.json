@@ -580,6 +580,7 @@
         "serverUpload": "上传打包为 Zip 文件的服务器",
         "serverVersion": "服务器版本",
         "sizeInGB": "大小（以 GB 为单位）",
+        "unsupported": "Crafty 不支持低于 1.8 的 Minecraft 版本。你仍可以安装，但结果无法保证。",
         "uploadButton": "上传",
         "uploadZip": "上传 Zip 文件以导入服务器",
         "zipPath": "服务器路径"

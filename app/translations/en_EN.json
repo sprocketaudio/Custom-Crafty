@@ -579,6 +579,7 @@
         "serverUpload": "Upload Zipped Server",
         "serverVersion": "Server Version",
         "sizeInGB": "Size in GB",
+        "unsupported": "Minecraft versions lower than 1.8 are not supported by Crafty. You may still install it. Results will vary.",
         "uploadButton": "Upload",
         "uploadZip": "Upload Zip File For Server Import",
         "zipPath": "Server Path"
