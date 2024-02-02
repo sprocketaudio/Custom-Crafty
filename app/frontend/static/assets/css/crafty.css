@@ -265,7 +265,6 @@ div.warnings div.wssError a:hover {
 /**************************************************************/
 *:lang(th-TH) :not(.fa, .fas, .fab, .fa-solid) {
     font-family: 'Sarabun', 'roboto', sans-serif;
-    font-size: medium;
 }
 
 /**************************************************************/
