@@ -7,6 +7,7 @@
 ### Refactor
 - Refactor subpage perm checks ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/695))
 ### Bug fixes
+- [`CVE-2024-1064`] Security-related fix to resolve an issue with the HTTP listener ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/704))
 - Fix bukkit and downstream fork MOTD crash ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/686))
 - Fix bug where invalid server Id leads to stack ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/690))
 - Fix indent on public status check box ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/691))
