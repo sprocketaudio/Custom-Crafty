@@ -18,6 +18,9 @@
 - Refactor Forge server initialisation flow for newer versions ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/687))
 - Remove scroll bars from player management ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/693))
 - Add warning to wizard for unsupported mc ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/701))
+- Improve display for `th-TH` characters ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/703))
+- Improve display of white text on **wssErrors** ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/703))
+- Improve display of white text on  **Buttons** ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/703))
 ### Lang
 - Update `zh_CN, pl_PL, nl_BE, lv_LV, he_IL, fr_FR, de_DE, lol_EN` translations for `4.2.3` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/696))
 - New `uk_UA, tr_TR, th_TH` translations for `4.2.3` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/696))
