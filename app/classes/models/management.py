@@ -1,3 +1,4 @@
+import uuid
 import logging
 import datetime
 from peewee import (
@@ -9,6 +10,7 @@ from peewee import (
     TextField,
     AutoField,
     BooleanField,
+    UUIDField,
 )
 from playhouse.shortcuts import model_to_dict
 
@@ -120,6 +122,9 @@ class Schedules(BaseModel):
 #                                   Backups Class
 # **********************************************************************************
 class Backups(BaseModel):
+    backup_id = UUIDField(primary_key=True, default=uuid.uuid4)
+    backup_name = CharField(default="New Backup")
+    backup_location = CharField(default="")
     excluded_dirs = CharField(null=True)
     max_backups = IntegerField()
     server_id = ForeignKeyField(Servers, backref="backups_server")
