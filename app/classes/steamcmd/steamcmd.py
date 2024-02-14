@@ -40,7 +40,7 @@ class SteamCMD:
 
         if not os.path.isdir(self._installation_path):
             raise NotADirectoryError(
-                message=f"No valid directory found at {self._installation_path}"
+                f"No valid directory found at {self._installation_path}. "
                 "Please make sure that the directory is correct."
             )
 
@@ -54,10 +54,8 @@ class SteamCMD:
         self.platform = platform.system()
         if self.platform not in ["Windows", "Linux"]:
             raise NotImplementedError(
-                message=(
-                    f"Non supported operating system. "
-                    f"Expected Windows, or Linux, got {self.platform}"
-                )
+                f"Non supported operating system. "
+                f"Expected Windows, or Linux, got {self.platform}"
             )
 
         self.steamcmd_url = package_links[self.platform]["url"]
@@ -85,7 +83,7 @@ class SteamCMD:
                 return data
         except Exception as e:
             raise FileNotFoundError(
-                message=f"An unknown exception occurred during downloading. {e}"
+                f"An unknown exception occurred during downloading. {e}"
             ) from e
 
     def _extract_steamcmd(self):
@@ -104,7 +102,7 @@ class SteamCMD:
         else:
             # This should never happen, but let's just throw it just in case.
             raise NotImplementedError(
-                message="The operating system is not supported."
+                "The operating system is not supported."
                 f"Expected Linux or Windows, received: {self.platform}"
             )
 
@@ -138,7 +136,7 @@ class SteamCMD:
 
         else:
             raise FileExistsError(
-                message="Steamcmd is already installed. Reinstall is not necessary."
+                "Steamcmd is already installed. Reinstall is not necessary."
                 "Use force=True to override."
             )
         try:
@@ -148,7 +146,7 @@ class SteamCMD:
                 logger.error("SteamCMD has returned error code 7 on fresh installation")
                 return
             raise SystemError(
-                message=f"Failed to install, check error code {e.returncode}"
+                f"Failed to install, check error code {e.returncode}"
             ) from e
 
         return
@@ -229,7 +227,7 @@ class SteamCMD:
         """
         if n_tries == 0:
             raise TimeoutError(
-                message="""Error executing command, max number of retries exceeded!
+                """Error executing command, max number of retries exceeded!
                 Consider increasing the n_tries parameter if the download is
                 particularly large"""
             )
@@ -262,4 +260,14 @@ class SteamCMD:
                 )
                 return self.execute(cmd, n_tries - 1)
 
-            raise SystemError(f"Steamcmd was unable to run. exit code was {e}") from e
+            # Specifically handle the case of exit code 8, insufficient disk space.
+            if e.returncode == 8:
+                raise SystemError(
+                    """SteamCMD was unable to run due to
+                    insufficient disk space. Exit code was 8."""
+                ) from e
+
+            # Handle other non-zero exit codes with a general error message.
+            raise SystemError(
+                f"SteamCMD was unable to run. Exit code was {e.returncode}."
+            ) from e
