@@ -233,22 +233,43 @@ class ImportHelpers:
 
     def create_steam_server(self, app_id, server_id, server_dir, server_exe):
         # TODO: what is the server exe called @zedifus
-        server_exe = "steamcmd.exe"
-        # Sets the steamCMD install directory for next install.
-        self.steam = SteamCMD(server_dir)
+        # @pretzel As we are not able to use steamcmd to launch game it
+        # is not possible to be populate as we dont know the executable.
+        server_exe = "game.exe"
+
+        # Initiate SteamCMD & game installing status.
+        ServersController.set_import(server_id)
+
+        # Set our storage locations
+        steamcmd_path = os.path.join(server_dir, "steamcmd_files")
+        gamefiles_path = os.path.join(server_dir, "gameserver_files")
+
+        # Ensure game and steam directories exist in server directory.
+        self.helper.ensure_dir_exists(steamcmd_path)
+        self.helper.ensure_dir_exists(gamefiles_path)
+
+        # Set the SteamCMD install directory for next install.
+        self.steam = SteamCMD(steamcmd_path)
+
+        # Install SteamCMD for managing game server files.
         self.steam.install()
 
-        full_jar_path = os.path.join(server_dir, server_exe)
-
+        # Set the server execuion command. TODO brainstorm how to approach.
+        full_jar_path = os.path.join(steamcmd_path, server_exe)
         if Helpers.is_os_windows():
-            server_command = f'"{full_jar_path}"'
+            server_command = f'"{full_jar_path}"'  # TODO why called jar
         else:
             server_command = f"./{server_exe}"
         logger.debug("command: " + server_command)
 
-        ServersController.set_import(server_id)
-        self.steam.app_update(app_id, "./gamefiles")
+        # Install the game server files.
+        self.steam.app_update(app_id, gamefiles_path)
+
+        # Finalise SteamCMD & game installing status.
         ServersController.finish_import(server_id)
+        server_users = PermissionsServers.get_server_user_list(server_id)
+        for user in server_users:
+            WebSocketManager().broadcast_user(user, "send_start_reload", {})
 
     def download_bedrock_server(self, path, new_id):
         download_thread = threading.Thread(
