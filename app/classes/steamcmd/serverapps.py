@@ -91,7 +91,8 @@ class SteamApps:
                 cache = json.load(cache_file)["steam_apps"]
 
         except Exception as e:
-            logger.error(f"Unable to read SteamApps cache file: {e}")
+            logger.error("Unable to read SteamApps"
+                         f" cache file: {e}")
 
         return cache
 
