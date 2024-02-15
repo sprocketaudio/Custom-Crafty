@@ -84,6 +84,7 @@ from app.classes.web.routes.api.crafty.exe_cache import (
 )
 from app.classes.web.routes.api.crafty.antilockout.index import ApiCraftyLockoutHandler
 
+
 def api_handlers(handler_args):
     return [
         # Auth routes
