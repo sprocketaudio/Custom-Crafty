@@ -263,8 +263,8 @@ class SteamCMD:
             # Specifically handle the case of exit code 8, insufficient disk space.
             if e.returncode == 8:
                 raise SystemError(
-                    """SteamCMD was unable to run due to
-                    insufficient disk space. Exit code was 8."""
+                    "SteamCMD was unable to run due to"
+                    "insufficient disk space. Exit code was 8."
                 ) from e
 
             # Handle other non-zero exit codes with a general error message.
