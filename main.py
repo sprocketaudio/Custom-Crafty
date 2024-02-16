@@ -11,7 +11,6 @@ from packaging import version as pkg_version
 
 from app.classes.shared.file_helpers import FileHelpers
 from app.classes.shared.import3 import Import3
-from app.classes.shared.migrate_uuid import MigrateUUID
 from app.classes.shared.console import Console
 from app.classes.shared.helpers import Helpers
 from app.classes.models.users import HelperUsers
@@ -384,7 +383,6 @@ if __name__ == "__main__":
     controller.set_project_root(APPLICATION_PATH)
     tasks_manager = TasksManager(helper, controller, file_helper)
     import3 = Import3(helper, controller)
-    migrate_uuid = MigrateUUID(helper, controller)
 
     # Check to see if client config.json version is different than the
     # Master config.json in helpers.py
@@ -417,7 +415,7 @@ if __name__ == "__main__":
 
     # start the Crafty console.
     crafty_prompt = MainPrompt(
-        helper, tasks_manager, migration_manager, controller, import3, migrate_uuid
+        helper, tasks_manager, migration_manager, controller, import3
     )
 
     # set up all controllers
