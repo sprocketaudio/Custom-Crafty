@@ -24,7 +24,6 @@ logger = logging.getLogger(__name__)
 class Servers(BaseModel):
     server_id = CharField(primary_key=True, default=Helpers.create_uuid())
     created = DateTimeField(default=datetime.datetime.now)
-    # server_uuid = CharField(default="", index=True)
     server_name = CharField(default="Server", index=True)
     path = CharField(default="")
     backup_path = CharField(default="")
