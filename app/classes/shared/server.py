@@ -541,7 +541,7 @@ class ServerInstance:
         #               STEAM SERVERS
         # ***********************************************
         # ***********************************************
-        elif HelperServers.get_server_type_by_id(self.server_id) == "raknet":
+        elif HelperServers.get_server_type_by_id(self.server_id) == "steam_cmd":
             my_env = os.environ
             env_mod = False
             with open(
@@ -1522,6 +1522,7 @@ class ServerInstance:
             return False
 
         # lets download the files
+
         if HelperServers.get_server_type_by_id(self.server_id) != "minecraft-bedrock":
             # boolean returns true for false for success
             downloaded = Helpers.download_file(
@@ -1871,6 +1872,8 @@ class ServerInstance:
             int_mc_ping = ping_raknet(internal_ip, int(server_port))
         else:
             int_mc_ping = ping(internal_ip, int(server_port))
+        # TODO MAKE BETTER identify based on db server type
+        # dont hammer servers with unrelated requests to their type
 
         int_data = False
         ping_data = {}

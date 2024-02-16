@@ -553,7 +553,7 @@ class Controller:
         elif data["monitoring_type"] == "steam_cmd":
             monitoring_port = data["steam_cmd_monitoring_data"]["port"]
             monitoring_host = data["steam_cmd_monitoring_data"]["host"]
-            monitoring_type = "raknet"
+            monitoring_type = "steam_cmd"
         elif data["monitoring_type"] == "none":
             # TODO: this needs to be NUKED..
             # There shouldn't be anything set if there is nothing to monitor
