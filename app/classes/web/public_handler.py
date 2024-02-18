@@ -1,5 +1,7 @@
 import logging
 import nh3
+import base64
+import binascii
 
 from app.classes.shared.helpers import Helpers
 from app.classes.models.users import HelperUsers
@@ -112,10 +114,13 @@ class PublicHandler(BaseHandler):
             if self.request.query:
                 next_page = "/login?" + self.request.query
 
-            # pylint: disable=no-member
-            entered_username = nh3.clean(self.get_argument("username"))
-            entered_password = self.get_argument("password")
-            # pylint: enable=no-member
+            entered_username = nh3.clean(self.get_argument("username")) # pylint: disable=no-member
+            try:
+                entered_password = base64.b64decode(self.get_argument("encPassword"))
+            except binascii.Error:
+                error_msg = ("Hello? Hello? Anybody home?"
+                " Go straight to jail. Do not pass go.")
+                return self.redirect(f"/login?error_msg={error_msg}")
 
             try:
                 user_id = HelperUsers.get_user_id_by_name(entered_username.lower())
@@ -132,7 +137,8 @@ class PublicHandler(BaseHandler):
                 # self.clear_cookie("user_data")
                 self.clear_cookie("token")
                 if self.request.query:
-                    self.redirect(f"/login?error_msg={error_msg}&{self.request.query}")
+                    self.redirect(f"/login?err  or_msg={error_msg}"
+                                  f"&{self.request.query}")
                 else:
                     self.redirect(f"/login?error_msg={error_msg}")
                 return
@@ -175,7 +181,6 @@ class PublicHandler(BaseHandler):
                 else:
                     self.redirect(f"/login?error_msg={error_msg}")
                 return
-
             login_result = self.helper.verify_pass(entered_password, user_data.password)
 
             # Valid Login

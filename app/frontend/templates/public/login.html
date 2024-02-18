@@ -78,9 +78,9 @@
                 }
               </style>
               {% if data['query'] %}
-              <form action="/login?{{ data['query'] }}" method="post">
+              <form id="login" action="/login?{{ data['query'] }}" method="post" onsubmit="encodePass()">
                 {% else %}
-                <form action="/login" method="post">
+                <form id="login" action="/login" method="post" onsubmit="encodePass()">
                   {% end %}
                   {% raw xsrf_form_html() %}
                   <div class="form-group">
@@ -170,7 +170,9 @@
       bootbox.alert(responseData.data)
 
     }
-
+  function encodePass(){
+    $("#encPassword").val(btoa($("#password").val()))
+  }
   </script>
   <style>
     .modal-content {
@@ -179,6 +181,9 @@
       text-align: center;
     }
   </style>
+  <input form="login" type="password" class="form-control login-text-input login-input"
+  placeholder="{{ translate('login', 'password', data['lang']) }}" name="encPassword" id="encPassword"
+  style="visibility: hidden;">
 </body>
 
 </html>
