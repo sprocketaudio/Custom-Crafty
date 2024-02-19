@@ -1,7 +1,7 @@
 import logging
-import nh3
-import base64
 import binascii
+import base64
+import nh3
 
 from app.classes.shared.helpers import Helpers
 from app.classes.models.users import HelperUsers
@@ -114,13 +114,18 @@ class PublicHandler(BaseHandler):
             if self.request.query:
                 next_page = "/login?" + self.request.query
 
-            entered_username = nh3.clean(self.get_argument("username")) # pylint: disable=no-member
+            entered_username = nh3.clean(
+                self.get_argument("username")
+            )  # pylint: disable=no-member
             try:
                 entered_password = base64.b64decode(
-                    self.get_argument("encPassword")).decode("utf-8")
+                    self.get_argument("encPassword")
+                ).decode("utf-8")
             except binascii.Error:
-                error_msg = ("Hello? Hello? Anybody home?"
-                " Go straight to jail. Do not pass go.")
+                error_msg = (
+                    "Hello? Hello? Anybody home?"
+                    " Go straight to jail. Do not pass go."
+                )
                 return self.redirect(f"/login?error_msg={error_msg}")
 
             try:
@@ -138,8 +143,9 @@ class PublicHandler(BaseHandler):
                 # self.clear_cookie("user_data")
                 self.clear_cookie("token")
                 if self.request.query:
-                    self.redirect(f"/login?err  or_msg={error_msg}"
-                                  f"&{self.request.query}")
+                    self.redirect(
+                        f"/login?err  or_msg={error_msg}" f"&{self.request.query}"
+                    )
                 else:
                     self.redirect(f"/login?error_msg={error_msg}")
                 return
@@ -221,17 +227,13 @@ class PublicHandler(BaseHandler):
                 # self.clear_cookie("user")
                 # self.clear_cookie("user_data")
                 self.clear_cookie("token")
-                error_msg = (
-                self.helper.translation.translate("login",
-                                                    "incorrect",
-                                                    self.helper.get_setting("language"))
+                error_msg = self.helper.translation.translate(
+                    "login", "incorrect", self.helper.get_setting("language")
                 )
                 if entered_password == "app/config/default-creds.txt":
                     error_msg += ". "
-                    error_msg += (
-                        self.helper.translation.translate("login",
-                                                    "defaultPath",
-                                                    self.helper.get_setting("language"))
+                    error_msg += self.helper.translation.translate(
+                        "login", "defaultPath", self.helper.get_setting("language")
                     )
                 # log this failed login attempt
                 self.controller.management.add_to_audit_log(
