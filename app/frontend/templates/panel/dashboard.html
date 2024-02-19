@@ -598,26 +598,27 @@
 </script>
 <script>
 
-  function send_command(server_id, command) {
+  async function send_command(server_id, command) {
     /* this getCookie function is in base.html */
     const token = getCookie("_xsrf");
-    $.ajax({
-      type: "POST",
-      headers: { 'X-XSRFToken': token },
-      url: `/api/v2/servers/${server_id}/action/${command}`,
-      success: function (data) {
-        console.log("got response:");
-        console.log(data);
-        if (command === "clone_server" && data.status === "ok") {
-          window.location.reload();
-        }
-        /*setTimeout(function () {
-          if (command != 'start_server') {
-            location.reload();
-          }
-        }, 10000);*/
-      }
+    let res = await fetch(`/api/v2/servers/${server_id}/action/${command}`, {
+      method: 'POST',
+      headers: {
+        'token': token,
+      },
     });
+    let responseData = await res.json();
+    if (responseData.status === "ok") {
+      if (command === "clone_server"){
+        window.location.reload()
+      }
+      console.log("Command received successfully")
+    } else {
+      bootbox.alert({
+        title: responseData.status,
+        message: responseData.error
+      });
+    }
   }
 
 

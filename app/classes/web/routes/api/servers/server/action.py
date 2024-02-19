@@ -30,7 +30,11 @@ class ApiServersServerActionHandler(BaseApiHandler):
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
 
         if action == "clone_server":
-            return self._clone_server(server_id, auth_data[4]["user_id"])
+            if self.controller.crafty_perms.can_create_server(auth_data[4]["user_id"]):
+                return self._clone_server(server_id, auth_data[4]["user_id"])
+            return self.finish_json(
+                200, {"status": "error", "error": "SERVER_LIMIT_REACHED"}
+            )
         if action == "eula":
             return self._agree_eula(server_id, auth_data[4]["user_id"])
 
