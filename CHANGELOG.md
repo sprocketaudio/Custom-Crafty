@@ -2,8 +2,11 @@
 ## --- [4.2.4] - 2023/TBD
 ### New features
 TBD
+### Refactor
+- Refactor remote file downloads ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/719))
 ### Bug fixes
-TBD
+- Fix Bedrock cert issues ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/719))
+- Make sure default.json is read from correct location ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/714))
 ### Tweaks
 - Bump pyOpenSSL & cryptography for CVE-2024-0727, CVE-2023-50782 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/716))
 ### Lang
