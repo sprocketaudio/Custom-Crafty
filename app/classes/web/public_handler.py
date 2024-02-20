@@ -156,8 +156,7 @@ class PublicHandler(BaseHandler):
                     {
                         "status": "error",
                         "error": "Hello? Hello? Anybody home?"
-                        " Go straight to jail. Do not pass go."
-                        " Uh oh! Stinky 💩",
+                        " Go straight to jail. Do not pass go.",
                     },
                 )
             except UnicodeDecodeError:
