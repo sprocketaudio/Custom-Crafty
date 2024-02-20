@@ -96,7 +96,6 @@ class PublicHandler(BaseHandler):
             "properties": {
                 "username": {
                     "type": "string",
-                    "pattern": "^[a-z0-9_]+$",
                 },
                 "password": {"type": "string"},
             },
