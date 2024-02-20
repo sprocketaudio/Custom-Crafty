@@ -3,7 +3,6 @@ import time
 import shutil
 import logging
 import threading
-import urllib
 
 from app.classes.controllers.server_perms_controller import PermissionsServers
 from app.classes.controllers.servers_controller import ServersController
@@ -227,25 +226,39 @@ class ImportHelpers:
         download_thread.start()
 
     def download_threaded_bedrock_server(self, path, new_id):
-        # downloads zip from remote url
+        """
+        Downloads the latest Bedrock server, unzips it, sets necessary permissions.
+
+        Parameters:
+            path (str): The directory path to download and unzip the Bedrock server.
+            new_id (str): The identifier for the new server import operation.
+
+        This method handles exceptions and logs errors for each step of the process.
+        """
         try:
             bedrock_url = Helpers.get_latest_bedrock_url()
-            if bedrock_url.lower().startswith("https"):
-                urllib.request.urlretrieve(
-                    bedrock_url,
-                    os.path.join(path, "bedrock_server.zip"),
+            if bedrock_url:
+                file_path = os.path.join(path, "bedrock_server.zip")
+
+                success = FileHelpers.ssl_get_file(
+                    bedrock_url, path, "bedrock_server.zip"
                 )
+                if not success:
+                    logger.error("Failed to download the Bedrock server zip.")
+                    return
 
-            unzip_path = os.path.join(path, "bedrock_server.zip")
-            unzip_path = self.helper.wtol_path(unzip_path)
-            # unzips archive that was downloaded.
-            FileHelpers.unzip_file(unzip_path)
-            # adjusts permissions for execution if os is not windows
-            if not self.helper.is_os_windows():
-                os.chmod(os.path.join(path, "bedrock_server"), 0o0744)
+                unzip_path = self.helper.wtol_path(file_path)
+                # unzips archive that was downloaded.
+                FileHelpers.unzip_file(unzip_path)
+                # adjusts permissions for execution if os is not windows
 
-            # we'll delete the zip we downloaded now
-            os.remove(os.path.join(path, "bedrock_server.zip"))
+                if not self.helper.is_os_windows():
+                    os.chmod(os.path.join(path, "bedrock_server"), 0o0744)
+
+                # we'll delete the zip we downloaded now
+                os.remove(file_path)
+            else:
+                logger.error("Bedrock download URL issue!")
         except Exception as e:
             logger.critical(
                 f"Failed to download bedrock executable during server creation! \n{e}"

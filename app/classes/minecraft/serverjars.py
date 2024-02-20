@@ -1,13 +1,14 @@
+import os
 import json
 import threading
 import time
-import shutil
 import logging
 from datetime import datetime
 import requests
 
 from app.classes.controllers.servers_controller import ServersController
 from app.classes.models.server_permissions import PermissionsServers
+from app.classes.shared.file_helpers import FileHelpers
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
@@ -23,6 +24,95 @@ class ServerJars:
     @staticmethod
     def get_paper_jars():
         return PAPERJARS
+
+    def get_paper_versions(self, project):
+        """
+        Retrieves a list of versions for a specified project from the PaperMC API.
+
+        Parameters:
+            project (str): The project name to query for available versions.
+
+        Returns:
+            list: A list of version strings available for the project. Returns an empty
+                list if the API call fails or if no versions are found.
+
+        This function makes a GET request to the PaperMC API to fetch available project
+        versions, The versions are returned in reverse order, with the most recent
+        version first.
+        """
+        try:
+            response = requests.get(
+                f"{self.paper_base}/v2/projects/{project}/", timeout=2
+            )
+            response.raise_for_status()
+            api_data = response.json()
+        except Exception as e:
+            logger.error(f"Error loading project versions for {project}: {e}")
+            return []
+
+        versions = api_data.get("versions", [])
+        versions.reverse()  # Ensure the most recent version comes first
+        return versions
+
+    def get_paper_build(self, project, version):
+        """
+        Fetches the latest build for a specified project and version from PaperMC API.
+
+        Parameters:
+            project (str): Project name, typically a server software like 'paper'.
+            version (str): Project version to fetch the build number for.
+
+        Returns:
+            int or None: Latest build number if successful, None if not or on error.
+
+        This method attempts to query the PaperMC API for the latest build and
+        handles exceptions by logging errors and returning None.
+        """
+        try:
+            response = requests.get(
+                f"{self.paper_base}/v2/projects/{project}/versions/{version}/builds/",
+                timeout=2,
+            )
+            response.raise_for_status()
+            api_data = response.json()
+        except Exception as e:
+            logger.error(f"Error fetching build for {project} {version}: {e}")
+            return None
+
+        builds = api_data.get("builds", [])
+        return builds[-1] if builds else None
+
+    def get_fetch_url(self, jar, server, version):
+        """
+        Constructs the URL for downloading a server JAR file based on the server type.
+
+        Supports two main types of server JAR sources:
+        - ServerJars API for servers not in PAPERJARS.
+        - Paper API for servers available through the Paper project.
+
+        Parameters:
+            jar (str): Name of the JAR file.
+            server (str): Server software name (e.g., "paper").
+            version (str): Server version.
+
+        Returns:
+            str or None: URL for downloading the JAR file, or None if URL cannot be
+                        constructed.
+        """
+        # Check if the server type is not specifically handled by Paper.
+        if server not in PAPERJARS:
+            return f"{self.base_url}/api/fetchJar/{jar}/{server}/{version}"
+
+        # For Paper servers, get the build number for the specified version.
+        build = self.get_paper_build(server, version).get("build")
+        if not build:
+            return None
+
+        # Construct and return the URL for downloading the Paper server JAR.
+        return (
+            f"{self.paper_base}/v2/projects/{server}/versions/{version}/"
+            f"builds/{build}/downloads/{server}-{version}-{build}.jar"
+        )
 
     def _get_api_result(self, call_url: str):
         full_url = f"{self.base_url}{call_url}"
@@ -43,40 +133,6 @@ class ServerJars:
             return {}
 
         return api_response
-
-    def get_paper_versions(self, project):
-        try:
-            response = requests.get(
-                f"{self.paper_base}/v2/projects/{project}/", timeout=2
-            )
-            response.raise_for_status()
-            api_data = json.loads(response.content)
-        except Exception as e:
-            logger.error(
-                f"Unable to load https://api.papermc.io/v2/projects/{project}/"
-                f"api due to error: {e}"
-            )
-            return {}
-        versions = api_data.get("versions", [])
-        versions.reverse()
-        return versions
-
-    def get_paper_build(self, project, version):
-        try:
-            response = requests.get(
-                f"{self.paper_base}/v2/projects/{project}/versions/{version}/builds/",
-                timeout=2,
-            )
-            response.raise_for_status()
-            api_data = json.loads(response.content)
-        except Exception as e:
-            logger.error(
-                f"Unable to load https://api.papermc.io/v2/projects/{project}/"
-                f"api due to error: {e}"
-            )
-            return {}
-        build = api_data.get("builds", [])[-1]
-        return build
 
     def _read_cache(self):
         cache_file = self.helper.serverjar_cache
@@ -213,55 +269,75 @@ class ServerJars:
         update_thread.start()
 
     def a_download_jar(self, jar, server, version, path, server_id):
+        """
+        Downloads a server JAR file and performs post-download actions including
+        notifying users and setting import status.
+
+        This method waits for the server registration to complete, retrieves the
+        download URL for the specified server JAR file.
+
+        Upon successful download, it either runs the installer for
+        Forge servers or simply finishes the import process for other types. It
+        notifies server users about the completion of the download.
+
+        Parameters:
+            - jar (str): The name of the JAR file to download.
+            - server (str): The type of server software (e.g., 'forge', 'paper').
+            - version (str): The version of the server software.
+            - path (str): The local filesystem path where the JAR file will be saved.
+            - server_id (str): The unique identifier for the server being updated or
+                imported, used for notifying users and setting the import status.
+
+        Returns:
+            - bool: True if the JAR file was successfully downloaded and saved;
+                False otherwise.
+
+        The method ensures that the server is properly registered before proceeding
+        with the download and handles exceptions by logging errors and reverting
+        the import status if necessary.
+        """
         # delaying download for server register to finish
         time.sleep(3)
-        if server not in PAPERJARS:
-            fetch_url = f"{self.base_url}/api/fetchJar/{jar}/{server}/{version}"
-        else:
-            build = self.get_paper_build(server, version).get("build", None)
-            if not build:
-                return
-            fetch_url = (
-                f"{self.paper_base}/v2/projects"
-                f"/{server}/versions/{version}/builds/{build}/downloads/"
-                f"{server}-{version}-{build}.jar"
-            )
+
+        fetch_url = self.get_fetch_url(jar, server, version)
+        if not fetch_url:
+            return False
+
         server_users = PermissionsServers.get_server_user_list(server_id)
 
-        # We need to make sure the server is registered before
-        # we submit a db update for it's stats.
+        # Make sure the server is registered before updating its stats
         while True:
             try:
                 ServersController.set_import(server_id)
                 for user in server_users:
                     WebSocketManager().broadcast_user(user, "send_start_reload", {})
-
                 break
             except Exception as ex:
-                logger.debug(f"server not registered yet. Delaying download - {ex}")
+                logger.debug(f"Server not registered yet. Delaying download - {ex}")
 
-        # open a file stream
-        with requests.get(fetch_url, timeout=2, stream=True) as r:
-            success = False
-            try:
-                with open(path, "wb") as output:
-                    shutil.copyfileobj(r.raw, output)
-                    # If this is the newer forge version we will run the installer
-                    if server == "forge":
-                        ServersController.finish_import(server_id, True)
-                    else:
-                        ServersController.finish_import(server_id)
+        # Initiate Download
+        jar_dir = os.path.dirname(path)
+        jar_name = os.path.basename(path)
+        logger.info(fetch_url)
+        success = FileHelpers.ssl_get_file(fetch_url, jar_dir, jar_name)
 
-                    success = True
-            except Exception as e:
-                logger.error(f"Unable to save jar to {path} due to error:{e}")
+        # Post-download actions
+        if success:
+            if server == "forge":
+                # If this is the newer Forge version, run the installer
+                ServersController.finish_import(server_id, True)
+            else:
                 ServersController.finish_import(server_id)
-                server_users = PermissionsServers.get_server_user_list(server_id)
 
+            # Notify users
             for user in server_users:
                 WebSocketManager().broadcast_user(
                     user, "notification", "Executable download finished"
                 )
-                time.sleep(3)
+                time.sleep(3)  # Delay for user notification
                 WebSocketManager().broadcast_user(user, "send_start_reload", {})
-            return success
+        else:
+            logger.error(f"Unable to save jar to {path} due to download failure.")
+            ServersController.finish_import(server_id)
+
+        return success
