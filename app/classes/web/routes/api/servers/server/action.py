@@ -30,8 +30,12 @@ class ApiServersServerActionHandler(BaseApiHandler):
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
 
         if action == "clone_server":
-            if self.controller.crafty_perms.can_create_server(auth_data[4]["user_id"]):
-                return self._clone_server(server_id, auth_data[4]["user_id"])
+            if (
+                self.controller.crafty_perms.can_create_server(auth_data[4]["user_id"])
+                or auth_data[4]["superuser"]
+            ):
+                self._clone_server(server_id, auth_data[4]["user_id"])
+                return self.finish_json(200, {"status": "ok"})
             return self.finish_json(
                 200, {"status": "error", "error": "SERVER_LIMIT_REACHED"}
             )
@@ -98,6 +102,13 @@ class ApiServersServerActionHandler(BaseApiHandler):
             user_id,
             server_data.get("server_port"),
         )
+        for role in self.controller.server_perms.get_server_roles(server_id):
+            mask = self.controller.server_perms.get_permissions_mask(
+                role.role_id, server_id
+            )
+            self.controller.server_perms.add_role_server(
+                new_server_id, role.role_id, mask
+            )
 
         self.controller.servers.init_all_servers()
 
