@@ -7,6 +7,7 @@ TBD
 ### Bug fixes
 - Fix Bedrock cert issues ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/719))
 - Make sure default.json is read from correct location ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/714))
+- Do not allow users at server limit to clone servers ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/718))
 ### Tweaks
 - Bump pyOpenSSL & cryptography for CVE-2024-0727, CVE-2023-50782 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/716))
 ### Lang
