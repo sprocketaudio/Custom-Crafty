@@ -104,12 +104,13 @@ class ServerJars:
             if server not in PAPERJARS:
                 return f"{self.base_url}/api/fetchJar/{jar}/{server}/{version}"
 
-            # For Paper servers, attempt to get the build number for the specified version.
+            # For Paper servers, attempt to get the build for the specified version.
             paper_build_info = self.get_paper_build(server, version)
             if paper_build_info is None:
                 # Log an error or handle the case where paper_build_info is None
                 logger.error(
-                    f"Error: Unable to get build information for server: {server}, version: {version}"
+                    "Error: Unable to get build information for server:"
+                    f" {server}, version: {version}"
                 )
                 return None
 
@@ -117,7 +118,8 @@ class ServerJars:
             if not build:
                 # Log an error or handle the case where build is None or not found
                 logger.error(
-                    f"Error: Build number not found for server: {server}, version: {version}"
+                    f"Error: Build number not found for server:"
+                    f" {server}, version: {version}"
                 )
                 return None
 
