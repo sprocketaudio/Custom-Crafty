@@ -97,22 +97,38 @@ class ServerJars:
 
         Returns:
             str or None: URL for downloading the JAR file, or None if URL cannot be
-                        constructed.
+                        constructed or an error occurs.
         """
-        # Check if the server type is not specifically handled by Paper.
-        if server not in PAPERJARS:
-            return f"{self.base_url}/api/fetchJar/{jar}/{server}/{version}"
+        try:
+            # Check if the server type is not specifically handled by Paper.
+            if server not in PAPERJARS:
+                return f"{self.base_url}/api/fetchJar/{jar}/{server}/{version}"
 
-        # For Paper servers, get the build number for the specified version.
-        build = self.get_paper_build(server, version).get("build")
-        if not build:
+            # For Paper servers, attempt to get the build number for the specified version.
+            paper_build_info = self.get_paper_build(server, version)
+            if paper_build_info is None:
+                # Log an error or handle the case where paper_build_info is None
+                logger.error(
+                    f"Error: Unable to get build information for server: {server}, version: {version}"
+                )
+                return None
+
+            build = paper_build_info.get("build")
+            if not build:
+                # Log an error or handle the case where build is None or not found
+                logger.error(
+                    f"Error: Build number not found for server: {server}, version: {version}"
+                )
+                return None
+
+            # Construct and return the URL for downloading the Paper server JAR.
+            return (
+                f"{self.paper_base}/v2/projects/{server}/versions/{version}/"
+                f"builds/{build}/downloads/{server}-{version}-{build}.jar"
+            )
+        except Exception as e:
+            logger.error(f"An error occurred while constructing fetch URL: {e}")
             return None
-
-        # Construct and return the URL for downloading the Paper server JAR.
-        return (
-            f"{self.paper_base}/v2/projects/{server}/versions/{version}/"
-            f"builds/{build}/downloads/{server}-{version}-{build}.jar"
-        )
 
     def _get_api_result(self, call_url: str):
         full_url = f"{self.base_url}{call_url}"
