@@ -1112,7 +1112,7 @@ class Helpers:
         return os.path.normpath(path)
 
     def find_default_password(self):
-        default_file = os.path.join(self.root_dir, "default.json")
+        default_file = os.path.join(self.root_dir, "app", "config", "default.json")
         data = {}
 
         if Helpers.check_file_exists(default_file):
