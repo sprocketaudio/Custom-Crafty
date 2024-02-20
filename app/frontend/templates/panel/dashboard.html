@@ -614,10 +614,13 @@
       }
       console.log("Command received successfully")
     } else {
+      setTimeout(function(){
+        $('.modal').modal('hide');
       bootbox.alert({
         title: responseData.status,
         message: responseData.error
       });
+      }, 2000)
     }
   }
 
