@@ -150,7 +150,7 @@ class PublicHandler(BaseHandler):
                 entered_password = urllib.parse.unquote(
                     base64.b64decode(data["password"]).decode("utf-8")
                 )
-            except (binascii.Error, UnicodeDecodeError):
+            except binascii.Error:
                 return self.finish_json(
                     403,
                     {
@@ -158,6 +158,14 @@ class PublicHandler(BaseHandler):
                         "error": "Hello? Hello? Anybody home?"
                         " Go straight to jail. Do not pass go."
                         " Uh oh! Stinky 💩",
+                    },
+                )
+            except UnicodeDecodeError:
+                return self.finish_json(
+                    403,
+                    {
+                        "status": "error",
+                        "error": "VWggb2ghIFN0aW5reSDwn5Kp",
                     },
                 )
 
