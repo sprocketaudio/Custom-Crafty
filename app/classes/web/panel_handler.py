@@ -574,6 +574,7 @@ class PanelHandler(BaseHandler):
                         "crash_detection": server_temp_obj["crash_detection"],
                         "show_status": server_temp_obj["show_status"],
                         "ignored_exits": server_temp_obj["ignored_exits"],
+                        "count_players": server_temp_obj["count_players"],
                     },
                     "running": False,
                     "crashed": False,
