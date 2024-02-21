@@ -215,14 +215,14 @@
         "version": "Version"
     },
     "login": {
+        "defaultPath": "The password you entered is the default credential path, not the password. Please find the default password in that location.",
+        "disabled": "User account disabled. Please contact your system administrator for more info.",
         "forgotPassword": "Forgot Password",
+        "incorrect": "Incorrect username or password",
         "login": "Log In",
         "password": "Password",
         "username": "Username",
-        "viewStatus": "View Public Status Page",
-        "incorrect": "Incorrect username or password",
-        "defaultPath": "The password you entered is the default credential path, not the password. Please find the default password in that location.",
-        "disabled": "User account disabled. Please contact your system administrator for more info."
+        "viewStatus": "View Public Status Page"
     },
     "notify": {
         "activityLog": "Activity Logs",
