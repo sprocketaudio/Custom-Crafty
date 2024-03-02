@@ -215,7 +215,10 @@
         "version": "VERSHUN"
     },
     "login": {
+        "defaultPath": "Silleh hooman, dat iz da dafault secret path, not da passwurd. Plz find da default passwurd in dat spot.",
+        "disabled": "User account no play. Plz boop ur system hooman for moar infoz.",
         "forgotPassword": "FORGWOTS YOUR SEEKRET",
+        "incorrect": "U gotz wrong name or passwurd",
         "login": "WOG INZ",
         "password": "SEEKRET",
         "username": "USERNAEM",

@@ -111,6 +111,7 @@
         "starting": "Inicio-retrasado",
         "status": "Estado",
         "stop": "Detener",
+        "storage": "Almacenamiento",
         "version": "Versión",
         "welcome": "Bienvenido a Crafty Controller"
     },
@@ -214,7 +215,10 @@
         "version": "Versión"
     },
     "login": {
+        "defaultPath": "La contraseña introducida es la ruta default de las credenciales, no la contraseña. Busca la contraseña accediendo a la carpeta de la ruta",
+        "disabled": "Cuenta del usuario desactivada. Porfavor contacta al administrador para mas informacion.",
         "forgotPassword": "Olvidé mi contraseña",
+        "incorrect": "El nombre de usuario o contraseña es incorrecto",
         "login": "Iniciar Sesión",
         "password": "Contraseña",
         "username": "Usuario",
@@ -326,6 +330,7 @@
         "bePatientDeleteFiles": "Tenga paciencia mientras eliminamos su servidor del panel de Crafty y eliminamos todos los archivos. Esta pantalla se cerrará en unos momentos.",
         "bePatientUpdate": "Tenga paciencia mientras actualizamos el servidor. El tiempo de descarga puede variar según la velocidad del Internet...<br /> Esta pantalla se actualizará en unos momentos.",
         "cancel": "Cancelar",
+        "countPlayers": "Incluir el servidor en la cuenta total de jugadores",
         "crashTime": "Tiempo de espera por crasheo",
         "crashTimeDesc": "¿Cuanto tiempo esperar para considerar el servidor como crasheado?",
         "deleteFilesQuestion": "¿Eliminar archivos del servidor del host?",
@@ -510,6 +515,7 @@
         "cpuUsage": "Uso de CPU",
         "description": "Descripción",
         "errorCalculatingUptime": "Error calculando tiempo de actividad",
+        "loadingMotd": "Cargando MOTD",
         "memUsage": "Uso de memoria",
         "offline": "Desconectado",
         "online": "En línea",
@@ -577,6 +583,7 @@
         "serverUpload": "Subir servidor comprimido",
         "serverVersion": "Versión del servidor",
         "sizeInGB": "Tamaño en GB",
+        "unsupported": "Versiones de Minecraft inferiores a la 1.8 no estan soportadas por Crafty. Es posible instalarlas. Resultados pueden variar.",
         "uploadButton": "Subir",
         "uploadZip": "Subir archivo Zip para importar servidor",
         "zipPath": "Ruta del servidor"
@@ -590,6 +597,15 @@
         "navigation": "Navegación",
         "newServer": "Crear nuevo Servidor",
         "servers": "Servidores"
+    },
+    "startup": {
+        "almost": "Terminando. Espera un momento...",
+        "internals": "Configurando e inicializando los componentes internos de Crafty",
+        "internet": "Verificando conexion a internet",
+        "server": "Inicializando ",
+        "serverInit": "Inicializando Servidores",
+        "starting": "Crafty esta iniciando...",
+        "tasks": "Iniciando el programador de tareas"
     },
     "userConfig": {
         "apiKey": "Claves API",

@@ -215,7 +215,10 @@
         "version": "Version"
     },
     "login": {
+        "defaultPath": "Der eingegebene Text ist der Pfad zum Passwort, nicht das Passwort selbst. Das Standartpasswort kann unter diesen Pfad eingesehen werden.",
+        "disabled": "Account gesperrt. Für weitere Informationen den Serveradministrator kontaktieren",
         "forgotPassword": "Passwort vergessen",
+        "incorrect": "Benutzername oder Passwort falsch",
         "login": "Einloggen",
         "password": "Passwort",
         "username": "Nutzername",

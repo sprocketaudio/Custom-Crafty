@@ -556,7 +556,7 @@
     xmlHttpRequest.addEventListener('load', (event) => {
       if (event.target.responseText == 'success') {
         console.log('Upload for file', file.name, 'was successful!')
-        document.getElementById("upload_input").innerHTML = `<div class="card-header header-sm d-flex justify-content-between align-items-center" style="width: 100%;"><input value=${fileName} type="text" id="file-uploaded" disabled></input> 🔒</div>`;
+        $("#upload_input").html(`<div class="card-header header-sm d-flex justify-content-between align-items-center" style="width: 100%;"><input value="${decodeURIComponent(fileName)}" type="text" id="file-uploaded" disabled></input> 🔒</div>`);
         document.getElementById("lower_half").style.visibility = "visible";
       }
       else {

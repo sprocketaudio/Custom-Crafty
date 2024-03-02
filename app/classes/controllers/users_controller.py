@@ -52,7 +52,7 @@ class UsersController:
             },
             "password": {
                 "type": "string",
-                "minLength": 8,
+                "minLength": self.helper.minimum_password_length,
                 "examples": ["crafty"],
                 "title": "Password",
             },
