@@ -5,6 +5,10 @@ import pathlib
 import tempfile
 import zipfile
 from zipfile import ZipFile, ZIP_DEFLATED
+import urllib.request
+import ssl
+import time
+import certifi
 
 from app.classes.shared.helpers import Helpers
 from app.classes.shared.console import Console
@@ -18,6 +22,92 @@ class FileHelpers:
 
     def __init__(self, helper):
         self.helper: Helpers = helper
+
+    @staticmethod
+    def ssl_get_file(
+        url, out_path, out_file, max_retries=3, backoff_factor=2, headers=None
+    ):
+        """
+        Downloads a file from a given URL using HTTPS with SSL context verification,
+        retries with exponential backoff and providing download progress feedback.
+
+        Parameters:
+            - url (str): The URL of the file to download. Must start with "https".
+            - out_path (str): The local path where the file will be saved.
+            - out_file (str): The name of the file to save the downloaded content as.
+            - max_retries (int, optional): The maximum number of retry attempts
+                in case of download failure. Defaults to 3.
+            - backoff_factor (int, optional): The factor by which the wait time
+                increases after each failed attempt. Defaults to 2.
+            - headers (dict, optional):
+                A dictionary of HTTP headers to send with the request.
+
+        Returns:
+            - bool: True if the download was successful, False otherwise.
+
+        Raises:
+            - urllib.error.URLError: If a URL error occurs during the download.
+            - ssl.SSLError: If an SSL error occurs during the download.
+        Exception: If an unexpected error occurs during the download.
+
+        Note:
+        This method logs critical errors and download progress information.
+        Ensure that the logger is properly configured to capture this information.
+        """
+        if not url.lower().startswith("https"):
+            logger.error("SSL File Get - Error: URL must start with https.")
+            return False
+
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
+
+        if not headers:
+            headers = {
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/58.0.3029.110 Safari/537.3"
+                )
+            }
+        req = urllib.request.Request(url, headers=headers)
+
+        write_path = os.path.join(out_path, out_file)
+        attempt = 0
+
+        logger.info(f"SSL File Get - Requesting remote: {url}")
+        file_path_full = os.path.join(out_path, out_file)
+        logger.info(f"SSL File Get - Download Destination: {file_path_full}")
+
+        while attempt < max_retries:
+            try:
+                with urllib.request.urlopen(req, context=ssl_context) as response:
+                    total_size = response.getheader("Content-Length")
+                    if total_size:
+                        total_size = int(total_size)
+                    downloaded = 0
+                    with open(write_path, "wb") as file:
+                        while True:
+                            chunk = response.read(1024 * 1024)  # 1 MB
+                            if not chunk:
+                                break
+                            file.write(chunk)
+                            downloaded += len(chunk)
+                            if total_size:
+                                progress = (downloaded / total_size) * 100
+                                logger.info(
+                                    f"SSL File Get - Download progress: {progress:.2f}%"
+                                )
+                    return True
+            except (urllib.error.URLError, ssl.SSLError) as e:
+                logger.warning(f"SSL File Get - Attempt {attempt+1} failed: {e}")
+                time.sleep(backoff_factor**attempt)
+            except Exception as e:
+                logger.critical(f"SSL File Get - Unexpected error: {e}")
+                return False
+            finally:
+                attempt += 1
+
+        logger.error("SSL File Get - Maximum retries reached. Download failed.")
+        return False
 
     @staticmethod
     def del_dirs(path):

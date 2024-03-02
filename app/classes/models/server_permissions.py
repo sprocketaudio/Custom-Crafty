@@ -172,9 +172,9 @@ class PermissionsServers:
             RoleServers.server_id, RoleServers.permissions
         ).where(RoleServers.role_id == role_id)
         for role_server in role_servers:
-            permissions_dict[
-                role_server.server_id_id
-            ] = PermissionsServers.get_permissions(role_server.permissions)
+            permissions_dict[role_server.server_id_id] = (
+                PermissionsServers.get_permissions(role_server.permissions)
+            )
         return permissions_dict
 
     @staticmethod

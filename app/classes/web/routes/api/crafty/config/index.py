@@ -80,9 +80,13 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
             200,
             {
                 "status": "ok",
-                "data": self.controller.roles.get_all_role_ids()
-                if get_only_ids
-                else [model_to_dict(r) for r in self.controller.roles.get_all_roles()],
+                "data": (
+                    self.controller.roles.get_all_role_ids()
+                    if get_only_ids
+                    else [
+                        model_to_dict(r) for r in self.controller.roles.get_all_roles()
+                    ]
+                ),
             },
         )
 
@@ -158,9 +162,13 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
             200,
             {
                 "status": "ok",
-                "data": self.controller.roles.get_all_role_ids()
-                if get_only_ids
-                else [model_to_dict(r) for r in self.controller.roles.get_all_roles()],
+                "data": (
+                    self.controller.roles.get_all_role_ids()
+                    if get_only_ids
+                    else [
+                        model_to_dict(r) for r in self.controller.roles.get_all_roles()
+                    ]
+                ),
             },
         )
 

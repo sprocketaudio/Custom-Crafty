@@ -345,15 +345,17 @@ class PanelHandler(BaseHandler):
                 self.controller.users.get_user_lang_by_id(exec_user["user_id"])
             ),
             "super_user": superuser,
-            "api_key": {
-                "name": api_key.name,
-                "created": api_key.created,
-                "server_permissions": api_key.server_permissions,
-                "crafty_permissions": api_key.crafty_permissions,
-                "superuser": api_key.superuser,
-            }
-            if api_key is not None
-            else None,
+            "api_key": (
+                {
+                    "name": api_key.name,
+                    "created": api_key.created,
+                    "server_permissions": api_key.server_permissions,
+                    "crafty_permissions": api_key.crafty_permissions,
+                    "superuser": api_key.superuser,
+                }
+                if api_key is not None
+                else None
+            ),
             "superuser": superuser,
         }
         try:
@@ -417,14 +419,14 @@ class PanelHandler(BaseHandler):
                 self.controller.first_login = False
             if superuser:  # TODO: Figure out a better solution
                 try:
-                    page_data[
-                        "servers"
-                    ] = self.controller.servers.get_all_servers_stats()
+                    page_data["servers"] = (
+                        self.controller.servers.get_all_servers_stats()
+                    )
                 except IndexError:
                     self.controller.servers.stats.record_stats()
-                    page_data[
-                        "servers"
-                    ] = self.controller.servers.get_all_servers_stats()
+                    page_data["servers"] = (
+                        self.controller.servers.get_all_servers_stats()
+                    )
             else:
                 try:
                     user_auth = self.controller.servers.get_authorized_servers_stats(
@@ -454,19 +456,19 @@ class PanelHandler(BaseHandler):
             for server_id in user_order[:]:
                 for server in un_used_servers[:]:
                     if flag == 0:
-                        server["stats"][
-                            "importing"
-                        ] = self.controller.servers.get_import_status(
-                            str(server["stats"]["server_id"]["server_id"])
+                        server["stats"]["importing"] = (
+                            self.controller.servers.get_import_status(
+                                str(server["stats"]["server_id"]["server_id"])
+                            )
                         )
                         server["stats"]["crashed"] = self.controller.servers.is_crashed(
                             str(server["stats"]["server_id"]["server_id"])
                         )
                         try:
-                            server["stats"][
-                                "waiting_start"
-                            ] = self.controller.servers.get_waiting_start(
-                                str(server["stats"]["server_id"]["server_id"])
+                            server["stats"]["waiting_start"] = (
+                                self.controller.servers.get_waiting_start(
+                                    str(server["stats"]["server_id"]["server_id"])
+                                )
                             )
                         except Exception as e:
                             logger.error(f"Failed to get server waiting to start: {e}")
@@ -543,9 +545,9 @@ class PanelHandler(BaseHandler):
                 server_id
             )
             if not self.failed_server:
-                page_data[
-                    "server_stats"
-                ] = self.controller.servers.get_server_stats_by_id(server_id)
+                page_data["server_stats"] = (
+                    self.controller.servers.get_server_stats_by_id(server_id)
+                )
             else:
                 server_temp_obj = self.controller.servers.get_server_data_by_id(
                     server_id
@@ -572,6 +574,7 @@ class PanelHandler(BaseHandler):
                         "crash_detection": server_temp_obj["crash_detection"],
                         "show_status": server_temp_obj["show_status"],
                         "ignored_exits": server_temp_obj["ignored_exits"],
+                        "count_players": server_temp_obj["count_players"],
                     },
                     "running": False,
                     "crashed": False,
@@ -611,19 +614,19 @@ class PanelHandler(BaseHandler):
                 "Config": EnumPermissionsServer.CONFIG,
                 "Players": EnumPermissionsServer.PLAYERS,
             }
-            page_data[
-                "user_permissions"
-            ] = self.controller.server_perms.get_user_id_permissions_list(
-                exec_user["user_id"], server_id
+            page_data["user_permissions"] = (
+                self.controller.server_perms.get_user_id_permissions_list(
+                    exec_user["user_id"], server_id
+                )
             )
             if not self.failed_server:
-                page_data["server_stats"][
-                    "crashed"
-                ] = self.controller.servers.is_crashed(server_id)
+                page_data["server_stats"]["crashed"] = (
+                    self.controller.servers.is_crashed(server_id)
+                )
             if not self.failed_server:
-                page_data["server_stats"][
-                    "server_type"
-                ] = self.controller.servers.get_server_type_by_id(server_id)
+                page_data["server_stats"]["server_type"] = (
+                    self.controller.servers.get_server_type_by_id(server_id)
+                )
 
             if not subpage:
                 for spage, perm in SUBPAGE_PERMS.items():
@@ -674,23 +677,23 @@ class PanelHandler(BaseHandler):
                 page_data["java_versions"] = page_java
             if subpage == "backup":
                 server_info = self.controller.servers.get_server_data_by_id(server_id)
-                page_data[
-                    "backup_config"
-                ] = self.controller.management.get_backup_config(server_id)
+                page_data["backup_config"] = (
+                    self.controller.management.get_backup_config(server_id)
+                )
                 exclusions = []
-                page_data[
-                    "exclusions"
-                ] = self.controller.management.get_excluded_backup_dirs(server_id)
-                page_data[
-                    "backing_up"
-                ] = self.controller.servers.get_server_instance_by_id(
-                    server_id
-                ).is_backingup
-                page_data[
-                    "backup_stats"
-                ] = self.controller.servers.get_server_instance_by_id(
-                    server_id
-                ).send_backup_status()
+                page_data["exclusions"] = (
+                    self.controller.management.get_excluded_backup_dirs(server_id)
+                )
+                page_data["backing_up"] = (
+                    self.controller.servers.get_server_instance_by_id(
+                        server_id
+                    ).is_backingup
+                )
+                page_data["backup_stats"] = (
+                    self.controller.servers.get_server_instance_by_id(
+                        server_id
+                    ).send_backup_status()
+                )
                 # makes it so relative path is the only thing shown
                 for file in page_data["exclusions"]:
                     if Helpers.is_os_windows():
@@ -723,10 +726,10 @@ class PanelHandler(BaseHandler):
                     server_id, hours=(days * 24)
                 )
             if subpage == "webhooks":
-                page_data[
-                    "webhooks"
-                ] = self.controller.management.get_webhooks_by_server(
-                    server_id, model=True
+                page_data["webhooks"] = (
+                    self.controller.management.get_webhooks_by_server(
+                        server_id, model=True
+                    )
                 )
                 page_data["triggers"] = WebhookFactory.get_monitored_events()
 
@@ -758,9 +761,9 @@ class PanelHandler(BaseHandler):
                     if not superuser:
                         self.redirect("/panel/error?error=Unauthorized access")
                 page_data["banned_players_html"] = get_banned_players_html()
-                page_data[
-                    "banned_players"
-                ] = self.controller.servers.get_banned_players(server_id)
+                page_data["banned_players"] = (
+                    self.controller.servers.get_banned_players(server_id)
+                )
                 server_instance = self.controller.servers.get_server_instance_by_id(
                     server_id
                 )
@@ -925,9 +928,9 @@ class PanelHandler(BaseHandler):
                     if item not in page_data["backgrounds"]:
                         page_data["backgrounds"].append(item)
                 page_data["background"] = self.controller.cached_login
-                page_data[
-                    "login_opacity"
-                ] = self.controller.management.get_login_opacity()
+                page_data["login_opacity"] = (
+                    self.controller.management.get_login_opacity()
+                )
 
                 page_data["active_link"] = "custom_login"
                 template = "panel/custom_login.html"
@@ -959,13 +962,11 @@ class PanelHandler(BaseHandler):
             page_data["servers"] = []
             page_data["servers_all"] = self.controller.servers.get_all_defined_servers()
             page_data["role-servers"] = []
-            page_data[
-                "permissions_all"
-            ] = self.controller.crafty_perms.list_defined_crafty_permissions()
+            page_data["permissions_all"] = (
+                self.controller.crafty_perms.list_defined_crafty_permissions()
+            )
             page_data["permissions_list"] = set()
-            page_data[
-                "quantity_server"
-            ] = (
+            page_data["quantity_server"] = (
                 self.controller.crafty_perms.list_all_crafty_permissions_quantity_limits()  # pylint: disable=line-too-long
             )
             page_data["languages"] = []
@@ -1007,10 +1008,10 @@ class PanelHandler(BaseHandler):
             page_data["server_data"] = self.controller.servers.get_server_data_by_id(
                 server_id
             )
-            page_data[
-                "user_permissions"
-            ] = self.controller.server_perms.get_user_id_permissions_list(
-                exec_user["user_id"], server_id
+            page_data["user_permissions"] = (
+                self.controller.server_perms.get_user_id_permissions_list(
+                    exec_user["user_id"], server_id
+                )
             )
             page_data["permissions"] = {
                 "Commands": EnumPermissionsServer.COMMANDS,
@@ -1025,9 +1026,9 @@ class PanelHandler(BaseHandler):
             page_data["server_stats"] = self.controller.servers.get_server_stats_by_id(
                 server_id
             )
-            page_data["server_stats"][
-                "server_type"
-            ] = self.controller.servers.get_server_type_by_id(server_id)
+            page_data["server_stats"]["server_type"] = (
+                self.controller.servers.get_server_type_by_id(server_id)
+            )
             page_data["new_webhook"] = True
             page_data["webhook"] = {}
             page_data["webhook"]["webhook_type"] = "Custom"
@@ -1061,10 +1062,10 @@ class PanelHandler(BaseHandler):
             page_data["server_data"] = self.controller.servers.get_server_data_by_id(
                 server_id
             )
-            page_data[
-                "user_permissions"
-            ] = self.controller.server_perms.get_user_id_permissions_list(
-                exec_user["user_id"], server_id
+            page_data["user_permissions"] = (
+                self.controller.server_perms.get_user_id_permissions_list(
+                    exec_user["user_id"], server_id
+                )
             )
             page_data["permissions"] = {
                 "Commands": EnumPermissionsServer.COMMANDS,
@@ -1079,9 +1080,9 @@ class PanelHandler(BaseHandler):
             page_data["server_stats"] = self.controller.servers.get_server_stats_by_id(
                 server_id
             )
-            page_data["server_stats"][
-                "server_type"
-            ] = self.controller.servers.get_server_type_by_id(server_id)
+            page_data["server_stats"]["server_type"] = (
+                self.controller.servers.get_server_type_by_id(server_id)
+            )
             page_data["new_webhook"] = False
             page_data["webhook"] = self.controller.management.get_webhook_by_id(
                 webhook_id
@@ -1121,10 +1122,10 @@ class PanelHandler(BaseHandler):
                 "Config": EnumPermissionsServer.CONFIG,
                 "Players": EnumPermissionsServer.PLAYERS,
             }
-            page_data[
-                "user_permissions"
-            ] = self.controller.server_perms.get_user_id_permissions_list(
-                exec_user["user_id"], server_id
+            page_data["user_permissions"] = (
+                self.controller.server_perms.get_user_id_permissions_list(
+                    exec_user["user_id"], server_id
+                )
             )
             page_data["server_data"] = self.controller.servers.get_server_data_by_id(
                 server_id
@@ -1132,9 +1133,9 @@ class PanelHandler(BaseHandler):
             page_data["server_stats"] = self.controller.servers.get_server_stats_by_id(
                 server_id
             )
-            page_data["server_stats"][
-                "server_type"
-            ] = self.controller.servers.get_server_type_by_id(server_id)
+            page_data["server_stats"]["server_type"] = (
+                self.controller.servers.get_server_type_by_id(server_id)
+            )
             page_data["new_schedule"] = True
             page_data["schedule"] = {}
             page_data["schedule"]["children"] = []
@@ -1189,10 +1190,10 @@ class PanelHandler(BaseHandler):
                 "Config": EnumPermissionsServer.CONFIG,
                 "Players": EnumPermissionsServer.PLAYERS,
             }
-            page_data[
-                "user_permissions"
-            ] = self.controller.server_perms.get_user_id_permissions_list(
-                exec_user["user_id"], server_id
+            page_data["user_permissions"] = (
+                self.controller.server_perms.get_user_id_permissions_list(
+                    exec_user["user_id"], server_id
+                )
             )
             page_data["server_data"] = self.controller.servers.get_server_data_by_id(
                 server_id
@@ -1200,9 +1201,9 @@ class PanelHandler(BaseHandler):
             page_data["server_stats"] = self.controller.servers.get_server_stats_by_id(
                 server_id
             )
-            page_data["server_stats"][
-                "server_type"
-            ] = self.controller.servers.get_server_type_by_id(server_id)
+            page_data["server_stats"]["server_type"] = (
+                self.controller.servers.get_server_type_by_id(server_id)
+            )
             page_data["new_schedule"] = False
             page_data["schedule"] = {}
             page_data["schedule"]["server_id"] = server_id
@@ -1212,9 +1213,9 @@ class PanelHandler(BaseHandler):
                 page_data["schedule"]["name"] = schedule.name
             else:
                 page_data["schedule"]["name"] = ""
-            page_data["schedule"][
-                "children"
-            ] = self.controller.management.get_child_schedules(sch_id)
+            page_data["schedule"]["children"] = (
+                self.controller.management.get_child_schedules(sch_id)
+            )
             # We check here to see if the command is any of the default ones.
             # We do not want a user changing to a custom command
             # and seeing our command there.
@@ -1280,16 +1281,16 @@ class PanelHandler(BaseHandler):
                 }
             if exec_user["superuser"]:
                 page_data["users"] = self.controller.users.get_all_users()
-            page_data[
-                "permissions_all"
-            ] = self.controller.crafty_perms.list_defined_crafty_permissions()
-            page_data[
-                "permissions_list"
-            ] = self.controller.crafty_perms.get_crafty_permissions_list(user_id)
-            page_data[
-                "quantity_server"
-            ] = self.controller.crafty_perms.list_crafty_permissions_quantity_limits(
-                user_id
+            page_data["permissions_all"] = (
+                self.controller.crafty_perms.list_defined_crafty_permissions()
+            )
+            page_data["permissions_list"] = (
+                self.controller.crafty_perms.get_crafty_permissions_list(user_id)
+            )
+            page_data["quantity_server"] = (
+                self.controller.crafty_perms.list_crafty_permissions_quantity_limits(
+                    user_id
+                )
             )
             page_data["languages"] = []
             page_data["languages"].append(
@@ -1349,12 +1350,12 @@ class PanelHandler(BaseHandler):
             page_data["user"] = self.controller.users.get_user_by_id(user_id)
             page_data["api_keys"] = self.controller.users.get_user_api_keys(user_id)
             # self.controller.crafty_perms.list_defined_crafty_permissions()
-            page_data[
-                "server_permissions_all"
-            ] = self.controller.server_perms.list_defined_permissions()
-            page_data[
-                "crafty_permissions_all"
-            ] = self.controller.crafty_perms.list_defined_crafty_permissions()
+            page_data["server_permissions_all"] = (
+                self.controller.server_perms.list_defined_permissions()
+            )
+            page_data["crafty_permissions_all"] = (
+                self.controller.crafty_perms.list_defined_crafty_permissions()
+            )
 
             if user_id is None:
                 self.redirect("/panel/error?error=Invalid User ID")
@@ -1442,9 +1443,9 @@ class PanelHandler(BaseHandler):
                         DatabaseShortcuts.get_data_obj(server.server_object)
                     )
             page_data["servers_all"] = page_servers
-            page_data[
-                "permissions_all"
-            ] = self.controller.server_perms.list_defined_permissions()
+            page_data["permissions_all"] = (
+                self.controller.server_perms.list_defined_permissions()
+            )
             page_data["permissions_dict"] = {}
             template = "panel/panel_edit_role.html"
 
@@ -1467,12 +1468,12 @@ class PanelHandler(BaseHandler):
                         DatabaseShortcuts.get_data_obj(server.server_object)
                     )
             page_data["servers_all"] = page_servers
-            page_data[
-                "permissions_all"
-            ] = self.controller.server_perms.list_defined_permissions()
-            page_data[
-                "permissions_dict"
-            ] = self.controller.server_perms.get_role_permissions_dict(role_id)
+            page_data["permissions_all"] = (
+                self.controller.server_perms.list_defined_permissions()
+            )
+            page_data["permissions_dict"] = (
+                self.controller.server_perms.get_role_permissions_dict(role_id)
+            )
             page_data["user-roles"] = user_roles
             page_data["users"] = self.controller.users.get_all_users()
 

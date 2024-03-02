@@ -118,15 +118,17 @@ class ServerHandler(BaseHandler):
             "lang_page": Helpers.get_lang_page(
                 self.controller.users.get_user_lang_by_id(exec_user["user_id"])
             ),
-            "api_key": {
-                "name": api_key.name,
-                "created": api_key.created,
-                "server_permissions": api_key.server_permissions,
-                "crafty_permissions": api_key.crafty_permissions,
-                "superuser": api_key.superuser,
-            }
-            if api_key is not None
-            else None,
+            "api_key": (
+                {
+                    "name": api_key.name,
+                    "created": api_key.created,
+                    "server_permissions": api_key.server_permissions,
+                    "crafty_permissions": api_key.crafty_permissions,
+                    "superuser": api_key.superuser,
+                }
+                if api_key is not None
+                else None
+            ),
             "superuser": superuser,
         }
 
