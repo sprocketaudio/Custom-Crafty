@@ -81,6 +81,7 @@ class Helpers:
         self.update_available = False
         self.ignored_names = ["crafty_managed.txt", "db_stats"]
         self.crafty_starting = False
+        self.minimum_password_length = 8
 
     @staticmethod
     def auto_installer_fix(ex):

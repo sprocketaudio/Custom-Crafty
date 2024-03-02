@@ -215,7 +215,10 @@
         "version": "Wersja"
     },
     "login": {
+        "defaultPath": "Hasło które wprowadziłeś jest podstawową ścieżką w której przechowywane są dane logowania. Znajdź podstawowe hasło w tej lokalizacji.",
+        "disabled": "Konto tego użytkownika jest wyłączone. Skontaktuj się z administratorem by uzyskać więcej informacji.",
         "forgotPassword": "Zapomniałem hasła",
+        "incorrect": "Niepoprawny login lub hasło/Niepoprawna nazwa użytkownika lub hasło",
         "login": "Zaloguj się",
         "password": "Hasło",
         "username": "Nazwa użytkownika",

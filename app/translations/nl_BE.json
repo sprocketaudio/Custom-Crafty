@@ -215,7 +215,10 @@
         "version": "Versie"
     },
     "login": {
+        "defaultPath": "Het ingevoerde wachtwoord is het pad naar de standaardreferentie, niet het wachtwoord zelf. Raadpleeg de standaardwachtwoord op de aangegeven locatie.",
+        "disabled": "Gebruikersaccount uitgeschakeld. Neem voor meer informatie contact op met uw systeembeheerder.",
         "forgotPassword": "Wachtwoord vergeten",
+        "incorrect": "Verkeerde gebruikersnaam of wachtwoord",
         "login": "Log In",
         "password": "Wachtwoord",
         "username": "gebruikersnaam",

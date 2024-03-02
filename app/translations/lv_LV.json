@@ -216,7 +216,10 @@
         "version": "Versija"
     },
     "login": {
+        "defaultPath": "Parole ko ievadijāt ir celš uz noklusētās paroles vietu, nevis noklusētā parole. Lūdzu apskatiet noklusēto paroli šajā vietā.",
+        "disabled": "Lietotāja konts atspējots. Lūdzu sazinieties ar savu sistēmas administratoru priekš papildus informācijas.",
         "forgotPassword": "Aizmirsu Paroli",
+        "incorrect": "Nepareizs lietotājvārds vai parole",
         "login": "Ieiet",
         "password": "Parole",
         "username": "Lietotājvārds",
