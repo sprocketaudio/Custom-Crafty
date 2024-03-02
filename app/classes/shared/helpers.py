@@ -117,7 +117,7 @@ class Helpers:
         Get latest bedrock executable url \n\n
         returns url if successful, False if not
         """
-        url = "https://minecraft.net/en-us/download/server/bedrock/"
+        url = "https://www.minecraft.net/en-us/download/server/bedrock/"
         headers = {
             "Accept-Encoding": "identity",
             "Accept-Language": "en",
@@ -127,8 +127,8 @@ class Helpers:
                 "Chrome/104.0.0.0 Safari/537.36"
             ),
         }
-        target_win = 'https://minecraft.azureedge.net/bin-win/[^"]*'
-        target_linux = 'https://minecraft.azureedge.net/bin-linux/[^"]*'
+        target_win = 'https://www.minecraft.azureedge.net/bin-win/[^"]*'
+        target_linux = 'https://www.minecraft.azureedge.net/bin-linux/[^"]*'
 
         try:
             # Get minecraft server download page
