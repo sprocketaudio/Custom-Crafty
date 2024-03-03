@@ -12,6 +12,7 @@ TBD
 - Fix forge install v1.20, 1.20.1 and 1.20.2 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/710))
 - Fix Sanitisation on Passwords ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/715))
 - Fix `Upload Imports` on unix systems, that have a space in the root dir name ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/722))
+- Fix Bedrock downloads, add `www` to download URL ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/723))
 ### Tweaks
 - Bump pyOpenSSL & cryptography for CVE-2024-0727, CVE-2023-50782 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/716))
 ### Lang
