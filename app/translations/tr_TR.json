@@ -215,7 +215,10 @@
         "version": "Sürüm"
     },
     "login": {
+        "defaultPath": "Girdiğiniz şifre varsayılan şifrenin konumudur, varsayılan şifre değil. Lütfen o konumda bulunan varsayılan şifreyi bulunuz.",
+        "disabled": "Bu kullanıcı hesabı engellenmiştir. Daha fazla bilgi için lütfen sunucu yöneticiniz ile konuşunuz.",
         "forgotPassword": "Şifremi Unuttum",
+        "incorrect": "Kullanıcı adınız veya şifreniz yanlış.",
         "login": "Oturum Aç",
         "password": "Şifre",
         "username": "Kullanıcı Adı",

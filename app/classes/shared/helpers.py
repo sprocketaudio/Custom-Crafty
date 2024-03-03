@@ -81,6 +81,7 @@ class Helpers:
         self.update_available = False
         self.ignored_names = ["crafty_managed.txt", "db_stats"]
         self.crafty_starting = False
+        self.minimum_password_length = 8
 
     @staticmethod
     def auto_installer_fix(ex):
@@ -117,7 +118,7 @@ class Helpers:
         Get latest bedrock executable url \n\n
         returns url if successful, False if not
         """
-        url = "https://minecraft.net/en-us/download/server/bedrock/"
+        url = "https://www.minecraft.net/en-us/download/server/bedrock/"
         headers = {
             "Accept-Encoding": "identity",
             "Accept-Language": "en",

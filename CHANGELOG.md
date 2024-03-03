@@ -1,5 +1,5 @@
 # Changelog
-## --- [4.2.4] - 2023/TBD
+## --- [4.3.0] - 2023/TBD
 ### New features
 TBD
 ### Refactor
@@ -9,10 +9,15 @@ TBD
 - Make sure default.json is read from correct location ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/714))
 - Do not allow users at server limit to clone servers ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/718))
 - Fix bug where you cannot get to config with unloaded server ([Commit](https://gitlab.com/crafty-controller/crafty-4/-/commit/9de08973b6bb2ddf91283c5c6b0e189ff34f7e24))
+- Fix forge install v1.20, 1.20.1 and 1.20.2 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/710))
+- Fix Sanitisation on Passwords ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/715))
+- Fix `Upload Imports` on unix systems, that have a space in the root dir name ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/722))
+- Fix Bedrock downloads, add `www` to download URL ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/723))
 ### Tweaks
 - Bump pyOpenSSL & cryptography for CVE-2024-0727, CVE-2023-50782 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/716))
+- Bump cryptography for CVE-2024-26130 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/724))
 ### Lang
-TBD
+- Update `de_DE, en_EN, es_ES, fr_FR, he_IL, lol_EN, lv_LV, nl_BE pl_PL, th_TH, tr_TR, uk_UA, zh_CN` translations for `4.3.0` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/715))
 <br><br>
 
 ## --- [4.2.3] - 2023/02/02

@@ -18,13 +18,20 @@ class DatabaseBuilder:
         logger.info("Fresh Install Detected - Creating Default Settings")
         Console.info("Fresh Install Detected - Creating Default Settings")
         default_data = self.helper.find_default_password()
-        if password not in default_data:
+        if "password" not in default_data:
             Console.help(
                 "No default password found. Using password created "
                 "by Crafty. Find it in app/config/default-creds.txt"
             )
         username = default_data.get("username", "admin")
-        password = default_data.get("password", password)
+        if self.helper.minimum_password_length > default_data.get("password", password):
+            Console.critical(
+                "Default password too short"
+                " using Crafty's created default."
+                " Find it in app/config/default-creds.txt"
+            )
+        else:
+            password = default_data.get("password", password)
 
         self.users_helper.add_user(
             username=username,

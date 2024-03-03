@@ -215,7 +215,10 @@
         "version": "Version"
     },
     "login": {
+        "defaultPath": "Ce que tu as renseigné n'est pas le mot de passe, mais le chemin du fichier où le trouver.",
+        "disabled": "Ce compte est désactivé. Merci de contacter l'administrateur de ton serveur pour plus d'informations.",
         "forgotPassword": "Mot de Passe Oublié",
+        "incorrect": "Identifiant et/ou mot de passe incorrect.",
         "login": "Connexion",
         "password": "Mot de Passe",
         "username": "Nom d'Utilisateur",

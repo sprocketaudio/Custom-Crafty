@@ -77,55 +77,49 @@
                   box-shadow: 0 12px 16px 0 hsla(0, 0%, 0%, 0.4);
                 }
               </style>
-              {% if data['query'] %}
-              <form action="/login?{{ data['query'] }}" method="post">
-                {% else %}
-                <form action="/login" method="post">
-                  {% end %}
-                  {% raw xsrf_form_html() %}
-                  <div class="form-group">
-                    <label class="label">{{ translate('login', 'username', data['lang']) }}</label>
-                    <div class="input-group">
-                      <input type="text" class="form-control login-text-input login-input"
-                             placeholder="{{ translate('login', 'username', data['lang']) }}" name="username" id="username"
-                             required="true">
-                    </div>
+              <form id="login-form" data-query="{{ data.get('query', None) }}">
+                {% raw xsrf_form_html() %}
+                <div class="form-group">
+                  <label class="label">{{ translate('login', 'username', data['lang']) }}</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control login-text-input login-input"
+                      placeholder="{{ translate('login', 'username', data['lang']) }}" name="username" id="username"
+                      required="true">
                   </div>
-                  <div class="form-group">
-                    <label class="label">{{ translate('login', 'password', data['lang']) }}</label>
-                    <div class="input-group">
-                      <input type="password" class="form-control login-text-input login-input"
-                             placeholder="{{ translate('login', 'password', data['lang']) }}" name="password" id="password"
-                             required="true">
-                    </div>
+                </div>
+                <div class="form-group">
+                  <label class="label">{{ translate('login', 'password', data['lang']) }}</label>
+                  <div class="input-group">
+                    <input type="password" class="form-control login-text-input login-input"
+                      placeholder="{{ translate('login', 'password', data['lang']) }}" name="password" id="password"
+                      required="true">
                   </div>
-                  <div class="form-group">
-                    <button class="login-input btn btn-primary submit-btn btn-block">{{ translate('login', 'login',
-                      data['lang']) }}</button>
+                </div>
+                <div class="form-group">
+                  <button class="login-input btn btn-primary submit-btn btn-block">{{ translate('login', 'login',
+                    data['lang']) }}</button>
+                </div>
+                <fieldset id="error-field" style="color: red; text-align: center;">
+                </fieldset>
+                <div class="form-group d-flex justify-content-between">
+                  <div class="form-check form-check-flat mt-0">
+                    &nbsp;
                   </div>
-                  {% if error_msg is not None %}
-                  <fieldset style="color: red; text-align: center;">
-                    <span>{{error_msg}}</span>
-                  </fieldset>
-                  {% end %}
-                  <div class="form-group d-flex justify-content-between">
-                    <div class="form-check form-check-flat mt-0">
-                      &nbsp;
-                    </div>
-                    <button onclick="resetPass()" id="#resetPass" form="" class="btn btn-outline-primary btn-sm forgot-password ">{{ translate('login', 'forgotPassword',
-                      data['lang']) }}</button>
-                  </div>
+                  <button onclick="resetPass()" id="#resetPass" form=""
+                    class="btn btn-outline-primary btn-sm forgot-password ">{{ translate('login', 'forgotPassword',
+                    data['lang']) }}</button>
+                </div>
 
-                  <div class="text-block text-center my-3">
-                    <span class="text-small font-weight-semibold"><a href="https://craftycontrol.com/">Crafty Control
-                        {{data['version'] }}</a> </span>
-                  </div>
-                  
-                  <div class="text-block text-center my-3">
-                    <a href="/status" class="text-small forgot-password">{{ translate('login', 'viewStatus',
-                      data['lang']) }}</a>
-                  </div>
-                </form>
+                <div class="text-block text-center my-3">
+                  <span class="text-small font-weight-semibold"><a href="https://craftycontrol.com/">Crafty Control
+                      {{data['version'] }}</a> </span>
+                </div>
+
+                <div class="text-block text-center my-3">
+                  <a href="/status" class="text-small forgot-password">{{ translate('login', 'viewStatus',
+                    data['lang']) }}</a>
+                </div>
+              </form>
 
             </div>
 
@@ -155,13 +149,13 @@
       document.getElementById('login-form-background').style.background = 'rgb(34, 36, 55, ' + (opacity / 100) + ')';
       //Register Service worker for mobile app
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/static/assets/js/shared/service-worker.js', {scope: '/'})
+        navigator.serviceWorker.register('/static/assets/js/shared/service-worker.js', { scope: '/' })
           .then(function (registration) {
             console.log('Service Worker Registered');
           });
       }
     });
-    async function resetPass(){
+    async function resetPass() {
       let res = await fetch(`/api/v2/crafty/resetPass/`, {
         method: 'GET',
       });
@@ -170,7 +164,38 @@
       bootbox.alert(responseData.data)
 
     }
+    $("#login-form").on("submit", async function (e) {
+      e.preventDefault();
+      let loginForm = document.getElementById("login-form");
 
+      let formData = new FormData(loginForm);
+
+      //Create an object from the form data entries
+      let formDataObject = Object.fromEntries(formData.entries());
+      console.log(formDataObject)
+      let res = await fetch(`/login`, {
+        method: 'POST',
+        headers: {
+          'X-XSRFToken': formDataObject._xsrf,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "username": formDataObject.username,
+          "password": formDataObject.password
+        }),
+      });
+      let responseData = await res.json();
+      if (responseData.status === "ok") {
+        console.log("OK")
+        if ($("#login-form").data("query")) {
+          location.href = `${$("#login-form").data("query")}`;
+        } else {
+          location.href = `/panel/dashboard`
+        }
+      } else {
+        $("#error-field").html(responseData.error);
+      }
+    });
   </script>
   <style>
     .modal-content {

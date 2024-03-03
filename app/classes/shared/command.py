@@ -82,11 +82,11 @@ class MainPrompt(cmd.Cmd):
         # get new password from user
         new_pass = getpass.getpass(prompt=f"NEW password for: {username} > ")
         # check to make sure it fits our requirements.
-        if len(new_pass) > 512:
-            Console.warning("Passwords must be greater than 6char long and under 512")
-            return False
-        if len(new_pass) < 6:
-            Console.warning("Passwords must be greater than 6char long and under 512")
+        if len(new_pass) < self.helper.minimum_password_length:
+            Console.warning(
+                "Passwords must be greater than"
+                f" {self.helper.minimum_password_length} char long"
+            )
             return False
         # grab repeated password input
         new_pass_conf = getpass.getpass(prompt="Re-enter your password: > ")
