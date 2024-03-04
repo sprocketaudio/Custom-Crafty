@@ -585,9 +585,17 @@ class Helpers:
             )
         return False
 
-    @staticmethod
-    def get_themes():
-        return ["default", "dark", "light", "ronald"]
+    def get_themes(self):
+        theme_list = []
+        themes_path = os.path.join(self.webroot, "static", "assets", "css", "themes")
+        theme_files = [
+            file
+            for file in os.listdir(themes_path)
+            if os.path.isfile(os.path.join(themes_path, file))
+        ]
+        for theme in theme_files:
+            theme_list.append(theme.split(".css")[0])
+        return theme_list
 
     @staticmethod
     def get_local_ip():

@@ -357,6 +357,7 @@ class PanelHandler(BaseHandler):
                 else None
             ),
             "superuser": superuser,
+            "themes": self.helper.get_themes(),
         }
         try:
             page_data["hosts_data"]["disk_json"] = json.loads(
