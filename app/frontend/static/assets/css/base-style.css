@@ -173,7 +173,7 @@ body {
     line-height: 1.5;
     color: #212529;
     text-align: left;
-    background: var(--base-text);
+    background: var(--base-bg);
 }
 
 [tabindex="-1"]:focus {
@@ -3468,7 +3468,7 @@ fieldset:disabled .wizard>.actions a,
 
 .btn-primary,
 .wizard>.actions a {
-    var(--base-text);
+    color: var(--base-text);
     background-color: var(--primary);
     border-color: var(--primary);
 }
@@ -24565,7 +24565,7 @@ ul li {
 }
 
 .todo-list .todo-item.edit-mode form .field-wrapper .form-group .tagsinput .tag {
-    var(--base-text)fff;
+    color: var(--base-text);
 }
 
 .activity-timeline .activity {
@@ -25624,14 +25624,14 @@ ul li {
     width: 40px;
     height: 40px;
     border-radius: 100%;
-    var(--base-text);
+    color: var(--base-text);
     font-size: 12px;
     font-weight: 500;
 }
 
 .product-item-wrapper .product-item .card-body .action-holder .favorite-button {
     margin-left: auto;
-    var(--base-text);
+    color: var(--base-text);
     font-size: 22px;
 }
 
@@ -28339,7 +28339,7 @@ div.tagsinput span.tag {
 }
 
 div.tagsinput span.tag a {
-    var(--base-text);
+    color: var(--base-text);
 }
 
 /* TinyMCE Editor */
@@ -29521,7 +29521,7 @@ div.tagsinput span.tag a {
 
 .auth.multi-step-login .step-form .step-progress li.active:before {
     background: var(--success);
-    var(--base-text);
+    color: var(--base-text);
 }
 
 .auth.multi-step-login .step-form .step-progress li:first-child:after {
@@ -29867,7 +29867,7 @@ div.tagsinput span.tag a {
     margin-bottom: 0;
     font-family: "roboto", sans-serif;
     font-weight: 600;
-    var(--base-text);
+    color: var(--base-text);
 }
 
 .profile-page .profile-header .profile-info .profile-user-designation {
