@@ -18,7 +18,12 @@ logger = logging.getLogger(__name__)
 
 class MainPrompt(cmd.Cmd):
     def __init__(
-        self, helper, tasks_manager, migration_manager, main_controller, import3
+        self,
+        helper,
+        tasks_manager,
+        migration_manager,
+        main_controller,
+        import3,
     ):
         super().__init__()
         self.helper: Helpers = helper

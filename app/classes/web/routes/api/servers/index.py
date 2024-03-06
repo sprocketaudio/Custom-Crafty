@@ -723,9 +723,7 @@ class ApiServersIndexHandler(BaseApiHandler):
                 405, {"status": "error", "error": "DATA CONSTRAINT FAILED"}
             )
             return
-        new_server_id, new_server_uuid = self.controller.create_api_server(
-            data, user["user_id"]
-        )
+        new_server_id = self.controller.create_api_server(data, user["user_id"])
 
         self.controller.servers.stats.record_stats()
 
@@ -734,7 +732,7 @@ class ApiServersIndexHandler(BaseApiHandler):
             (
                 f"created server {data['name']}"
                 f" (ID: {new_server_id})"
-                f" (UUID: {new_server_uuid})"
+                f" (UUID: {new_server_id})"
             ),
             server_id=new_server_id,
             source_ip=self.get_remote_ip(),
@@ -746,7 +744,7 @@ class ApiServersIndexHandler(BaseApiHandler):
                 "status": "ok",
                 "data": {
                     "new_server_id": str(new_server_id),
-                    "new_server_uuid": new_server_uuid,
+                    "new_server_uuid": new_server_id,
                 },
             },
         )

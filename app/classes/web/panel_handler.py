@@ -174,7 +174,7 @@ class PanelHandler(BaseHandler):
             self.redirect("/panel/error?error=Invalid Server ID")
             return None
         for server in self.controller.servers.failed_servers:
-            if int(server_id) == server["server_id"]:
+            if server_id == server["server_id"]:
                 self.failed_server = True
                 return server_id
         # Does this server exist?
@@ -556,7 +556,7 @@ class PanelHandler(BaseHandler):
                     "server_id": {
                         "server_id": server_id,
                         "server_name": server_temp_obj["server_name"],
-                        "server_uuid": server_temp_obj["server_uuid"],
+                        "server_uuid": server_temp_obj["server_id"],
                         "path": server_temp_obj["path"],
                         "log_path": server_temp_obj["log_path"],
                         "executable": server_temp_obj["executable"],

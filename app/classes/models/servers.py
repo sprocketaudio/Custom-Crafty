@@ -3,7 +3,6 @@ import datetime
 import typing as t
 from peewee import (
     CharField,
-    AutoField,
     DateTimeField,
     BooleanField,
     IntegerField,
@@ -13,6 +12,9 @@ from playhouse.shortcuts import model_to_dict
 from app.classes.shared.main_models import DatabaseShortcuts
 from app.classes.models.base_model import BaseModel
 
+# from app.classes.models.users import Users
+from app.classes.shared.helpers import Helpers
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,9 +22,8 @@ logger = logging.getLogger(__name__)
 #                                   Servers Model
 # **********************************************************************************
 class Servers(BaseModel):
-    server_id = AutoField()
+    server_id = CharField(primary_key=True, default=Helpers.create_uuid())
     created = DateTimeField(default=datetime.datetime.now)
-    server_uuid = CharField(default="", index=True)
     server_name = CharField(default="Server", index=True)
     path = CharField(default="")
     backup_path = CharField(default="")
@@ -40,6 +41,7 @@ class Servers(BaseModel):
     type = CharField(default="minecraft-java")
     show_status = BooleanField(default=1)
     created_by = IntegerField(default=-100)
+    # created_by = ForeignKeyField(Users, backref="creator_server", null=True)
     shutdown_timeout = IntegerField(default=60)
     ignored_exits = CharField(default="0")
     count_players = BooleanField(default=True)
@@ -60,8 +62,8 @@ class HelperServers:
     # **********************************************************************************
     @staticmethod
     def create_server(
+        server_id: str,
         name: str,
-        server_uuid: str,
         server_dir: str,
         backup_path: str,
         server_command: str,
@@ -95,25 +97,24 @@ class HelperServers:
         Raises:
             PeeweeException: If the server already exists
         """
-        return Servers.insert(
-            {
-                Servers.server_name: name,
-                Servers.server_uuid: server_uuid,
-                Servers.path: server_dir,
-                Servers.executable: server_file,
-                Servers.execution_command: server_command,
-                Servers.auto_start: False,
-                Servers.auto_start_delay: 10,
-                Servers.crash_detection: False,
-                Servers.log_path: server_log_file,
-                Servers.server_port: server_port,
-                Servers.server_ip: server_host,
-                Servers.stop_command: server_stop,
-                Servers.backup_path: backup_path,
-                Servers.type: server_type,
-                Servers.created_by: created_by,
-            }
-        ).execute()
+        return Servers.create(
+            server_id=server_id,
+            server_uuid=server_id,
+            server_name=name,
+            path=server_dir,
+            executable=server_file,
+            execution_command=server_command,
+            auto_start=False,
+            auto_start_delay=10,
+            crash_detection=False,
+            log_path=server_log_file,
+            server_port=server_port,
+            server_ip=server_host,
+            stop_command=server_stop,
+            backup_path=backup_path,
+            type=server_type,
+            created_by=created_by,
+        ).server_id
 
     @staticmethod
     def get_server_obj(server_id):

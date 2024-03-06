@@ -1,5 +1,5 @@
 # Changelog
-## --- [4.2.4] - 2023/TBD
+## --- [4.3.0] - 2023/TBD
 ### New features
 TBD
 ### Refactor

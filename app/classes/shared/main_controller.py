@@ -239,7 +239,7 @@ class Controller:
             try:
                 os.mkdir(final_path)
             except FileExistsError:
-                final_path += "_" + server["server_uuid"]
+                final_path += "_" + server["server_id"]
                 os.mkdir(final_path)
             try:
                 FileHelpers.copy_file(
@@ -632,11 +632,11 @@ class Controller:
         # and add the user to it if he's not a superuser
         if len(captured_roles) == 0:
             if not exec_user["superuser"]:
-                new_server_uuid = self.servers.get_server_data_by_id(new_server_id).get(
-                    "server_uuid"
+                new_server_id = self.servers.get_server_data_by_id(new_server_id).get(
+                    "server_id"
                 )
                 role_id = self.roles.add_role(
-                    f"Creator of Server with uuid={new_server_uuid}",
+                    f"Creator of Server with id={new_server_id}",
                     exec_user["user_id"],
                 )
                 self.server_perms.add_role_server(new_server_id, role_id, "11111111")
@@ -647,7 +647,7 @@ class Controller:
                 role_id = role
                 self.server_perms.add_role_server(new_server_id, role_id, "11111111")
 
-        return new_server_id, server_fs_uuid
+        return new_server_id
 
     @staticmethod
     def verify_jar_server(server_path: str, server_jar: str):
@@ -1095,7 +1095,7 @@ class Controller:
         for server in servers:
             server_path = server.get("path")
             new_local_server_path = os.path.join(
-                new_server_path, server.get("server_uuid")
+                new_server_path, server.get("server_id")
             )
             if os.path.isdir(server_path):
                 WebSocketManager().broadcast_page(

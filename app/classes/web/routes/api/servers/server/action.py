@@ -3,7 +3,6 @@ import os
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.models.servers import Servers
 from app.classes.shared.file_helpers import FileHelpers
-from app.classes.shared.helpers import Helpers
 from app.classes.web.base_api_handler import BaseApiHandler
 
 
@@ -68,10 +67,20 @@ class ApiServersServerActionHandler(BaseApiHandler):
             name_counter += 1
             new_server_name = server_data.get("server_name") + f" (Copy {name_counter})"
 
-        new_server_uuid = Helpers.create_uuid()
-        while os.path.exists(os.path.join(self.helper.servers_dir, new_server_uuid)):
-            new_server_uuid = Helpers.create_uuid()
-        new_server_path = os.path.join(self.helper.servers_dir, new_server_uuid)
+        new_server_id = self.controller.servers.create_server(
+            new_server_name,
+            None,
+            "",
+            None,
+            server_data.get("executable"),
+            None,
+            server_data.get("stop_command"),
+            server_data.get("type"),
+            user_id,
+            server_data.get("server_port"),
+        )
+
+        new_server_path = os.path.join(self.helper.servers_dir, new_server_id)
 
         self.controller.management.add_to_audit_log(
             user_id,
@@ -89,19 +98,12 @@ class ApiServersServerActionHandler(BaseApiHandler):
             self.helper.get_os_understandable_path(server_data.get("log_path"))
         )
 
-        new_server_id = self.controller.servers.create_server(
-            new_server_name,
-            new_server_uuid,
-            new_server_path,
-            "",
-            new_server_command,
-            server_data.get("executable"),
-            new_server_log_file,
-            server_data.get("stop_command"),
-            server_data.get("type"),
-            user_id,
-            server_data.get("server_port"),
-        )
+        server: Servers = self.controller.servers.get_server_obj(new_server_id)
+        server.path = new_server_path
+        server.log_path = new_server_log_file
+        server.execution_command = new_server_command
+        self.controller.servers.update_server(server)
+
         for role in self.controller.server_perms.get_server_roles(server_id):
             mask = self.controller.server_perms.get_permissions_mask(
                 role.role_id, server_id
