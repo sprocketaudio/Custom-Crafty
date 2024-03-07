@@ -24,7 +24,9 @@ class DatabaseBuilder:
                 "by Crafty. Find it in app/config/default-creds.txt"
             )
         username = default_data.get("username", "admin")
-        if self.helper.minimum_password_length > default_data.get("password", password):
+        if self.helper.minimum_password_length > len(
+            default_data.get("password", password)
+        ):
             Console.critical(
                 "Default password too short"
                 " using Crafty's created default."
