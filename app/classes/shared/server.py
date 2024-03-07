@@ -208,7 +208,7 @@ class ServerInstance:
         self.dir_scheduler.start()
         self.start_dir_calc_task()
         self.backup_thread = threading.Thread(
-            target=self.a_backup_server, daemon=True, name=f"backup_{self.name}"
+            target=self.backup_server, daemon=True, name=f"backup_{self.name}"
         )
         self.is_backingup = False
         # Reset crash and update at initialization
@@ -1110,13 +1110,12 @@ class ServerInstance:
             f.write("eula=true")
         self.run_threaded_server(user_id)
 
-    @callback
-    def backup_server(self):
+    def a_backup_server(self):
         if self.settings["backup_path"] == "":
             logger.critical("Backup path is None. Canceling Backup!")
             return
         backup_thread = threading.Thread(
-            target=self.a_backup_server, daemon=True, name=f"backup_{self.name}"
+            target=self.backup_server, daemon=True, name=f"backup_{self.name}"
         )
         logger.info(
             f"Starting Backup Thread for server {self.settings['server_name']}."
@@ -1143,7 +1142,8 @@ class ServerInstance:
             return False
         logger.info(f"Backup Thread started for server {self.settings['server_name']}.")
 
-    def a_backup_server(self):
+    @callback
+    def backup_server(self):
         was_server_running = None
         logger.info(f"Starting server {self.name} (ID {self.server_id}) backup")
         server_users = PermissionsServers.get_server_user_list(self.server_id)
@@ -1373,7 +1373,7 @@ class ServerInstance:
     def a_jar_update(self):
         server_users = PermissionsServers.get_server_user_list(self.server_id)
         was_started = "-1"
-        self.backup_server()
+        self.a_backup_server()
         # checks if server is running. Calls shutdown if it is running.
         if self.check_running():
             was_started = True
