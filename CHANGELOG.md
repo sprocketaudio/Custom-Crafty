@@ -1,7 +1,9 @@
 # Changelog
-## --- [4.3.0] - 2023/TBD
-### New features
-TBD
+## --- [4.3.0] - 2023/03/09
+### Breaking Changes
+- This release includes database migrations that are not revertable. Once you update to this version you will not be able to rollback to a previous version.
+- In this release, we've implemented a breaking change to enhance server identification within Crafty: instead of relying on numerical integers (1, 2, 3, etc.), Servers are now uniquely identified by their UUIDs. Please adapt your API clients accordingly.
+
 ### Refactor
 - Refactor remote file downloads ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/719))
 ### Bug fixes
