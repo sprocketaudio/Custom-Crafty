@@ -39,7 +39,111 @@
           <span class="d-block d-sm-none">
             {% include "parts/m_server_controls_list.html %}
           </span>
-
+          <div class="row">
+            <div class="col-md-12 col-sm-12" style="overflow-x:auto;">
+              <div class="card">
+                <div class="card-header header-sm d-flex justify-content-between align-items-center">
+                  <h4 class="card-title"><i class="fa-regular fa-bell"></i> {{ translate('backups', 'backups', data['lang']) }} </h4>
+                  {% if data['user_data']['hints'] %}
+                  <span class="too_small" title="{{ translate('serverSchedules', 'cannotSee', data['lang']) }}" , data-content="{{ translate('serverSchedules', 'cannotSeeOnMobile', data['lang']) }}" , data-placement="bottom"></span>
+                  {% end %}
+                  <div><a class="btn btn-info" href="/panel/add_backup?id={{ data['server_stats']['server_id']['server_id'] }}"><i class="fas fa-plus-circle"></i> {{ translate('backups', 'new', data['lang']) }}</a></div>
+                </div>
+                <div class="card-body">
+                  {% if len(data['backups']) == 0 %}
+                  <div style="text-align: center; color: grey;">
+                    <h7>{{ translate('backups', 'no-backup', data['lang']) }} <strong>{{ translate('backups', 'newbackup',data['lang']) }}</strong>.</h7>
+                  </div>
+                  {% end %}
+                  {% if len(data['backups']) > 0 %}
+                  <div class="d-none d-lg-block">
+                    <table class="table table-hover responsive-table" aria-label="backups list" id="backup_table" width="100%" style="table-layout:fixed;">
+                      <thead>
+                        <tr class="rounded">
+                          <th scope="col" style="width: 5%; min-width: 64px;">{{ translate('serverBackups', 'enabled', data['lang']) }}</th>
+                          <th scope="col" style="width: 15%; min-width: 10px;">{{ translate('serverBackups', 'name', data['lang']) }} </th>
+                          <th scope="col" style="width: 60%; min-width: 50px;">{{ translate('serverBackups', 'storageLocation', data['lang']) }}</th>
+                          <th scope="col" style="width: 10%; min-width: 50px;">{{ translate('serverBackups', 'maxBackups', data['lang']) }}</th>
+                          <th scope="col" style="width: 10%; min-width: 50px;">{{ translate('serverBackups', 'actions', data['lang']) }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for backup in data['backups'] %}
+                        <tr>
+                          <td id="{{backup.enabled}}" class="enabled">
+                            <button type="button" class="btn btn-sm btn-info btn-toggle backup-custom-toggle" id="backup_{{backup.id}}" name="backup_{{backup.id}}" data-backup-id="{{backup.id}}" data-backup-enabled="{{ 'true' if backup.enabled else 'false' }}" data-toggle="button" aria-pressed="true" autocomplete="off">
+                              <div class="handle"></div>
+                            </button>
+                          </td>
+                          <td id="{{backup.backup_name}}" class="id">
+                            <p>{{backup.backup_name}}</p>
+                          </td>
+                          <td id="{{backup.backup_location}}" class="type">
+                            <p>{{backup.backup_location}}</p>
+                          </td>
+                          <td id="{{backup.max_backups}}" class="trigger" style="overflow: scroll; max-width: 30px;">
+                            <p>{{backup.max_backups}}</p>
+                          </td>
+                          <td id="backup_edit" class="action">
+                            <button onclick="window.location.href=`/panel/backup_edit?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.id}}`" class="btn btn-info">
+                              <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button data-backup={{ backup.id }} class="btn btn-danger del_button">
+                              <i class="fas fa-trash" aria-hidden="true"></i>
+                            </button>
+                            <button data-backup={{ backup.id }} data-toggle="tooltip" title="{{ translate('backups', 'run', data['lang']) }}" class="btn btn-outline-warning test-socket">
+                              <i class="fa-solid fa-vial"></i>
+                            </button>
+                          </td>
+                        </tr>
+                        {% end %}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="d-block d-lg-none">
+                    <table aria-label="backups list" class="table table-hover responsive-table" id="backup_table_mini" width="100%" style="table-layout:fixed;">
+                      <thead>
+                        <tr class="rounded">
+                          <th style="width: 20%; min-width: 64px;">{{ translate('backups', 'enabled',
+                            data['lang']) }}</th>
+                          <th style="width: 40%; min-width: 10px;">Name
+                          </th>
+                          <th style="width: 40%; min-width: 50px;">{{ translate('backups', 'edit', data['lang'])
+                            }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for backup in data['backups'] %}
+                        <tr>
+                          <td id="{{backup.enabled}}" class="enabled">
+                            <button type="button" class="btn btn-sm btn-info btn-toggle backup-custom-toggle" id="backup_{{backup.id}}" name="backup_{{backup.id}}" data-backup-id="{{backup.id}}" data-backup-enabled="{{ 'true' if backup.enabled else 'false' }}" data-toggle="button" aria-pressed="true" autocomplete="off">
+                              <div class="handle"></div>
+                            </button>
+                          </td>
+                          <td id="{{backup.backup_name}}" class="id">
+                            <p>{{backup.backup_name}}</p>
+                          </td>
+                          <td id="backup_edit" class="action">
+                            <button onclick="window.location.href=`/panel/backup_edit?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.id}}`" class="btn btn-info">
+                              <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button data-backup={{ backup.backup_id }} class="btn btn-danger del_button">
+                              <i class="fas fa-trash" aria-hidden="true"></i>
+                            </button>
+                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip" title="{{ translate('backups', 'run', data['lang']) }}" class="btn btn-outline-warning test-socket">
+                              <i class="fa-solid fa-vial"></i>
+                            </button>
+                          </td>
+                        </tr>
+                        {% end %}
+                      </tbody>
+                    </table>
+                  </div>
+                  {% end %}
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="row">
             <div class="col-md-6 col-sm-12">
               <br>
@@ -69,7 +173,7 @@
                       class="text-muted ml-1"> - {{ translate('serverBackups', 'storageLocationDesc', data['lang'])
                       }}</small> </label>
                   <input type="text" class="form-control" name="backup_path" id="backup_path"
-                    value="{{ data['server_stats']['server_id']['backup_path']  }}"
+                    value="{{ data['backup_config']['backup_path']  }}"
                     placeholder="{{ translate('serverBackups', 'storageLocation', data['lang']) }}">
                   {% end %}
                 </div>

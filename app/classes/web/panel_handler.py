@@ -680,6 +680,11 @@ class PanelHandler(BaseHandler):
                 page_data["backup_config"] = (
                     self.controller.management.get_backup_config(server_id)
                 )
+                page_data["backups"] = self.controller.management.get_backups_by_server(
+                    server_id, model=True
+                )
+                for backup in page_data["backups"]:
+                    print(backup)
                 exclusions = []
                 page_data["exclusions"] = (
                     self.controller.management.get_excluded_backup_dirs(server_id)
@@ -706,7 +711,9 @@ class PanelHandler(BaseHandler):
                     page_data["backup_list"] = server.list_backups()
                 except:
                     page_data["backup_list"] = []
-                page_data["backup_path"] = Helpers.wtol_path(server_info["backup_path"])
+                page_data["backup_path"] = Helpers.wtol_path(
+                    page_data["backup_config"]["backup_path"]
+                )
 
             if subpage == "metrics":
                 try:
