@@ -43,16 +43,16 @@
             <div class="col-md-12 col-sm-12" style="overflow-x:auto;">
               <div class="card">
                 <div class="card-header header-sm d-flex justify-content-between align-items-center">
-                  <h4 class="card-title"><i class="fa-regular fa-bell"></i> {{ translate('backups', 'backups', data['lang']) }} </h4>
+                  <h4 class="card-title"><i class="fa-regular fa-bell"></i> {{ translate('serverBackups', 'backups', data['lang']) }} </h4>
                   {% if data['user_data']['hints'] %}
                   <span class="too_small" title="{{ translate('serverSchedules', 'cannotSee', data['lang']) }}" , data-content="{{ translate('serverSchedules', 'cannotSeeOnMobile', data['lang']) }}" , data-placement="bottom"></span>
                   {% end %}
-                  <div><a class="btn btn-info" href="/panel/add_backup?id={{ data['server_stats']['server_id']['server_id'] }}"><i class="fas fa-plus-circle"></i> {{ translate('backups', 'new', data['lang']) }}</a></div>
+                  <div><a class="btn btn-info" href="/panel/add_backup?id={{ data['server_stats']['server_id']['server_id'] }}"><i class="fas fa-plus-circle"></i> {{ translate('serverBackups', 'newBackup', data['lang']) }}</a></div>
                 </div>
                 <div class="card-body">
                   {% if len(data['backups']) == 0 %}
                   <div style="text-align: center; color: grey;">
-                    <h7>{{ translate('backups', 'no-backup', data['lang']) }} <strong>{{ translate('backups', 'newbackup',data['lang']) }}</strong>.</h7>
+                    <h7>{{ translate('serverBackups', 'no-backup', data['lang']) }} <strong>{{ translate('serverBackups', 'newBackup',data['lang']) }}</strong>.</h7>
                   </div>
                   {% end %}
                   {% if len(data['backups']) > 0 %}
@@ -91,7 +91,7 @@
                             <button data-backup={{ backup.id }} class="btn btn-danger del_button">
                               <i class="fas fa-trash" aria-hidden="true"></i>
                             </button>
-                            <button data-backup={{ backup.id }} data-toggle="tooltip" title="{{ translate('backups', 'run', data['lang']) }}" class="btn btn-outline-warning test-socket">
+                            <button data-backup={{ backup.id }} data-toggle="tooltip" title="{{ translate('serverBackups', 'run', data['lang']) }}" class="btn btn-outline-warning test-socket">
                               <i class="fa-solid fa-vial"></i>
                             </button>
                           </td>
@@ -104,11 +104,11 @@
                     <table aria-label="backups list" class="table table-hover responsive-table" id="backup_table_mini" width="100%" style="table-layout:fixed;">
                       <thead>
                         <tr class="rounded">
-                          <th style="width: 20%; min-width: 64px;">{{ translate('backups', 'enabled',
+                          <th style="width: 20%; min-width: 64px;">{{ translate('serverBackups', 'enabled',
                             data['lang']) }}</th>
                           <th style="width: 40%; min-width: 10px;">Name
                           </th>
-                          <th style="width: 40%; min-width: 50px;">{{ translate('backups', 'edit', data['lang'])
+                          <th style="width: 40%; min-width: 50px;">{{ translate('serverBackups', 'edit', data['lang'])
                             }}</th>
                         </tr>
                       </thead>
@@ -130,7 +130,7 @@
                             <button data-backup={{ backup.backup_id }} class="btn btn-danger del_button">
                               <i class="fas fa-trash" aria-hidden="true"></i>
                             </button>
-                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip" title="{{ translate('backups', 'run', data['lang']) }}" class="btn btn-outline-warning test-socket">
+                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip" title="{{ translate('serverBackups', 'run', data['lang']) }}" class="btn btn-outline-warning test-socket">
                               <i class="fa-solid fa-vial"></i>
                             </button>
                           </td>
