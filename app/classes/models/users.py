@@ -119,7 +119,6 @@ class HelperUsers:
     @staticmethod
     def get_user_total():
         count = Users.select().where(Users.username != "system").count()
-        print(count)
         return count
 
     @staticmethod

@@ -14,7 +14,6 @@ def migrate(migrator: Migrator, database, **kwargs):
     """
     Write your migrations here.
     """
-    print("pee pee")
     db = database
 
     migrator.add_columns("backups", backup_id=peewee.UUIDField(default=uuid.uuid4))
@@ -70,7 +69,6 @@ def migrate(migrator: Migrator, database, **kwargs):
 
     # Copy data from the existing backups table to the new one
     for backup in Backups.select():
-        print(backup)
         # Fetch the related server entry from the Servers table
         server = Servers.get(Servers.server_id == backup.server_id)
 
