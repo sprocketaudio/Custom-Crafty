@@ -372,8 +372,8 @@ class MigrationManager(object):
         Create migrator
         """
         migrator = Migrator(self.database)
-        # Removing the up_one to prevent running all 
-        # migrations each time we got a new one. 
+        # Removing the up_one to prevent running all
+        # migrations each time we got a new one.
         # It's handled by migration.up() function.
         # for name in self.done:
         #    self.up_one(name, migrator, True)
