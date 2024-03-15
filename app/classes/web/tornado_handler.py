@@ -25,7 +25,6 @@ from app.classes.web.server_handler import ServerHandler
 from app.classes.web.websocket_handler import WebSocketHandler
 from app.classes.web.static_handler import CustomStaticHandler
 from app.classes.web.upload_handler import UploadHandler
-from app.classes.web.http_handler import HTTPHandler, HTTPHandlerPage
 from app.classes.web.status_handler import StatusHandler
 
 
@@ -44,7 +43,6 @@ class Webserver:
         file_helper: FileHelpers,
     ):
         self.ioloop = None
-        self.http_server = None
         self.https_server = None
         self.helper = helper
         self.controller = controller
@@ -173,30 +171,6 @@ class Webserver:
             static_handler_class=CustomStaticHandler,
             serve_traceback=debug_errors,
         )
-        http_handers = [
-            (r"/", HTTPHandler, handler_args),
-            (r"/(.+)", HTTPHandlerPage, handler_args),
-        ]
-        http_app = tornado.web.Application(
-            http_handers,
-            template_path=os.path.join(self.helper.webroot, "templates"),
-            static_path=os.path.join(self.helper.webroot, "static"),
-            debug=debug_errors,
-            cookie_secret=cookie_secret,
-            xsrf_cookies=True,
-            autoreload=False,
-            log_function=self.log_function,
-            default_handler_class=HTTPHandler,
-            login_url="/login",
-            serve_traceback=debug_errors,
-        )
-
-        if http_port != 0:
-            self.http_server = tornado.httpserver.HTTPServer(http_app)
-            self.http_server.listen(http_port)
-        else:
-            logger.info("http port disabled by config")
-
         self.https_server = tornado.httpserver.HTTPServer(app, ssl_options=cert_objects)
         self.https_server.listen(https_port)
 
@@ -218,7 +192,6 @@ class Webserver:
         logger.info("Shutting Down Web Server")
         Console.info("Shutting Down Web Server")
         self.ioloop.stop()
-        self.http_server.stop()
         self.https_server.stop()
         logger.info("Web Server Stopped")
         Console.info("Web Server Stopped")
