@@ -191,7 +191,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
             superuser = user["superuser"]
             if api_key is not None:
-                superuser = superuser and api_key.superuser
+                superuser = superuser and api_key.full_access
 
             exec_user_role = set()
             if superuser:

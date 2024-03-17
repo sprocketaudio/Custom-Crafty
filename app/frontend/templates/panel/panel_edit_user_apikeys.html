@@ -70,7 +70,7 @@
                                                         <td>{{ apikey.name }}</td>
                                                         <td>{{ apikey.created.strftime('%d/%m/%Y %H:%M:%S') }}</td>
                                                         <td>
-                                                            {% if apikey.superuser %}
+                                                            {% if apikey.full_access %}
                                                             <span class="text-success">
                                                                 <i class="fas fa-check-square"></i> {{
                                                                 translate('apiKeys', 'yes', data['lang']) }}
@@ -158,8 +158,8 @@
                                             </tbody>
                                         </table>
 
-                                        <label for="superuser">Superuser</label>
-                                        <input type="checkbox" class="" id="superuser" name="superuser" value="1">
+                                        <label for="full_access">Superuser</label>
+                                        <input type="checkbox" class="" id="full_access" name="full_access" value="1">
 
                                         <br />
 
@@ -240,7 +240,7 @@
                 "name": formDataObject.name,
                 "server_permissions_mask": server_permissions,
                 "crafty_permissions_mask": crafty_permissions,
-                "superuser": $("#superuser").prop('checked'),
+                "full_access": $("#full_access").prop('checked'),
             });
             console.log(formDataJsonString);
 
