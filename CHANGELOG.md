@@ -1,16 +1,16 @@
 # Changelog
-## --- [4.3.1] - 2023/TBD
+## --- [4.3.1] - 2024/TBD
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Fix Server ID Rework for backups, schedules, and roles (INT ID to UUID migration) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/729))
 ### Tweaks
 TBD
 ### Lang
 TBD
 <br><br>
 
-## --- [4.3.0] - 2023/03/09
+## --- [4.3.0] - 2024/03/09
 ### Breaking Changes
 - This release includes database migrations that are not revertable. Once you update to this version you will not be able to rollback to a previous version.
 - In this release, we've implemented a breaking change to enhance server identification within Crafty: instead of relying on numerical integers (1, 2, 3, etc.), Servers are now uniquely identified by their UUIDs. Please adapt your API clients accordingly.
@@ -34,7 +34,7 @@ TBD
 - Update `de_DE, en_EN, es_ES, fr_FR, he_IL, lol_EN, lv_LV, nl_BE pl_PL, th_TH, tr_TR, uk_UA, zh_CN` translations for `4.3.0` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/715))
 <br><br>
 
-## --- [4.2.3] - 2023/02/02
+## --- [4.2.3] - 2024/02/02
 ### New features
 - Use Papermc Group's API for `paper` & `folia` builds in server builder ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/688))
 - Allow omission of player count from Dashboard (e.g. for  proxy servers) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/692))
