@@ -1,13 +1,10 @@
 # Changelog
 ## --- [4.3.1] - 2024/TBD
-### New features
-TBD
 ### Bug fixes
 - Fix Server ID Rework for backups, schedules, and roles (INT ID to UUID migration) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/729))
 ### Tweaks
-TBD
-### Lang
-TBD
+- Remove http re-direct handler. Users should implement nginx configurations for port 80 redirects ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/730))
+
 <br><br>
 
 ## --- [4.3.0] - 2024/03/09
