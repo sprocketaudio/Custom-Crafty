@@ -369,11 +369,14 @@ class MigrationManager(object):
     @cached_property
     def migrator(self) -> Migrator:
         """
-        Create migrator and setup it with fake migrations.
+        Create migrator
         """
         migrator = Migrator(self.database)
-        for name in self.done:
-            self.up_one(name, migrator, True)
+        # Removing the up_one to prevent running all
+        # migrations each time we got a new one.
+        # It's handled by migration.up() function.
+        # for name in self.done:
+        #    self.up_one(name, migrator, True)
         return migrator
 
     def compile(self, name, migrate="", rollback=""):
