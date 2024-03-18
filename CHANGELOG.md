@@ -1,5 +1,5 @@
 # Changelog
-## --- [4.3.1] - 2024/TBD
+## --- [4.3.1] - 2024/03/18
 ### Bug fixes
 - Fix Server ID Rework for backups, schedules, and roles (INT ID to UUID migration) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/729))
 ### Tweaks
