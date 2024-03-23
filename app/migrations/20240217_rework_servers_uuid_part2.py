@@ -60,6 +60,11 @@ def migrate(migrator: Migrator, database, **kwargs):
     if this_migration is not None:
         Console.debug("Update database already done, skipping this part")
         return
+    else:
+        servers_columns = db.get_columns('servers')
+        if not any(column_data.name == "server_uuid" for column_data in servers_columns):
+            Console.debug("Servers.server_uuid already deleted in Crafty version 4.3.0, skipping this part")
+            return
 
     try:
         logger.info("Migrating Data from Int to UUID (Foreign Keys)")
