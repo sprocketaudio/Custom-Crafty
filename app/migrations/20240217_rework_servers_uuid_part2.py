@@ -12,7 +12,6 @@ from app.classes.models.management import (
     Backups,
 )
 from app.classes.models.server_permissions import RoleServers
-from app.classes.models.servers import Servers
 from app.classes.models.base_model import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -23,6 +22,37 @@ def migrate(migrator: Migrator, database, **kwargs):
     Write your migrations here.
     """
     db = database
+
+    # **********************************************************************************
+    #          Servers New Model from Old (easier to migrate without dunmping Database)
+    # **********************************************************************************
+    class Servers(peewee.Model):
+        server_id = peewee.CharField(primary_key=True, default=str(uuid.uuid4()))
+        created = peewee.DateTimeField(default=datetime.datetime.now)
+        server_uuid = peewee.CharField(default="", index=True)
+        server_name = peewee.CharField(default="Server", index=True)
+        path = peewee.CharField(default="")
+        backup_path = peewee.CharField(default="")
+        executable = peewee.CharField(default="")
+        log_path = peewee.CharField(default="")
+        execution_command = peewee.CharField(default="")
+        auto_start = peewee.BooleanField(default=0)
+        auto_start_delay = peewee.IntegerField(default=10)
+        crash_detection = peewee.BooleanField(default=0)
+        stop_command = peewee.CharField(default="stop")
+        executable_update_url = peewee.CharField(default="")
+        server_ip = peewee.CharField(default="127.0.0.1")
+        server_port = peewee.IntegerField(default=25565)
+        logs_delete_after = peewee.IntegerField(default=0)
+        type = peewee.CharField(default="minecraft-java")
+        show_status = peewee.BooleanField(default=1)
+        created_by = peewee.IntegerField(default=-100)
+        shutdown_timeout = peewee.IntegerField(default=60)
+        ignored_exits = peewee.CharField(default="0")
+
+        class Meta:
+            table_name = "servers"
+            database = db
 
     this_migration = MigrateHistory.get_or_none(
         MigrateHistory.name == "20240217_rework_servers_uuid_part2"
@@ -149,12 +179,13 @@ def rollback(migrator: Migrator, database, **kwargs):
         return
 
     # **********************************************************************************
-    #                                   Old Servers Model
+    #          Servers New Model from Old (easier to migrate without dunmping Database)
     # **********************************************************************************
-    class OldServers(BaseModel):
-        server_id = peewee.AutoField()
+    class Servers(peewee.Model):
+        server_id = peewee.CharField(primary_key=True, default=str(uuid.uuid4()))
         created = peewee.DateTimeField(default=datetime.datetime.now)
         server_uuid = peewee.CharField(default="", index=True)
+        server_name = peewee.CharField(default="Server", index=True)
         path = peewee.CharField(default="")
         backup_path = peewee.CharField(default="")
         executable = peewee.CharField(default="")
@@ -171,13 +202,12 @@ def rollback(migrator: Migrator, database, **kwargs):
         type = peewee.CharField(default="minecraft-java")
         show_status = peewee.BooleanField(default=1)
         created_by = peewee.IntegerField(default=-100)
-        # created_by = ForeignKeyField(Users, backref="creator_server", null=True)
         shutdown_timeout = peewee.IntegerField(default=60)
         ignored_exits = peewee.CharField(default="0")
-        count_players = peewee.BooleanField(default=True)
 
         class Meta:
             table_name = "servers"
+            database = db
 
     try:
         logger.info("Migrating Data from UUID to Int (Primary Keys)")
@@ -215,8 +245,8 @@ def rollback(migrator: Migrator, database, **kwargs):
                 new_server_id = 0
             else:
                 try:
-                    server = OldServers.get_or_none(
-                        OldServers.server_uuid == old_server_id
+                    server = Servers.get_or_none(
+                        Servers.server_uuid == old_server_id
                     )
                     new_server_id = server.server_id
                 except:
@@ -229,7 +259,7 @@ def rollback(migrator: Migrator, database, **kwargs):
         for webhook in Webhooks.select():
             old_server_id = webhook.server_id_id
             try:
-                server = OldServers.get_or_none(OldServers.server_uuid == old_server_id)
+                server = Servers.get_or_none(Servers.server_uuid == old_server_id)
                 new_server_id = server.server_id
             except:
                 new_server_id = old_server_id
@@ -241,7 +271,7 @@ def rollback(migrator: Migrator, database, **kwargs):
         for schedule in Schedules.select():
             old_server_id = schedule.server_id_id
             try:
-                server = OldServers.get_or_none(OldServers.server_uuid == old_server_id)
+                server = Servers.get_or_none(Servers.server_uuid == old_server_id)
                 new_server_id = server.server_id
             except:
                 new_server_id = old_server_id
@@ -253,7 +283,7 @@ def rollback(migrator: Migrator, database, **kwargs):
         for backup in Backups.select():
             old_server_id = backup.server_id_id
             try:
-                server = OldServers.get_or_none(OldServers.server_uuid == old_server_id)
+                server = Servers.get_or_none(Servers.server_uuid == old_server_id)
                 new_server_id = server.server_id
             except:
                 new_server_id = old_server_id
@@ -265,7 +295,7 @@ def rollback(migrator: Migrator, database, **kwargs):
         for role_servers in RoleServers.select():
             old_server_id = role_servers.server_id_id
             try:
-                server = OldServers.get_or_none(OldServers.server_uuid == old_server_id)
+                server = Servers.get_or_none(Servers.server_uuid == old_server_id)
                 new_server_id = server.server_id
             except:
                 new_server_id = old_server_id
