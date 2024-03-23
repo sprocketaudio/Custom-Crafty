@@ -56,9 +56,11 @@ def migrate(migrator: Migrator, database, **kwargs):
         )
 
         # Drop Column after migration
-        servers_columns = db.get_columns('servers')
+        servers_columns = db.get_columns("servers")
         if any(column_data.name == "server_uuid" for column_data in servers_columns):
-            Console.debug("Servers.server_uuid not deleted before Crafty version 4.3.2, skipping this part")
+            Console.debug(
+                "Servers.server_uuid not deleted before Crafty version 4.3.2, skipping this part"
+            )
             migrator.drop_columns("servers", ["server_uuid"])
 
     except Exception as ex:
