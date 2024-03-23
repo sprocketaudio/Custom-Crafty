@@ -13,6 +13,7 @@ from app.classes.models.management import (
 )
 from app.classes.models.server_permissions import RoleServers
 from app.classes.models.servers import Servers
+from app.classes.models.base_model import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -137,23 +138,146 @@ def rollback(migrator: Migrator, database, **kwargs):
     """
     db = database
 
-    # Changes on Server Table
-    migrator.alter_column_type(
-        "servers",
-        "server_id",
-        peewee.AutoField(),
-    )
+    # Condition to prevent running rollback each time we've got a rollback to do
+    this_migration = MigrateHistory.get_or_none(MigrateHistory.name == "20240216_rework_servers_uuid_part2")
+    if this_migration is None:
+        Console.debug("Update database already done, skipping this part")
+        return
 
-    # Changes on Audit Log Table
-    migrator.alter_column_type(
-        AuditLog,
-        "server_id",
-        peewee.IntegerField(default=None, index=True),
-    )
+    # **********************************************************************************
+    #                                   Old Servers Model
+    # **********************************************************************************
+    class OldServers(BaseModel):
+        server_id = peewee.AutoField()
+        created = peewee.DateTimeField(default=datetime.datetime.now)
+        server_uuid = peewee.CharField(default="", index=True)
+        path = peewee.CharField(default="")
+        backup_path = peewee.CharField(default="")
+        executable = peewee.CharField(default="")
+        log_path = peewee.CharField(default="")
+        execution_command = peewee.CharField(default="")
+        auto_start = peewee.BooleanField(default=0)
+        auto_start_delay = peewee.IntegerField(default=10)
+        crash_detection = peewee.BooleanField(default=0)
+        stop_command = peewee.CharField(default="stop")
+        executable_update_url = peewee.CharField(default="")
+        server_ip = peewee.CharField(default="127.0.0.1")
+        server_port = peewee.IntegerField(default=25565)
+        logs_delete_after = peewee.IntegerField(default=0)
+        type = peewee.CharField(default="minecraft-java")
+        show_status = peewee.BooleanField(default=1)
+        created_by = peewee.IntegerField(default=-100)
+        # created_by = ForeignKeyField(Users, backref="creator_server", null=True)
+        shutdown_timeout = peewee.IntegerField(default=60)
+        ignored_exits = peewee.CharField(default="0")
+        count_players = peewee.BooleanField(default=True)
 
-    # Changes on Webhook Table
-    migrator.alter_column_type(
-        Webhooks,
-        "server_id",
-        peewee.IntegerField(null=True),
-    )
+        class Meta:
+            table_name = "servers"
+
+    try:
+        logger.info("Migrating Data from UUID to Int (Primary Keys)")
+        Console.info("Migrating Data from UUID to Int (Primary Keys)")
+        # Migrating servers from the old id type to the new one
+        new_id = 0
+        for server in Servers.select():
+            new_id += 1
+            Servers.update(server_uuid=server.server_id).where(
+                Servers.server_id == server.server_id
+            ).execute()
+            Servers.update(server_id=new_id).where(
+                Servers.server_id == server.server_id
+            ).execute()
+
+        logger.info("Migrating Data from UUID to Int (Primary Keys) : SUCCESS")
+        Console.info("Migrating Data from UUID to Int (Primary Keys) : SUCCESS")
+
+    except Exception as ex:
+        logger.error("Error while migrating Data from UUID to Int (Primary Keys)")
+        logger.error(ex)
+        Console.error("Error while migrating Data from UUID to Int (Primary Keys)")
+        Console.error(ex)
+        last_migration = MigrateHistory.get_by_id(MigrateHistory.select().count())
+        last_migration.delete()
+        return
+
+    try:
+        logger.info("Migrating Data from UUID to Int (Foreign Keys)")
+        Console.info("Migrating Data from UUID to Int (Foreign Keys)")
+        # Changes on Audit Log Table
+        for audit_log in AuditLog.select():
+            old_server_id = audit_log.server_id_id
+            if old_server_id is None:
+                new_server_id = 0
+            else:
+                try:
+                    server = OldServers.get_or_none(OldServers.server_uuid == old_server_id)
+                    new_server_id = server.server_id
+                except:
+                    new_server_id = old_server_id
+            AuditLog.update(server_id=new_server_id).where(
+                AuditLog.audit_id == audit_log.audit_id
+            ).execute()
+
+        # Changes on Webhooks Log Table
+        for webhook in Webhooks.select():
+            old_server_id = webhook.server_id_id
+            try:
+                server = OldServers.get_or_none(OldServers.server_uuid == old_server_id)
+                new_server_id = server.server_id
+            except:
+                new_server_id = old_server_id
+            Webhooks.update(server_id=new_server_id).where(
+                Webhooks.id == webhook.id
+            ).execute()
+
+        # Changes on Schedules Log Table
+        for schedule in Schedules.select():
+            old_server_id = schedule.server_id_id
+            try:
+                server = OldServers.get_or_none(OldServers.server_uuid == old_server_id)
+                new_server_id = server.server_id
+            except:
+                new_server_id = old_server_id
+            Schedules.update(server_id=new_server_id).where(
+                Schedules.schedule_id == schedule.schedule_id
+            ).execute()
+
+        # Changes on Backups Log Table
+        for backup in Backups.select():
+            old_server_id = backup.server_id_id
+            try:
+                server = OldServers.get_or_none(OldServers.server_uuid == old_server_id)
+                new_server_id = server.server_id
+            except:
+                new_server_id = old_server_id
+            Backups.update(server_id=new_server_id).where(
+                Backups.server_id == old_server_id
+            ).execute()
+
+        # Changes on RoleServers Log Table
+        for role_servers in RoleServers.select():
+            old_server_id = role_servers.server_id_id
+            try:
+                server = OldServers.get_or_none(OldServers.server_uuid == old_server_id)
+                new_server_id = server.server_id
+            except:
+                new_server_id = old_server_id
+            RoleServers.update(server_id=new_server_id).where(
+                RoleServers.role_id == role_servers.id
+                and RoleServers.server_id == old_server_id
+            ).execute()
+
+        logger.info("Migrating Data from UUID to Int (Foreign Keys) : SUCCESS")
+        Console.info("Migrating Data from UUID to Int (Foreign Keys) : SUCCESS")
+
+    except Exception as ex:
+        logger.error("Error while migrating Data from UUID to Int (Foreign Keys)")
+        logger.error(ex)
+        Console.error("Error while migrating Data from UUID to Int (Foreign Keys)")
+        Console.error(ex)
+        last_migration = MigrateHistory.get_by_id(MigrateHistory.select().count())
+        last_migration.delete()
+        return
+
+    return
