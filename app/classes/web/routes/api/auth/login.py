@@ -101,7 +101,7 @@ class ApiAuthLoginHandler(BaseApiHandler):
 
             # log this login
             self.controller.management.add_to_audit_log(
-                user_data.user_id, "logged in via the API", 0, self.get_remote_ip()
+                user_data.user_id, "logged in via the API", None, self.get_remote_ip()
             )
 
             self.finish_json(
@@ -119,7 +119,7 @@ class ApiAuthLoginHandler(BaseApiHandler):
         else:
             # log this failed login attempt
             self.controller.management.add_to_audit_log(
-                user_data.user_id, "Tried to log in", 0, self.get_remote_ip()
+                user_data.user_id, "Tried to log in", None, self.get_remote_ip()
             )
             self.finish_json(
                 401,
