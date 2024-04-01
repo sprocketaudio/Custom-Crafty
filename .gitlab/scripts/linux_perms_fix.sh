@@ -4,10 +4,10 @@
 read -p "Enter the directory path to set permissions (/var/opt/minecraft/crafty): " directory_path
 
 # Count the total number of directories
-total_dirs=$(find "$directory_path" -type d | wc -l)
+total_dirs=$(find "$directory_path" -type d 2>/dev/null | wc -l)
 
 # Count the total number of files
-total_files=$(find "$directory_path" -type f | wc -l)
+total_files=$(find "$directory_path" -type f 2>/dev/null | wc -l)
 
 # Initialize a counter for directories and files
 dir_count=0
@@ -27,17 +27,19 @@ else
 
     # Run the commands to set permissions for directories
     echo "Changing permissions for directories:"
-    for dir in $(find "$directory_path" -type d); do
-        sudo chmod 700 "$dir"
-        ((dir_count++))
+    for dir in $(find "$directory_path" -type d 2>/dev/null); do
+        if [ -e "$dir" ]; then
+            sudo chmod 700 "$dir" && ((dir_count++))
+        fi
         print_progress
     done
 
     # Run the commands to set permissions for files
     echo -e "\nChanging permissions for files:"
-    for file in $(find "$directory_path" -type f); do
-        sudo chmod 644 "$file"
-        ((file_count++))
+    for file in $(find "$directory_path" -type f 2>/dev/null); do
+        if [ -e "$file" ]; then
+            sudo chmod 644 "$file" && ((file_count++))
+        fi
         print_progress
     done
     echo "You will now need to execute a chmod +x on all bedrock executables"
