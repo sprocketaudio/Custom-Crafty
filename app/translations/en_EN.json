@@ -203,6 +203,7 @@
         "not-downloaded": "We can't seem to find your executable file. Has it finished downloading? Are the permissions set to executable?",
         "portReminder": "We have detected this is the first time {} has been run. Make sure to forward port {} through your router/firewall to make this remotely accessible from the internet.",
         "privMsg": "and the ",
+        "return": "Return to Dashboard",
         "serverJars1": "Server JARs API unreachable. Please check",
         "serverJars2": "for the most up to date information.",
         "start-error": "Server {} failed to start with error code: {}",
