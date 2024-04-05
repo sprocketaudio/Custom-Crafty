@@ -575,7 +575,7 @@ class Controller:
                 ):
                     server_obj = self.servers.get_server_obj(new_server_id)
                     url = (
-                        "https://serverjars.com/api/fetchJar/"
+                        "https://api.serverjars.com/api/fetchJar/"
                         f"{create_data['category']}"
                         f"/{create_data['type']}/{create_data['version']}"
                     )

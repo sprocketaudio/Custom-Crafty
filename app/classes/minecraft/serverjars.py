@@ -12,13 +12,15 @@ from app.classes.shared.file_helpers import FileHelpers
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
+# Temp type var, see line(s) #215 #257 #285
+SERVERJARS_TYPES = ["modded", "proxies", "servers", "vanilla"]
 PAPERJARS = ["paper", "folia"]
 
 
 class ServerJars:
     def __init__(self, helper):
         self.helper = helper
-        self.base_url = "https://serverjars.com"
+        self.base_url = "https://api.serverjars.com"
         self.paper_base = "https://api.papermc.io"
 
     @staticmethod
@@ -168,21 +170,28 @@ class ServerJars:
         data = self._read_cache()
         return data.get("types")
 
-    def _check_api_alive(self):
+    def _check_sjars_api_alive(self):
         logger.info("Checking serverjars.com API status")
 
-        check_url = f"{self.base_url}/api/fetchTypes"
+        check_url = f"{self.base_url}"
         try:
             response = requests.get(check_url, timeout=2)
+            response_json = response.json()
 
-            if response.status_code in [200, 201]:
-                logger.info("Serverjars.com API is alive")
+            if (
+                response.status_code in [200, 201]
+                and response_json.get("status") == "success"
+                and response_json.get("response", {}).get("status") == "ok"
+            ):
+                logger.info("Serverjars.com API is alive and responding as expected")
                 return True
         except Exception as e:
-            logger.error(f"Unable to connect to serverjar.com api due to error: {e}")
-            return {}
+            logger.error(f"Unable to connect to serverjar.com API due to error: {e}")
+            return False
 
-        logger.error("unable to contact serverjars.com api")
+        logger.error(
+            "Serverjars.com API is not responding as expected or unable to contact"
+        )
         return False
 
     def manual_refresh_cache(self):
@@ -192,7 +201,7 @@ class ServerJars:
         # cache_old = True
 
         # if the API is down... we bomb out
-        if not self._check_api_alive():
+        if not self._check_sjars_api_alive():
             return False
 
         logger.info("Manual Refresh requested.")
@@ -202,7 +211,14 @@ class ServerJars:
             "types": {},
         }
 
-        jar_types = self._get_server_type_list()
+        # jar_types = self._get_server_type_list()
+        jar_types = {
+            type_: (
+                {paperjar: [] for paperjar in PAPERJARS} if type_ == "servers" else {}
+            )
+            for type_ in SERVERJARS_TYPES
+        }
+
         data["types"].update(jar_types)
         for s in data["types"]:
             data["types"].update({s: dict.fromkeys(data["types"].get(s), {})})
@@ -228,7 +244,7 @@ class ServerJars:
         # cache_old = True
 
         # if the API is down... we bomb out
-        if not self._check_api_alive():
+        if not self._check_sjars_api_alive():
             return False
 
         logger.info("Checking Cache file age")
@@ -242,7 +258,16 @@ class ServerJars:
                 "types": {},
             }
 
-            jar_types = self._get_server_type_list()
+            # jar_types = self._get_server_type_list()
+            jar_types = {
+                type_: (
+                    {paperjar: [] for paperjar in PAPERJARS}
+                    if type_ == "servers"
+                    else {}
+                )
+                for type_ in SERVERJARS_TYPES
+            }
+
             data["types"].update(jar_types)
             for s in data["types"]:
                 data["types"].update({s: dict.fromkeys(data["types"].get(s), {})})
@@ -269,13 +294,14 @@ class ServerJars:
         time.sleep(0.5)
         return temp
 
-    def _get_server_type_list(self):
-        url = "/api/fetchTypes/"
-        response = self._get_api_result(url)
-        if "bedrock" in response.keys():
-            # remove pocketmine from options
-            del response["bedrock"]
-        return response
+    # Disabled temporarily until api.serverjars.com resolve their fetchTypes route
+    # def _get_server_type_list(self):
+    #     url = "/api/fetchTypes/"
+    #     response = self._get_api_result(url)
+    #     if "bedrock" in response.keys():
+    #         # remove pocketmine from options
+    #         del response["bedrock"]
+    #     return response
 
     def download_jar(self, jar, server, version, path, server_id):
         update_thread = threading.Thread(
