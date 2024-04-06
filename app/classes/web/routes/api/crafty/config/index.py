@@ -9,7 +9,6 @@ from app.classes.web.base_api_handler import BaseApiHandler
 config_json_schema = {
     "type": "object",
     "properties": {
-        "http_port": {"type": "integer"},
         "https_port": {"type": "integer"},
         "language": {
             "type": "string",
