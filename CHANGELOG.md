@@ -1,7 +1,5 @@
 # Changelog
-## --- [4.3.2] - 2024/TBD
-### New features
-TBD
+## --- [4.3.2] - 2024/04/07
 ### Refactor
 - Refactor ServerJars caching and move to api.serverjars.com ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/744) | [Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/746))
 ### Bug fixes
