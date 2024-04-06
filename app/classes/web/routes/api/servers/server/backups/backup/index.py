@@ -203,7 +203,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 except JobLookupError as e:
                     logger.info("No active tasks found for server: {e}")
                 self.controller.remove_server(server_id, True)
-        except Exception as e:
+        except (FileNotFoundError, NotADirectoryError) as e:
             return self.finish_json(
                 400, {"status": "error", "error": f"NO BACKUP FOUND {e}"}
             )
