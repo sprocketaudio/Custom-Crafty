@@ -8,6 +8,8 @@ TBD
 - Fix migrator issue when jumping versions ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/734))
 - Fix backend issue causing error when restoring backups in 4.3.x ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/736))
 - Fix backend issue causing error when cloning servers in 4.3.x ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/741))
+- Bump orjson for CVE-2024-27454 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/747))
+- Fix calling of orjson JSONDecodeError class ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/747))
 ### Tweaks
 - Clean up remaining http handler references ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/733))
 - Remove version disclosure on login page ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/737))

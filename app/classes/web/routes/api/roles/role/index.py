@@ -133,7 +133,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
 
         try:
             data = orjson.loads(self.request.body)
-        except orjson.decoder.JSONDecodeError as e:
+        except orjson.JSONDecodeError as e:
             return self.finish_json(
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
