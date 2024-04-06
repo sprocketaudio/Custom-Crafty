@@ -58,7 +58,7 @@
                                                         <!--<th>ID</th>-->
                                                         <th>{{ translate('apiKeys', 'name', data['lang']) }}</th>
                                                         <th>{{ translate('apiKeys', 'created', data['lang']) }}</th>
-                                                        <th>{{ translate('apiKeys', 'superUser', data['lang']) }}</th>
+                                                        <th>{{ translate('apiKeys', 'fullAccess', data['lang']) }}</th>
                                                         <th>{{ translate('apiKeys', 'perms', data['lang']) }}</th>
                                                         <th>{{ translate('apiKeys', 'buttons', data['lang']) }}</th>
                                                     </tr>
@@ -164,7 +164,7 @@
                                             </tbody>
                                         </table>
 
-                                        <label for="full_access">Superuser</label>
+                                        <label for="full_access">{{translate('apiKeys', 'fullAccess', data['lang'])}}</label>
                                         <input type="checkbox" class="" id="full_access" name="full_access" value="1">
 
                                         <br />
