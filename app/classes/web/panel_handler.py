@@ -1403,7 +1403,7 @@ class PanelHandler(BaseHandler):
             self.controller.management.add_to_audit_log(
                 exec_user["user_id"],
                 f"Removed user {target_user['username']} (UID:{user_id})",
-                server_id=0,
+                server_id=None,
                 source_ip=self.get_remote_ip(),
             )
             self.redirect("/panel/panel_config")

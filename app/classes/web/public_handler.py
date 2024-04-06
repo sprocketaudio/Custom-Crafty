@@ -228,7 +228,7 @@ class PublicHandler(BaseHandler):
                 )
                 # log this login
                 self.controller.management.add_to_audit_log(
-                    user_data.user_id, "Logged in", 0, self.get_remote_ip()
+                    user_data.user_id, "Logged in", None, self.get_remote_ip()
                 )
 
                 return self.finish_json(
@@ -254,7 +254,7 @@ class PublicHandler(BaseHandler):
                 )
             # log this failed login attempt
             self.controller.management.add_to_audit_log(
-                user_data.user_id, "Tried to log in", 0, self.get_remote_ip()
+                user_data.user_id, "Tried to log in", None, self.get_remote_ip()
             )
             return self.finish_json(
                 403,
