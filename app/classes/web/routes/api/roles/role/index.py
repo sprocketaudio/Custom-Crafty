@@ -112,7 +112,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
         self.controller.management.add_to_audit_log(
             user["user_id"],
             f"deleted role with ID {role_id}",
-            server_id=0,
+            server_id=None,
             source_ip=self.get_remote_ip(),
         )
 
@@ -172,7 +172,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
         self.controller.management.add_to_audit_log(
             user["user_id"],
             f"modified role with ID {role_id}",
-            server_id=0,
+            server_id=None,
             source_ip=self.get_remote_ip(),
         )
 

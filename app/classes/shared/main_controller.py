@@ -575,7 +575,7 @@ class Controller:
                 ):
                     server_obj = self.servers.get_server_obj(new_server_id)
                     url = (
-                        "https://serverjars.com/api/fetchJar/"
+                        "https://api.serverjars.com/api/fetchJar/"
                         f"{create_data['category']}"
                         f"/{create_data['type']}/{create_data['version']}"
                     )
@@ -1131,7 +1131,7 @@ class Controller:
             server_obj.path = new_local_server_path
             failed = False
             for s in self.servers.failed_servers:
-                if int(s["server_id"]) == int(server.get("server_id")):
+                if s["server_id"] == server.get("server_id"):
                     failed = True
             if not failed:
                 self.servers.update_server(server_obj)
