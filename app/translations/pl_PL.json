@@ -203,6 +203,7 @@
         "not-downloaded": "Nie możemy znaleść twojego pliku serwera. Czy skończył się pobierać? Czy permisje są ustawione na wykonywanle?",
         "portReminder": "Zauważyliśmy że to jest pierwszy raz {} kiedy był włączony. Upewnij się że otworzyłeś port {} na swoim routerze/firewallu aby korzystać z tego poza domem.",
         "privMsg": "i także ",
+        "return": "Powrót do panelu",
         "serverJars1": "API Server Jars jest niedostępne. Proszę sprawdź",
         "serverJars2": "dla najnowzsych informacji.",
         "start-error": "Serwer {} nie mógł się odpalić z powodu: {}",

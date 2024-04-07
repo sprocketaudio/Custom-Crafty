@@ -203,6 +203,7 @@
         "not-downloaded": "Nous ne parvenons pas à trouver le fichier exécutable. A-t-il fini de Télécharger ? Les permissions permettent elles l'exécution ?",
         "portReminder": "Nous avons détecté que c'est la première fois que {} est exécuté. Assurez-vous de transférer le port {} via votre routeur/pare-feu pour le rendre accessible à distance depuis Internet.",
         "privMsg": "et le ",
+        "return": "Revenir au Tableau de Bord",
         "serverJars1": "l'API Server JARs est inaccessible. Merci de vérifier",
         "serverJars2": "pour les informations les plus à jour.",
         "start-error": "Le serveur {} n'a pas pu démarrer avec le code d'erreur : {}",

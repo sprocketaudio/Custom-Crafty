@@ -204,6 +204,7 @@
         "not-downloaded": "Mēs nevaram atrast jūsu izpildāmo failu. Vai tas ir beidzis lejupielādēties? Vai tā peikļuves ir uzstādītas kā palaižamas?",
         "portReminder": "Mēs noteicām ka šī ir pirmā reize, kad {} ir ticis palaists. Pārliecinies izlaist portu {} cauri savam rūterim/ugunsmūrim lai padarītu šo attāli pieejamu no interneta.",
         "privMsg": "un ",
+        "return": "Atgriezties uz pārskatu",
         "serverJars1": "Serveru JAR API nav sasniedzams. Lūdzu pārbaudiet",
         "serverJars2": "priekš jaunākās informācijas.",
         "start-error": "Serveris {} neveiskmīgi startējās ar kļūdas kodu: {}",

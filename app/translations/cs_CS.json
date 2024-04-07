@@ -218,6 +218,7 @@
         "not-downloaded": "Zdá se, že nemůžeme najít váš spustitelný soubor. Bylo jeho stahování dokončeno? Jsou oprávnění nastavena na spustitelný soubor?",
         "portReminder": "Zjistili jsme, že server {} byl spuštěn poprvé. Ujistěte se, že jste přesměrovali port {} přes váš směrovač/firewall, aby byl tento port vzdáleně přístupný z internetu.",
         "privMsg": "a ",
+        "return": "vrátit se na hlavní stránku",
         "serverJars1": "Server JAR api je nepřístupná. Prosím zkontrolujte",
         "serverJars2": "pro aktualní informace.",
         "start-error": "Server {} se nepodařilo spustit s kódem chyby: {}",

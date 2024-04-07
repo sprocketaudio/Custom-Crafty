@@ -203,6 +203,7 @@
         "not-downloaded": "We kunnen uw uitvoerbare bestand niet vinden. Is het klaar met downloaden? Zijn de rechten ingesteld op uitvoerbaar?",
         "portReminder": "We hebben ontdekt dat dit de eerste keer is dat {} wordt uitgevoerd. Zorg ervoor dat u poort {} doorstuurt via uw router/firewall om deze op afstand toegankelijk te maken vanaf het internet.",
         "privMsg": "en de ",
+        "return": "Terug naar Dashboard",
         "serverJars1": "Server JARs API niet bereikbaar. Controleer alstublieft",
         "serverJars2": "voor de meest recente informatie.",
         "start-error": "Server {} kan niet starten met foutcode: {}",
