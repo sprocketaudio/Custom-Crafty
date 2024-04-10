@@ -7,6 +7,7 @@ from app.classes.shared.console import Console
 from app.classes.shared.migration import Migrator, MigrateHistory
 from app.classes.models.management import Schedules, Backups
 from app.classes.models.server_permissions import RoleServers
+from app.classes.models.servers import Servers
 
 logger = logging.getLogger(__name__)
 
@@ -17,40 +18,7 @@ def migrate(migrator: Migrator, database, **kwargs):
     """
     db = database
 
-    # **********************************************************************************
-    #          Servers New Model from Old (easier to migrate without dunmping Database)
-    # **********************************************************************************
-    class Servers(peewee.Model):
-        server_id = peewee.CharField(primary_key=True, default=str(uuid.uuid4()))
-        created = peewee.DateTimeField(default=datetime.datetime.now)
-        server_name = peewee.CharField(default="Server", index=True)
-        path = peewee.CharField(default="")
-        backup_path = peewee.CharField(default="")
-        executable = peewee.CharField(default="")
-        log_path = peewee.CharField(default="")
-        execution_command = peewee.CharField(default="")
-        auto_start = peewee.BooleanField(default=0)
-        auto_start_delay = peewee.IntegerField(default=10)
-        crash_detection = peewee.BooleanField(default=0)
-        stop_command = peewee.CharField(default="stop")
-        executable_update_url = peewee.CharField(default="")
-        server_ip = peewee.CharField(default="127.0.0.1")
-        server_port = peewee.IntegerField(default=25565)
-        logs_delete_after = peewee.IntegerField(default=0)
-        type = peewee.CharField(default="minecraft-java")
-        show_status = peewee.BooleanField(default=1)
-        created_by = peewee.IntegerField(default=-100)
-        shutdown_timeout = peewee.IntegerField(default=60)
-        ignored_exits = peewee.CharField(default="0")
-
-        class Meta:
-            table_name = "servers"
-            database = db
-
     try:
-        logger.info("Migrating Data from Int to UUID (Fixing Issue)")
-        Console.info("Migrating Data from Int to UUID (Fixing Issue)")
-
         # Changes on Servers Roles Table
         migrator.alter_column_type(
             RoleServers,
@@ -87,10 +55,13 @@ def migrate(migrator: Migrator, database, **kwargs):
             ),
         )
 
-        migrator.run()
-
-        logger.info("Migrating Data from Int to UUID (Fixing Issue) : SUCCESS")
-        Console.info("Migrating Data from Int to UUID (Fixing Issue) : SUCCESS")
+        # Drop Column after migration
+        servers_columns = db.get_columns("servers")
+        if any(column_data.name == "server_uuid" for column_data in servers_columns):
+            Console.debug(
+                "Servers.server_uuid not deleted before Crafty version 4.3.2, skipping this part"
+            )
+            migrator.drop_columns("servers", ["server_uuid"])
 
     except Exception as ex:
         logger.error("Error while migrating Data from Int to UUID (Fixing Issue)")
@@ -130,3 +101,7 @@ def rollback(migrator: Migrator, database, **kwargs):
         "server_id",
         peewee.IntegerField(null=True),
     )
+
+    migrator.add_columns(
+        "servers", server_uuid=peewee.CharField(default="", index=True)
+    )  # Recreating the column for roll back

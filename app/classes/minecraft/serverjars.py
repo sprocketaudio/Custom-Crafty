@@ -12,13 +12,15 @@ from app.classes.shared.file_helpers import FileHelpers
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
+# Temp type var until sjars restores generic fetchTypes0
+SERVERJARS_TYPES = ["modded", "proxies", "servers", "vanilla"]
 PAPERJARS = ["paper", "folia"]
 
 
 class ServerJars:
     def __init__(self, helper):
         self.helper = helper
-        self.base_url = "https://serverjars.com"
+        self.base_url = "https://api.serverjars.com"
         self.paper_base = "https://api.papermc.io"
 
     @staticmethod
@@ -82,6 +84,183 @@ class ServerJars:
         builds = api_data.get("builds", [])
         return builds[-1] if builds else None
 
+    def _read_cache(self):
+        cache_file = self.helper.serverjar_cache
+        cache = {}
+        try:
+            with open(cache_file, "r", encoding="utf-8") as f:
+                cache = json.load(f)
+
+        except Exception as e:
+            logger.error(f"Unable to read serverjars.com cache file: {e}")
+
+        return cache
+
+    def get_serverjar_data(self):
+        data = self._read_cache()
+        return data.get("types")
+
+    def _check_sjars_api_alive(self):
+        logger.info("Checking serverjars.com API status")
+
+        check_url = f"{self.base_url}"
+        try:
+            response = requests.get(check_url, timeout=2)
+            response_json = response.json()
+
+            if (
+                response.status_code in [200, 201]
+                and response_json.get("status") == "success"
+                and response_json.get("response", {}).get("status") == "ok"
+            ):
+                logger.info("Serverjars.com API is alive and responding as expected")
+                return True
+        except Exception as e:
+            logger.error(f"Unable to connect to serverjar.com API due to error: {e}")
+            return False
+
+        logger.error(
+            "Serverjars.com API is not responding as expected or unable to contact"
+        )
+        return False
+
+    def _fetch_projects_for_type(self, server_type):
+        """
+        Fetches projects for a given server type from the ServerJars API.
+        """
+        try:
+            response = requests.get(
+                f"{self.base_url}/api/fetchTypes/{server_type}", timeout=5
+            )
+            response.raise_for_status()  # Ensure HTTP errors are caught
+            data = response.json()
+            if data.get("status") == "success":
+                return data["response"].get("servers", [])
+        except requests.RequestException as e:
+            print(f"Error fetching projects for type {server_type}: {e}")
+        return []
+
+    def _get_server_type_list(self):
+        """
+        Builds the type structure with projects fetched for each type.
+        """
+        type_structure = {}
+        for server_type in SERVERJARS_TYPES:
+            projects = self._fetch_projects_for_type(server_type)
+            type_structure[server_type] = {project: [] for project in projects}
+        return type_structure
+
+    def _get_jar_versions(self, server_type, project_name, max_ver=50):
+        """
+        Grabs available versions for specified project
+
+        Args:
+            server_type (str): Server Type Category (modded, servers, etc)
+            project_name (str): Target project (paper, forge, magma, etc)
+            max (int, optional): Max versions returned. Defaults to 50.
+
+        Returns:
+            list: An array of versions
+        """
+        url = f"{self.base_url}/api/fetchAll/{server_type}/{project_name}?max={max_ver}"
+        try:
+            response = requests.get(url, timeout=5)
+            response.raise_for_status()  # Ensure HTTP errors are caught
+            data = response.json()
+            logger.debug(f"Received data for {server_type}/{project_name}: {data}")
+
+            if data.get("status") == "success":
+                versions = [
+                    item.get("version")
+                    for item in data.get("response", [])
+                    if "version" in item
+                ]
+                versions.reverse()  # Reverse so versions are newest -> oldest
+                logger.debug(f"Versions extracted: {versions}")
+                return versions
+        except requests.RequestException as e:
+            logger.error(
+                f"Error fetching jar versions for {server_type}/{project_name}: {e}"
+            )
+
+        return []
+
+    def _refresh_cache(self):
+        """
+        Contains the shared logic for refreshing the cache.
+        This method is called by both manual_refresh_cache and refresh_cache methods.
+        """
+        now = datetime.now()
+        cache_data = {
+            "last_refreshed": now.strftime("%m/%d/%Y, %H:%M:%S"),
+            "types": self._get_server_type_list(),
+        }
+
+        for server_type, projects in cache_data["types"].items():
+            for project_name in projects:
+                versions = self._get_jar_versions(server_type, project_name)
+                cache_data["types"][server_type][project_name] = versions
+
+        for paper_project in PAPERJARS:
+            cache_data["types"]["servers"][paper_project] = self.get_paper_versions(
+                paper_project
+            )
+
+        return cache_data
+
+    def manual_refresh_cache(self):
+        """
+        Manually triggers the cache refresh process.
+        """
+        if not self._check_sjars_api_alive():
+            logger.error("ServerJars API is not available.")
+            return False
+
+        logger.info("Manual cache refresh requested.")
+        cache_data = self._refresh_cache()
+
+        # Save the updated cache data
+        try:
+            with open(self.helper.serverjar_cache, "w", encoding="utf-8") as cache_file:
+                json.dump(cache_data, cache_file, indent=4)
+                logger.info("Cache file successfully refreshed manually.")
+        except Exception as e:
+            logger.error(f"Failed to update cache file manually: {e}")
+
+    def refresh_cache(self):
+        """
+        Automatically trigger cache refresh process based age.
+
+        This method checks if the cache file is older than a specified number of days
+        before deciding to refresh.
+        """
+        cache_file_path = self.helper.serverjar_cache
+
+        # Determine if the cache is old and needs refreshing
+        cache_old = self.helper.is_file_older_than_x_days(cache_file_path)
+
+        # debug override
+        # cache_old = True
+
+        if not self._check_sjars_api_alive():
+            logger.error("ServerJars API is not available.")
+            return False
+
+        if not cache_old:
+            logger.info("Cache file is not old enough to require automatic refresh.")
+            return False
+
+        logger.info("Automatic cache refresh initiated due to old cache.")
+        cache_data = self._refresh_cache()
+
+        # Save the updated cache data
+        try:
+            with open(cache_file_path, "w", encoding="utf-8") as cache_file:
+                json.dump(cache_data, cache_file, indent=4)
+                logger.info("Cache file successfully refreshed automatically.")
+        except Exception as e:
+            logger.error(f"Failed to update cache file automatically: {e}")
+
     def get_fetch_url(self, jar, server, version):
         """
         Constructs the URL for downloading a server JAR file based on the server type.
@@ -131,151 +310,6 @@ class ServerJars:
         except Exception as e:
             logger.error(f"An error occurred while constructing fetch URL: {e}")
             return None
-
-    def _get_api_result(self, call_url: str):
-        full_url = f"{self.base_url}{call_url}"
-
-        try:
-            response = requests.get(full_url, timeout=2)
-            response.raise_for_status()
-            api_data = json.loads(response.content)
-        except Exception as e:
-            logger.error(f"Unable to load {full_url} api due to error: {e}")
-            return {}
-
-        api_result = api_data.get("status")
-        api_response = api_data.get("response", {})
-
-        if api_result != "success":
-            logger.error(f"Api returned a failed status: {api_result}")
-            return {}
-
-        return api_response
-
-    def _read_cache(self):
-        cache_file = self.helper.serverjar_cache
-        cache = {}
-        try:
-            with open(cache_file, "r", encoding="utf-8") as f:
-                cache = json.load(f)
-
-        except Exception as e:
-            logger.error(f"Unable to read serverjars.com cache file: {e}")
-
-        return cache
-
-    def get_serverjar_data(self):
-        data = self._read_cache()
-        return data.get("types")
-
-    def _check_api_alive(self):
-        logger.info("Checking serverjars.com API status")
-
-        check_url = f"{self.base_url}/api/fetchTypes"
-        try:
-            response = requests.get(check_url, timeout=2)
-
-            if response.status_code in [200, 201]:
-                logger.info("Serverjars.com API is alive")
-                return True
-        except Exception as e:
-            logger.error(f"Unable to connect to serverjar.com api due to error: {e}")
-            return {}
-
-        logger.error("unable to contact serverjars.com api")
-        return False
-
-    def manual_refresh_cache(self):
-        cache_file = self.helper.serverjar_cache
-
-        # debug override
-        # cache_old = True
-
-        # if the API is down... we bomb out
-        if not self._check_api_alive():
-            return False
-
-        logger.info("Manual Refresh requested.")
-        now = datetime.now()
-        data = {
-            "last_refreshed": now.strftime("%m/%d/%Y, %H:%M:%S"),
-            "types": {},
-        }
-
-        jar_types = self._get_server_type_list()
-        data["types"].update(jar_types)
-        for s in data["types"]:
-            data["types"].update({s: dict.fromkeys(data["types"].get(s), {})})
-            for j in data["types"].get(s):
-                versions = self._get_jar_details(j, s)
-                data["types"][s].update({j: versions})
-        for item in PAPERJARS:
-            data["types"]["servers"][item] = self.get_paper_versions(item)
-        # save our cache
-        try:
-            with open(cache_file, "w", encoding="utf-8") as f:
-                f.write(json.dumps(data, indent=4))
-                logger.info("Cache file refreshed")
-
-        except Exception as e:
-            logger.error(f"Unable to update serverjars.com cache file: {e}")
-
-    def refresh_cache(self):
-        cache_file = self.helper.serverjar_cache
-        cache_old = self.helper.is_file_older_than_x_days(cache_file)
-
-        # debug override
-        # cache_old = True
-
-        # if the API is down... we bomb out
-        if not self._check_api_alive():
-            return False
-
-        logger.info("Checking Cache file age")
-        # if file is older than 1 day
-
-        if cache_old:
-            logger.info("Cache file is over 1 day old, refreshing")
-            now = datetime.now()
-            data = {
-                "last_refreshed": now.strftime("%m/%d/%Y, %H:%M:%S"),
-                "types": {},
-            }
-
-            jar_types = self._get_server_type_list()
-            data["types"].update(jar_types)
-            for s in data["types"]:
-                data["types"].update({s: dict.fromkeys(data["types"].get(s), {})})
-                for j in data["types"].get(s):
-                    versions = self._get_jar_details(j, s)
-                    data["types"][s].update({j: versions})
-            for item in PAPERJARS:
-                data["types"]["servers"][item] = self.get_paper_versions(item)
-            # save our cache
-            try:
-                with open(cache_file, "w", encoding="utf-8") as f:
-                    f.write(json.dumps(data, indent=4))
-                    logger.info("Cache file refreshed")
-
-            except Exception as e:
-                logger.error(f"Unable to update serverjars.com cache file: {e}")
-
-    def _get_jar_details(self, server_type, jar_type="servers"):
-        url = f"/api/fetchAll/{jar_type}/{server_type}"
-        response = self._get_api_result(url)
-        temp = []
-        for v in response:
-            temp.append(v.get("version"))
-        time.sleep(0.5)
-        return temp
-
-    def _get_server_type_list(self):
-        url = "/api/fetchTypes/"
-        response = self._get_api_result(url)
-        if "bedrock" in response.keys():
-            # remove pocketmine from options
-            del response["bedrock"]
-        return response
 
     def download_jar(self, jar, server, version, path, server_id):
         update_thread = threading.Thread(

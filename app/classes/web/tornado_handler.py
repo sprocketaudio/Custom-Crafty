@@ -98,7 +98,6 @@ class Webserver:
         # let's verify we have an SSL cert
         self.helper.create_self_signed_cert()
 
-        http_port = self.helper.get_setting("http_port")
         https_port = self.helper.get_setting("https_port")
 
         debug_errors = self.helper.get_setting("show_errors")
@@ -109,9 +108,6 @@ class Webserver:
         if cookie_secret is False or cookie_secret == "":
             cookie_secret = self.helper.random_string_generator(32)
             HelpersManagement.set_cookie_secret(cookie_secret)
-
-        if not http_port and http_port != 0:
-            http_port = 8000
 
         if not https_port:
             https_port = 8443
@@ -125,7 +121,7 @@ class Webserver:
             ),
         }
 
-        logger.info(f"Starting Web Server on ports http:{http_port} https:{https_port}")
+        logger.info(f"Starting Web Server on ports https:{https_port}")
 
         asyncio.set_event_loop(asyncio.new_event_loop())
 

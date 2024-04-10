@@ -55,7 +55,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             self.controller.management.add_to_audit_log_raw(
                 "unknown",
                 0,
-                0,
+                None,
                 "Someone tried to connect via WebSocket without proper authentication",
                 self.get_remote_ip(),
             )

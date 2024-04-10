@@ -18,5 +18,5 @@ termcolor==1.1
 tornado==6.3.3
 tzlocal==5.1
 jsonschema==4.19.1
-orjson==3.9.7
+orjson==3.9.15
 prometheus-client==0.17.1

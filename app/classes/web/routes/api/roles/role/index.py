@@ -112,7 +112,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
         self.controller.management.add_to_audit_log(
             user["user_id"],
             f"deleted role with ID {role_id}",
-            server_id=0,
+            server_id=None,
             source_ip=self.get_remote_ip(),
         )
 
@@ -133,7 +133,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
 
         try:
             data = orjson.loads(self.request.body)
-        except orjson.decoder.JSONDecodeError as e:
+        except orjson.JSONDecodeError as e:
             return self.finish_json(
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
@@ -172,7 +172,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
         self.controller.management.add_to_audit_log(
             user["user_id"],
             f"modified role with ID {role_id}",
-            server_id=0,
+            server_id=None,
             source_ip=self.get_remote_ip(),
         )
 

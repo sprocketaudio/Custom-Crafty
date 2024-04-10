@@ -1,5 +1,5 @@
 # Changelog
-## --- [4.3.2] - 2024/TBD
+## --- [4.3.3] - 2024/TBD
 ### New features
 TBD
 ### Bug fixes
@@ -8,6 +8,24 @@ TBD
 TBD
 ### Lang
 TBD
+<br><br>
+
+## --- [4.3.2] - 2024/04/07
+### Refactor
+- Refactor ServerJars caching and move to api.serverjars.com ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/744) | [Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/746))
+### Bug fixes
+- Fix migrator issue when jumping versions ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/734))
+- Fix backend issue causing error when restoring backups in 4.3.x ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/736))
+- Fix backend issue causing error when cloning servers in 4.3.x ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/741))
+- Bump orjson for CVE-2024-27454 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/747))
+- Fix calling of orjson JSONDecodeError class ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/747))
+- Fix stack on Crafty permissions route request in API ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/745))
+### Tweaks
+- Clean up remaining http handler references ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/733))
+- Remove version disclosure on login page ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/737))
+- Add openjdk-21 for recent versions of MC ([Commit](https://gitlab.com/crafty-controller/crafty-4/-/commit/77b0c2c9d2eac124a7504a3d3916fa22d29fa9d1))
+### Lang
+- Update `it_IT, cs_CS` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/739) | [Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/742))
 <br><br>
 
 ## --- [4.3.1] - 2024/03/18

@@ -1,13 +1,14 @@
 ## Summary
-*Outline the issue being faced, and why this needs to change*
+<!-- Outline the issue being faced, and why this needs to change -->
 
 ## Area of the system
-*This might only be one part, but may involve multiple sections, Login/Dashboad/Terminal/Config*
+<!-- This might only be one part, but may involve multiple sections, Login/Dashboad/Terminal/Config -->
 
 ## How does this currently work?
+<!-- A brief description of how the functionality currently operates -->
 
 ## What is the desired way of working?
-*After the change, what should the process/operation be?*
+<!-- After the change, what should the process/operation be? -->
 
 ## Priority/Severity
 - [ ] High (This will bring a huge increase in performance/productivity/usability)

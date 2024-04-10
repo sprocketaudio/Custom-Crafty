@@ -372,11 +372,11 @@ class MigrationManager(object):
         Create migrator
         """
         migrator = Migrator(self.database)
-        # Removing the up_one to prevent running all
-        # migrations each time we got a new one.
-        # It's handled by migration.up() function.
-        # for name in self.done:
-        #    self.up_one(name, migrator, True)
+        # Running false migrations to retrives the schemes of
+        # the precedents created tables in the table_dict element
+        # It's useful to run the new migrations
+        for name in self.done:
+            self.up_one(name, migrator, True)
         return migrator
 
     def compile(self, name, migrate="", rollback=""):

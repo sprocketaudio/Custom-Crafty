@@ -51,7 +51,7 @@ class ServerPermsController:
                 new_server_id,
                 role.role_id,
                 PermissionsServers.get_permissions_mask(
-                    int(role.role_id), int(old_server_id)
+                    int(role.role_id), old_server_id
                 ),
             )
             # Permissions_Servers.add_role_server(
