@@ -20,6 +20,7 @@ from app.classes.shared.main_models import DatabaseShortcuts
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
+auth_logger = logging.getLogger("audit_log")
 
 
 # **********************************************************************************
@@ -166,50 +167,26 @@ class HelpersManagement:
                 WebSocketManager().broadcast_user(user, "notification", audit_msg)
             except Exception as e:
                 logger.error(f"Error broadcasting to user {user} - {e}")
-
-        AuditLog.insert(
-            {
-                AuditLog.user_name: user_data["username"],
-                AuditLog.user_id: user_id,
-                AuditLog.server_id: server_id,
-                AuditLog.log_msg: audit_msg,
-                AuditLog.source_ip: source_ip,
-            }
-        ).execute()
-        # deletes records when there's more than 300
-        ordered = AuditLog.select().order_by(+AuditLog.created)
-        for item in ordered:
-            if not self.helper.get_setting("max_audit_entries"):
-                max_entries = 300
-            else:
-                max_entries = self.helper.get_setting("max_audit_entries")
-            if AuditLog.select().count() > max_entries:
-                AuditLog.delete().where(AuditLog.audit_id == item.audit_id).execute()
-            else:
-                return
+        auth_logger.info(
+            str(log_msg),
+            extra={
+                "user_name": user_data["username"],
+                "user_id": user_id,
+                "server_id": server_id,
+                "source_ip": source_ip,
+            },
+        )
 
     def add_to_audit_log_raw(self, user_name, user_id, server_id, log_msg, source_ip):
-        AuditLog.insert(
-            {
-                AuditLog.user_name: user_name,
-                AuditLog.user_id: user_id,
-                AuditLog.server_id: server_id,
-                AuditLog.log_msg: log_msg,
-                AuditLog.source_ip: source_ip,
-            }
-        ).execute()
-        # deletes records when there's more than 300
-        ordered = AuditLog.select().order_by(+AuditLog.created)
-        for item in ordered:
-            # configurable through app/config/config.json
-            if not self.helper.get_setting("max_audit_entries"):
-                max_entries = 300
-            else:
-                max_entries = self.helper.get_setting("max_audit_entries")
-            if AuditLog.select().count() > max_entries:
-                AuditLog.delete().where(AuditLog.audit_id == item.audit_id).execute()
-            else:
-                return
+        auth_logger.info(
+            str(log_msg),
+            extra={
+                "user_name": user_name,
+                "user_id": user_id,
+                "server_id": server_id,
+                "source_ip": source_ip,
+            },
+        )
 
     @staticmethod
     def create_crafty_row():

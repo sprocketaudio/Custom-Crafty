@@ -17,6 +17,7 @@ from app.classes.models.users import HelperUsers
 from app.classes.models.management import HelpersManagement
 from app.classes.shared.import_helper import ImportHelpers
 from app.classes.shared.websocket_manager import WebSocketManager
+from app.classes.logging.log_formatter import JsonFormatter
 
 console = Console()
 helper = Helpers()
@@ -283,6 +284,11 @@ def setup_logging(debug=True):
                 logging_config["loggers"][""]["level"] = "DEBUG"
 
             logging.config.dictConfig(logging_config)
+
+            # Apply JSON formatting to the "audit" handler
+            for handler in logging.getLogger().handlers:
+                if handler.name == "audit_log_handler":
+                    handler.setFormatter(JsonFormatter())
 
     else:
         logging.basicConfig(level=logging.DEBUG)
