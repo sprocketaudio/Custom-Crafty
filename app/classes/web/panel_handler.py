@@ -1237,9 +1237,11 @@ class PanelHandler(BaseHandler):
             page_data["schedule"]["interval_type"] = schedule.interval_type
             if schedule.interval_type == "reaction":
                 difficulty = "reaction"
-                page_data["parent"] = self.controller.management.get_scheduled_task(
-                    schedule.parent
-                )
+                page_data["parent"] = None
+                if schedule.parent:
+                    page_data["parent"] = self.controller.management.get_scheduled_task(
+                        schedule.parent
+                    )
             elif schedule.cron_string == "":
                 difficulty = "basic"
                 page_data["parent"] = None
