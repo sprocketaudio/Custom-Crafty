@@ -386,22 +386,7 @@ class HelpersManagement:
     # **********************************************************************************
     @staticmethod
     def get_backup_config(backup_id):
-        try:
-            row = Backups.select().where(Backups.backup_id == backup_id)
-            conf = {
-                "backup_path": row.backup_location,
-                "excluded_dirs": row.excluded_dirs,
-                "max_backups": row.max_backups,
-                "backup_location": row.backup_location,
-                "server_id": row.server_id_id,
-                "compress": row.compress,
-                "shutdown": row.shutdown,
-                "before": row.before,
-                "after": row.after,
-            }
-        except IndexError:
-            return None
-        return conf
+        return model_to_dict(Backups.get(Backups.backup_id == backup_id))
 
     @staticmethod
     def get_backups_by_server(server_id, model):
@@ -454,67 +439,12 @@ class HelpersManagement:
         Backups.create(**conf)
         logger.debug("Creating new backup record.")
 
-    def update_backup_config(
-        self,
-        server_id: int,
-        backup_path: str = None,
-        max_backups: int = None,
-        excluded_dirs: list = None,
-        compress: bool = False,
-        shutdown: bool = False,
-        before: str = "",
-        after: str = "",
-    ):
-        logger.debug(f"Updating server {server_id} backup config with {locals()}")
-        if Backups.select().where(Backups.server_id == server_id).exists():
-            new_row = False
-            conf = {}
-        else:
-            conf = {
-                "excluded_dirs": None,
-                "max_backups": 0,
-                "server_id": server_id,
-                "compress": False,
-                "shutdown": False,
-                "before": "",
-                "after": "",
-            }
-            new_row = True
-        if max_backups is not None:
-            conf["max_backups"] = max_backups
-        if excluded_dirs is not None:
-            dirs_to_exclude = ",".join(excluded_dirs)
-            conf["excluded_dirs"] = dirs_to_exclude
-        conf["compress"] = compress
-        conf["shutdown"] = shutdown
-        conf["before"] = before
-        conf["after"] = after
-        if not new_row:
-            with self.database.atomic():
-                if backup_path is not None:
-                    server_rows = (
-                        Servers.update(backup_path=backup_path)
-                        .where(Servers.server_id == server_id)
-                        .execute()
-                    )
-                else:
-                    server_rows = 0
-                backup_rows = (
-                    Backups.update(conf).where(Backups.server_id == server_id).execute()
-                )
-            logger.debug(
-                f"Updating existing backup record. "
-                f"{server_rows}+{backup_rows} rows affected"
-            )
-        else:
-            with self.database.atomic():
-                conf["server_id"] = server_id
-                if backup_path is not None:
-                    Servers.update(backup_path=backup_path).where(
-                        Servers.server_id == server_id
-                    )
-                Backups.create(**conf)
-            logger.debug("Creating new backup record.")
+    @staticmethod
+    def update_backup_config(backup_id, data):
+        if "excluded_dirs" in data:
+            dirs_to_exclude = ",".join(data["excluded_dirs"])
+            data["excluded_dirs"] = dirs_to_exclude
+        Backups.update(**data).where(Backups.backup_id == backup_id).execute()
 
     @staticmethod
     def get_excluded_backup_dirs(backup_id: int):
