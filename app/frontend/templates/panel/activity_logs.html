@@ -36,25 +36,14 @@
             <table class="table table-hover" id="audit_table" style="overflow: scroll;" width="100%">
               <thead>
                 <tr class="rounded">
-                  <td>Username</td>
-                  <td>Time</td>
-                  <td>Action</td>
-                  <td>Server ID</td>
-                  <td>IP</td>
+                  <th>Time</th>
+                  <th>Username</th>
+                  <th>Action</th>
+                  <th>Server ID</th>
+                  <th>IP</th>
                 </tr>
               </thead>
               <tbody>
-                {% for row in data['audit_logs'] %}
-                <tr>
-                  <td>{{ row['user_name'] }}</td>
-                  <td>
-                    {{ row['created'].strftime('%Y-%m-%d %H:%M:%S') }}
-                  </td>
-                  <td>{{ row['log_msg'] }}</td>
-                  <td>{{ row['server_id'] }}</td>
-                  <td>{{ row['source_ip'] }}</td>
-                </tr>
-                {% end %}
               </tbody>
             </table>
 
@@ -80,17 +69,6 @@
 
 {% block js %}
 <script>
-
-  $(document).ready(function () {
-    console.log('ready for JS!')
-    $('#audit_table').DataTable({
-      'order': [1, 'desc']
-    }
-    );
-
-  });
-</script>
-<script>
   $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
     if ($(window).width() < 1000) {
@@ -112,6 +90,50 @@
       $('.too_small').popover("hide");
     } // New width
   });
+
+  $(document).ready(function () {
+    console.log('ready for JS!')
+    // Initialize DataTables
+    // Load initial data
+    getActivity();
+  });
+
+  function updateActivity(data) {
+    let tbody = $('#audit_table tbody');
+    tbody.empty(); // Clear existing rows
+    $.each(data, function (index, value) {
+      let row = $('<tr>');
+      row.append(`<td>${value.time}</td>`);
+      row.append(`<td><a href="/panel/edit_user?id=${value.user_id}">${value.user_name}</a></td>`);
+      row.append(`<td>${value.log_msg}</td>`);
+      row.append(`<td>${value.server_id}</td>`);
+      row.append(`<td>${value.source_ip}</td>`);
+      tbody.append(row);
+    });
+    $('#audit_table').DataTable({
+      'order': [[0, 'desc']], // Sort by the first column in descending order
+      filter: true,
+      "searching": true,
+    })
+  }
+
+  async function getActivity() {
+    var token = getCookie("_xsrf");
+    let res = await fetch(`/api/v2/crafty/logs/audit`, {
+      method: 'GET',
+      headers: {
+        'X-XSRFToken': token
+      },
+    });
+    let responseData = await res.json();
+    console.log(responseData);
+    if (responseData.status === "ok") {
+      updateActivity(responseData.data);
+      console.log("activity update")
+    } else {
+      bootbox.alert(responseData.error)
+    }
+  }
 </script>
 
 {% end %}
