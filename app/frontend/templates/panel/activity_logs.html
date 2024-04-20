@@ -44,6 +44,13 @@
                 </tr>
               </thead>
               <tbody>
+                <tr>
+                  <td colspan="5" id="image-div" class="text-center"> <!-- Center image within table -->
+                    <img class="img-center" id="logo-animate" src="../static/assets/images/crafty-logo-square-1024.png"
+                      alt="Crafty Logo, Crafty is loading" width="20%"><br><br>{{ translate('datatables',
+                    'loadingRecords', data['lang'])}}
+                  </td>
+                </tr>
               </tbody>
             </table>
 
@@ -134,6 +141,26 @@
       bootbox.alert(responseData.error)
     }
   }
+
+  function rotateImage(degree) {
+    $('#logo-animate').animate({ transform: degree }, {
+      step: function (now, fx) {
+        $(this).css({
+          '-webkit-transform': 'rotate(' + now + 'deg)',
+          '-moz-transform': 'rotate(' + now + 'deg)',
+          'transform': 'rotate(' + now + 'deg)'
+        });
+      }
+    });
+    setTimeout(function () {
+      rotateImage(360);
+    }, 2000);
+  }
+  $(document).ready(function () {
+    setTimeout(function () {
+      rotateImage(360);
+    }, 2000);
+  });
 </script>
 
 {% end %}
