@@ -6,7 +6,6 @@ import logging
 from app.classes.shared.console import Console
 from app.classes.shared.migration import Migrator, MigrateHistory
 from app.classes.models.management import (
-    AuditLog,
     Webhooks,
     Schedules,
     Backups,
@@ -61,17 +60,6 @@ def migrate(migrator: Migrator, database, **kwargs):
             peewee.CharField(primary_key=True, default=str(uuid.uuid4())),
         )
 
-        # Changes on Audit Log Table
-        migrator.alter_column_type(
-            AuditLog,
-            "server_id",
-            peewee.ForeignKeyField(
-                Servers,
-                backref="audit_server",
-                null=True,
-                field=peewee.CharField(primary_key=True, default=str(uuid.uuid4())),
-            ),
-        )
         # Changes on Webhook Table
         migrator.alter_column_type(
             Webhooks,
@@ -107,13 +95,6 @@ def rollback(migrator: Migrator, database, **kwargs):
         "servers",
         "server_id",
         peewee.AutoField(),
-    )
-
-    # Changes on Audit Log Table
-    migrator.alter_column_type(
-        AuditLog,
-        "server_id",
-        peewee.IntegerField(default=None, index=True),
     )
 
     # Changes on Webhook Table

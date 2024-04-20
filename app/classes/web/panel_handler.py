@@ -1503,8 +1503,6 @@ class PanelHandler(BaseHandler):
             template = "panel/panel_edit_role.html"
 
         elif page == "activity_logs":
-            page_data["audit_logs"] = self.controller.management.get_activity_log()
-
             template = "panel/activity_logs.html"
 
         elif page == "download_file":

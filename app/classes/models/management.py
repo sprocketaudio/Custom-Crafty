@@ -24,24 +24,6 @@ auth_logger = logging.getLogger("audit_log")
 
 
 # **********************************************************************************
-#                                   Audit_Log Class
-# **********************************************************************************
-class AuditLog(BaseModel):
-    audit_id = AutoField()
-    created = DateTimeField(default=datetime.datetime.now)
-    user_name = CharField(default="")
-    user_id = IntegerField(default=0, index=True)
-    source_ip = CharField(default="127.0.0.1")
-    server_id = ForeignKeyField(
-        Servers, backref="audit_server", null=True
-    )  # When auditing global events, use server ID null
-    log_msg = TextField(default="")
-
-    class Meta:
-        table_name = "audit_log"
-
-
-# **********************************************************************************
 #                                Crafty Settings Class
 # **********************************************************************************
 class CraftySettings(BaseModel):
@@ -150,10 +132,6 @@ class HelpersManagement:
     # **********************************************************************************
     #                                   Audit_Log Methods
     # **********************************************************************************
-    @staticmethod
-    def get_activity_log():
-        query = AuditLog.select()
-        return DatabaseShortcuts.return_db_rows(query)
 
     def add_to_audit_log(self, user_id, log_msg, server_id=None, source_ip=None):
         logger.debug(f"Adding to audit log User:{user_id} - Message: {log_msg} ")
