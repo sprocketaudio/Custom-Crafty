@@ -189,7 +189,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                     bu_path = os.path.relpath(item_path, loop_backup_path)
                     bu_path = os.path.join(new_server_obj.path, bu_path)
                     excluded_dirs.append(bu_path)
-                self.controller.management.set_backup_config(
+                self.controller.management.add_backup_config(
                     new_server_id,
                     new_server_obj.backup_path,
                     backup_config["max_backups"],

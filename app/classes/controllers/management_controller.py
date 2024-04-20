@@ -185,18 +185,22 @@ class ManagementController:
     def get_backups_by_server(server_id, model=False):
         return HelpersManagement.get_backups_by_server(server_id, model)
 
-    def set_backup_config(
+    @staticmethod
+    def update_backup_config(backup_id, updates):
+        return HelpersManagement.update_backup_config(backup_id, updates)
+
+    def add_backup_config(
         self,
         server_id: int,
-        backup_path: str = None,
-        max_backups: int = None,
+        backup_path: str = "",
+        max_backups: int = 0,
         excluded_dirs: list = None,
         compress: bool = False,
         shutdown: bool = False,
         before: str = "",
         after: str = "",
     ):
-        return self.management_helper.set_backup_config(
+        return self.management_helper.add_backup_config(
             server_id,
             backup_path,
             max_backups,

@@ -552,7 +552,6 @@ class Controller:
             name=data["name"],
             server_uuid=server_fs_uuid,
             server_dir=new_server_path,
-            backup_path=backup_path,
             server_command=server_command,
             server_file=server_file,
             server_log_file=log_location,
@@ -562,7 +561,7 @@ class Controller:
             server_host=monitoring_host,
             server_type=monitoring_type,
         )
-        self.management.set_backup_config(
+        self.management.add_backup_config(
             new_server_id,
             backup_path,
         )
@@ -905,7 +904,6 @@ class Controller:
         name: str,
         server_uuid: str,
         server_dir: str,
-        backup_path: str,
         server_command: str,
         server_file: str,
         server_log_file: str,
@@ -920,7 +918,6 @@ class Controller:
             name,
             server_uuid,
             server_dir,
-            backup_path,
             server_command,
             server_file,
             server_log_file,

@@ -52,7 +52,7 @@ class ApiServersServerBackupsIndexHandler(BaseApiHandler):
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
         self.finish_json(200, self.controller.management.get_backup_config(server_id))
 
-    def patch(self, server_id: str):
+    def patch(self, backup_id: str):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -78,7 +78,8 @@ class ApiServersServerBackupsIndexHandler(BaseApiHandler):
                     "error_data": str(e),
                 },
             )
-
+        backup_conf = self.controller.management.get_backup_config(backup_id)
+        server_id = backup_conf["server_id"]
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
@@ -92,32 +93,5 @@ class ApiServersServerBackupsIndexHandler(BaseApiHandler):
             # if the user doesn't have Schedule permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
 
-        self.controller.management.set_backup_config(
-            server_id,
-            data.get(
-                "backup_path",
-                self.controller.management.get_backup_config(server_id)["backup_path"],
-            ),
-            data.get(
-                "max_backups",
-                self.controller.management.get_backup_config(server_id)["max_backups"],
-            ),
-            data.get("exclusions"),
-            data.get(
-                "compress",
-                self.controller.management.get_backup_config(server_id)["compress"],
-            ),
-            data.get(
-                "shutdown",
-                self.controller.management.get_backup_config(server_id)["shutdown"],
-            ),
-            data.get(
-                "backup_before",
-                self.controller.management.get_backup_config(server_id)["before"],
-            ),
-            data.get(
-                "backup_after",
-                self.controller.management.get_backup_config(server_id)["after"],
-            ),
-        )
+        self.controller.management.update_backup_config(server_id, data)
         return self.finish_json(200, {"status": "ok"})
