@@ -16,7 +16,6 @@ from app.classes.models.base_model import BaseModel
 from app.classes.models.users import HelperUsers
 from app.classes.models.servers import Servers
 from app.classes.models.server_permissions import PermissionsServers
-from app.classes.shared.main_models import DatabaseShortcuts
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)

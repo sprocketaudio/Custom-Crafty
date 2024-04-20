@@ -18,8 +18,8 @@ class JsonEncoderDatetime(JsonEncoderStrFallback):
     def default(self, o):
         if isinstance(o, datetime):
             return o.strftime("%Y-%m-%dT%H:%M:%S%z")
-        else:
-            return super().default(o)
+
+        return super().default(o)
 
 
 class JsonFormatter(logging.Formatter):
@@ -31,10 +31,9 @@ class JsonFormatter(logging.Formatter):
         if datefmt:
             # Use the specified date format
             return timestamp.strftime(datefmt)
-        else:
-            # Default date format: YYYY-MM-DD HH:MM:SS,mmm
-            secs = int(record.msecs)
-            return f"{timestamp.strftime('%Y-%m-%d %H:%M:%S')},{secs:03d}"
+        # Default date format: YYYY-MM-DD HH:MM:SS,mmm
+        secs = int(record.msecs)
+        return f"{timestamp.strftime('%Y-%m-%d %H:%M:%S')},{secs:03d}"
 
     def format(self, record):
         log_data = {
