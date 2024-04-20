@@ -156,6 +156,8 @@ class HelpersManagement:
         )
 
     def add_to_audit_log_raw(self, user_name, user_id, server_id, log_msg, source_ip):
+        if isinstance(server_id, Servers) and server_id is not None:
+            server_id = server_id.server_id
         auth_logger.info(
             str(log_msg),
             extra={

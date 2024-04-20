@@ -111,7 +111,11 @@
     $.each(data, function (index, value) {
       let row = $('<tr>');
       row.append(`<td>${value.time}</td>`);
-      row.append(`<td><a href="/panel/edit_user?id=${value.user_id}">${value.user_name}</a></td>`);
+      if (value.user_name != "system" && value.user_id != "-1") {
+        row.append(`<td><a href="/panel/edit_user?id=${value.user_id}">${value.user_name}</a></td>`);
+      } else {
+        row.append(`<td>${value.user_name}</td>`);
+      }
       row.append(`<td>${value.log_msg}</td>`);
       row.append(`<td>${value.server_id}</td>`);
       row.append(`<td>${value.source_ip}</td>`);
