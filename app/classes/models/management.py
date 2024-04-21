@@ -455,7 +455,7 @@ class HelpersManagement:
             dir_list = []
         return dir_list
 
-    def add_excluded_backup_dir(self, server_id: int, dir_to_add: str):
+    def add_excluded_backup_dir(self, server_id: str, dir_to_add: str):
         dir_list = self.get_excluded_backup_dirs(server_id)
         if dir_to_add not in dir_list:
             dir_list.append(dir_to_add)
@@ -467,7 +467,7 @@ class HelpersManagement:
                 f"already in the excluded directory list for server ID {server_id}"
             )
 
-    def del_excluded_backup_dir(self, server_id: int, dir_to_del: str):
+    def del_excluded_backup_dir(self, server_id: str, dir_to_del: str):
         dir_list = self.get_excluded_backup_dirs(server_id)
         if dir_to_del in dir_list:
             dir_list.remove(dir_to_del)

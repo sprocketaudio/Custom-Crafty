@@ -85,7 +85,8 @@
                         <tr>
                           <td id="{{backup.enabled}}" class="enabled">
                             <button type="button" class="btn btn-sm btn-info btn-toggle backup-custom-toggle"
-                              id="backup_{{backup.id}}" name="backup_{{backup.id}}" data-backup-id="{{backup.id}}"
+                              id="backup_{{backup.backup_id}}" name="backup_{{backup.backup_id}}"
+                              data-backup-id="{{backup.backup_id}}"
                               data-backup-enabled="{{ 'true' if backup.enabled else 'false' }}" data-toggle="button"
                               aria-pressed="true" autocomplete="off">
                               <div class="handle"></div>
@@ -102,14 +103,14 @@
                           </td>
                           <td id="backup_edit" class="action">
                             <button
-                              onclick="window.location.href=`/panel/backup_edit?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.id}}`"
+                              onclick="window.location.href=`/panel/edit_backup?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.backup_id}}`"
                               class="btn btn-info">
                               <i class="fas fa-pencil-alt"></i>
                             </button>
-                            <button data-backup={{ backup.id }} class="btn btn-danger del_button">
+                            <button data-backup={{ backup.backup_id }} class="btn btn-danger del_button">
                               <i class="fas fa-trash" aria-hidden="true"></i>
                             </button>
-                            <button data-backup={{ backup.id }} data-toggle="tooltip"
+                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip"
                               title="{{ translate('serverBackups', 'run', data['lang']) }}"
                               class="btn btn-outline-warning test-socket">
                               <i class="fa-solid fa-vial"></i>
@@ -138,7 +139,8 @@
                         <tr>
                           <td id="{{backup.enabled}}" class="enabled">
                             <button type="button" class="btn btn-sm btn-info btn-toggle backup-custom-toggle"
-                              id="backup_{{backup.id}}" name="backup_{{backup.id}}" data-backup-id="{{backup.id}}"
+                              id="backup_{{backup.backup_id}}" name="backup_{{backup.backup_id}}"
+                              data-backup-id="{{backup.backup_id}}"
                               data-backup-enabled="{{ 'true' if backup.enabled else 'false' }}" data-toggle="button"
                               aria-pressed="true" autocomplete="off">
                               <div class="handle"></div>
@@ -149,7 +151,7 @@
                           </td>
                           <td id="backup_edit" class="action">
                             <button
-                              onclick="window.location.href=`/panel/backup_edit?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.id}}`"
+                              onclick="window.location.href=`/panel/edit_backup?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.backup_id}}`"
                               class="btn btn-info">
                               <i class="fas fa-pencil-alt"></i>
                             </button>

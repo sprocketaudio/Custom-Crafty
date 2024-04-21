@@ -178,8 +178,8 @@ class ManagementController:
     #                                   Backups Methods
     # **********************************************************************************
     @staticmethod
-    def get_backup_config(server_id):
-        return HelpersManagement.get_backup_config(server_id)
+    def get_backup_config(backup_id):
+        return HelpersManagement.get_backup_config(backup_id)
 
     @staticmethod
     def get_backups_by_server(server_id, model=False):
@@ -212,8 +212,8 @@ class ManagementController:
         )
 
     @staticmethod
-    def get_excluded_backup_dirs(server_id: int):
-        return HelpersManagement.get_excluded_backup_dirs(server_id)
+    def get_excluded_backup_dirs(backup_id: int):
+        return HelpersManagement.get_excluded_backup_dirs(backup_id)
 
     def add_excluded_backup_dir(self, server_id: int, dir_to_add: str):
         self.management_helper.add_excluded_backup_dir(server_id, dir_to_add)

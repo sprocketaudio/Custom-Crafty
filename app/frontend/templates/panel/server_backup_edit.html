@@ -40,111 +40,6 @@
             {% include "parts/m_server_controls_list.html %}
           </span>
           <div class="row">
-            <div class="col-md-12 col-sm-12" style="overflow-x:auto;">
-              <div class="card">
-                <div class="card-header header-sm d-flex justify-content-between align-items-center">
-                  <h4 class="card-title"><i class="fa-regular fa-bell"></i> {{ translate('serverBackups', 'backups', data['lang']) }} </h4>
-                  {% if data['user_data']['hints'] %}
-                  <span class="too_small" title="{{ translate('serverSchedules', 'cannotSee', data['lang']) }}" , data-content="{{ translate('serverSchedules', 'cannotSeeOnMobile', data['lang']) }}" , data-placement="bottom"></span>
-                  {% end %}
-                  <div><a class="btn btn-info" href="/panel/add_backup?id={{ data['server_stats']['server_id']['server_id'] }}"><i class="fas fa-plus-circle"></i> {{ translate('serverBackups', 'newBackup', data['lang']) }}</a></div>
-                </div>
-                <div class="card-body">
-                  {% if len(data['backups']) == 0 %}
-                  <div style="text-align: center; color: grey;">
-                    <h7>{{ translate('serverBackups', 'no-backup', data['lang']) }} <strong>{{ translate('serverBackups', 'newBackup',data['lang']) }}</strong>.</h7>
-                  </div>
-                  {% end %}
-                  {% if len(data['backups']) > 0 %}
-                  <div class="d-none d-lg-block">
-                    <table class="table table-hover responsive-table" aria-label="backups list" id="backup_table" width="100%" style="table-layout:fixed;">
-                      <thead>
-                        <tr class="rounded">
-                          <th scope="col" style="width: 5%; min-width: 64px;">{{ translate('serverBackups', 'enabled', data['lang']) }}</th>
-                          <th scope="col" style="width: 15%; min-width: 10px;">{{ translate('serverBackups', 'name', data['lang']) }} </th>
-                          <th scope="col" style="width: 60%; min-width: 50px;">{{ translate('serverBackups', 'storageLocation', data['lang']) }}</th>
-                          <th scope="col" style="width: 10%; min-width: 50px;">{{ translate('serverBackups', 'maxBackups', data['lang']) }}</th>
-                          <th scope="col" style="width: 10%; min-width: 50px;">{{ translate('serverBackups', 'actions', data['lang']) }}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {% for backup in data['backups'] %}
-                        <tr>
-                          <td id="{{backup.enabled}}" class="enabled">
-                            <button type="button" class="btn btn-sm btn-info btn-toggle backup-custom-toggle" id="backup_{{backup.id}}" name="backup_{{backup.id}}" data-backup-id="{{backup.id}}" data-backup-enabled="{{ 'true' if backup.enabled else 'false' }}" data-toggle="button" aria-pressed="true" autocomplete="off">
-                              <div class="handle"></div>
-                            </button>
-                          </td>
-                          <td id="{{backup.backup_name}}" class="id">
-                            <p>{{backup.backup_name}}</p>
-                          </td>
-                          <td id="{{backup.backup_location}}" class="type">
-                            <p>{{backup.backup_location}}</p>
-                          </td>
-                          <td id="{{backup.max_backups}}" class="trigger" style="overflow: scroll; max-width: 30px;">
-                            <p>{{backup.max_backups}}</p>
-                          </td>
-                          <td id="backup_edit" class="action">
-                            <button onclick="window.location.href=`/panel/backup_edit?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.id}}`" class="btn btn-info">
-                              <i class="fas fa-pencil-alt"></i>
-                            </button>
-                            <button data-backup={{ backup.id }} class="btn btn-danger del_button">
-                              <i class="fas fa-trash" aria-hidden="true"></i>
-                            </button>
-                            <button data-backup={{ backup.id }} data-toggle="tooltip" title="{{ translate('serverBackups', 'run', data['lang']) }}" class="btn btn-outline-warning test-socket">
-                              <i class="fa-solid fa-vial"></i>
-                            </button>
-                          </td>
-                        </tr>
-                        {% end %}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div class="d-block d-lg-none">
-                    <table aria-label="backups list" class="table table-hover responsive-table" id="backup_table_mini" width="100%" style="table-layout:fixed;">
-                      <thead>
-                        <tr class="rounded">
-                          <th style="width: 20%; min-width: 64px;">{{ translate('serverBackups', 'enabled',
-                            data['lang']) }}</th>
-                          <th style="width: 40%; min-width: 10px;">Name
-                          </th>
-                          <th style="width: 40%; min-width: 50px;">{{ translate('serverBackups', 'edit', data['lang'])
-                            }}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {% for backup in data['backups'] %}
-                        <tr>
-                          <td id="{{backup.enabled}}" class="enabled">
-                            <button type="button" class="btn btn-sm btn-info btn-toggle backup-custom-toggle" id="backup_{{backup.id}}" name="backup_{{backup.id}}" data-backup-id="{{backup.id}}" data-backup-enabled="{{ 'true' if backup.enabled else 'false' }}" data-toggle="button" aria-pressed="true" autocomplete="off">
-                              <div class="handle"></div>
-                            </button>
-                          </td>
-                          <td id="{{backup.backup_name}}" class="id">
-                            <p>{{backup.backup_name}}</p>
-                          </td>
-                          <td id="backup_edit" class="action">
-                            <button onclick="window.location.href=`/panel/backup_edit?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.id}}`" class="btn btn-info">
-                              <i class="fas fa-pencil-alt"></i>
-                            </button>
-                            <button data-backup={{ backup.backup_id }} class="btn btn-danger del_button">
-                              <i class="fas fa-trash" aria-hidden="true"></i>
-                            </button>
-                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip" title="{{ translate('serverBackups', 'run', data['lang']) }}" class="btn btn-outline-warning test-socket">
-                              <i class="fa-solid fa-vial"></i>
-                            </button>
-                          </td>
-                        </tr>
-                        {% end %}
-                      </tbody>
-                    </table>
-                  </div>
-                  {% end %}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
             <div class="col-md-6 col-sm-12">
               <br>
               <br>
@@ -173,7 +68,7 @@
                       class="text-muted ml-1"> - {{ translate('serverBackups', 'storageLocationDesc', data['lang'])
                       }}</small> </label>
                   <input type="text" class="form-control" name="backup_path" id="backup_path"
-                    value="{{ data['backup_config']['backup_path']  }}"
+                    value="{{ data['backup_config']['backup_location']  }}"
                     placeholder="{{ translate('serverBackups', 'storageLocation', data['lang']) }}">
                   {% end %}
                 </div>
@@ -272,8 +167,10 @@
                         </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" id="modal-cancel" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>
-                        <button type="button" id="modal-okay" data-dismiss="modal" class="btn btn-primary"><i class="fa-solid fa-thumbs-up"></i></button>
+                        <button type="button" id="modal-cancel" class="btn btn-secondary" data-dismiss="modal"><i
+                            class="fa-solid fa-xmark"></i></button>
+                        <button type="button" id="modal-okay" data-dismiss="modal" class="btn btn-primary"><i
+                            class="fa-solid fa-thumbs-up"></i></button>
                       </div>
                     </div>
                   </div>
@@ -309,7 +206,7 @@
                         </a>
                         <br>
                         <br>
-                        <button data-file="{{ backup['path'] }}" data-backup_path="{{ data['backup_path'] }}"
+                        <button data-file="{{ backup['path'] }}" data-backup_path="{{ data['backup_location'] }}"
                           class="btn btn-danger del_button">
                           <i class="fas fa-trash" aria-hidden="true"></i>
                           {{ translate('serverBackups', 'delete', data['lang']) }}
@@ -414,15 +311,15 @@
   async function backup_started() {
     const token = getCookie("_xsrf")
     let res = await fetch(`/api/v2/servers/${server_id}/action/backup_server`, {
-        method: 'POST',
-        headers: {
-          'X-XSRFToken': token
-        }
-      });
-      let responseData = await res.json();
-      if (responseData.status === "ok") {
-        console.log(responseData);
-        $("#backup_button").html(`<div class="progress" style="height: 15px;">
+      method: 'POST',
+      headers: {
+        'X-XSRFToken': token
+      }
+    });
+    let responseData = await res.json();
+    if (responseData.status === "ok") {
+      console.log(responseData);
+      $("#backup_button").html(`<div class="progress" style="height: 15px;">
                   <div class="progress-bar progress-bar-striped progress-bar-animated" id="backup_progress_bar"
                     role="progressbar" style="width:{{data['backup_stats']['percent']}}%;"
                     aria-valuenow="{{data['backup_stats']['percent']}}" aria-valuemin="0" aria-valuemax="100">{{
@@ -430,18 +327,18 @@
                 </div>
                 <p>Backing up <i class="fas fa-spin fa-spinner"></i> <span
                     id="total_files">{{data['server_stats']['world_size']}}</span></p>`);
-      } else {
+    } else {
 
-        bootbox.alert({
-          title: responseData.status,
-          message: responseData.error
-        });
-      }
+      bootbox.alert({
+        title: responseData.status,
+        message: responseData.error
+      });
+    }
     return;
   }
   async function del_backup(filename, id) {
     const token = getCookie("_xsrf")
-    let contents = JSON.stringify({"filename": filename})
+    let contents = JSON.stringify({ "filename": filename })
     let res = await fetch(`/api/v2/servers/${id}/backups/backup/`, {
       method: 'DELETE',
       headers: {
@@ -452,15 +349,17 @@
     let responseData = await res.json();
     if (responseData.status === "ok") {
       window.location.reload();
-    }else{
-      bootbox.alert({"title": responseData.status,
-                    "message": responseData.error})
+    } else {
+      bootbox.alert({
+        "title": responseData.status,
+        "message": responseData.error
+      })
     }
   }
 
   async function restore_backup(filename, id) {
     const token = getCookie("_xsrf")
-    let contents = JSON.stringify({"filename": filename})
+    let contents = JSON.stringify({ "filename": filename })
     var dialog = bootbox.dialog({
       message: "<i class='fa fa-spin fa-spinner'></i> {{ translate('serverBackups', 'restoring', data['lang']) }}",
       closeButton: false
@@ -475,9 +374,11 @@
     let responseData = await res.json();
     if (responseData.status === "ok") {
       window.location.href = "/panel/dashboard";
-    }else{
-      bootbox.alert({"title": responseData.status,
-                    "message": responseData.error})
+    } else {
+      bootbox.alert({
+        "title": responseData.status,
+        "message": responseData.error
+      })
     }
   }
 
@@ -529,7 +430,7 @@
       $('input.excluded:checkbox:checked').each(function () {
         excluded.push($(this).val());
       });
-      if ($("#root_files_button").hasClass("clicked")){
+      if ($("#root_files_button").hasClass("clicked")) {
         formDataObject.exclusions = excluded;
       }
       delete formDataObject.root_path
@@ -711,54 +612,54 @@
     });
   }
 
-  function getDirView(event){
+  function getDirView(event) {
     let path = event.target.parentElement.getAttribute("data-path");
     if (document.getElementById(path).classList.contains('clicked')) {
       return;
-    }else{
+    } else {
       getTreeView(path);
     }
 
   }
-  async function getTreeView(path){
+  async function getTreeView(path) {
     console.log(path)
     const token = getCookie("_xsrf");
     let res = await fetch(`/api/v2/servers/${server_id}/files`, {
-        method: 'POST',
-        headers: {
-          'X-XSRFToken': token
-        },
-        body: JSON.stringify({"page": "backups", "path": path}),
+      method: 'POST',
+      headers: {
+        'X-XSRFToken': token
+      },
+      body: JSON.stringify({ "page": "backups", "path": path }),
+    });
+    let responseData = await res.json();
+    if (responseData.status === "ok") {
+      console.log(responseData);
+      process_tree_response(responseData);
+
+    } else {
+
+      bootbox.alert({
+        title: responseData.status,
+        message: responseData.error
       });
-      let responseData = await res.json();
-      if (responseData.status === "ok") {
-        console.log(responseData);
-        process_tree_response(responseData);
-
-      } else {
-
-        bootbox.alert({
-          title: responseData.status,
-          message: responseData.error
-        });
-      }
+    }
   }
 
   function process_tree_response(response) {
     let path = response.data.root_path.path;
     let text = `<ul class="tree-nested d-block" id="${path}ul">`;
-      Object.entries(response.data).forEach(([key, value]) => {
-        if (key === "root_path" || key === "db_stats"){
-          //continue is not valid in for each. Return acts as a continue.
-          return;
-        }
+    Object.entries(response.data).forEach(([key, value]) => {
+      if (key === "root_path" || key === "db_stats") {
+        //continue is not valid in for each. Return acts as a continue.
+        return;
+      }
       let checked = ""
       let dpath = value.path;
       let filename = key;
-      if (value.excluded){
+      if (value.excluded) {
         checked = "checked"
       }
-      if (value.dir){
+      if (value.dir) {
         text += `<li class="tree-item" data-path="${dpath}">
                             \n<div id="${dpath}" data-path="${dpath}" data-name="${filename}" class="tree-caret tree-ctx-item tree-folder">
                             <input type="checkbox" class="checkBoxClass excluded" value="${dpath}" ${checked}>
@@ -768,7 +669,7 @@
                             <strong>${filename}</strong>
                             </span>
                             </input></div><li>`
-      }else{
+      } else {
         text += `<li
                         class="d-block tree-ctx-item tree-file"
                         data-path="${dpath}"
@@ -778,30 +679,30 @@
       }
     });
     text += `</ul>`;
-    if(response.data.root_path.top){
+    if (response.data.root_path.top) {
       try {
-          document.getElementById('main-tree-div').innerHTML += text;
-          document.getElementById('main-tree').parentElement.classList.add("clicked");
-        } catch {
-          document.getElementById('files-tree').innerHTML = text;
-        }
-    }else{
+        document.getElementById('main-tree-div').innerHTML += text;
+        document.getElementById('main-tree').parentElement.classList.add("clicked");
+      } catch {
+        document.getElementById('files-tree').innerHTML = text;
+      }
+    } else {
       try {
-            document.getElementById(path + "span").classList.add('tree-caret-down');
-            document.getElementById(path).innerHTML += text;
-            document.getElementById(path).classList.add("clicked");
-          } catch {
-            console.log("Bad")
-          }
+        document.getElementById(path + "span").classList.add('tree-caret-down');
+        document.getElementById(path).innerHTML += text;
+        document.getElementById(path).classList.add("clicked");
+      } catch {
+        console.log("Bad")
+      }
 
-          var toggler = document.getElementById(path + "span");
+      var toggler = document.getElementById(path + "span");
 
-          if (toggler.classList.contains('files-tree-title')) {
-            document.getElementById(path + "span").addEventListener("click", function caretListener() {
-              document.getElementById(path + "ul").classList.toggle("d-block");
-              document.getElementById(path + "span").classList.toggle("tree-caret-down");
-            });
-          }
+      if (toggler.classList.contains('files-tree-title')) {
+        document.getElementById(path + "span").addEventListener("click", function caretListener() {
+          document.getElementById(path + "ul").classList.toggle("d-block");
+          document.getElementById(path + "span").classList.toggle("tree-caret-down");
+        });
+      }
     }
   }
 
