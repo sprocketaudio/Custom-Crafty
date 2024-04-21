@@ -731,7 +731,9 @@ class PanelHandler(BaseHandler):
                         server_id, model=True
                     )
                 )
-                page_data["triggers"] = WebhookFactory.get_monitored_events()
+                page_data["triggers"] = list(
+                    WebhookFactory.get_monitored_events().keys()
+                )
 
             def get_banned_players_html():
                 banned_players = self.controller.servers.get_banned_players(server_id)
@@ -1041,7 +1043,7 @@ class PanelHandler(BaseHandler):
             page_data["webhook"]["enabled"] = True
 
             page_data["providers"] = WebhookFactory.get_supported_providers()
-            page_data["triggers"] = WebhookFactory.get_monitored_events()
+            page_data["triggers"] = list(WebhookFactory.get_monitored_events().keys())
 
             if not EnumPermissionsServer.CONFIG in page_data["user_permissions"]:
                 if not superuser:
@@ -1092,7 +1094,7 @@ class PanelHandler(BaseHandler):
             ).split(",")
 
             page_data["providers"] = WebhookFactory.get_supported_providers()
-            page_data["triggers"] = WebhookFactory.get_monitored_events()
+            page_data["triggers"] = list(WebhookFactory.get_monitored_events().keys())
 
             if not EnumPermissionsServer.CONFIG in page_data["user_permissions"]:
                 if not superuser:
