@@ -32,7 +32,7 @@ from app.classes.shared.console import Console
 from app.classes.shared.helpers import Helpers
 from app.classes.shared.file_helpers import FileHelpers
 from app.classes.shared.import_helper import ImportHelpers
-from app.classes.minecraft.serverjars import ServerJars
+from app.classes.minecraft.bigbucket import BigBucket
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ class Controller:
         self.helper: Helpers = helper
         self.file_helper: FileHelpers = file_helper
         self.import_helper: ImportHelpers = import_helper
-        self.server_jars: ServerJars = ServerJars(helper)
+        self.big_bucket: BigBucket = BigBucket(helper)
         self.users_helper: HelperUsers = HelperUsers(database, self.helper)
         self.roles_helper: HelperRoles = HelperRoles(database)
         self.servers_helper: HelperServers = HelperServers(database)
@@ -571,7 +571,7 @@ class Controller:
                 # modded update urls from server jars will only update the installer
                 if (
                     create_data["category"] != "modded"
-                    and create_data["type"] not in ServerJars.get_paper_jars()
+                    and create_data["type"] not in BigBucket.get_paper_jars()
                 ):
                     server_obj = self.servers.get_server_obj(new_server_id)
                     url = (
@@ -581,7 +581,7 @@ class Controller:
                     )
                     server_obj.executable_update_url = url
                     self.servers.update_server(server_obj)
-                self.server_jars.download_jar(
+                self.big_bucket.download_jar(
                     create_data["category"],
                     create_data["type"],
                     create_data["version"],

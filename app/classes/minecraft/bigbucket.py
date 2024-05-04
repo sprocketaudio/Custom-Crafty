@@ -17,10 +17,10 @@ SERVERJARS_TYPES = ["modded", "proxies", "servers", "vanilla"]
 PAPERJARS = ["paper", "folia"]
 
 
-class ServerJars:
+class BigBucket:
     def __init__(self, helper):
         self.helper = helper
-        self.base_url = "https://api.serverjars.com"
+        self.base_url = "https://jars.arcadiatech.org"
         self.paper_base = "https://api.papermc.io"
 
     @staticmethod
@@ -85,7 +85,7 @@ class ServerJars:
         return builds[-1] if builds else None
 
     def _read_cache(self):
-        cache_file = self.helper.serverjar_cache
+        cache_file = self.helper.big_bucket_cache
         cache = {}
         try:
             with open(cache_file, "r", encoding="utf-8") as f:
@@ -96,136 +96,69 @@ class ServerJars:
 
         return cache
 
-    def get_serverjar_data(self):
+    def get_bucket_data(self):
         data = self._read_cache()
         return data.get("types")
 
-    def _check_sjars_api_alive(self):
-        logger.info("Checking serverjars.com API status")
+    def _check_bucket_alive(self):
+        logger.info("Checking Big Bucket status")
 
-        check_url = f"{self.base_url}"
+        check_url = f"{self.base_url}/manifest.json"
         try:
             response = requests.get(check_url, timeout=2)
-            response_json = response.json()
 
-            if (
-                response.status_code in [200, 201]
-                and response_json.get("status") == "success"
-                and response_json.get("response", {}).get("status") == "ok"
-            ):
-                logger.info("Serverjars.com API is alive and responding as expected")
+            if response.status_code in [200, 201]:
+                logger.info("Big bucket is alive and responding as expected")
                 return True
         except Exception as e:
-            logger.error(f"Unable to connect to serverjar.com API due to error: {e}")
+            logger.error(f"Unable to connect to big bucket due to error: {e}")
             return False
 
         logger.error(
-            "Serverjars.com API is not responding as expected or unable to contact"
+            "Big bucket manifest is not available as expected or unable to contact"
         )
         return False
 
-    def _fetch_projects_for_type(self, server_type):
-        """
-        Fetches projects for a given server type from the ServerJars API.
-        """
+    def _get_big_bucket(self) -> dict:
+        logger.debug("Calling for big bucket manifest.")
         try:
-            response = requests.get(
-                f"{self.base_url}/api/fetchTypes/{server_type}", timeout=5
-            )
-            response.raise_for_status()  # Ensure HTTP errors are caught
-            data = response.json()
-            if data.get("status") == "success":
-                return data["response"].get("servers", [])
-        except requests.RequestException as e:
-            print(f"Error fetching projects for type {server_type}: {e}")
-        return []
-
-    def _get_server_type_list(self):
-        """
-        Builds the type structure with projects fetched for each type.
-        """
-        type_structure = {}
-        for server_type in SERVERJARS_TYPES:
-            projects = self._fetch_projects_for_type(server_type)
-            type_structure[server_type] = {project: [] for project in projects}
-        return type_structure
-
-    def _get_jar_versions(self, server_type, project_name, max_ver=50):
-        """
-        Grabs available versions for specified project
-
-        Args:
-            server_type (str): Server Type Category (modded, servers, etc)
-            project_name (str): Target project (paper, forge, magma, etc)
-            max (int, optional): Max versions returned. Defaults to 50.
-
-        Returns:
-            list: An array of versions
-        """
-        url = f"{self.base_url}/api/fetchAll/{server_type}/{project_name}?max={max_ver}"
-        try:
-            response = requests.get(url, timeout=5)
-            response.raise_for_status()  # Ensure HTTP errors are caught
-            data = response.json()
-            logger.debug(f"Received data for {server_type}/{project_name}: {data}")
-
-            if data.get("status") == "success":
-                versions = [
-                    item.get("version")
-                    for item in data.get("response", [])
-                    if "version" in item
-                ]
-                versions.reverse()  # Reverse so versions are newest -> oldest
-                logger.debug(f"Versions extracted: {versions}")
-                return versions
-        except requests.RequestException as e:
-            logger.error(
-                f"Error fetching jar versions for {server_type}/{project_name}: {e}"
-            )
-
-        return []
+            response = requests.get(f"{self.base_url}/manifest.json", timeout=5)
+            if response.status_code in [200, 201]:
+                return response.json().get("mc_java_servers")
+            return {}
+        except TimeoutError as e:
+            logger.error(f"Unable to get jars from remote with error {e}")
+            return {}
 
     def _refresh_cache(self):
         """
         Contains the shared logic for refreshing the cache.
         This method is called by both manual_refresh_cache and refresh_cache methods.
         """
-        now = datetime.now()
+        if not self._check_bucket_alive():
+            logger.error("big bucket API is not available.")
+            return False
+
         cache_data = {
-            "last_refreshed": now.strftime("%m/%d/%Y, %H:%M:%S"),
-            "types": self._get_server_type_list(),
+            "last_refreshed": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+            "types": self._get_big_bucket(),
         }
-
-        for server_type, projects in cache_data["types"].items():
-            for project_name in projects:
-                versions = self._get_jar_versions(server_type, project_name)
-                cache_data["types"][server_type][project_name] = versions
-
-        for paper_project in PAPERJARS:
-            cache_data["types"]["servers"][paper_project] = self.get_paper_versions(
-                paper_project
-            )
-
-        return cache_data
+        try:
+            with open(
+                self.helper.big_bucket_cache, "w", encoding="utf-8"
+            ) as cache_file:
+                json.dump(cache_data, cache_file, indent=4)
+                logger.info("Cache file successfully refreshed manually.")
+        except Exception as e:
+            logger.error(f"Failed to update cache file manually: {e}")
 
     def manual_refresh_cache(self):
         """
         Manually triggers the cache refresh process.
         """
-        if not self._check_sjars_api_alive():
-            logger.error("ServerJars API is not available.")
-            return False
-
-        logger.info("Manual cache refresh requested.")
-        cache_data = self._refresh_cache()
-
-        # Save the updated cache data
-        try:
-            with open(self.helper.serverjar_cache, "w", encoding="utf-8") as cache_file:
-                json.dump(cache_data, cache_file, indent=4)
-                logger.info("Cache file successfully refreshed manually.")
-        except Exception as e:
-            logger.error(f"Failed to update cache file manually: {e}")
+        logger.info("Manual bucket cache refresh initiated.")
+        self._refresh_cache()
+        logger.info("Manual refresh completed.")
 
     def refresh_cache(self):
         """
@@ -234,7 +167,7 @@ class ServerJars:
         This method checks if the cache file is older than a specified number of days
         before deciding to refresh.
         """
-        cache_file_path = self.helper.serverjar_cache
+        cache_file_path = self.helper.big_bucket_cache
 
         # Determine if the cache is old and needs refreshing
         cache_old = self.helper.is_file_older_than_x_days(cache_file_path)
@@ -242,8 +175,8 @@ class ServerJars:
         # debug override
         # cache_old = True
 
-        if not self._check_sjars_api_alive():
-            logger.error("ServerJars API is not available.")
+        if not self._check_bucket_alive():
+            logger.error("big bucket API is not available.")
             return False
 
         if not cache_old:
@@ -251,22 +184,14 @@ class ServerJars:
             return False
 
         logger.info("Automatic cache refresh initiated due to old cache.")
-        cache_data = self._refresh_cache()
-
-        # Save the updated cache data
-        try:
-            with open(cache_file_path, "w", encoding="utf-8") as cache_file:
-                json.dump(cache_data, cache_file, indent=4)
-                logger.info("Cache file successfully refreshed automatically.")
-        except Exception as e:
-            logger.error(f"Failed to update cache file automatically: {e}")
+        self._refresh_cache()
 
     def get_fetch_url(self, jar, server, version):
         """
         Constructs the URL for downloading a server JAR file based on the server type.
 
         Supports two main types of server JAR sources:
-        - ServerJars API for servers not in PAPERJARS.
+        - big bucket API for servers not in PAPERJARS.
         - Paper API for servers available through the Paper project.
 
         Parameters:

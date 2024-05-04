@@ -149,9 +149,9 @@ class ServerHandler(BaseHandler):
                 page_data["server_api"] = self.helper.check_address_status(
                     "https://api.serverjars.com"
                 )
-            page_data["server_types"] = self.controller.server_jars.get_serverjar_data()
+            page_data["server_types"] = self.controller.big_bucket.get_bucket_data()
             page_data["js_server_types"] = json.dumps(
-                self.controller.server_jars.get_serverjar_data()
+                self.controller.big_bucket.get_bucket_data()
             )
             if page_data["server_types"] is None:
                 page_data["server_types"] = []

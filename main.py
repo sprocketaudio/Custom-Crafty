@@ -117,7 +117,7 @@ def controller_setup():
 def tasks_starter():
     """
     Method starts stats recording, app scheduler, and
-    serverjars/steamCMD cache refreshers
+    big bucket/steamCMD cache refreshers
     """
     # start stats logging
     tasks_manager.start_stats_recording()
@@ -127,8 +127,8 @@ def tasks_starter():
     tasks_manager.start_scheduler()
 
     # refresh our cache and schedule for every 12 hoursour cache refresh
-    # for serverjars.com
-    tasks_manager.serverjar_cache_refresher()
+    # for big bucket.com
+    tasks_manager.big_bucket_cache_refresher()
 
 
 def signal_handler(signum, _frame):
