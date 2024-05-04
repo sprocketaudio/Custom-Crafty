@@ -67,14 +67,14 @@
                 {% end %}
                 {% raw xsrf_form_html() %}
                 <div class="row">
+
                   <div class="col-sm-12">
                     <div class="form-group">
-                      <label for="server_jar">{{ translate('serverWizard', 'serverType', data['lang'])
-                        }}</label>
+                      <label for="server_type">{{ translate('serverWizard', 'serverSelect', data['lang']) }}</label>
                       <div class="input-group">
-                        <select required class="form-control form-control-lg select-css" id="server_jar"
-                          name="server_jar" onchange="serverJarChange(this)">
-                          <option value="None">{{ translate('serverWizard', 'selectType', data['lang']) }}</option>
+                        <select required class="form-control form-control-lg select-css" id="server_type" name="type"
+                          onchange="serverTypeChange(this)">
+                          <option value="">{{ translate('serverWizard', 'selectServer', data['lang']) }}</option>
                           {% for s in data['server_types'] %}
                           <option value="{{ s }}">{{ s.capitalize() }}</option>
                           {% end %}
@@ -91,16 +91,6 @@
 
                   <div class="col-sm-12">
                     <div class="form-group">
-                      <label for="server_type">{{ translate('serverWizard', 'serverSelect', data['lang']) }}</label>
-                      <select required class="form-control form-control-lg select-css" id="server_type" name="type"
-                        onchange="serverTypeChange(this)">
-                        <option value="">{{ translate('serverWizard', 'selectServer', data['lang']) }}</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="col-sm-12">
-                    <div class="form-group">
                       <label for="server_version">{{ translate('serverWizard', 'serverVersion', data['lang']) }}</label>
                       <select required class="form-control form-control-lg select-css" id="server" name="version">
                         <option value="">{{ translate('serverWizard', 'selectVersion', data['lang']) }}</option>
@@ -108,7 +98,8 @@
                     </div>
                   </div>
                   <span data-html="true" class="version-hint text-center"
-                    data-content="⚠️ {{ translate('serverWizard', 'unsupported', data['lang']) }} ⚠️" , data-placement="right"></span>
+                    data-content="⚠️ {{ translate('serverWizard', 'unsupported', data['lang']) }} ⚠️" ,
+                    data-placement="right"></span>
                   <div class="col-sm-12">
                     <div class="form-group">
                       <label for="server_name">{{ translate('serverWizard', 'serverName', data['lang']) }}</label>
@@ -192,7 +183,8 @@
         <div class="api-alert" style="position: absolute; top: -5px; z-index: 100; opacity: .99;">
           <p style="color: white !important;"><i class="fas fa-exclamation-triangle" style="color: red;"></i>&nbsp;{{
             translate('error', 'serverJars1', data['lang']) }}<a style="color: red;" ;
-              href="https://status.craftycontrol.com/status/craftycontrol" target="_blank" rel="noopener">&nbsp;{{ translate('error',
+              href="https://status.craftycontrol.com/status/craftycontrol" target="_blank" rel="noopener">&nbsp;{{
+              translate('error',
               'craftyStatus', data['lang']) }}</a>
             &nbsp;{{ translate('error', 'serverJars2', data['lang']) }}</p>
         </div>
@@ -827,7 +819,7 @@
         message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
         closeButton: false
       });
-      setTimeout(function(){
+      setTimeout(function () {
         getDirView();
       }, 2000);
     } else {
@@ -845,9 +837,9 @@
       message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
       closeButton: false
     });
-    setTimeout(function(){
-        getDirView();
-      }, 2000);
+    setTimeout(function () {
+      getDirView();
+    }, 2000);
   });
   var upload = false;
   var file;
@@ -970,9 +962,8 @@
         "minecraft_java_create_data": {
           "create_type": "download_jar",
           "download_jar_create_data": {
-            "category": formDataObject.version.split("|")[0],
-            "type": formDataObject.version.split("|")[1],
-            "version": formDataObject.version.split("|")[2],
+            "type": formDataObject.version.split("|")[0],
+            "version": formDataObject.version.split("|")[1],
             "mem_min": formDataObject.mem_min,
             "mem_max": formDataObject.mem_max,
             "server_properties_port": formDataObject.port
@@ -1197,34 +1188,25 @@
   */
   function serverTypeChange(selectObj) {
     // get the index of the selected option
-    let idx = document.getElementById('server_type').selectedIndex;
+    let idx = document.getElementById('server_type').value;
     // get the value of the selected option
     let cSelect = document.getElementById("server");
     let which = {};
     try {
-      which = document.getElementById('server_type').options[idx].value;
+      versions = Object.keys(serverTypesLists[idx]["versions"]);
     } catch {
       while (cSelect.options.length > 0) {
         cSelect.remove(0);
       }
       return;
     }
-    let server_type = which.split('|')[0];
-    let server = which.split('|')[1];
-    // use the selected option value to retrieve the list of items from the serverTypesLists array
-    let cList = serverTypesLists[server_type];
-    // get the country select element via its known id
-    cSelect = document.getElementById("server");
-    // remove the current options from the country select
-    while (cSelect.options.length > 0) {
-      cSelect.remove(0);
-    }
-    let newOption;
+
     // create new options ordered by ascending
-    cList[server].forEach(type => {
+    versions.forEach(type => {
       newOption = document.createElement("option");
-      newOption.value = which + "|" + type;  // assumes option string and value are the same
+      newOption.value = idx + "|" + type;  // assumes option string and value are the same
       newOption.text = type;
+      console.log(type)
       // add the new option
       try {
         cSelect.add(newOption);  // this will fail in DOM browsers but is needed for IE
@@ -1234,17 +1216,18 @@
       }
     })
   }
-  $("#server").change(function (){
+
+  $("#server").change(function () {
     let selected_version = $("#server :selected").text().split(".");
-    if(parseInt(selected_version[0]) === 1 && parseInt(selected_version[1]) < 8 ){
+    if (parseInt(selected_version[0]) === 1 && parseInt(selected_version[1]) < 8) {
       $('[data-toggle="popover"]').popover();
-    if ($(window).width() < 1000) {
-      $('.version-hint').attr("data-placement", "top")
+      if ($(window).width() < 1000) {
+        $('.version-hint').attr("data-placement", "top")
+      } else {
+        $('.version-hint').attr("data-placement", "right")
+      }
+      $('.version-hint').popover("show");
     } else {
-      $('.version-hint').attr("data-placement", "right")
-    }
-    $('.version-hint').popover("show");
-    }else{
       $('.version-hint').popover("hide");
     }
   });

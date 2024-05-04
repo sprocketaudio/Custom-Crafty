@@ -134,13 +134,7 @@ new_server_schema = {
                         "mem_min",
                         "mem_max",
                         "server_properties_port",
-                        "category",
                     ],
-                    "category": {
-                        "title": "Jar Category",
-                        "type": "string",
-                        "examples": ["modded", "vanilla"],
-                    },
                     "properties": {
                         "type": {
                             "title": "Server JAR Type",

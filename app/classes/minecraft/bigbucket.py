@@ -186,7 +186,7 @@ class BigBucket:
         logger.info("Automatic cache refresh initiated due to old cache.")
         self._refresh_cache()
 
-    def get_fetch_url(self, jar, server, version):
+    def get_fetch_url(self, server, version):
         """
         Constructs the URL for downloading a server JAR file based on the server type.
 
@@ -203,10 +203,13 @@ class BigBucket:
             str or None: URL for downloading the JAR file, or None if URL cannot be
                         constructed or an error occurs.
         """
+        print(self._read_cache()["types"][server]["versions"][version]["url"][0])
         try:
             # Check if the server type is not specifically handled by Paper.
             if server not in PAPERJARS:
-                return f"{self.base_url}/api/fetchJar/{jar}/{server}/{version}"
+                return self._read_cache()["types"][server]["versions"][version]["url"][
+                    0
+                ]
 
             # For Paper servers, attempt to get the build for the specified version.
             paper_build_info = self.get_paper_build(server, version)
@@ -236,16 +239,16 @@ class BigBucket:
             logger.error(f"An error occurred while constructing fetch URL: {e}")
             return None
 
-    def download_jar(self, jar, server, version, path, server_id):
+    def download_jar(self, server, version, path, server_id):
         update_thread = threading.Thread(
             name=f"server_download-{server_id}-{server}-{version}",
             target=self.a_download_jar,
             daemon=True,
-            args=(jar, server, version, path, server_id),
+            args=(server, version, path, server_id),
         )
         update_thread.start()
 
-    def a_download_jar(self, jar, server, version, path, server_id):
+    def a_download_jar(self, server, version, path, server_id):
         """
         Downloads a server JAR file and performs post-download actions including
         notifying users and setting import status.
@@ -276,7 +279,7 @@ class BigBucket:
         # delaying download for server register to finish
         time.sleep(3)
 
-        fetch_url = self.get_fetch_url(jar, server, version)
+        fetch_url = self.get_fetch_url(server, version)
         if not fetch_url:
             return False
 

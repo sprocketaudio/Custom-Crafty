@@ -570,19 +570,17 @@ class Controller:
             if root_create_data["create_type"] == "download_jar":
                 # modded update urls from server jars will only update the installer
                 if (
-                    create_data["category"] != "modded"
+                    create_data["type"] != "forge-installer"
                     and create_data["type"] not in BigBucket.get_paper_jars()
                 ):
                     server_obj = self.servers.get_server_obj(new_server_id)
-                    url = (
-                        "https://api.serverjars.com/api/fetchJar/"
-                        f"{create_data['category']}"
-                        f"/{create_data['type']}/{create_data['version']}"
+                    url = self.big_bucket.get_fetch_url(
+                        create_data["type"], create_data["version"]
                     )
+                    print(url)
                     server_obj.executable_update_url = url
                     self.servers.update_server(server_obj)
                 self.big_bucket.download_jar(
-                    create_data["category"],
                     create_data["type"],
                     create_data["version"],
                     full_jar_path,
