@@ -690,7 +690,8 @@ class ServerInstance:
                 try:
                     # Getting the forge version from the executable command
                     version = re.findall(
-                        r"forge-([0-9\.]+)((?:)|(?:-([0-9\.]+)-[a-zA-Z]+)).jar",
+                        r"forge-installer-([0-9\.]+)((?:)|"
+                        r"(?:-([0-9\.]+)-[a-zA-Z]+)).jar",
                         server_obj.execution_command,
                     )
                     version_param = version[0][0].split(".")

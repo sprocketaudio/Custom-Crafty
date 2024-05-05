@@ -436,7 +436,7 @@ class Controller:
             if root_create_data["create_type"] == "download_jar":
                 if Helpers.is_os_windows():
                     # Let's check for and setup for install server commands
-                    if create_data["type"] == "forge":
+                    if create_data["type"] == "forge-installer":
                         server_command = (
                             f"java -Xms{Helpers.float_to_string(min_mem)}M "
                             f"-Xmx{Helpers.float_to_string(max_mem)}M "
@@ -449,7 +449,7 @@ class Controller:
                             f'-jar "{server_file}" nogui'
                         )
                 else:
-                    if create_data["type"] == "forge":
+                    if create_data["type"] == "forge-installer":
                         server_command = (
                             f"java -Xms{Helpers.float_to_string(min_mem)}M "
                             f"-Xmx{Helpers.float_to_string(max_mem)}M "
@@ -574,7 +574,6 @@ class Controller:
                     url = self.big_bucket.get_fetch_url(
                         create_data["type"], create_data["version"]
                     )
-                    print(url)
                     server_obj.executable_update_url = url
                     self.servers.update_server(server_obj)
                 self.big_bucket.download_jar(

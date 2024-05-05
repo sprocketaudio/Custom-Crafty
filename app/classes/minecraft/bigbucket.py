@@ -166,7 +166,6 @@ class BigBucket:
         notifies server users about the completion of the download.
 
         Parameters:
-            - jar (str): The name of the JAR file to download.
             - server (str): The type of server software (e.g., 'forge', 'paper').
             - version (str): The version of the server software.
             - path (str): The local filesystem path where the JAR file will be saved.
@@ -208,7 +207,7 @@ class BigBucket:
 
         # Post-download actions
         if success:
-            if server == "forge":
+            if server == "forge-installer":
                 # If this is the newer Forge version, run the installer
                 ServersController.finish_import(server_id, True)
             else:
