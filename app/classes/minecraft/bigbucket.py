@@ -13,8 +13,6 @@ from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
 # Temp type var until sjars restores generic fetchTypes0
-SERVERJARS_TYPES = ["modded", "proxies", "servers", "vanilla"]
-PAPERJARS = ["paper", "folia"]
 
 
 class BigBucket:
@@ -23,68 +21,7 @@ class BigBucket:
         self.base_url = "https://jars.arcadiatech.org"
         self.paper_base = "https://api.papermc.io"
 
-    @staticmethod
-    def get_paper_jars():
-        return PAPERJARS
-
-    def get_paper_versions(self, project):
-        """
-        Retrieves a list of versions for a specified project from the PaperMC API.
-
-        Parameters:
-            project (str): The project name to query for available versions.
-
-        Returns:
-            list: A list of version strings available for the project. Returns an empty
-                list if the API call fails or if no versions are found.
-
-        This function makes a GET request to the PaperMC API to fetch available project
-        versions, The versions are returned in reverse order, with the most recent
-        version first.
-        """
-        try:
-            response = requests.get(
-                f"{self.paper_base}/v2/projects/{project}/", timeout=2
-            )
-            response.raise_for_status()
-            api_data = response.json()
-        except Exception as e:
-            logger.error(f"Error loading project versions for {project}: {e}")
-            return []
-
-        versions = api_data.get("versions", [])
-        versions.reverse()  # Ensure the most recent version comes first
-        return versions
-
-    def get_paper_build(self, project, version):
-        """
-        Fetches the latest build for a specified project and version from PaperMC API.
-
-        Parameters:
-            project (str): Project name, typically a server software like 'paper'.
-            version (str): Project version to fetch the build number for.
-
-        Returns:
-            int or None: Latest build number if successful, None if not or on error.
-
-        This method attempts to query the PaperMC API for the latest build and
-        handles exceptions by logging errors and returning None.
-        """
-        try:
-            response = requests.get(
-                f"{self.paper_base}/v2/projects/{project}/versions/{version}/builds/",
-                timeout=2,
-            )
-            response.raise_for_status()
-            api_data = response.json()
-        except Exception as e:
-            logger.error(f"Error fetching build for {project} {version}: {e}")
-            return None
-
-        builds = api_data.get("builds", [])
-        return builds[-1] if builds else None
-
-    def _read_cache(self):
+    def _read_cache(self) -> dict:
         cache_file = self.helper.big_bucket_cache
         cache = {}
         try:
@@ -100,14 +37,17 @@ class BigBucket:
         data = self._read_cache()
         return data.get("types")
 
-    def _check_bucket_alive(self):
+    def _check_bucket_alive(self) -> bool:
         logger.info("Checking Big Bucket status")
 
-        check_url = f"{self.base_url}/manifest.json"
+        check_url = f"{self.base_url}/healthcheck"
         try:
             response = requests.get(check_url, timeout=2)
-
-            if response.status_code in [200, 201]:
+            response_json = response.json()
+            if (
+                response.status_code in [200, 201]
+                and response_json.get("status") == "ok"
+            ):
                 logger.info("Big bucket is alive and responding as expected")
                 return True
         except Exception as e:
@@ -186,16 +126,10 @@ class BigBucket:
         logger.info("Automatic cache refresh initiated due to old cache.")
         self._refresh_cache()
 
-    def get_fetch_url(self, server, version):
+    def get_fetch_url(self, server, version) -> str:
         """
         Constructs the URL for downloading a server JAR file based on the server type.
-
-        Supports two main types of server JAR sources:
-        - big bucket API for servers not in PAPERJARS.
-        - Paper API for servers available through the Paper project.
-
         Parameters:
-            jar (str): Name of the JAR file.
             server (str): Server software name (e.g., "paper").
             version (str): Server version.
 
@@ -203,38 +137,9 @@ class BigBucket:
             str or None: URL for downloading the JAR file, or None if URL cannot be
                         constructed or an error occurs.
         """
-        print(self._read_cache()["types"][server]["versions"][version]["url"][0])
         try:
-            # Check if the server type is not specifically handled by Paper.
-            if server not in PAPERJARS:
-                return self._read_cache()["types"][server]["versions"][version]["url"][
-                    0
-                ]
-
-            # For Paper servers, attempt to get the build for the specified version.
-            paper_build_info = self.get_paper_build(server, version)
-            if paper_build_info is None:
-                # Log an error or handle the case where paper_build_info is None
-                logger.error(
-                    "Error: Unable to get build information for server:"
-                    f" {server}, version: {version}"
-                )
-                return None
-
-            build = paper_build_info.get("build")
-            if not build:
-                # Log an error or handle the case where build is None or not found
-                logger.error(
-                    f"Error: Build number not found for server:"
-                    f" {server}, version: {version}"
-                )
-                return None
-
-            # Construct and return the URL for downloading the Paper server JAR.
-            return (
-                f"{self.paper_base}/v2/projects/{server}/versions/{version}/"
-                f"builds/{build}/downloads/{server}-{version}-{build}.jar"
-            )
+            # Read cache file for URL that is in a list of one item
+            return self._read_cache()["types"][server]["versions"][version]["url"][0]
         except Exception as e:
             logger.error(f"An error occurred while constructing fetch URL: {e}")
             return None
