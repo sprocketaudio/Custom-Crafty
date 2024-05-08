@@ -38,7 +38,7 @@ class BigBucket:
 
     def get_bucket_data(self):
         data = self._read_cache()
-        return data.get("types")
+        return data.get("categories")
 
     def _check_bucket_alive(self) -> bool:
         logger.info("Checking Big Bucket status")
@@ -86,7 +86,7 @@ class BigBucket:
 
         cache_data = {
             "last_refreshed": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
-            "types": self._get_big_bucket(),
+            "categories": self._get_big_bucket(),
         }
         try:
             with open(
@@ -145,9 +145,9 @@ class BigBucket:
         """
         try:
             # Read cache file for URL that is in a list of one item
-            return self._read_cache()["types"][jar][server]["versions"][version]["url"][
-                0
-            ]
+            return self.get_bucket_data()[jar]["types"][server]["versions"][version][
+                "url"
+            ][0]
         except Exception as e:
             logger.error(f"An error occurred while constructing fetch URL: {e}")
             return None
