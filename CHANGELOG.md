@@ -2,6 +2,7 @@
 ## --- [4.3.3] - 2024/TBD
 ### Refactor
 - Refactor API keys "super user" to "full access" ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/731))
+- Refactor SBuilder to use Big Bucket Svc ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/755))
 ### New features
 TBD
 ### Bug fixes
