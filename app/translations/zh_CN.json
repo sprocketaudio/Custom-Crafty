@@ -20,6 +20,7 @@
         "created": "创建时间",
         "deleteKeyConfirmation": "您想要删除这个 API 密钥吗？此操作不能撤销。",
         "deleteKeyConfirmationTitle": "删除 API 密钥 ${keyId}？",
+        "fullAccess": "完全访问",
         "getToken": "获得一个令牌",
         "name": "名称",
         "nameDesc": "你想把这个 API 令牌叫做什么？",

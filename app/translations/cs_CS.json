@@ -20,6 +20,7 @@
         "created": "Vytvořen",
         "deleteKeyConfirmation": "Chcete tento API klíč odstranit? Tuto akci nelze vrátit zpět.",
         "deleteKeyConfirmationTitle": "Odstranit klíč API ${keyId}?",
+        "fullAccess": "všechno",
         "getToken": "Získat token",
         "name": "Jméno",
         "nameDesc": "Jak chcete nazvat tento token API? ",

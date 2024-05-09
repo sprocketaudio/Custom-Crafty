@@ -20,6 +20,7 @@
         "created": "สร้างเมื่อ",
         "deleteKeyConfirmation": "คุณต้องการลบคีย์ API นี้หรือไม่ สิ่งนี้ไม่สามารถยกเลิกได้",
         "deleteKeyConfirmationTitle": "ลบคีย์ API นี้ ${keyId} หรือไม่?",
+        "fullAccess": "เข้าถึงได้ทั้งหมด",
         "getToken": "แสดงโทเค็น",
         "name": "ชื่อ",
         "nameDesc": "คุณต้องการเรียกโทเค็น API นี้ว่าอะไร ? ",

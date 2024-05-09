@@ -58,7 +58,7 @@
                                                         <!--<th>ID</th>-->
                                                         <th>{{ translate('apiKeys', 'name', data['lang']) }}</th>
                                                         <th>{{ translate('apiKeys', 'created', data['lang']) }}</th>
-                                                        <th>{{ translate('apiKeys', 'superUser', data['lang']) }}</th>
+                                                        <th>{{ translate('apiKeys', 'fullAccess', data['lang']) }}</th>
                                                         <th>{{ translate('apiKeys', 'perms', data['lang']) }}</th>
                                                         <th>{{ translate('apiKeys', 'buttons', data['lang']) }}</th>
                                                     </tr>
@@ -70,7 +70,7 @@
                                                         <td>{{ apikey.name }}</td>
                                                         <td>{{ apikey.created.strftime('%d/%m/%Y %H:%M:%S') }}</td>
                                                         <td>
-                                                            {% if apikey.superuser %}
+                                                            {% if apikey.full_access %}
                                                             <span class="text-success">
                                                                 <i class="fas fa-check-square"></i> {{
                                                                 translate('apiKeys', 'yes', data['lang']) }}
@@ -148,9 +148,15 @@
                                                             }}</label>
                                                     </td>
                                                     <td>
+                                                        {% if permission in data['user_crafty_permissions'] %}
                                                         <input type="checkbox" class="crafty_perm"
                                                             id="permission_{{ permission.name }}"
                                                             name="permission_{{ permission.name }}" value="1">
+                                                        {% else %}
+                                                        <input type="checkbox" class="crafty_perm"
+                                                            id="permission_{{ permission.name }}"
+                                                            name="permission_{{ permission.name }}" value="1" disabled>
+                                                        {% end %}
                                                     </td>
                                                 </tr>
                                                 {% end %}
@@ -158,8 +164,8 @@
                                             </tbody>
                                         </table>
 
-                                        <label for="superuser">Superuser</label>
-                                        <input type="checkbox" class="" id="superuser" name="superuser" value="1">
+                                        <label for="full_access">{{translate('apiKeys', 'fullAccess', data['lang'])}}</label>
+                                        <input type="checkbox" class="" id="full_access" name="full_access" value="1">
 
                                         <br />
 
@@ -240,7 +246,7 @@
                 "name": formDataObject.name,
                 "server_permissions_mask": server_permissions,
                 "crafty_permissions_mask": crafty_permissions,
-                "superuser": $("#superuser").prop('checked'),
+                "full_access": $("#full_access").prop('checked'),
             });
             console.log(formDataJsonString);
 

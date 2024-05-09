@@ -20,6 +20,7 @@
         "created": "Gecreëerd",
         "deleteKeyConfirmation": "Wilt u deze API sleutel verwijderen? Dit kan niet ongedaan gemaakt worden.",
         "deleteKeyConfirmationTitle": "API sleutel verwijderen ${keyId}?",
+        "fullAccess": "Volledige toegang",
         "getToken": "Verkrijg een Token",
         "name": "Naam",
         "nameDesc": "Hoe wilt u dit API token noemen? ",

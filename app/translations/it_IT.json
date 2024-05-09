@@ -20,6 +20,7 @@
         "created": "Creato",
         "deleteKeyConfirmation": "Vuoi cancellare questa chiave API? Non puoi tornare indietro.",
         "deleteKeyConfirmationTitle": "Rimuovere la chiave API ${keyId}?",
+        "fullAccess": " Accesso completo",
         "getToken": "Prendi un Token",
         "name": "Nome",
         "nameDesc": "Come desideri chiamare questo Token API? ",

@@ -187,7 +187,7 @@ class PermissionsCrafty:
     @staticmethod
     def get_api_key_permissions_list(key: ApiKeys):
         user = HelperUsers.get_user(key.user_id)
-        if user["superuser"] and key.superuser:
+        if user["superuser"] and key.full_access:
             return PermissionsCrafty.get_permissions_list()
         if user["superuser"]:
             # User is superuser but API key isn't

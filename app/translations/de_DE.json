@@ -20,6 +20,7 @@
         "created": "Erstellt",
         "deleteKeyConfirmation": "Möchten Sie diesen API Schlüssel löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
         "deleteKeyConfirmationTitle": "Folgenden API Schlüssel löschen: ${keyId}?",
+        "fullAccess": "Vollzugriff",
         "getToken": "Schlüssel erhalten",
         "name": "Name",
         "nameDesc": "Wie soll der API Schlüssel genannt werden? ",

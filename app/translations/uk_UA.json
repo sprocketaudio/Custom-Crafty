@@ -20,6 +20,7 @@
         "created": "Створений",
         "deleteKeyConfirmation": "Ви дійсно бажаєте видалити API ключ? Це незворотня дія.",
         "deleteKeyConfirmationTitle": "Видалення API ключ ${keyId}?",
+        "fullAccess": "Повний доступ",
         "getToken": "Отримати Токен",
         "name": "Ім'я",
         "nameDesc": "Як ви хочете назвати даний API токен?",

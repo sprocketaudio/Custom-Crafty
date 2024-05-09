@@ -168,7 +168,7 @@ class PanelHandler(BaseHandler):
         # Commented out because there is no server access control for API keys,
         # they just inherit from the host user
         # if api_key is not None:
-        #     superuser = superuser and api_key.superuser
+        #     superuser = superuser and api_key.full_access
 
         if server_id is None:
             self.redirect("/panel/error?error=Invalid Server ID")
@@ -242,7 +242,7 @@ class PanelHandler(BaseHandler):
         api_key, _token_data, exec_user = self.current_user
         superuser = exec_user["superuser"]
         if api_key is not None:
-            superuser = superuser and api_key.superuser
+            superuser = superuser and api_key.full_access
 
         if superuser:  # TODO: Figure out a better solution
             defined_servers = self.controller.servers.list_defined_servers()
@@ -351,7 +351,7 @@ class PanelHandler(BaseHandler):
                     "created": api_key.created,
                     "server_permissions": api_key.server_permissions,
                     "crafty_permissions": api_key.crafty_permissions,
-                    "superuser": api_key.superuser,
+                    "full_access": api_key.full_access,
                 }
                 if api_key is not None
                 else None
@@ -1355,6 +1355,9 @@ class PanelHandler(BaseHandler):
             )
             page_data["crafty_permissions_all"] = (
                 self.controller.crafty_perms.list_defined_crafty_permissions()
+            )
+            page_data["user_crafty_permissions"] = (
+                self.controller.crafty_perms.get_crafty_permissions_list(user_id)
             )
 
             if user_id is None:

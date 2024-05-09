@@ -42,7 +42,7 @@ class UploadHandler(BaseHandler):
         if self.upload_type == "server_import":
             superuser = exec_user["superuser"]
             if api_key is not None:
-                superuser = superuser and api_key.superuser
+                superuser = superuser and api_key.full_access
             user_id = exec_user["user_id"]
             stream_size_value = self.helper.get_setting("stream_size_GB")
 
@@ -133,7 +133,7 @@ class UploadHandler(BaseHandler):
         elif self.upload_type == "background":
             superuser = exec_user["superuser"]
             if api_key is not None:
-                superuser = superuser and api_key.superuser
+                superuser = superuser and api_key.full_access
             user_id = exec_user["user_id"]
             stream_size_value = self.helper.get_setting("stream_size_GB")
 
@@ -212,7 +212,7 @@ class UploadHandler(BaseHandler):
             server_id = self.get_argument("server_id", None)
             superuser = exec_user["superuser"]
             if api_key is not None:
-                superuser = superuser and api_key.superuser
+                superuser = superuser and api_key.full_access
             user_id = exec_user["user_id"]
             stream_size_value = self.helper.get_setting("stream_size_GB")
 

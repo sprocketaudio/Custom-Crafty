@@ -20,6 +20,7 @@
         "created": "Crée",
         "deleteKeyConfirmation": "Es-tu sûr de vouloir supprimer cette clé API? Tu ne pourras plus revenir en arrière.",
         "deleteKeyConfirmationTitle": "Supprimer la clé API ${keyId}?",
+        "fullAccess": "Accès Complet",
         "getToken": "Obtenir un Jeton",
         "name": "Nom",
         "nameDesc": "Comment appeler ce Jeton d'API ? ",

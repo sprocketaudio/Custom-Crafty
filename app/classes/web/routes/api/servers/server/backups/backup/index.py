@@ -26,12 +26,14 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
-        if (
-            EnumPermissionsServer.BACKUP
-            not in self.controller.server_perms.get_user_id_permissions_list(
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
-            )
-        ):
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.BACKUP not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
         self.finish_json(200, self.controller.management.get_backup_config(server_id))
@@ -41,12 +43,14 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
         backup_conf = self.controller.management.get_backup_config(server_id)
         if not auth_data:
             return
-        if (
-            EnumPermissionsServer.BACKUP
-            not in self.controller.server_perms.get_user_id_permissions_list(
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
-            )
-        ):
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.BACKUP not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
 
@@ -89,12 +93,14 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
-        if (
-            EnumPermissionsServer.BACKUP
-            not in self.controller.server_perms.get_user_id_permissions_list(
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
-            )
-        ):
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.BACKUP not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
 

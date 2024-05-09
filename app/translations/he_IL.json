@@ -20,6 +20,7 @@
         "created": "נוצר",
         "deleteKeyConfirmation": "האם ברצונך למחוק מפתח API זה? אי אפשר לבטל את זה.",
         "deleteKeyConfirmationTitle": "? ${keyId} API-להסיר את מפתח ה",
+        "fullAccess": "גישה מלאה להכל",
         "getToken": "קבלת אסימון",
         "name": "שם",
         "nameDesc": "הזה API-איך תרצו לקרוא לאסימון ה",
