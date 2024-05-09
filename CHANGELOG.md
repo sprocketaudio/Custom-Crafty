@@ -7,7 +7,7 @@ TBD
 ### Bug fixes
 TBD
 ### Tweaks
-TBD
+- Add link to go back to dashboard on error page ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/743))
 ### Lang
 TBD
 <br><br>

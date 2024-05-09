@@ -204,6 +204,7 @@
         "not-downloaded": "Crafty kann die auszuführende Datei nicht finden. Ist der Download abgeschlossen? Sind die Berechtigungen für Crafty korrekt?",
         "portReminder": "Wir haben festgestellt, dass dies das erste Mal ist, dass {} ausgeführt wurde. Stellen Sie sicher, dass Sie Port {} durch Ihren Router/Firewall weiterleiten, um den Fernzugriff aus dem Internet zu ermöglichen.",
         "privMsg": "und der/die/das ",
+        "return": "Zurück zum Dashboard",
         "serverJars1": "Server-JAR-API nicht erreichbar. Bitte überprüfen Sie ",
         "serverJars2": "um die aktuellsten Informationen zu erhalten.",
         "start-error": "Der Server {} konnte wegen dem Fehlercode: {} nicht gestartet werden",

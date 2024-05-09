@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ data.get('lang_page', 'en') }}" class="{{data['user_data'].get('theme', 'default')}}"
+  data-username="{{data['user_data'].get('username', None)}}">
 
 <head>
   <!-- Required meta tags -->
@@ -60,6 +61,11 @@
                         <b>{{ translate('error', 'hereIsTheError', data['lang']) }}: {{data['error']}}</b><br /><br />
                         That's all the help I can give you - Godspeed
                         <br /><br />
+                        <a class="d-inline font-weight-medium" href="/panel/dashboard"><button class="btn btn-info">{{
+                            translate('error', 'return',
+                            data['lang'])}}</button></a>
+                        <br>
+                        <br>
                         <a class="d-inline font-weight-medium" href="https://discord.gg/9VJPhCE"> {{ translate('error',
                           'contact', data['lang']) }}</a>
                       </p>

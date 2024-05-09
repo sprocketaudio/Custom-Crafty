@@ -204,6 +204,7 @@
         "not-downloaded": "No podemos encontrar el archivo ejecutable. ¿Ha terminado de descargarse? ¿Están los permisos puestos como ejecutable?",
         "portReminder": "Detectamos que es la primera vez que se inicia {}. Asegúrese de configurar el puerto {} a través de su router/firewall para hacer el servidor accesible por Internet.",
         "privMsg": "y el ",
+        "return": "Volver al panel de control",
         "serverJars1": "API de Servidor JAR no disponible. por favor, compruebe",
         "serverJars2": "para la información más actualizada.",
         "start-error": "Servidor {} fallo al iniciar con código de error: {}",

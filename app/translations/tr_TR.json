@@ -204,6 +204,7 @@
         "not-downloaded": "Çalıştırılabilir dosyanızı bulamıyoruz. İndirme işlemi tamamlandı mı? İzinler çalıştırılabilir olarak ayarlandı mı?",
         "portReminder": "{} ilk kez çalıştırılıyor olduğunu tespit ettik. Bunu internetten uzaktan erişilebilir kılmak için {} bağlantı noktasını yönlendiriciniz/güvenlik duvarınız üzerinden ilettiğinizden emin olun.",
         "privMsg": "ve ",
+        "return": "Arayüze Geri Dön",
         "serverJars1": "Sunucu JARs API'ına erişilemiyor.",
         "serverJars2": "en güncel bilgilere sahiptir",
         "start-error": "{} sunucusu başlamatılamadı. Hata kodu: {}",
