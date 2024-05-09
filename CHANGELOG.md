@@ -9,7 +9,7 @@ TBD
 ### Tweaks
 - Add link to go back to dashboard on error page ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/743))
 ### Lang
-TBD
+- Changes of phrase in `cs_CS` translation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/749))
 <br><br>
 
 ## --- [4.3.2] - 2024/04/07
