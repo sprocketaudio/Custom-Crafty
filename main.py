@@ -212,6 +212,8 @@ def setup_starter():
     time.sleep(2)
     controller_setup_thread.start()
 
+    web_sock.broadcast("update", {"section": "cache"})
+    controller.big_bucket.manual_refresh_cache()
     # Wait for the setup threads to finish
     web_sock.broadcast(
         "update",
