@@ -48,7 +48,10 @@ class PublicHandler(BaseHandler):
         }
 
         if self.request.query:
-            page_data["query"] = self.request.query_arguments.get("next")[0].decode()
+            request_query = self.request.query_arguments.get("next")
+            if not request_query:
+                self.redirect("/login")
+            page_data["query"] = request_query[0].decode()
 
         # sensible defaults
         template = "public/404.html"

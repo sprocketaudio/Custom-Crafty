@@ -171,7 +171,6 @@
 
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
-      console.log(formDataObject)
       let res = await fetch(`/login`, {
         method: 'POST',
         headers: {
