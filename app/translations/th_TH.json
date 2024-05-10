@@ -117,7 +117,6 @@
         "welcome": "ยินดีต้อนรับสู่ Crafty Controller"
     },
     "datatables": {
-        "loadingRecords": "กำลังโหลด...",
         "i18n": {
             "aria": {
                 "sortAscending": ": เปิดใช้งานเพื่อเรียงลำดับคอลัมน์จากน้อยไปมาก",
@@ -179,7 +178,8 @@
             },
             "thousands": ",",
             "zeroRecords": "ไม่พบรายการที่ตรงกัน"
-        }
+        },
+        "loadingRecords": "กำลังโหลด..."
     },
     "error": {
         "agree": "ยอมรับ",

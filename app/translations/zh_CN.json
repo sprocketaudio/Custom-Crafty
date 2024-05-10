@@ -117,7 +117,6 @@
         "welcome": "欢迎来到 Crafty Controller"
     },
     "datatables": {
-        "loadingRecords": "正在加载……",
         "i18n": {
             "aria": {
                 "sortAscending": "：激活对队列的升序排列",
@@ -179,11 +178,14 @@
             },
             "thousands": ",",
             "zeroRecords": "没有找到匹配的记录"
-        }
+        },
+        "loadingRecords": "正在加载……"
     },
     "error": {
         "agree": "同意",
         "bedrockError": "基岩版下载不可用。请检查",
+        "bigBucket1": "Big Bucket 查活失败。请检查",
+        "bigBucket2": "以获取最新信息。",
         "cancel": "取消",
         "contact": "通过 Discord 联系 Crafty Control 支持",
         "craftyStatus": "Crafty 的状态页面",
@@ -206,6 +208,7 @@
         "portReminder": "我们检测到这是你首次运行 {}。请确保从您的路由器/防火墙转发 {} 端口，以使程序可以从公网远程访问。",
         "privMsg": "以及",
         "return": "返回仪表板",
+        "selfHost": "如果您自托管此仓库，请检查您的地址或参考我们的故障排除指南。",
         "serverJars1": "无法访问服务器 JAR API。请检查",
         "serverJars2": "以获取最新信息。",
         "start-error": "服务器 {} 启动失败，错误代码为：{}",
@@ -603,6 +606,7 @@
     },
     "startup": {
         "almost": "即将完成。请稍候……",
+        "cache": "正在刷新 Big Bucket 缓存文件",
         "internals": "正在配置并启动 Crafty 的内部组件",
         "internet": "正在检查网络连接",
         "server": "正在初始化 ",

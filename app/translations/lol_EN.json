@@ -117,7 +117,6 @@
         "welcome": "WELCOM 2 CWAFTY CONTROLLR"
     },
     "datatables": {
-        "loadingRecords": "Loading...",
         "i18n": {
             "aria": {
                 "sortAscending": ": activate to sort column ascending",
@@ -179,11 +178,14 @@
             },
             "thousands": ",",
             "zeroRecords": "No matching records found"
-        }
+        },
+        "loadingRecords": "Loading..."
     },
     "error": {
         "agree": "YESH PLS",
         "bedrockError": "BEDROCKZ DOWNLOADZ NO WORKY. CHECK PLZ.",
+        "bigBucket1": "Big Bucket No Worky. Plz check",
+        "bigBucket2": "for da freshest nooz.",
         "cancel": "NOPEZ",
         "contact": "CONTACK CWAFTY CONTROLLR SUPORT ON DA DIZORD",
         "craftyStatus": "CWAFTY'S STATUSZ",
@@ -206,6 +208,7 @@
         "portReminder": "WE HAS DETECTD DIS AR TEH FURST TIEM {} IZ BEAN RUN. IF U WANTS IT ACESIBLE TO NEIGHBORHOOD CATS PLZ UNLOCK CAT_FLAP, {}, THRU UR ROUTR IF U HAS NOT DUN SO.",
         "privMsg": "AND THEEZ ",
         "return": "Go Bak to Dashbored",
+        "selfHost": "If u iz self-hostin' dis repo, check ur addy or peep our fix-it guide.",
         "serverJars1": "CAN'T TALK TO SERVER JARS API. CHECKZ",
         "serverJars2": "TO SEE NEWZ STUFFZ.",
         "start-error": "CHAIR {} FAILD 2 START WIF OOF CODE: {}",
@@ -603,6 +606,7 @@
     },
     "startup": {
         "almost": "ALMOST DUN. HOLD ON TO YER WHISKERS...",
+        "cache": "Fightin' for a Big Bucket o Fish",
         "internals": "SETTIN' UP AN' STARTIN' CWAFTY'S INSIDE BITZ",
         "internet": "LOOKIN' FOR OUTER SPACE TALKY",
         "server": "WAKIN' UPZ ",

@@ -116,7 +116,6 @@
         "welcome": "Welcome to Crafty Controller"
     },
     "datatables": {
-        "loadingRecords": "Loading...",
         "i18n": {
             "aria": {
                 "sortAscending": ": activate to sort column ascending",
@@ -178,11 +177,14 @@
             },
             "thousands": ",",
             "zeroRecords": "No matching records found"
-        }
+        },
+        "loadingRecords": "Loading..."
     },
     "error": {
         "agree": "Agree",
         "bedrockError": "Bedrock downloads unavailable. Please check",
+        "bigBucket1": "Big Bucket Health Check Failed. Please check",
+        "bigBucket2": "for the most up to date information.",
         "cancel": "Cancel",
         "contact": "Contact Crafty Control Support via Discord",
         "craftyStatus": "Crafty's status page",
@@ -208,6 +210,7 @@
         "bigBucket2": "for the most up to date information.",
         "selfHost": "If you are self-hosting this repo please check your address or consult our troubleshooting guide.",
         "return": "Return to Dashboard",
+        "selfHost": "If you are self-hosting this repo please check your address or consult our troubleshooting guide.",
         "start-error": "Server {} failed to start with error code: {}",
         "superError": "You must be a super user to complete this action.",
         "terribleFailure": "What a Terrible Failure!"

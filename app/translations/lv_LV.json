@@ -118,7 +118,6 @@
         "welcome": "Esiet sveicināts Crafty Controller"
     },
     "datatables": {
-        "loadingRecords": "Ielādē...",
         "i18n": {
             "aria": {
                 "sortAscending": ": aktivizēt lai kārotu kolonnu augoši",
@@ -180,11 +179,14 @@
             },
             "thousands": ",",
             "zeroRecords": "Nav atrasti atbilstoši ieraksti"
-        }
+        },
+        "loadingRecords": "Ielādē..."
     },
     "error": {
         "agree": "Piekrītu",
         "bedrockError": "Bedrock lejupielādes nav pieejamas. Lūdzu pārbaudi",
+        "bigBucket1": "Big Bucket stāvokļa pārbaude neizdevās. Lūdzu izpētiet",
+        "bigBucket2": "priekš jaunākās informācijas.",
         "cancel": "Atcelt",
         "contact": "Sazinies ar Crafty Control Atbalstu izmantojot Discord",
         "craftyStatus": "Crafty statusa lapa",
@@ -207,6 +209,7 @@
         "portReminder": "Mēs noteicām ka šī ir pirmā reize, kad {} ir ticis palaists. Pārliecinies izlaist portu {} cauri savam rūterim/ugunsmūrim lai padarītu šo attāli pieejamu no interneta.",
         "privMsg": "un ",
         "return": "Atgriezties uz pārskatu",
+        "selfHost": "Ja jūs paši uzturat šo repozitoriju, pārbaudiet savu adresi vai apskatiet mūsu kļūdu novēršanas dokumentāciju.",
         "serverJars1": "Serveru JAR API nav sasniedzams. Lūdzu pārbaudiet",
         "serverJars2": "priekš jaunākās informācijas.",
         "start-error": "Serveris {} neveiskmīgi startējās ar kļūdas kodu: {}",
@@ -604,6 +607,7 @@
     },
     "startup": {
         "almost": "Pabeidz. Vēl tik nedaudz...",
+        "cache": "Atjauno Big Bucket keša failu",
         "internals": "Konfigurē un Startē Crafty iekšējās komponenetes",
         "internet": "Pārbauda interneta savienojumu",
         "server": "Inicializē ",

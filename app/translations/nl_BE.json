@@ -117,7 +117,6 @@
         "welcome": "Welkom bij Crafty Controller "
     },
     "datatables": {
-        "loadingRecords": "Bezig met laden...",
         "i18n": {
             "aria": {
                 "sortAscending": ": activeren om kolom oplopend te sorteren",
@@ -179,11 +178,14 @@
             },
             "thousands": ",",
             "zeroRecords": "Geen overeenkomende records gevonden"
-        }
+        },
+        "loadingRecords": "Bezig met laden..."
     },
     "error": {
         "agree": "Akkoord",
         "bedrockError": "Bedrock-downloads niet beschikbaar. Controleer alstublieft",
+        "bigBucket1": "Big Bucket-gezondheidscontrole mislukt. Controleer alstublieft",
+        "bigBucket2": "voor de meest recente informatie.",
         "cancel": "Annuleren",
         "contact": "Neem contact op met Crafty Control ondersteuning via Discord",
         "craftyStatus": "Crafty's statuspagina",
@@ -206,6 +208,7 @@
         "portReminder": "We hebben ontdekt dat dit de eerste keer is dat {} wordt uitgevoerd. Zorg ervoor dat u poort {} doorstuurt via uw router/firewall om deze op afstand toegankelijk te maken vanaf het internet.",
         "privMsg": "en de ",
         "return": "Terug naar Dashboard",
+        "selfHost": "Als u deze repository zelf host, controleer dan uw adres of raadpleeg onze handleiding voor probleemoplossing.",
         "serverJars1": "Server JARs API niet bereikbaar. Controleer alstublieft",
         "serverJars2": "voor de meest recente informatie.",
         "start-error": "Server {} kan niet starten met foutcode: {}",
@@ -603,6 +606,7 @@
     },
     "startup": {
         "almost": "De laatste hand leggen. Houd je vast...",
+        "cache": "Big Bucket-cachebestand vernieuwen",
         "internals": "Crafty's interne componenten configureren en starten",
         "internet": "Controleren op internetverbinding",
         "server": "Initialiseren ",
