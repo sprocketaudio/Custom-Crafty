@@ -24,6 +24,7 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             _,
             _,
             user,
+            _,
         ) = auth_data
 
         if user_id in ["@me", user["user_id"]]:
@@ -72,6 +73,7 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             _,
             _,
             user,
+            _,
         ) = auth_data
 
         if (user_id in ["@me", user["user_id"]]) and self.helper.get_setting(
@@ -121,6 +123,7 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
 
         try:

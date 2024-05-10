@@ -14,6 +14,7 @@ class ApiCraftyLogIndexHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         if not superuser:

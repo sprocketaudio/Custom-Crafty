@@ -21,6 +21,7 @@ class ApiUsersIndexHandler(BaseApiHandler):
             _,
             _,
             user,
+            _,
         ) = auth_data
 
         # GET /api/v2/users?ids=true
@@ -70,6 +71,7 @@ class ApiUsersIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
 
         if EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:

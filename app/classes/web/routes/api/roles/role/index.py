@@ -74,6 +74,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         if not superuser:
@@ -97,6 +98,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
 
         if not superuser:
@@ -126,6 +128,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
 
         if not superuser:
