@@ -16,28 +16,10 @@ from app.classes.models.base_model import BaseModel
 from app.classes.models.users import HelperUsers
 from app.classes.models.servers import Servers
 from app.classes.models.server_permissions import PermissionsServers
-from app.classes.shared.main_models import DatabaseShortcuts
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
-
-
-# **********************************************************************************
-#                                   Audit_Log Class
-# **********************************************************************************
-class AuditLog(BaseModel):
-    audit_id = AutoField()
-    created = DateTimeField(default=datetime.datetime.now)
-    user_name = CharField(default="")
-    user_id = IntegerField(default=0, index=True)
-    source_ip = CharField(default="127.0.0.1")
-    server_id = ForeignKeyField(
-        Servers, backref="audit_server", null=True
-    )  # When auditing global events, use server ID null
-    log_msg = TextField(default="")
-
-    class Meta:
-        table_name = "audit_log"
+auth_logger = logging.getLogger("audit_log")
 
 
 # **********************************************************************************
@@ -149,10 +131,6 @@ class HelpersManagement:
     # **********************************************************************************
     #                                   Audit_Log Methods
     # **********************************************************************************
-    @staticmethod
-    def get_activity_log():
-        query = AuditLog.select()
-        return DatabaseShortcuts.return_db_rows(query)
 
     def add_to_audit_log(self, user_id, log_msg, server_id=None, source_ip=None):
         logger.debug(f"Adding to audit log User:{user_id} - Message: {log_msg} ")
@@ -166,50 +144,28 @@ class HelpersManagement:
                 WebSocketManager().broadcast_user(user, "notification", audit_msg)
             except Exception as e:
                 logger.error(f"Error broadcasting to user {user} - {e}")
-
-        AuditLog.insert(
-            {
-                AuditLog.user_name: user_data["username"],
-                AuditLog.user_id: user_id,
-                AuditLog.server_id: server_id,
-                AuditLog.log_msg: audit_msg,
-                AuditLog.source_ip: source_ip,
-            }
-        ).execute()
-        # deletes records when there's more than 300
-        ordered = AuditLog.select().order_by(+AuditLog.created)
-        for item in ordered:
-            if not self.helper.get_setting("max_audit_entries"):
-                max_entries = 300
-            else:
-                max_entries = self.helper.get_setting("max_audit_entries")
-            if AuditLog.select().count() > max_entries:
-                AuditLog.delete().where(AuditLog.audit_id == item.audit_id).execute()
-            else:
-                return
+        auth_logger.info(
+            str(log_msg),
+            extra={
+                "user_name": user_data["username"],
+                "user_id": user_id,
+                "server_id": server_id,
+                "source_ip": source_ip,
+            },
+        )
 
     def add_to_audit_log_raw(self, user_name, user_id, server_id, log_msg, source_ip):
-        AuditLog.insert(
-            {
-                AuditLog.user_name: user_name,
-                AuditLog.user_id: user_id,
-                AuditLog.server_id: server_id,
-                AuditLog.log_msg: log_msg,
-                AuditLog.source_ip: source_ip,
-            }
-        ).execute()
-        # deletes records when there's more than 300
-        ordered = AuditLog.select().order_by(+AuditLog.created)
-        for item in ordered:
-            # configurable through app/config/config.json
-            if not self.helper.get_setting("max_audit_entries"):
-                max_entries = 300
-            else:
-                max_entries = self.helper.get_setting("max_audit_entries")
-            if AuditLog.select().count() > max_entries:
-                AuditLog.delete().where(AuditLog.audit_id == item.audit_id).execute()
-            else:
-                return
+        if isinstance(server_id, Servers) and server_id is not None:
+            server_id = server_id.server_id
+        auth_logger.info(
+            str(log_msg),
+            extra={
+                "user_name": user_name,
+                "user_id": user_id,
+                "server_id": server_id,
+                "source_ip": source_ip,
+            },
+        )
 
     @staticmethod
     def create_crafty_row():

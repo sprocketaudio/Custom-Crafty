@@ -31,6 +31,7 @@ config_json_schema = {
         "monitored_mounts": {"type": "array"},
         "dir_size_poll_freq_minutes": {"type": "integer"},
         "crafty_logs_delete_after_days": {"type": "integer"},
+        "big_bucket_repo": {"type": "string"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -67,6 +68,7 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         # GET /api/v2/roles?ids=true
@@ -93,13 +95,7 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
-        (
-            _,
-            _,
-            _,
-            superuser,
-            user,
-        ) = auth_data
+        (_, _, _, superuser, user, _) = auth_data
 
         if not superuser:
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
@@ -149,6 +145,7 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         # GET /api/v2/roles?ids=true
@@ -181,6 +178,7 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
         if not superuser:
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})

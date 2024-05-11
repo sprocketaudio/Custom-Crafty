@@ -80,16 +80,16 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
-
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
+                auth_data[4]["user_id"], server_id
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
         if (
-            EnumPermissionsServer.FILES
-            not in self.controller.server_perms.get_user_id_permissions_list(
-                auth_data[4]["user_id"], server_id
-            )
-            and EnumPermissionsServer.BACKUP
-            not in self.controller.server_perms.get_user_id_permissions_list(
-                auth_data[4]["user_id"], server_id
-            )
+            EnumPermissionsServer.FILES not in server_permissions
+            and EnumPermissionsServer.BACKUP not in server_permissions
         ):
             # if the user doesn't have Files or Backup permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
@@ -197,13 +197,14 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
-
-        if (
-            EnumPermissionsServer.FILES
-            not in self.controller.server_perms.get_user_id_permissions_list(
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
-            )
-        ):
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
         try:
@@ -254,13 +255,14 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
-
-        if (
-            EnumPermissionsServer.FILES
-            not in self.controller.server_perms.get_user_id_permissions_list(
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
-            )
-        ):
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
         try:
@@ -307,13 +309,14 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
-
-        if (
-            EnumPermissionsServer.FILES
-            not in self.controller.server_perms.get_user_id_permissions_list(
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
-            )
-        ):
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
         try:
@@ -373,13 +376,14 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
-
-        if (
-            EnumPermissionsServer.FILES
-            not in self.controller.server_perms.get_user_id_permissions_list(
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
-            )
-        ):
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
         try:
@@ -438,13 +442,14 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
-
-        if (
-            EnumPermissionsServer.FILES
-            not in self.controller.server_perms.get_user_id_permissions_list(
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
-            )
-        ):
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
         try:
@@ -504,13 +509,14 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
-
-        if (
-            EnumPermissionsServer.FILES
-            not in self.controller.server_perms.get_user_id_permissions_list(
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
-            )
-        ):
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
         try:

@@ -100,6 +100,7 @@
         "welcome": "Tervetuloa Crafty Controller"
     },
     "datatables": {
+        "loadingRecords": "Ladataan...",
         "i18n": {
             "aria": {
                 "sortAscending": ": lajittele sarake nousevasti",

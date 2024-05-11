@@ -20,6 +20,7 @@
         "created": "Stworzono",
         "deleteKeyConfirmation": "Czy chcesz usunąć ten klucz API? Nie można tego cofnąć.",
         "deleteKeyConfirmationTitle": "Usunąć Klucz API ${keyId}?",
+        "fullAccess": "Pełny dostęp",
         "getToken": "Zdobądź token",
         "name": "Nazwa",
         "nameDesc": "Jak chcesz nazwać ten klucz API? ",
@@ -177,11 +178,14 @@
             },
             "thousands": ",",
             "zeroRecords": "Nie znaleziono pasujacego wyniku"
-        }
+        },
+        "loadingRecords": "Wczytywanie..."
     },
     "error": {
         "agree": "Zgadzam się",
         "bedrockError": "Pobieranie serwera bedrock jest teraz niedostępne. Proszę sprawdź",
+        "bigBucket1": "Odświeżanie Big Bucket nie powiodło się. Sprawdź",
+        "bigBucket2": "dla najnowszych informacji.",
         "cancel": "Anuluj",
         "contact": "Podrzebujesz pomocy? Zapraszamy na serwer discord Crafty Controler",
         "craftyStatus": "Status strony Craftyiego",
@@ -203,6 +207,8 @@
         "not-downloaded": "Nie możemy znaleść twojego pliku serwera. Czy skończył się pobierać? Czy permisje są ustawione na wykonywanle?",
         "portReminder": "Zauważyliśmy że to jest pierwszy raz {} kiedy był włączony. Upewnij się że otworzyłeś port {} na swoim routerze/firewallu aby korzystać z tego poza domem.",
         "privMsg": "i także ",
+        "return": "Powrót do panelu",
+        "selfHost": "Jeśli zarządasz tą repozytorią upewnij się że adres hest poprawny, w innym przypadku odwiedź strone rozwiązywania problemów.",
         "serverJars1": "API Server Jars jest niedostępne. Proszę sprawdź",
         "serverJars2": "dla najnowzsych informacji.",
         "start-error": "Serwer {} nie mógł się odpalić z powodu: {}",
@@ -599,6 +605,7 @@
     },
     "startup": {
         "almost": "Prawie gotowe! Jeszcze tylko chwilka...",
+        "cache": "Odświeżanie pamięci podręcznej Big Bucket",
         "internals": "Konfigurowanie i włączanie backendu...",
         "internet": "Sprawdzam połączenie z internetem",
         "server": "Włączanie ",

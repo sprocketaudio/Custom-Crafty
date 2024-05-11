@@ -99,6 +99,7 @@
         "welcome": "Wolkom by Crafty Controller"
     },
     "datatables": {
+        "loadingRecords": "Laden...",
         "i18n": {
             "aria": {
                 "sortAscending": ": aktivearje om kolom oprinnend te sortearjen",

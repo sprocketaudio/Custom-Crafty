@@ -75,6 +75,7 @@ class ApiRolesIndexHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         # GET /api/v2/roles?ids=true
@@ -107,6 +108,7 @@ class ApiRolesIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
 
         if not superuser:

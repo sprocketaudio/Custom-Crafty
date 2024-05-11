@@ -264,7 +264,7 @@ class PermissionsServers:
     @staticmethod
     def get_api_key_permissions_list(key: ApiKeys, server_id: str):
         user = HelperUsers.get_user(key.user_id)
-        if user["superuser"] and key.superuser:
+        if user["superuser"] and key.full_access:
             return PermissionsServers.get_permissions_list()
         roles_list = HelperUsers.get_user_roles_id(user["user_id"])
         role_server = (

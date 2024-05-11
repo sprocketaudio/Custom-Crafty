@@ -27,6 +27,7 @@ class ApiUsersUserPermissionsHandler(BaseApiHandler):
             _,
             _,
             user,
+            _,
         ) = auth_data
 
         if user_id in ["@me", user["user_id"]]:

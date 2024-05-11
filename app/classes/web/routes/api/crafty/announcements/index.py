@@ -26,6 +26,7 @@ class ApiAnnounceIndexHandler(BaseApiHandler):
             _,
             _,
             _user,
+            _,
         ) = auth_data
 
         data = self.helper.get_announcements()
@@ -72,6 +73,7 @@ class ApiAnnounceIndexHandler(BaseApiHandler):
             _,
             _,
             _user,
+            _,
         ) = auth_data
         try:
             data = json.loads(self.request.body)

@@ -6,7 +6,6 @@ import logging
 from app.classes.shared.console import Console
 from app.classes.shared.migration import Migrator, MigrateHistory
 from app.classes.models.management import (
-    AuditLog,
     Webhooks,
     Schedules,
     Backups,
@@ -73,20 +72,6 @@ def migrate(migrator: Migrator, database, **kwargs):
     try:
         logger.info("Migrating Data from Int to UUID (Foreign Keys)")
         Console.info("Migrating Data from Int to UUID (Foreign Keys)")
-        # Changes on Audit Log Table
-        for audit_log in AuditLog.select():
-            old_server_id = audit_log.server_id_id
-            if old_server_id == "0" or old_server_id is None:
-                server_uuid = None
-            else:
-                try:
-                    server = Servers.get_by_id(old_server_id)
-                    server_uuid = server.server_uuid
-                except:
-                    server_uuid = old_server_id
-            AuditLog.update(server_id=server_uuid).where(
-                AuditLog.audit_id == audit_log.audit_id
-            ).execute()
 
         # Changes on Webhooks Log Table
         for webhook in Webhooks.select():
@@ -247,21 +232,6 @@ def rollback(migrator: Migrator, database, **kwargs):
     try:
         logger.info("Migrating Data from UUID to Int (Foreign Keys)")
         Console.info("Migrating Data from UUID to Int (Foreign Keys)")
-        # Changes on Audit Log Table
-        for audit_log in AuditLog.select():
-            old_server_id = audit_log.server_id_id
-            if old_server_id is None:
-                new_server_id = 0
-            else:
-                try:
-                    server = Servers.get_or_none(Servers.server_uuid == old_server_id)
-                    new_server_id = server.server_id
-                except:
-                    new_server_id = old_server_id
-            AuditLog.update(server_id=new_server_id).where(
-                AuditLog.audit_id == audit_log.audit_id
-            ).execute()
-
         # Changes on Webhooks Log Table
         for webhook in Webhooks.select():
             old_server_id = webhook.server_id_id

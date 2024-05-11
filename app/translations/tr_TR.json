@@ -20,6 +20,7 @@
         "created": "Oluşturuldu",
         "deleteKeyConfirmation": "Bu API anahtarını silmek istediğine emin misin? Bu geri alınamaz.",
         "deleteKeyConfirmationTitle": "${keyId} API anahtarını kaldırma işlemi.",
+        "fullAccess": "Tam Erişim",
         "getToken": "Bir Token Al",
         "name": "Ad",
         "nameDesc": "Bu API tokeninin adı ne olsun?",
@@ -177,11 +178,14 @@
             },
             "thousands": ".",
             "zeroRecords": "Eşleşen kayıt bulunamadı"
-        }
+        },
+        "loadingRecords": "Yükleniyor..."
     },
     "error": {
         "agree": "Kabul Et",
         "bedrockError": "Bedrock indirmeleri kullanılamıyor. Lütfen kontrol edin",
+        "bigBucket1": "Big Bucket sağlık kontrolü yapılamadı. En güncel bilgileri burada bulabilirsiniz:",
+        "bigBucket2": ".",
         "cancel": "İptal",
         "contact": "Crafty Control Destek Discord Sunucusu",
         "craftyStatus": "Crafty'nin durum sayfası",
@@ -203,6 +207,8 @@
         "not-downloaded": "Çalıştırılabilir dosyanızı bulamıyoruz. İndirme işlemi tamamlandı mı? İzinler çalıştırılabilir olarak ayarlandı mı?",
         "portReminder": "{} ilk kez çalıştırılıyor olduğunu tespit ettik. Bunu internetten uzaktan erişilebilir kılmak için {} bağlantı noktasını yönlendiriciniz/güvenlik duvarınız üzerinden ilettiğinizden emin olun.",
         "privMsg": "ve ",
+        "return": "Arayüze Geri Dön",
+        "selfHost": "Bu depoyu kendiniz barındırıyorsanız lütfen adresinizi kontrol ediniz veya sorun giderme kılavuzumuza bakınız.",
         "serverJars1": "Sunucu JARs API'ına erişilemiyor.",
         "serverJars2": "en güncel bilgilere sahiptir",
         "start-error": "{} sunucusu başlamatılamadı. Hata kodu: {}",
@@ -599,6 +605,7 @@
     },
     "startup": {
         "almost": "Bitiriliyor. Sıkı tutun...",
+        "cache": "Big Bucket önbellek dosyası yenileniyor",
         "internals": "Crafty'nin dahili bileşenlerini konfigüre etme ve başlatma",
         "internet": "İnternet bağlantısı kontrol ediliyor",
         "server": "Başlatılıyor ",

@@ -75,7 +75,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
                     "name": key.name,
                     "server_permissions": key.server_permissions,
                     "crafty_permissions": key.crafty_permissions,
-                    "superuser": key.superuser,
+                    "full_access": key.full_access,
                 }
             )
         self.finish_json(
@@ -99,7 +99,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
                     "type": "string",
                     "pattern": "^[01]{3}$",  # 8 bits, see EnumPermissionsCrafty
                 },
-                "superuser": {"type": "boolean"},
+                "full_access": {"type": "boolean"},
             },
             "additionalProperties": False,
             "minProperties": 1,
@@ -113,6 +113,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
             _,
             _superuser,
             user,
+            _,
         ) = auth_data
 
         try:
@@ -163,7 +164,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
         key_id = self.controller.users.add_user_api_key(
             data["name"],
             user_id,
-            data["superuser"],
+            data["full_access"],
             data["server_permissions_mask"],
             data["crafty_permissions_mask"],
         )
@@ -188,6 +189,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
             _,
             _,
             _user,
+            _,
         ) = auth_data
         if key_id:
             key = self.controller.users.get_user_api_key(key_id)

@@ -18,6 +18,10 @@ class ServerPermsController:
         return PermissionsServers.get_server_user_list(server_id)
 
     @staticmethod
+    def get_permissions(permissions_mask):
+        return PermissionsServers.get_permissions(permissions_mask)
+
+    @staticmethod
     def list_defined_permissions():
         permissions_list = PermissionsServers.get_permissions_list()
         return permissions_list
@@ -62,6 +66,22 @@ class ServerPermsController:
         return PermissionsServers.get_permissions_mask(role_id, server_id)
 
     @staticmethod
+    def get_lowest_api_perm_mask(user_server_permissions_mask, api_key_permssions_mask):
+        mask = ""
+        # If this isn't an API key we'll know the request came from basic
+        # authentication and ignore the API key permissions mask.
+        if not api_key_permssions_mask:
+            return user_server_permissions_mask
+        for _index, (user_perm, api_perm) in enumerate(
+            zip(user_server_permissions_mask, api_key_permssions_mask)
+        ):
+            if user_perm == "1" and api_perm == "1":
+                mask += "1"
+            else:
+                mask += "0"
+        return mask
+
+    @staticmethod
     def set_permission(
         permission_mask, permission_tested: EnumPermissionsServer, value
     ):
@@ -81,6 +101,11 @@ class ServerPermsController:
     @staticmethod
     def get_api_key_permissions_list(key: ApiKeys, server_id: str):
         return PermissionsServers.get_api_key_permissions_list(key, server_id)
+
+    @staticmethod
+    def get_user_permissions_mask(user_id: str, server_id: str):
+        user = HelperUsers.get_user_model(user_id)
+        return PermissionsServers.get_user_permissions_mask(user, server_id)
 
     @staticmethod
     def get_authorized_servers_stats_from_roles(user_id):

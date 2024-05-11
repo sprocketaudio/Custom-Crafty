@@ -17,6 +17,7 @@ from app.classes.models.users import HelperUsers
 from app.classes.models.management import HelpersManagement
 from app.classes.shared.import_helper import ImportHelpers
 from app.classes.shared.websocket_manager import WebSocketManager
+from app.classes.logging.log_formatter import JsonFormatter
 
 console = Console()
 helper = Helpers()
@@ -117,7 +118,7 @@ def controller_setup():
 def tasks_starter():
     """
     Method starts stats recording, app scheduler, and
-    serverjars/steamCMD cache refreshers
+    big bucket/steamCMD cache refreshers
     """
     # start stats logging
     tasks_manager.start_stats_recording()
@@ -127,8 +128,8 @@ def tasks_starter():
     tasks_manager.start_scheduler()
 
     # refresh our cache and schedule for every 12 hoursour cache refresh
-    # for serverjars.com
-    tasks_manager.serverjar_cache_refresher()
+    # for big bucket.com
+    tasks_manager.big_bucket_cache_refresher()
 
 
 def signal_handler(signum, _frame):
@@ -212,6 +213,8 @@ def setup_starter():
     time.sleep(2)
     controller_setup_thread.start()
 
+    web_sock.broadcast("update", {"section": "cache"})
+    controller.big_bucket.manual_refresh_cache()
     # Wait for the setup threads to finish
     web_sock.broadcast(
         "update",
@@ -283,6 +286,11 @@ def setup_logging(debug=True):
                 logging_config["loggers"][""]["level"] = "DEBUG"
 
             logging.config.dictConfig(logging_config)
+
+            # Apply JSON formatting to the "audit" handler
+            for handler in logging.getLogger().handlers:
+                if handler.name == "audit_log_handler":
+                    handler.setFormatter(JsonFormatter())
 
     else:
         logging.basicConfig(level=logging.DEBUG)

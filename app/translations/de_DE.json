@@ -20,6 +20,7 @@
         "created": "Erstellt",
         "deleteKeyConfirmation": "Möchten Sie diesen API Schlüssel löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
         "deleteKeyConfirmationTitle": "Folgenden API Schlüssel löschen: ${keyId}?",
+        "fullAccess": "Vollzugriff",
         "getToken": "Schlüssel erhalten",
         "name": "Name",
         "nameDesc": "Wie soll der API Schlüssel genannt werden? ",
@@ -177,11 +178,14 @@
             },
             "thousands": ".",
             "zeroRecords": "Keine passenden Einträge gefunden"
-        }
+        },
+        "loadingRecords": "Laden..."
     },
     "error": {
         "agree": "Zustimmen",
         "bedrockError": "Bedrock-Downloads sind nicht verfügbar. Bitte überprüfen Sie",
+        "bigBucket1": "Big Bucket Zustandsprüfung fehlgeschlagen. Bitte Überprüfen",
+        "bigBucket2": "für die aktuellsten Informationen.",
         "cancel": "Abbrechen",
         "contact": "Kontaktieren Sie den Crafty Control Support über Discord",
         "craftyStatus": "Crafty-Statusseite",
@@ -203,6 +207,8 @@
         "not-downloaded": "Crafty kann die auszuführende Datei nicht finden. Ist der Download abgeschlossen? Sind die Berechtigungen für Crafty korrekt?",
         "portReminder": "Wir haben festgestellt, dass dies das erste Mal ist, dass {} ausgeführt wurde. Stellen Sie sicher, dass Sie Port {} durch Ihren Router/Firewall weiterleiten, um den Fernzugriff aus dem Internet zu ermöglichen.",
         "privMsg": "und der/die/das ",
+        "return": "Zurück zum Dashboard",
+        "selfHost": "Wenn Sie dieses Repo selbst hosten, überprüfen Sie bitte Ihre Adresse oder konsultieren Sie unsere Anleitung zur Fehlerbehebung.",
         "serverJars1": "Server-JAR-API nicht erreichbar. Bitte überprüfen Sie ",
         "serverJars2": "um die aktuellsten Informationen zu erhalten.",
         "start-error": "Der Server {} konnte wegen dem Fehlercode: {} nicht gestartet werden",
@@ -600,6 +606,7 @@
     },
     "startup": {
         "almost": "Nur noch einen Moment, fast geschafft",
+        "cache": "Aktualisieren der Big Bucket-Cache-Datei",
         "internals": "Crafty's interne Komponneten initialisieren und starten",
         "internet": "Verbindung zum Internet überprüfen",
         "server": "initialisieren ",

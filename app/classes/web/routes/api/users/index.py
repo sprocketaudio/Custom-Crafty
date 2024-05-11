@@ -21,6 +21,7 @@ class ApiUsersIndexHandler(BaseApiHandler):
             _,
             _,
             user,
+            _,
         ) = auth_data
 
         # GET /api/v2/users?ids=true
@@ -70,6 +71,7 @@ class ApiUsersIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
 
         if EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
@@ -149,11 +151,12 @@ class ApiUsersIndexHandler(BaseApiHandler):
                 400, {"status": "error", "error": "INVALID_SUPERUSER_CREATE"}
             )
 
-        if len(roles) != 0 and not superuser:
-            # HACK: This should check if the user has the roles or something
-            return self.finish_json(
-                400, {"status": "error", "error": "INVALID_ROLES_CREATE"}
-            )
+        for role in roles:
+            role = self.controller.roles.get_role(role)
+            if int(role["manager"]) != int(auth_data[4]["user_id"]) and not superuser:
+                return self.finish_json(
+                    400, {"status": "error", "error": "INVALID_ROLES_CREATE"}
+                )
 
         # TODO: do this in the most efficient way
         user_id = self.controller.users.add_user(

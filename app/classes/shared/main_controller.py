@@ -32,7 +32,7 @@ from app.classes.shared.console import Console
 from app.classes.shared.helpers import Helpers
 from app.classes.shared.file_helpers import FileHelpers
 from app.classes.shared.import_helper import ImportHelpers
-from app.classes.minecraft.serverjars import ServerJars
+from app.classes.minecraft.bigbucket import BigBucket
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ class Controller:
         self.helper: Helpers = helper
         self.file_helper: FileHelpers = file_helper
         self.import_helper: ImportHelpers = import_helper
-        self.server_jars: ServerJars = ServerJars(helper)
+        self.big_bucket: BigBucket = BigBucket(helper)
         self.users_helper: HelperUsers = HelperUsers(database, self.helper)
         self.roles_helper: HelperRoles = HelperRoles(database)
         self.servers_helper: HelperServers = HelperServers(database)
@@ -436,7 +436,7 @@ class Controller:
             if root_create_data["create_type"] == "download_jar":
                 if Helpers.is_os_windows():
                     # Let's check for and setup for install server commands
-                    if create_data["type"] == "forge":
+                    if create_data["type"] == "forge-installer":
                         server_command = (
                             f"java -Xms{Helpers.float_to_string(min_mem)}M "
                             f"-Xmx{Helpers.float_to_string(max_mem)}M "
@@ -449,7 +449,7 @@ class Controller:
                             f'-jar "{server_file}" nogui'
                         )
                 else:
-                    if create_data["type"] == "forge":
+                    if create_data["type"] == "forge-installer":
                         server_command = (
                             f"java -Xms{Helpers.float_to_string(min_mem)}M "
                             f"-Xmx{Helpers.float_to_string(max_mem)}M "
@@ -569,19 +569,16 @@ class Controller:
         if data["create_type"] == "minecraft_java":
             if root_create_data["create_type"] == "download_jar":
                 # modded update urls from server jars will only update the installer
-                if (
-                    create_data["category"] != "modded"
-                    and create_data["type"] not in ServerJars.get_paper_jars()
-                ):
+                if create_data["type"] != "forge-installer":
                     server_obj = self.servers.get_server_obj(new_server_id)
-                    url = (
-                        "https://api.serverjars.com/api/fetchJar/"
-                        f"{create_data['category']}"
-                        f"/{create_data['type']}/{create_data['version']}"
+                    url = self.big_bucket.get_fetch_url(
+                        create_data["category"],
+                        create_data["type"],
+                        create_data["version"],
                     )
                     server_obj.executable_update_url = url
                     self.servers.update_server(server_obj)
-                self.server_jars.download_jar(
+                self.big_bucket.download_jar(
                     create_data["category"],
                     create_data["type"],
                     create_data["version"],

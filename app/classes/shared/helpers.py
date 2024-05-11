@@ -72,7 +72,7 @@ class Helpers:
         self.db_path = os.path.join(
             self.root_dir, "app", "config", "db", "crafty.sqlite"
         )
-        self.serverjar_cache = os.path.join(self.config_dir, "serverjars.json")
+        self.big_bucket_cache = os.path.join(self.config_dir, "bigbucket.json")
         self.credits_cache = os.path.join(self.config_dir, "credits.json")
         self.passhasher = PasswordHasher()
         self.exiting = False
@@ -516,6 +516,7 @@ class Helpers:
             "monitored_mounts": mounts,
             "dir_size_poll_freq_minutes": 5,
             "crafty_logs_delete_after_days": 0,
+            "big_bucket_repo": "https://jars.arcadiatech.org",
         }
 
     def get_all_settings(self):

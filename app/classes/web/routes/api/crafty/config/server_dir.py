@@ -24,6 +24,7 @@ class ApiCraftyConfigServerDirHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         # GET /api/v2/roles?ids=true
@@ -51,6 +52,7 @@ class ApiCraftyConfigServerDirHandler(BaseApiHandler):
         if not auth_data:
             return
         (
+            _,
             _,
             _,
             _,

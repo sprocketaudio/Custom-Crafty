@@ -20,6 +20,7 @@
         "created": "Creato",
         "deleteKeyConfirmation": "Vuoi cancellare questa chiave API? Non puoi tornare indietro.",
         "deleteKeyConfirmationTitle": "Rimuovere la chiave API ${keyId}?",
+        "fullAccess": " Accesso completo",
         "getToken": "Prendi un Token",
         "name": "Nome",
         "nameDesc": "Come desideri chiamare questo Token API? ",
@@ -177,11 +178,14 @@
             },
             "thousands": ",",
             "zeroRecords": "Nessun record corrispondente trovato"
-        }
+        },
+        "loadingRecords": "Carico..."
     },
     "error": {
         "agree": "Conferma",
         "bedrockError": "I download di Bedrock non sono disponibili. Si prega di controllare",
+        "bigBucket1": "Controllo integrità di Big Bucket fallito. Controlla nuovamente",
+        "bigBucket2": "per informazioni più aggiornate.",
         "cancel": "Annulla",
         "contact": "Contact Crafty Control Support via Discord",
         "craftyStatus": "Stato di Crafty",
@@ -203,6 +207,8 @@
         "not-downloaded": "We can't seem to find your executable file. Has it finished downloading? Are the permissions set to executable?",
         "portReminder": "We have detected this is the first time {} has been run. Make sure to forward port {} through your router/firewall to make this remotely accessible from the internet.",
         "privMsg": "e il ",
+        "return": "Torna alla pagina iniziale",
+        "selfHost": "se stai ospitando te questo repo, controlla il tuo indirizzo o consulta la nostra guida di risoluzione dei problemi.",
         "serverJars1": "API JAR del server non raggiungibile. Si prega di controllare",
         "serverJars2": "per informazioni più aggiornate.",
         "start-error": "Server {} failed to start with error code: {}",
@@ -600,6 +606,7 @@
     },
     "startup": {
         "almost": "Finalizzazione. Tieniti forte...",
+        "cache": "Aggiornamento cache di Big Bucket",
         "internals": "Configurazione e avvio dei componenti interni di Crafty",
         "internet": "Controllo connessione a internet",
         "server": "Inizializzazione ",

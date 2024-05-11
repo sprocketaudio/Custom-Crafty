@@ -20,6 +20,7 @@
         "created": "Vytvořen",
         "deleteKeyConfirmation": "Chcete tento API klíč odstranit? Tuto akci nelze vrátit zpět.",
         "deleteKeyConfirmationTitle": "Odstranit klíč API ${keyId}?",
+        "fullAccess": "všechno",
         "getToken": "Získat token",
         "name": "Jméno",
         "nameDesc": "Jak chcete nazvat tento token API? ",
@@ -192,11 +193,14 @@
             },
             "thousands": " ",
             "zeroRecords": "Nebyly nalezeny žádné odpovídající záznamy"
-        }
+        },
+        "loadingRecords": "Načítání..."
     },
     "error": {
         "agree": "Souhlasím",
         "bedrockError": "Stažení Bedrocku není dostupné. Prosím zkontrolujte",
+        "bigBucket1": "Big Bucket Kontrola stavu selhala. Prosím zkontrolujte jej",
+        "bigBucket2": "pro nejnovější informace.",
         "cancel": "Zrušit",
         "contact": "Kontaktujte podporu Crafty přes Discord",
         "craftyStatus": "Crafty stav systémů",
@@ -218,6 +222,8 @@
         "not-downloaded": "Zdá se, že nemůžeme najít váš spustitelný soubor. Bylo jeho stahování dokončeno? Jsou oprávnění nastavena na spustitelný soubor?",
         "portReminder": "Zjistili jsme, že server {} byl spuštěn poprvé. Ujistěte se, že jste přesměrovali port {} přes váš směrovač/firewall, aby byl tento port vzdáleně přístupný z internetu.",
         "privMsg": "a ",
+        "return": "vrátit se na hlavní stránku",
+        "selfHost": "Pokud Hostujete sami toto uložiště prosím zkontrolujte adresu nebo si přečtěte náš průvodce odstraňováním problémů.",
         "serverJars1": "Server JAR api je nepřístupná. Prosím zkontrolujte",
         "serverJars2": "pro aktualní informace.",
         "start-error": "Server {} se nepodařilo spustit s kódem chyby: {}",
@@ -612,13 +618,14 @@
         "credits": "Zásluhy",
         "dashboard": "Ovládací panel",
         "documentation": "Dokumentace",
-        "inApp": "V app dokumentaci",
+        "inApp": "V lokalní dokumentaci",
         "navigation": "Navigace",
         "newServer": "Vytvořit nový server",
         "servers": "Servery"
     },
     "startup": {
         "almost": "Dokončuji. Držte se...",
+        "cache": "Znovu načítam  mezipaměť Big Bucket",
         "internals": "Nastavuji a startuji Crafty interní komponenty",
         "internet": "Kontroluju připojení k internetu",
         "server": "Konfigurace ",
