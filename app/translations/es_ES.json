@@ -610,8 +610,6 @@
         "internet": "Verificando conexion a internet",
         "server": "Inicializando ",
         "cache": "Actualizando el archivo de caché de Big Bucket",
-        "bigBucket2": "para obtener la información más actualizada.",
-        "selfHost": "Si estás autoalojando este repositorio, revisa tu dirección o consulta nuestra guía de solución de problemas.",
         "serverInit": "Inicializando Servidores",
         "starting": "Crafty esta iniciando...",
         "tasks": "Iniciando el programador de tareas"
