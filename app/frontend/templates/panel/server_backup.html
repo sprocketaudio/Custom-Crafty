@@ -68,8 +68,6 @@
                       width="100%" style="table-layout:fixed;">
                       <thead>
                         <tr class="rounded">
-                          <th scope="col" style="width: 5%; min-width: 64px;">{{ translate('serverBackups', 'enabled',
-                            data['lang']) }}</th>
                           <th scope="col" style="width: 15%; min-width: 10px;">{{ translate('serverBackups', 'name',
                             data['lang']) }} </th>
                           <th scope="col" style="width: 60%; min-width: 50px;">{{ translate('serverBackups',
@@ -83,15 +81,6 @@
                       <tbody>
                         {% for backup in data['backups'] %}
                         <tr>
-                          <td id="{{backup.enabled}}" class="enabled">
-                            <button type="button" class="btn btn-sm btn-info btn-toggle backup-custom-toggle"
-                              id="backup_{{backup.backup_id}}" name="backup_{{backup.backup_id}}"
-                              data-backup-id="{{backup.backup_id}}"
-                              data-backup-enabled="{{ 'true' if backup.enabled else 'false' }}" data-toggle="button"
-                              aria-pressed="true" autocomplete="off">
-                              <div class="handle"></div>
-                            </button>
-                          </td>
                           <td id="{{backup.backup_name}}" class="id">
                             <p>{{backup.backup_name}}</p>
                           </td>
@@ -126,8 +115,6 @@
                       width="100%" style="table-layout:fixed;">
                       <thead>
                         <tr class="rounded">
-                          <th style="width: 20%; min-width: 64px;">{{ translate('serverBackups', 'enabled',
-                            data['lang']) }}</th>
                           <th style="width: 40%; min-width: 10px;">Name
                           </th>
                           <th style="width: 40%; min-width: 50px;">{{ translate('serverBackups', 'edit', data['lang'])
@@ -137,15 +124,6 @@
                       <tbody>
                         {% for backup in data['backups'] %}
                         <tr>
-                          <td id="{{backup.enabled}}" class="enabled">
-                            <button type="button" class="btn btn-sm btn-info btn-toggle backup-custom-toggle"
-                              id="backup_{{backup.backup_id}}" name="backup_{{backup.backup_id}}"
-                              data-backup-id="{{backup.backup_id}}"
-                              data-backup-enabled="{{ 'true' if backup.enabled else 'false' }}" data-toggle="button"
-                              aria-pressed="true" autocomplete="off">
-                              <div class="handle"></div>
-                            </button>
-                          </td>
                           <td id="{{backup.backup_name}}" class="id">
                             <p>{{backup.backup_name}}</p>
                           </td>

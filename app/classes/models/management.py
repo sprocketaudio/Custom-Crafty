@@ -114,7 +114,6 @@ class Backups(BaseModel):
     shutdown = BooleanField(default=False)
     before = CharField(default="")
     after = CharField(default="")
-    enabled = BooleanField(default=True)
 
     class Meta:
         table_name = "backups"

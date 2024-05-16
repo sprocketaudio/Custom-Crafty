@@ -19,7 +19,6 @@ def migrate(migrator: Migrator, database, **kwargs):
     migrator.add_columns("backups", backup_id=peewee.UUIDField(default=uuid.uuid4))
     migrator.add_columns("backups", backup_name=peewee.CharField(default="Default"))
     migrator.add_columns("backups", backup_location=peewee.CharField(default=""))
-    migrator.add_columns("backups", enabled=peewee.BooleanField(default=True))
 
     class Servers(peewee.Model):
         server_id = peewee.CharField(primary_key=True, default=str(uuid.uuid4()))
@@ -59,7 +58,6 @@ def migrate(migrator: Migrator, database, **kwargs):
         shutdown = peewee.BooleanField(default=False)
         before = peewee.CharField(default="")
         after = peewee.CharField(default="")
-        enabled = peewee.BooleanField(default=True)
 
         class Meta:
             table_name = "new_backups"
@@ -85,7 +83,6 @@ def migrate(migrator: Migrator, database, **kwargs):
             shutdown=backup.shutdown,
             before=backup.before,
             after=backup.after,
-            enabled=True,
         )
 
     # Drop the existing backups table
