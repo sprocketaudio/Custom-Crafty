@@ -184,6 +184,8 @@
     "error": {
         "agree": "Aceptar",
         "bedrockError": "Descargas de Bedrock no disponibles. por favor, compruebe",
+        "bigBucket1": "La verificación de estado de Big Bucket ha fallado. Por favor, verifica",
+        "bigBucket2": "para obtener la información más actualizada.",
         "cancel": "Cancelar",
         "contact": "Contacta el soporte de Crafty Control desde Discord",
         "craftyStatus": "Página de estados de Crafty",
@@ -206,6 +208,7 @@
         "portReminder": "Detectamos que es la primera vez que se inicia {}. Asegúrese de configurar el puerto {} a través de su router/firewall para hacer el servidor accesible por Internet.",
         "privMsg": "y el ",
         "return": "Volver al panel de control",
+        "selfHost": "Si estás autoalojando este repositorio, revisa tu dirección o consulta nuestra guía de solución de problemas.",
         "serverJars1": "API de Servidor JAR no disponible. por favor, compruebe",
         "serverJars2": "para la información más actualizada.",
         "start-error": "Servidor {} fallo al iniciar con código de error: {}",
@@ -603,6 +606,7 @@
     },
     "startup": {
         "almost": "Terminando. Espera un momento...",
+        "cache": "Actualizando el archivo de caché de Big Bucket",
         "internals": "Configurando e inicializando los componentes internos de Crafty",
         "internet": "Verificando conexion a internet",
         "server": "Inicializando ",

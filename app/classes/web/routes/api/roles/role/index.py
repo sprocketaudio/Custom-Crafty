@@ -74,6 +74,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         if not superuser:
@@ -97,6 +98,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
 
         if not superuser:
@@ -126,10 +128,19 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
 
-        if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+        role = self.controller.roles.get_role(role_id)
+        if not superuser and user["user_id"] != role["manager"]:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": "Not Authorized",
+                },
+            )
 
         try:
             data = orjson.loads(self.request.body)

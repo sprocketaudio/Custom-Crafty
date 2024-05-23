@@ -12,6 +12,7 @@ class ApiCraftyJarCacheIndexHandler(BaseApiHandler):
             _,
             _,
             _,
+            _,
         ) = auth_data
 
         if not auth_data[4]["superuser"]:
