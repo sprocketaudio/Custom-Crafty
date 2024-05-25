@@ -4,7 +4,7 @@ import logging
 import pathlib
 import tempfile
 import zipfile
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
 import urllib.request
 import ssl
 import time
@@ -254,7 +254,7 @@ class FileHelpers:
             results,
         )
         # Set the compression mode based on the `compressed` parameter
-        compression_mode = ZIP_DEFLATED if compressed else None
+        compression_mode = ZIP_DEFLATED if compressed else ZIP_STORED
         with ZipFile(path_to_destination, "w", compression_mode) as zip_file:
             zip_file.comment = bytes(
                 comment, "utf-8"
