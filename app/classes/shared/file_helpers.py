@@ -229,74 +229,14 @@ class FileHelpers:
 
         return True
 
-    def make_compressed_backup(
-        self, path_to_destination, path_to_zip, excluded_dirs, server_id, comment=""
-    ):
-        # create a ZipFile object
-        path_to_destination += ".zip"
-        ex_replace = [p.replace("\\", "/") for p in excluded_dirs]
-        total_bytes = 0
-        dir_bytes = Helpers.get_dir_size(path_to_zip)
-        results = {
-            "percent": 0,
-            "total_files": self.helper.human_readable_file_size(dir_bytes),
-        }
-        WebSocketManager().broadcast_page_params(
-            "/panel/server_detail",
-            {"id": str(server_id)},
-            "backup_status",
-            results,
-        )
-        with ZipFile(path_to_destination, "w", ZIP_DEFLATED) as zip_file:
-            zip_file.comment = bytes(
-                comment, "utf-8"
-            )  # comments over 65535 bytes will be truncated
-            for root, dirs, files in os.walk(path_to_zip, topdown=True):
-                for l_dir in dirs:
-                    if str(os.path.join(root, l_dir)).replace("\\", "/") in ex_replace:
-                        dirs.remove(l_dir)
-                ziproot = path_to_zip
-                for file in files:
-                    if (
-                        str(os.path.join(root, file)).replace("\\", "/")
-                        not in ex_replace
-                        and file != "crafty.sqlite"
-                    ):
-                        try:
-                            logger.info(f"backing up: {os.path.join(root, file)}")
-                            if os.name == "nt":
-                                zip_file.write(
-                                    os.path.join(root, file),
-                                    os.path.join(root.replace(ziproot, ""), file),
-                                )
-                            else:
-                                zip_file.write(
-                                    os.path.join(root, file),
-                                    os.path.join(root.replace(ziproot, "/"), file),
-                                )
-
-                        except Exception as e:
-                            logger.warning(
-                                f"Error backing up: {os.path.join(root, file)}!"
-                                f" - Error was: {e}"
-                            )
-                    total_bytes += os.path.getsize(os.path.join(root, file))
-                    percent = round((total_bytes / dir_bytes) * 100, 2)
-                    results = {
-                        "percent": percent,
-                        "total_files": self.helper.human_readable_file_size(dir_bytes),
-                    }
-                    WebSocketManager().broadcast_page_params(
-                        "/panel/server_detail",
-                        {"id": str(server_id)},
-                        "backup_status",
-                        results,
-                    )
-
-        return True
-
     def make_backup(
-        self, path_to_destination, path_to_zip, excluded_dirs, server_id, comment=""
+        self,
+        path_to_destination,
+        path_to_zip,
+        excluded_dirs,
+        server_id,
+        comment="",
+        compressed=None,
     ):
         # create a ZipFile object
         path_to_destination += ".zip"
@@ -313,7 +253,9 @@ class FileHelpers:
             "backup_status",
             results,
         )
-        with ZipFile(path_to_destination, "w") as zip_file:
+        # Set the compression mode based on the `compressed` parameter
+        compression_mode = ZIP_DEFLATED if compressed else None
+        with ZipFile(path_to_destination, "w", compression_mode) as zip_file:
             zip_file.comment = bytes(
                 comment, "utf-8"
             )  # comments over 65535 bytes will be truncated
