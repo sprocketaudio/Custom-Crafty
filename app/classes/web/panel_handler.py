@@ -1286,7 +1286,9 @@ class PanelHandler(BaseHandler):
             )
             self.controller.servers.refresh_server_settings(server_id)
             try:
-                page_data["backup_list"] = server.list_backups()
+                page_data["backup_list"] = server.list_backups(
+                    page_data["backup_config"]["backup_location"]
+                )
             except:
                 page_data["backup_list"] = []
             page_data["backup_path"] = Helpers.wtol_path(

@@ -357,7 +357,7 @@ class HelpersManagement:
                 data[str(backup.backup_id)] = {
                     "backup_id": backup.backup_id,
                     "backup_name": backup.backup_name,
-                    "backup_path": backup.backup_location,
+                    "backup_location": backup.backup_location,
                     "excluded_dirs": backup.excluded_dirs,
                     "max_backups": backup.max_backups,
                     "server_id": backup.server_id_id,

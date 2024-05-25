@@ -11,7 +11,7 @@ from app.classes.shared.helpers import Helpers
 
 logger = logging.getLogger(__name__)
 
-backup_schema = {
+BACKUP_SCHEMA = {
     "type": "object",
     "properties": {
         "filename": {"type": "string", "minLength": 5},
@@ -19,11 +19,40 @@ backup_schema = {
     "additionalProperties": False,
     "minProperties": 1,
 }
+BACKUP_PATCH_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "backup_location": {"type": "string", "minLength": 1},
+        "max_backups": {"type": "integer"},
+        "compress": {"type": "boolean"},
+        "shutdown": {"type": "boolean"},
+        "before": {"type": "string"},
+        "after": {"type": "string"},
+        "exclusions": {"type": "array"},
+    },
+    "additionalProperties": False,
+    "minProperties": 1,
+}
+
+BASIC_BACKUP_PATCH_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "max_backups": {"type": "integer"},
+        "compress": {"type": "boolean"},
+        "shutdown": {"type": "boolean"},
+        "before": {"type": "string"},
+        "after": {"type": "string"},
+        "exclusions": {"type": "array"},
+    },
+    "additionalProperties": False,
+    "minProperties": 1,
+}
 
 
 class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
-    def get(self, server_id: str):
+    def get(self, server_id: str, backup_id: str):
         auth_data = self.authenticate_user()
+        backup_conf = self.controller.management.get_backup_config(backup_id)
         if not auth_data:
             return
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
@@ -32,15 +61,40 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
             ),
             auth_data[5],
         )
+        if backup_conf["server_id"]["server_id"] != server_id:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "ID_MISMATCH",
+                    "error_data": "Server ID backup server ID different",
+                },
+            )
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.BACKUP not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
-        self.finish_json(200, self.controller.management.get_backup_config(server_id))
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": "Authorization Error",
+                },
+            )
+        self.finish_json(200, backup_conf)
 
-    def delete(self, server_id: str):
+    def delete(self, server_id: str, backup_id: str):
         auth_data = self.authenticate_user()
-        backup_conf = self.controller.management.get_backup_config(server_id)
+        backup_conf = self.controller.management.get_backup_config(backup_id)
+        if backup_conf["server_id"]["server_id"] != server_id:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "ID_MISMATCH",
+                    "error_data": "Server ID backup server ID different",
+                },
+            )
         if not auth_data:
             return
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
@@ -52,7 +106,14 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.BACKUP not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": "Authorization Error",
+                },
+            )
 
         try:
             data = json.loads(self.request.body)
@@ -61,7 +122,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
         try:
-            validate(data, backup_schema)
+            validate(data, BACKUP_SCHEMA)
         except ValidationError as e:
             return self.finish_json(
                 400,
@@ -74,7 +135,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
 
         try:
             FileHelpers.del_file(
-                os.path.join(backup_conf["backup_path"], data["filename"])
+                os.path.join(backup_conf["backup_location"], data["filename"])
             )
         except Exception as e:
             return self.finish_json(
@@ -89,7 +150,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
 
         return self.finish_json(200, {"status": "ok"})
 
-    def post(self, server_id: str):
+    def post(self, server_id: str, backup_id: str):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -102,7 +163,24 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.BACKUP not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": "Authorization Error",
+                },
+            )
+        backup_config = self.controller.management.get_backup_config(backup_id)
+        if backup_config["server_id"] != server_id:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "ID_MISMATCH",
+                    "error_data": "Server ID backup server ID different",
+                },
+            )
 
         try:
             data = json.loads(self.request.body)
@@ -111,7 +189,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
         try:
-            validate(data, backup_schema)
+            validate(data, BACKUP_SCHEMA)
         except ValidationError as e:
             return self.finish_json(
                 400,
@@ -184,7 +262,6 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 self.controller.servers.update_server(new_server_obj)
 
                 # preserve backup config
-                backup_config = self.controller.management.get_backup_config(server_id)
                 excluded_dirs = []
                 server_obj = self.controller.servers.get_server_obj(server_id)
                 loop_backup_path = self.helper.wtol_path(server_obj.path)
@@ -220,4 +297,71 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
             self.get_remote_ip(),
         )
 
+        return self.finish_json(200, {"status": "ok"})
+
+    def patch(self, server_id: str, backup_id: str):
+        auth_data = self.authenticate_user()
+        if not auth_data:
+            return
+
+        try:
+            data = json.loads(self.request.body)
+        except json.decoder.JSONDecodeError as e:
+            return self.finish_json(
+                400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
+            )
+
+        try:
+            if auth_data[4]["superuser"]:
+                validate(data, BACKUP_PATCH_SCHEMA)
+            else:
+                validate(data, BASIC_BACKUP_PATCH_SCHEMA)
+        except ValidationError as e:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "INVALID_JSON_SCHEMA",
+                    "error_data": str(e),
+                },
+            )
+        backup_conf = self.controller.management.get_backup_config(backup_id)
+        if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
+            # if the user doesn't have access to the server, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": "Authorization Error",
+                },
+            )
+        if backup_conf["server_id"]["server_id"] != server_id:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "ID_MISMATCH",
+                    "error_data": "Server ID backup server ID different",
+                },
+            )
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
+                auth_data[4]["user_id"], server_id
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.BACKUP not in server_permissions:
+            # if the user doesn't have Schedule permission, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": "Authorization Error",
+                },
+            )
+
+        self.controller.management.update_backup_config(backup_id, data)
         return self.finish_json(200, {"status": "ok"})

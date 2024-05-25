@@ -218,7 +218,7 @@ def api_handlers(handler_args):
             handler_args,
         ),
         (
-            r"/api/v2/servers/([a-z0-9-]+)/backups/backup/?",
+            r"/api/v2/servers/([a-z0-9-]+)/backups/backup/([a-z0-9-]+)/?",
             ApiServersServerBackupsBackupIndexHandler,
             handler_args,
         ),

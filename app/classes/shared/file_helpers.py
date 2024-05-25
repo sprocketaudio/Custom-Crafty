@@ -235,6 +235,7 @@ class FileHelpers:
         path_to_zip,
         excluded_dirs,
         server_id,
+        backup_id,
         comment="",
         compressed=None,
     ):
@@ -306,6 +307,7 @@ class FileHelpers:
                     results = {
                         "percent": percent,
                         "total_files": self.helper.human_readable_file_size(dir_bytes),
+                        "backup_id": backup_id,
                     }
                     # send status results to page.
                     WebSocketManager().broadcast_page_params(

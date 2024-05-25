@@ -10,12 +10,12 @@ logger = logging.getLogger(__name__)
 backup_patch_schema = {
     "type": "object",
     "properties": {
-        "backup_path": {"type": "string", "minLength": 1},
+        "backup_location": {"type": "string", "minLength": 1},
         "max_backups": {"type": "integer"},
         "compress": {"type": "boolean"},
         "shutdown": {"type": "boolean"},
-        "backup_before": {"type": "string"},
-        "backup_after": {"type": "string"},
+        "before": {"type": "string"},
+        "after": {"type": "string"},
         "exclusions": {"type": "array"},
     },
     "additionalProperties": False,
@@ -28,8 +28,8 @@ basic_backup_patch_schema = {
         "max_backups": {"type": "integer"},
         "compress": {"type": "boolean"},
         "shutdown": {"type": "boolean"},
-        "backup_before": {"type": "string"},
-        "backup_after": {"type": "string"},
+        "before": {"type": "string"},
+        "after": {"type": "string"},
         "exclusions": {"type": "array"},
     },
     "additionalProperties": False,
@@ -52,9 +52,11 @@ class ApiServersServerBackupsIndexHandler(BaseApiHandler):
         if EnumPermissionsServer.BACKUP not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
-        self.finish_json(200, self.controller.management.get_backup_config(server_id))
+        self.finish_json(
+            200, self.controller.management.get_backups_by_server(server_id)
+        )
 
-    def patch(self, backup_id: str):
+    def post(self, server_id: str):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -80,8 +82,6 @@ class ApiServersServerBackupsIndexHandler(BaseApiHandler):
                     "error_data": str(e),
                 },
             )
-        backup_conf = self.controller.management.get_backup_config(backup_id)
-        server_id = backup_conf["server_id"]
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})

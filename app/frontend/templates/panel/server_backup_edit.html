@@ -67,7 +67,7 @@
                   <label for="server_name">{{ translate('serverBackups', 'storageLocation', data['lang']) }} <small
                       class="text-muted ml-1"> - {{ translate('serverBackups', 'storageLocationDesc', data['lang'])
                       }}</small> </label>
-                  <input type="text" class="form-control" name="backup_path" id="backup_path"
+                  <input type="text" class="form-control" name="backup_location" id="backup_location"
                     value="{{ data['backup_config']['backup_location']  }}"
                     placeholder="{{ translate('serverBackups', 'storageLocation', data['lang']) }}">
                   {% end %}
@@ -107,14 +107,14 @@
                   <input type="checkbox" class="form-check-input" id="before-check" name="before-check" checked>{{
                   translate('serverBackups', 'before', data['lang']) }}
                   <br>
-                  <input type="text" class="form-control" name="backup_before" id="backup_before"
+                  <input type="text" class="form-control" name="before" id="backup_before"
                     value="{{ data['backup_config']['before'] }}" placeholder="We enter the / for you"
                     style="display: inline-block;">
                   {% else %}
                   <input type="checkbox" class="form-check-input" id="before-check" name="before-check">{{
                   translate('serverBackups', 'before', data['lang']) }}
                   <br>
-                  <input type="text" class="form-control" name="backup_before" id="backup_before" value=""
+                  <input type="text" class="form-control" name="before" id="backup_before" value=""
                     placeholder="We enter the / for you." style="display: none;">
                   {% end %}
                 </div>
@@ -124,14 +124,14 @@
                   <input type="checkbox" class="form-check-input" id="after-check" name="after-check" checked>{{
                   translate('serverBackups', 'after', data['lang']) }}
                   <br>
-                  <input type="text" class="form-control" name="backup_after" id="backup_after"
+                  <input type="text" class="form-control" name="after" id="backup_after"
                     value="{{ data['backup_config']['after'] }}" placeholder="We enter the / for you"
                     style="display: inline-block;">
                   {% else %}
                   <input type="checkbox" class="form-check-input" id="after-check" name="after-check">{{
                   translate('serverBackups', 'after', data['lang']) }}
                   <br>
-                  <input type="text" class="form-control" name="backup_after" id="backup_after" value=""
+                  <input type="text" class="form-control" name="after" id="backup_after" value=""
                     placeholder="We enter the / for you." style="display: none;">
                   {% end %}
                 </div>
@@ -206,7 +206,8 @@
                         </a>
                         <br>
                         <br>
-                        <button data-file="{{ backup['path'] }}" data-backup_path="{{ data['backup_location'] }}"
+                        <button data-file="{{ backup['path'] }}"
+                          data-backup_location="{{ data['backup_config']['backup_location'] }}"
                           class="btn btn-danger del_button">
                           <i class="fas fa-trash" aria-hidden="true"></i>
                           {{ translate('serverBackups', 'delete', data['lang']) }}
@@ -300,6 +301,7 @@
 <script>
 
   const server_id = new URLSearchParams(document.location.search).get('id')
+  const backup_id = new URLSearchParams(document.location.search).get('backup_id')
 
 
   //used to get cookies from browser - this is part of tornados xsrf protection - it's for extra security
@@ -310,7 +312,7 @@
 
   async function backup_started() {
     const token = getCookie("_xsrf")
-    let res = await fetch(`/api/v2/servers/${server_id}/action/backup_server`, {
+    let res = await fetch(`/api/v2/servers/${server_id}/action/backup_server/${backup_id}`, {
       method: 'POST',
       headers: {
         'X-XSRFToken': token
@@ -339,7 +341,7 @@
   async function del_backup(filename, id) {
     const token = getCookie("_xsrf")
     let contents = JSON.stringify({ "filename": filename })
-    let res = await fetch(`/api/v2/servers/${id}/backups/backup/`, {
+    let res = await fetch(`/api/v2/servers/${id}/backups/backup/${backup_id}/`, {
       method: 'DELETE',
       headers: {
         'token': token,
@@ -364,7 +366,7 @@
       message: "<i class='fa fa-spin fa-spinner'></i> {{ translate('serverBackups', 'restoring', data['lang']) }}",
       closeButton: false
     });
-    let res = await fetch(`/api/v2/servers/${id}/backups/backup/`, {
+    let res = await fetch(`/api/v2/servers/${id}/backups/backup/${backup_id}/`, {
       method: 'POST',
       headers: {
         'token': token,
@@ -400,7 +402,14 @@
   });
 
   function replacer(key, value) {
-    if (key != "backup_before" && key != "backup_after") {
+    if (key === "exclusions") {
+      if (value == 0) {
+        return []
+      } else {
+        return value
+      }
+    }
+    if (key != "before" && key != "after") {
       if (typeof value == "boolean" || key === "executable_update_url") {
         return value
       } else {
@@ -426,22 +435,20 @@
       //We need to make sure these are sent regardless of whether or not they're checked
       formDataObject.compress = $("#compress").prop('checked');
       formDataObject.shutdown = $("#shutdown").prop('checked');
-      let excluded = [];
-      $('input.excluded:checkbox:checked').each(function () {
-        excluded.push($(this).val());
-      });
       if ($("#root_files_button").hasClass("clicked")) {
+        $('input.excluded:checkbox:checked').each(function () {
+          excluded.push($(this).val());
+        });
         formDataObject.exclusions = excluded;
       }
       delete formDataObject.root_path
-      console.log(excluded);
       console.log(formDataObject);
       // Format the plain form data as JSON
       let formDataJsonString = JSON.stringify(formDataObject, replacer);
 
       console.log(formDataJsonString);
 
-      let res = await fetch(`/api/v2/servers/${server_id}/backups/`, {
+      let res = await fetch(`/api/v2/servers/${server_id}/backups/backup/${backup_id}`, {
         method: 'PATCH',
         headers: {
           'X-XSRFToken': token
@@ -461,7 +468,7 @@
     });
 
     try {
-      if ($('#backup_path').val() == '') {
+      if ($('#backup_location').val() == '') {
         console.log('true')
         try {
           document.getElementById('backup_now_button').disabled = true;
@@ -502,7 +509,7 @@
 
     $(".del_button").click(function () {
       var file_to_del = $(this).data("file");
-      var backup_path = $(this).data('backup_path');
+      var backup_location = $(this).data('backup_location');
 
       console.log("file to delete is" + file_to_del);
 
@@ -520,7 +527,7 @@
         callback: function (result) {
           console.log(result);
           if (result == true) {
-            var full_path = backup_path + '/' + file_to_del;
+            var full_path = backup_location + '/' + file_to_del;
             del_backup(file_to_del, server_id);
           }
         }

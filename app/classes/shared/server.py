@@ -1197,6 +1197,7 @@ class ServerInstance:
                 server_dir,
                 excluded_dirs,
                 self.server_id,
+                backup_id,
                 conf["backup_name"],
                 conf["compress"],
             )
@@ -1205,7 +1206,7 @@ class ServerInstance:
                 len(self.list_backups(backup_location)) > conf["max_backups"]
                 and conf["max_backups"] > 0
             ):
-                backup_list = self.list_backups()
+                backup_list = self.list_backups(conf["backup_location"])
                 oldfile = backup_list[0]
                 oldfile_path = f"{backup_location}/{oldfile['path']}"
                 logger.info(f"Removing old backup '{oldfile['path']}'")
@@ -1213,7 +1214,12 @@ class ServerInstance:
 
             self.is_backingup = False
             logger.info(f"Backup of server: {self.name} completed")
-            results = {"percent": 100, "total_files": 0, "current_file": 0}
+            results = {
+                "percent": 100,
+                "total_files": 0,
+                "current_file": 0,
+                "backup_id": backup_id,
+            }
             if len(WebSocketManager().clients) > 0:
                 WebSocketManager().broadcast_page_params(
                     "/panel/server_detail",
@@ -1251,7 +1257,12 @@ class ServerInstance:
             logger.exception(
                 f"Failed to create backup of server {self.name} (ID {self.server_id})"
             )
-            results = {"percent": 100, "total_files": 0, "current_file": 0}
+            results = {
+                "percent": 100,
+                "total_files": 0,
+                "current_file": 0,
+                "backup_id": backup_id,
+            }
             if len(WebSocketManager().clients) > 0:
                 WebSocketManager().broadcast_page_params(
                     "/panel/server_detail",
@@ -1266,17 +1277,6 @@ class ServerInstance:
                 )
                 self.run_threaded_server(HelperUsers.get_user_id_by_name("system"))
             self.last_backup_failed = True
-
-    def backup_status(self, source_path, dest_path):
-        results = Helpers.calc_percent(source_path, dest_path)
-        self.backup_stats = results
-        if len(WebSocketManager().clients) > 0:
-            WebSocketManager().broadcast_page_params(
-                "/panel/server_detail",
-                {"id": str(self.server_id)},
-                "backup_status",
-                results,
-            )
 
     def last_backup_status(self):
         return self.last_backup_failed
