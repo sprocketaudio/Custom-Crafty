@@ -70,9 +70,9 @@
                         <tr class="rounded">
                           <th scope="col" style="width: 15%; min-width: 10px;">{{ translate('serverBackups', 'name',
                             data['lang']) }} </th>
-                          <th scope="col" style="width: 5%; min-width: 10px;">{{ translate('serverBackups', 'status',
+                          <th scope="col" style="width: 10%; min-width: 10px;">{{ translate('serverBackups', 'status',
                             data['lang']) }} </th>
-                          <th scope="col" style="width: 55%; min-width: 50px;">{{ translate('serverBackups',
+                          <th scope="col" style="width: 50%; min-width: 50px;">{{ translate('serverBackups',
                             'storageLocation', data['lang']) }}</th>
                           <th scope="col" style="width: 10%; min-width: 50px;">{{ translate('serverBackups',
                             'maxBackups', data['lang']) }}</th>
@@ -101,7 +101,7 @@
                             </div>
                           </td>
                           <td id="{{backup.backup_location}}" class="type">
-                            <p>{{backup.backup_location}}</p>
+                            <p style="overflow: scroll;" class="no-scroll">{{backup.backup_location}}</p>
                           </td>
                           <td id="{{backup.max_backups}}" class="trigger" style="overflow: scroll; max-width: 30px;">
                             <p>{{backup.max_backups}}</p>
@@ -145,6 +145,12 @@
                           <td id="{{backup.backup_name}}" class="id">
                             <p>{{backup.backup_name}}</p>
                             <br>
+                            <div id="{{backup.backup_id}}_status">
+                              <button class="btn btn-outline-success backup-status" data-status="{{ backup.status }}"
+                                data-Standby="{{ translate('serverBackups', 'standby', data['lang'])}}"
+                                data-Failed="{{ translate('serverBackups', 'failed', data['lang'])}}"></button>
+                            </div>
+                            <br>
                             {% if backup.default %}
                             <span class="badge-pill badge-outline-warning">{{ translate('serverBackups', 'default',
                               data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain"
@@ -165,8 +171,8 @@
                             {% end %}
                             <button data-backup={{ backup.backup_id }} data-toggle="tooltip"
                               title="{{ translate('serverBackups', 'run', data['lang']) }}"
-                              class="btn btn-outline-warning test-socket">
-                              <i class="fa-solid fa-vial"></i>
+                              class="btn btn-outline-warning test-socket backup_now_button">
+                              <i class="fa-solid fa-forward"></i>
                             </button>
                           </td>
                         </tr>
@@ -351,8 +357,8 @@
       "searching": true,
       "ordering": true,
       "info": true,
-      "autoWidth": false,
-      "responsive": true,
+      "autoWidth": true,
+      "responsive": false,
     });
 
     $(".del_button").click(function () {
