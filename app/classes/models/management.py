@@ -1,4 +1,3 @@
-import uuid
 import logging
 import datetime
 from peewee import (
@@ -384,8 +383,7 @@ class HelpersManagement:
 
         if backup_model:
             return model_to_dict(backup_model)
-        else:
-            raise IndexError
+        raise IndexError
 
     @staticmethod
     def remove_backup_config(backup_id):
