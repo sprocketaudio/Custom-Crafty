@@ -304,10 +304,8 @@
 
       try {
 
-        console.log("DATA " + data)
-
         // Update the element's text with the status value
-        $(this).text(data.status);
+        $(this).text($(this).data(data["status"].toLowerCase()));
 
         // Optionally, add classes based on status to style the element
         $(this).attr('data-message', data["message"]);
@@ -322,7 +320,7 @@
           $(this).addClass('badge-pill badge-outline-secondary btn');
         }
       } catch (e) {
-        console.error('Invalid JSON string:', jsonString);
+        console.error('Invalid JSON string:', e);
       }
     });
 
