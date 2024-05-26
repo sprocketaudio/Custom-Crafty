@@ -394,30 +394,6 @@ class HelpersManagement:
             dir_list = []
         return dir_list
 
-    def add_excluded_backup_dir(self, server_id: str, dir_to_add: str):
-        dir_list = self.get_excluded_backup_dirs(server_id)
-        if dir_to_add not in dir_list:
-            dir_list.append(dir_to_add)
-            excluded_dirs = ",".join(dir_list)
-            self.update_backup_config(server_id=server_id, excluded_dirs=excluded_dirs)
-        else:
-            logger.debug(
-                f"Not adding {dir_to_add} to excluded directories - "
-                f"already in the excluded directory list for server ID {server_id}"
-            )
-
-    def del_excluded_backup_dir(self, server_id: str, dir_to_del: str):
-        dir_list = self.get_excluded_backup_dirs(server_id)
-        if dir_to_del in dir_list:
-            dir_list.remove(dir_to_del)
-            excluded_dirs = ",".join(dir_list)
-            self.update_backup_config(server_id=server_id, excluded_dirs=excluded_dirs)
-        else:
-            logger.debug(
-                f"Not removing {dir_to_del} from excluded directories - "
-                f"not in the excluded directory list for server ID {server_id}"
-            )
-
 
 # **********************************************************************************
 #                                   Webhooks Class
