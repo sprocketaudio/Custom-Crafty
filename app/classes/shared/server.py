@@ -1651,7 +1651,7 @@ class ServerInstance:
                 except:
                     Console.critical("Can't broadcast server status to websocket")
 
-    def check_backup_by_id(_self, backup_id: str) -> bool:
+    def check_backup_by_id(self, backup_id: str) -> bool:
         # Check to see if we're already backing up
         for thread in threading.enumerate():
             if thread.getName() == f"backup_{backup_id}":
