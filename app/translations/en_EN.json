@@ -338,7 +338,9 @@
         "backups": "Server Backups",
         "default": "Default Backup",
         "defaultExplain": "The backup that Crafty will use before updates. This cannot be changed or deleted.",
-        "status": "Status"
+        "status": "Status",
+        "standby": "Standby",
+        "failed": "Failed"
     },
     "serverConfig": {
         "bePatientDelete": "Please be patient while we remove your server from the Crafty panel. This screen will close in a few moments.",

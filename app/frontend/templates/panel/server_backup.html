@@ -95,8 +95,9 @@
                           </td>
                           <td>
                             <div id="{{backup.backup_id}}_status">
-                              <span class="badge-pill badge-outline-success backup-status"
-                                data-status="{{ backup.status }}"></span>
+                              <button class="btn btn-outline-success backup-status" data-status="{{ backup.status }}"
+                                data-Standby="{{ translate('serverBackups', 'standby', data['lang'])}}"
+                                data-Failed="{{ translate('serverBackups', 'failed', data['lang'])}}"></button>
                             </div>
                           </td>
                           <td id="{{backup.backup_location}}" class="type">
@@ -292,6 +293,11 @@
       bootbox.alert($(this).data("explain"));
     });
 
+    $(".backup-status").on("click", function () {
+      if ($(this).data('message') != "") {
+        bootbox.alert($(this).data('message'));
+      }
+    });
     $('.backup-status').each(function () {
       // Get the JSON string from the element's text
       var data = $(this).data('status');
@@ -304,12 +310,16 @@
         $(this).text(data.status);
 
         // Optionally, add classes based on status to style the element
+        $(this).attr('data-message', data["message"]);
         if (data.status === 'Active') {
-          $(this).addClass('badge-pill badge-outline-success');
+          $(this).removeClass();
+          $(this).addClass('badge-pill badge-outline-success btn');
         } else if (data.status === 'Failed') {
-          $(this).addClass('badge-pill badge-outline-danger');
+          $(this).removeClass();
+          $(this).addClass('badge-pill badge-outline-danger btn');
         } else if (data.status === 'Standby') {
-          $(this).addClass('badge-pill badge-outline-secondary');
+          $(this).removeClass();
+          $(this).addClass('badge-pill badge-outline-secondary btn');
         }
       } catch (e) {
         console.error('Invalid JSON string:', jsonString);

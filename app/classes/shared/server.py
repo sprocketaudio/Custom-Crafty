@@ -1108,10 +1108,14 @@ class ServerInstance:
         self.run_threaded_server(user_id)
 
     def server_backup_threader(self, backup_id, update=False):
+        # Check to see if we're already backing up
+        if self.check_backup_by_id(backup_id):
+            return False
+
         backup_thread = threading.Thread(
             target=self.backup_server,
             daemon=True,
-            name=f"backup_{self.name}",
+            name=f"backup_{backup_id}",
             args=[backup_id, update],
         )
         logger.info(
@@ -1123,19 +1127,11 @@ class ServerInstance:
                 "Backup Thread - Local server path not defined. "
                 "Setting local server path variable."
             )
-        # checks if the backup thread is currently alive for this server
-        if not self.is_backingup:
-            try:
-                backup_thread.start()
-                self.is_backingup = True
-            except Exception as ex:
-                logger.error(f"Failed to start backup: {ex}")
-                return False
-        else:
-            logger.error(
-                f"Backup is already being processed for server "
-                f"{self.settings['server_name']}. Canceling backup request"
-            )
+
+        try:
+            backup_thread.start()
+        except Exception as ex:
+            logger.error(f"Failed to start backup: {ex}")
             return False
         logger.info(f"Backup Thread started for server {self.settings['server_name']}.")
 
@@ -1157,7 +1153,6 @@ class ServerInstance:
         backup_location = conf["backup_location"]
         if not backup_location:
             Console.critical("No backup path found. Canceling")
-            self.is_backingup = False
             return None
         if conf["before"]:
             if self.check_running():
@@ -1215,7 +1210,6 @@ class ServerInstance:
                 logger.info(f"Removing old backup '{oldfile['path']}'")
                 os.remove(Helpers.get_os_understandable_path(oldfile_path))
 
-            self.is_backingup = False
             logger.info(f"Backup of server: {self.name} completed")
             results = {
                 "percent": 100,
@@ -1247,7 +1241,6 @@ class ServerInstance:
                 )
                 self.run_threaded_server(HelperUsers.get_user_id_by_name("system"))
             time.sleep(3)
-            self.last_backup_failed = False
             if conf["after"]:
                 if self.check_running():
                     logger.debug(
@@ -1256,7 +1249,7 @@ class ServerInstance:
                     self.send_command(conf["after"])
             # pause to let people read message.
             time.sleep(5)
-        except:
+        except Exception as e:
             logger.exception(
                 f"Failed to create backup of server {self.name} (ID {self.server_id})"
             )
@@ -1273,16 +1266,27 @@ class ServerInstance:
                     "backup_status",
                     results,
                 )
-            self.is_backingup = False
             if was_server_running:
                 logger.info(
                     "Backup complete. User had shutdown preference. Starting server."
                 )
                 self.run_threaded_server(HelperUsers.get_user_id_by_name("system"))
-            self.last_backup_failed = True
+            HelpersManagement.update_backup_config(
+                backup_id, {"status": json.dumps({"status": "Failed", "message": f"{e}"})}
+            )
+        self.set_backup_status()
 
     def last_backup_status(self):
         return self.last_backup_failed
+
+    def set_backup_status(self):
+        backups = HelpersManagement.get_backups_by_server(self.server_id, True)
+        alert = False
+        for backup in backups:
+            print(backup.status)
+            if json.loads(backup.status)["status"] == "Failed":
+                alert = True
+        self.last_backup_failed = alert
 
     def list_backups(self, backup_location):
         if not backup_location:
@@ -1426,12 +1430,17 @@ class ServerInstance:
         except FileNotFoundError:
             logger.error("Could not create backup of jarfile. File not found.")
 
+        backing_up = True
         # wait for backup
-        while self.is_backingup:
-            time.sleep(10)
+        while backing_up:
+            # Check to see if we're already backing up
+            backing_up = self.check_backup_by_id(backup_config["backup_id"])
 
         # check if backup was successful
-        if self.last_backup_failed:
+        backup_status = json.load(
+            HelpersManagement.get_backup_config(backup_config["backup_id"])["status"]
+        )["status"]
+        if backup_status == "Failed":
             for user in server_users:
                 WebSocketManager().broadcast_user(
                     user,
@@ -1637,6 +1646,14 @@ class ServerInstance:
                     )
                 except:
                     Console.critical("Can't broadcast server status to websocket")
+
+    def check_backup_by_id(_self, backup_id: str) -> bool:
+        # Check to see if we're already backing up
+        for thread in threading.enumerate():
+            if thread.getName() == f"backup_{backup_id}":
+                Console.debug(f"Backup with id {backup_id} already running!")
+                return True
+        return False
 
     def get_servers_stats(self):
         server_stats = {}
