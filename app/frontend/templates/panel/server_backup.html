@@ -236,7 +236,7 @@
 {% block js %}
 <script>
 
-  const server_id = new URLSearchParams(document.location.search).get('id')
+  const serverId = new URLSearchParams(document.location.search).get('id')
 
 
   //used to get cookies from browser - this is part of tornados xsrf protection - it's for extra security
@@ -248,7 +248,7 @@
   async function backup_started(backup_id) {
     const token = getCookie("_xsrf")
     console.log(backup_id)
-    let res = await fetch(`/api/v2/servers/${server_id}/action/backup_server/${backup_id}/`, {
+    let res = await fetch(`/api/v2/servers/${serverId}/action/backup_server/${backup_id}/`, {
       method: 'POST',
       headers: {
         'X-XSRFToken': token
@@ -269,7 +269,7 @@
   }
   async function del_backup(backup_id) {
     const token = getCookie("_xsrf")
-    let res = await fetch(`/api/v2/servers/${server_id}/backups/backup/${backup_id}`, {
+    let res = await fetch(`/api/v2/servers/${serverId}/backups/backup/${backup_id}`, {
       method: 'DELETE',
       headers: {
         'token': token,
@@ -402,7 +402,7 @@
         callback: function (result) {
           console.log(result);
           if (result == true) {
-            restore_backup(file_to_restore, server_id);
+            restore_backup(file_to_restore, serverId);
           }
         }
       });
@@ -465,7 +465,7 @@
   async function getTreeView(path) {
     console.log(path)
     const token = getCookie("_xsrf");
-    let res = await fetch(`/api/v2/servers/${server_id}/files`, {
+    let res = await fetch(`/api/v2/servers/${serverId}/files`, {
       method: 'POST',
       headers: {
         'X-XSRFToken': token
