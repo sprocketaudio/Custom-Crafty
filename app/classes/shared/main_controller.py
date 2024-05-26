@@ -561,7 +561,7 @@ class Controller:
             server_host=monitoring_host,
             server_type=monitoring_type,
         )
-        self.management.add_backup_config(
+        self.management.add_default_backup_config(
             new_server_id,
             backup_path,
         )

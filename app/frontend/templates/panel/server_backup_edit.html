@@ -63,6 +63,16 @@
               {% end %}
               <form id="backup-form" class="forms-sample">
                 <div class="form-group">
+                  <label for="backup_name">{{ translate('serverBackups', 'name', data['lang']) }} </label>
+                  {% if data["backup_config"].get("backup_id", None) %}
+                  <input type="text" class="form-control" name="backup_name" id="backup_name"
+                    value="{{ data['backup_config']['backup_name']  }}">
+                  {% else %}
+                  <input type="text" class="form-control" name="backup_name" id="backup_name"
+                    placeholder="{{ translate('serverBackups', 'myBackup', data['lang']) }}">
+                  {% end %}
+                  <br>
+                  <br>
                   {% if data['super_user'] %}
                   <label for="server_name">{{ translate('serverBackups', 'storageLocation', data['lang']) }} <small
                       class="text-muted ml-1"> - {{ translate('serverBackups', 'storageLocationDesc', data['lang'])
@@ -341,7 +351,7 @@
   async function del_backup(filename, id) {
     const token = getCookie("_xsrf")
     let contents = JSON.stringify({ "filename": filename })
-    let res = await fetch(`/api/v2/servers/${id}/backups/backup/${backup_id}/`, {
+    let res = await fetch(`/api/v2/servers/${server_id}/backups/backup/${backup_id}/files/`, {
       method: 'DELETE',
       headers: {
         'token': token,
@@ -366,7 +376,7 @@
       message: "<i class='fa fa-spin fa-spinner'></i> {{ translate('serverBackups', 'restoring', data['lang']) }}",
       closeButton: false
     });
-    let res = await fetch(`/api/v2/servers/${id}/backups/backup/${backup_id}/`, {
+    let res = await fetch(`/api/v2/servers/${server_id}/backups/backup/${backup_id}/`, {
       method: 'POST',
       headers: {
         'token': token,
@@ -402,7 +412,7 @@
   });
 
   function replacer(key, value) {
-    if (key === "exclusions") {
+    if (key === "excluded_dirs") {
       if (value == 0) {
         return []
       } else {
@@ -436,10 +446,11 @@
       formDataObject.compress = $("#compress").prop('checked');
       formDataObject.shutdown = $("#shutdown").prop('checked');
       if ($("#root_files_button").hasClass("clicked")) {
+        excluded = []
         $('input.excluded:checkbox:checked').each(function () {
           excluded.push($(this).val());
         });
-        formDataObject.exclusions = excluded;
+        formDataObject.excluded_dirs = excluded;
       }
       delete formDataObject.root_path
       console.log(formDataObject);
@@ -447,9 +458,14 @@
       let formDataJsonString = JSON.stringify(formDataObject, replacer);
 
       console.log(formDataJsonString);
-
-      let res = await fetch(`/api/v2/servers/${server_id}/backups/backup/${backup_id}`, {
-        method: 'PATCH',
+      let url = `/api/v2/servers/${server_id}/backups/backup/${backup_id}/`
+      let method = "PATCH"
+      if (!backup_id) {
+        url = `/api/v2/servers/${server_id}/backups/`
+        method = "POST";
+      }
+      let res = await fetch(url, {
+        method: method,
         headers: {
           'X-XSRFToken': token
         },
@@ -457,7 +473,7 @@
       });
       let responseData = await res.json();
       if (responseData.status === "ok") {
-        window.location.reload();
+        window.location.href = `/panel/server_detail?id=${server_id}&subpage=backup`;
       } else {
 
         bootbox.alert({
@@ -631,7 +647,13 @@
   async function getTreeView(path) {
     console.log(path)
     const token = getCookie("_xsrf");
-    let res = await fetch(`/api/v2/servers/${server_id}/files`, {
+    let url = `/api/v2/servers/${server_id}/files/${backup_id}`
+    if (!backup_id) {
+      url = `/api/v2/servers/${server_id}/files/`
+      console.log("NEW URL")
+    }
+    console.log(url);
+    let res = await fetch(url, {
       method: 'POST',
       headers: {
         'X-XSRFToken': token

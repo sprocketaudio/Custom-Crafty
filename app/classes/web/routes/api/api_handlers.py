@@ -38,6 +38,7 @@ from app.classes.web.routes.api.servers.server.backups.index import (
 )
 from app.classes.web.routes.api.servers.server.backups.backup.index import (
     ApiServersServerBackupsBackupIndexHandler,
+    ApiServersServerBackupsBackupFilesIndexHandler,
 )
 from app.classes.web.routes.api.servers.server.files import (
     ApiServersServerFilesIndexHandler,
@@ -223,7 +224,12 @@ def api_handlers(handler_args):
             handler_args,
         ),
         (
-            r"/api/v2/servers/([a-z0-9-]+)/files/?",
+            r"/api/v2/servers/([a-z0-9-]+)/backups/backup/([a-z0-9-]+)/files/?",
+            ApiServersServerBackupsBackupFilesIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/servers/([a-z0-9-]+)/files(?:/([a-zA-Z0-9-]+))?/?",
             ApiServersServerFilesIndexHandler,
             handler_args,
         ),

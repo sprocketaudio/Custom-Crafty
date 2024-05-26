@@ -10,13 +10,14 @@ logger = logging.getLogger(__name__)
 backup_patch_schema = {
     "type": "object",
     "properties": {
+        "backup_name": {"type": "string", "minLength": 3},
         "backup_location": {"type": "string", "minLength": 1},
         "max_backups": {"type": "integer"},
         "compress": {"type": "boolean"},
         "shutdown": {"type": "boolean"},
         "before": {"type": "string"},
         "after": {"type": "string"},
-        "exclusions": {"type": "array"},
+        "excluded_dirs": {"type": "array"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -25,12 +26,13 @@ backup_patch_schema = {
 basic_backup_patch_schema = {
     "type": "object",
     "properties": {
+        "backup_name": {"type": "string", "minLength": 3},
         "max_backups": {"type": "integer"},
         "compress": {"type": "boolean"},
         "shutdown": {"type": "boolean"},
         "before": {"type": "string"},
         "after": {"type": "string"},
-        "exclusions": {"type": "array"},
+        "excluded_dirs": {"type": "array"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -95,6 +97,8 @@ class ApiServersServerBackupsIndexHandler(BaseApiHandler):
         if EnumPermissionsServer.BACKUP not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
-
-        self.controller.management.update_backup_config(server_id, data)
+        data["server_id"] = server_id
+        if not data.get("excluded_dirs", None):
+            data["excluded_dirs"] = []
+        self.controller.management.add_backup_config(data)
         return self.finish_json(200, {"status": "ok"})

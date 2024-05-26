@@ -22,13 +22,14 @@ BACKUP_SCHEMA = {
 BACKUP_PATCH_SCHEMA = {
     "type": "object",
     "properties": {
+        "backup_name": {"type": "string", "minLength": 3},
         "backup_location": {"type": "string", "minLength": 1},
         "max_backups": {"type": "integer"},
         "compress": {"type": "boolean"},
         "shutdown": {"type": "boolean"},
         "before": {"type": "string"},
         "after": {"type": "string"},
-        "exclusions": {"type": "array"},
+        "excluded_dirs": {"type": "array"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -37,12 +38,13 @@ BACKUP_PATCH_SCHEMA = {
 BASIC_BACKUP_PATCH_SCHEMA = {
     "type": "object",
     "properties": {
+        "backup_name": {"type": "string", "minLength": 3},
         "max_backups": {"type": "integer"},
         "compress": {"type": "boolean"},
         "shutdown": {"type": "boolean"},
         "before": {"type": "string"},
         "after": {"type": "string"},
-        "exclusions": {"type": "array"},
+        "excluded_dirs": {"type": "array"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -115,38 +117,14 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 },
             )
 
-        try:
-            data = json.loads(self.request.body)
-        except json.decoder.JSONDecodeError as e:
-            return self.finish_json(
-                400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
-            )
-        try:
-            validate(data, BACKUP_SCHEMA)
-        except ValidationError as e:
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
-                },
-            )
-
-        try:
-            FileHelpers.del_file(
-                os.path.join(backup_conf["backup_location"], data["filename"])
-            )
-        except Exception as e:
-            return self.finish_json(
-                400, {"status": "error", "error": f"DELETE FAILED with error {e}"}
-            )
         self.controller.management.add_to_audit_log(
             auth_data[4]["user_id"],
-            f"Edited server {server_id}: removed backup {data['filename']}",
+            f"Edited server {server_id}: removed backup config"
+            f" {backup_conf['backup_name']}",
             server_id,
             self.get_remote_ip(),
         )
+        self.controller.management.delete_backup_config(backup_id)
 
         return self.finish_json(200, {"status": "ok"})
 
@@ -275,10 +253,6 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 self.controller.management.add_backup_config(
                     new_server_id,
                     new_server_obj.backup_path,
-                    backup_config["max_backups"],
-                    excluded_dirs,
-                    backup_config["compress"],
-                    backup_config["shutdown"],
                 )
                 # remove old server's tasks
                 try:
@@ -362,6 +336,74 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                     "error_data": "Authorization Error",
                 },
             )
-
         self.controller.management.update_backup_config(backup_id, data)
+        return self.finish_json(200, {"status": "ok"})
+
+
+class ApiServersServerBackupsBackupFilesIndexHandler(BaseApiHandler):
+    def delete(self, server_id: str, backup_id: str):
+        auth_data = self.authenticate_user()
+        backup_conf = self.controller.management.get_backup_config(backup_id)
+        if backup_conf["server_id"]["server_id"] != server_id:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "ID_MISMATCH",
+                    "error_data": "Server ID backup server ID different",
+                },
+            )
+        if not auth_data:
+            return
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
+                auth_data[4]["user_id"], server_id
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.BACKUP not in server_permissions:
+            # if the user doesn't have Schedule permission, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": "Authorization Error",
+                },
+            )
+
+        try:
+            data = json.loads(self.request.body)
+        except json.decoder.JSONDecodeError as e:
+            return self.finish_json(
+                400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
+            )
+        try:
+            validate(data, BACKUP_SCHEMA)
+        except ValidationError as e:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "INVALID_JSON_SCHEMA",
+                    "error_data": str(e),
+                },
+            )
+
+        try:
+            FileHelpers.del_file(
+                os.path.join(backup_conf["backup_location"], data["filename"])
+            )
+        except Exception as e:
+            return self.finish_json(
+                400, {"status": "error", "error": f"DELETE FAILED with error {e}"}
+            )
+        self.controller.management.add_to_audit_log(
+            auth_data[4]["user_id"],
+            f"Edited server {server_id}: removed backup {data['filename']}",
+            server_id,
+            self.get_remote_ip(),
+        )
+
         return self.finish_json(200, {"status": "ok"})

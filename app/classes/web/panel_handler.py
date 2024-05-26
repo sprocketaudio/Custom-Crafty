@@ -1320,6 +1320,70 @@ class PanelHandler(BaseHandler):
                     return
             template = "panel/server_backup_edit.html"
 
+        elif page == "add_backup":
+            server_id = self.get_argument("id", None)
+            backup_id = self.get_argument("backup_id", None)
+            page_data["active_link"] = "backups"
+            page_data["permissions"] = {
+                "Commands": EnumPermissionsServer.COMMANDS,
+                "Terminal": EnumPermissionsServer.TERMINAL,
+                "Logs": EnumPermissionsServer.LOGS,
+                "Schedule": EnumPermissionsServer.SCHEDULE,
+                "Backup": EnumPermissionsServer.BACKUP,
+                "Files": EnumPermissionsServer.FILES,
+                "Config": EnumPermissionsServer.CONFIG,
+                "Players": EnumPermissionsServer.PLAYERS,
+            }
+            if not self.failed_server:
+                server_obj = self.controller.servers.get_server_instance_by_id(
+                    server_id
+                )
+                page_data["backup_failed"] = server_obj.last_backup_status()
+            page_data["user_permissions"] = (
+                self.controller.server_perms.get_user_id_permissions_list(
+                    exec_user["user_id"], server_id
+                )
+            )
+            server_info = self.controller.servers.get_server_data_by_id(server_id)
+            page_data["backup_config"] = {
+                "excluded_dirs": [],
+                "max_backups": 0,
+                "server_id": server_id,
+                "backup_location": os.path.join(self.helper.backup_path, server_id),
+                "compress": False,
+                "shutdown": False,
+                "before": "",
+                "after": "",
+            }
+            page_data["backing_up"] = False
+            page_data["backup_stats"] = (
+                self.controller.servers.get_server_instance_by_id(
+                    server_id
+                ).send_backup_status()
+            )
+            self.controller.servers.refresh_server_settings(server_id)
+
+            page_data["backup_list"] = []
+            page_data["backup_path"] = Helpers.wtol_path(
+                page_data["backup_config"]["backup_location"]
+            )
+            page_data["server_data"] = self.controller.servers.get_server_data_by_id(
+                server_id
+            )
+            page_data["server_stats"] = self.controller.servers.get_server_stats_by_id(
+                server_id
+            )
+            page_data["server_stats"]["server_type"] = (
+                self.controller.servers.get_server_type_by_id(server_id)
+            )
+            page_data["exclusions"] = []
+
+            if not EnumPermissionsServer.BACKUP in page_data["user_permissions"]:
+                if not superuser:
+                    self.redirect("/panel/error?error=Unauthorized access To Schedules")
+                    return
+            template = "panel/server_backup_edit.html"
+
         elif page == "edit_user":
             user_id = self.get_argument("id", None)
             role_servers = self.controller.servers.get_authorized_servers(user_id)

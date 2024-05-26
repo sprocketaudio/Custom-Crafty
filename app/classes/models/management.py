@@ -371,30 +371,10 @@ class HelpersManagement:
         return data
 
     @staticmethod
-    def remove_backup_config(server_id):
-        Backups.delete().where(Backups.server_id == server_id).execute()
+    def remove_backup_config(backup_id):
+        Backups.delete().where(Backups.backup_id == backup_id).execute()
 
-    def add_backup_config(
-        self,
-        server_id: str,
-        backup_path: str = "",
-        max_backups: int = 0,
-        excluded_dirs: list = None,
-        compress: bool = False,
-        shutdown: bool = False,
-        before: str = "",
-        after: str = "",
-    ):
-        conf = {
-            "excluded_dirs": excluded_dirs,
-            "max_backups": max_backups,
-            "server_id": server_id,
-            "backup_location": backup_path,
-            "compress": compress,
-            "shutdown": shutdown,
-            "before": before,
-            "after": after,
-        }
+    def add_backup_config(self, conf):
         Backups.create(**conf)
         logger.debug("Creating new backup record.")
 

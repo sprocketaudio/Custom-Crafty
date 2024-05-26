@@ -5,6 +5,7 @@ from prometheus_client import CollectorRegistry, Gauge
 
 from app.classes.models.management import HelpersManagement, HelpersWebhooks
 from app.classes.models.servers import HelperServers
+from app.classes.shared.helpers import Helpers
 
 logger = logging.getLogger(__name__)
 
@@ -190,29 +191,33 @@ class ManagementController:
         return HelpersManagement.get_backups_by_server(server_id, model)
 
     @staticmethod
+    def delete_backup_config(backup_id):
+        HelpersManagement.remove_backup_config(backup_id)
+
+    @staticmethod
     def update_backup_config(backup_id, updates):
+        if "backup_location" in updates:
+            updates["backup_location"] = Helpers.wtol_path(updates["backup_location"])
         return HelpersManagement.update_backup_config(backup_id, updates)
 
-    def add_backup_config(
-        self,
-        server_id: int,
-        backup_path: str = "",
-        max_backups: int = 0,
-        excluded_dirs: list = None,
-        compress: bool = False,
-        shutdown: bool = False,
-        before: str = "",
-        after: str = "",
-    ):
+    def add_backup_config(self, data):
+        if "backup_location" in data:
+            data["backup_location"] = Helpers.wtol_path(data["backup_location"])
+        return self.management_helper.add_backup_config(data)
+
+    def add_default_backup_config(self, server_id, backup_path):
         return self.management_helper.add_backup_config(
-            server_id,
-            backup_path,
-            max_backups,
-            excluded_dirs,
-            compress,
-            shutdown,
-            before,
-            after,
+            {
+                "backup_name": "afdgahah",
+                "backup_location": Helpers.wtol_path(backup_path),
+                "max_backups": 0,
+                "before": "",
+                "after": "",
+                "compress": False,
+                "shutdown": False,
+                "server_id": server_id,
+                "excluded_dirs": [],
+            }
         )
 
     @staticmethod

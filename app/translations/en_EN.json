@@ -318,6 +318,7 @@
         "exclusionsTitle": "Backup Exclusions",
         "maxBackups": "Max Backups",
         "maxBackupsDesc": "Crafty will not store more than N backups, deleting the oldest (enter 0 to keep all)",
+        "myBackup": "My New Backup",
         "options": "Options",
         "path": "Path",
         "restore": "Restore",

@@ -247,15 +247,14 @@
     }
     return;
   }
-  async function del_backup(filename, id) {
+  async function del_backup(backup_id) {
     const token = getCookie("_xsrf")
-    let contents = JSON.stringify({ "filename": filename })
-    let res = await fetch(`/api/v2/servers/${id}/backups/backup/`, {
+    let res = await fetch(`/api/v2/servers/${server_id}/backups/backup/${backup_id}`, {
       method: 'DELETE',
       headers: {
         'token': token,
       },
-      body: contents
+      body: {}
     });
     let responseData = await res.json();
     if (responseData.status === "ok") {
@@ -268,90 +267,8 @@
     }
   }
 
-  async function restore_backup(filename, id) {
-    const token = getCookie("_xsrf")
-    let contents = JSON.stringify({ "filename": filename })
-    var dialog = bootbox.dialog({
-      message: "<i class='fa fa-spin fa-spinner'></i> {{ translate('serverBackups', 'restoring', data['lang']) }}",
-      closeButton: false
-    });
-    let res = await fetch(`/api/v2/servers/${id}/backups/backup/`, {
-      method: 'POST',
-      headers: {
-        'token': token,
-      },
-      body: contents
-    });
-    let responseData = await res.json();
-    if (responseData.status === "ok") {
-      window.location.href = "/panel/dashboard";
-    } else {
-      bootbox.alert({
-        "title": responseData.status,
-        "message": responseData.error
-      })
-    }
-  }
-
-  $("#before-check").on("click", function () {
-    if ($("#before-check:checked").val()) {
-      $("#backup_before").css("display", "inline-block");
-    } else {
-      $("#backup_before").css("display", "none");
-      $("#backup_before").val("");
-    }
-  });
-  $("#after-check").on("click", function () {
-    if ($("#after-check:checked").val()) {
-      $("#backup_after").css("display", "inline-block");
-    } else {
-      $("#backup_after").css("display", "none");
-      $("#backup_after").val("");
-    }
-  });
-
-  function replacer(key, value) {
-    if (key != "backup_before" && key != "backup_after") {
-      if (typeof value == "boolean" || key === "executable_update_url") {
-        return value
-      } else {
-        return (isNaN(value) ? value : +value);
-      }
-    } else {
-      return value;
-    }
-  }
-
   $(document).ready(function () {
-
-    try {
-      if ($('#backup_path').val() == '') {
-        console.log('true')
-        try {
-          document.getElementById('backup_now_button').disabled = true;
-        } catch {
-
-        }
-      } else {
-        document.getElementById('backup_now_button').disabled = false;
-      }
-    } catch {
-      try {
-        document.getElementById('backup_now_button').disabled = false;
-      } catch {
-
-      }
-    }
     console.log("ready!");
-    $("#backup_config_box").hide();
-    $("#backup_save_note").hide();
-
-    $("#show_config").click(function () {
-      $("#backup_config_box").toggle();
-      $('#backup_button').hide();
-      $('#backup_save_note').show();
-      $('#backup_data').hide();
-    });
 
     $('#backup_table').DataTable({
       "order": [[1, "desc"]],
@@ -365,6 +282,7 @@
     });
 
     $(".del_button").click(function () {
+      let backup = $(this).data('backup');
       var file_to_del = $(this).data("file");
       var backup_path = $(this).data('backup_path');
 
@@ -384,8 +302,8 @@
         callback: function (result) {
           console.log(result);
           if (result == true) {
-            var full_path = backup_path + '/' + file_to_del;
-            del_backup(file_to_del, server_id);
+
+            del_backup(backup);
           }
         }
       });
