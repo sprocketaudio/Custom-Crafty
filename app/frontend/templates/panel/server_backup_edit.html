@@ -43,13 +43,10 @@
             <div class="col-md-6 col-sm-12">
               <br>
               <br>
-              {% if data['backing_up'] %}
-              <div class="progress" style="height: 15px;">
-                <div class="progress-bar progress-bar-striped progress-bar-animated" id="backup_progress_bar"
-                  role="progressbar" style="width:{{data['backup_stats']['percent']}}%;"
-                  aria-valuenow="{{data['backup_stats']['percent']}}" aria-valuemin="0" aria-valuemax="100">{{
-                  data['backup_stats']['percent'] }}%</div>
+              <div id="{{data['backup_config']['backup_id']}}_status" class="progress"
+                style="height: 15px; display: none;">
               </div>
+              {% if data['backing_up'] %}
               <p>Backing up <i class="fas fa-spin fa-spinner"></i> <span
                   id="total_files">{{data['server_stats']['world_size']}}</span></p>
               {% end %}
@@ -339,14 +336,7 @@
     let responseData = await res.json();
     if (responseData.status === "ok") {
       console.log(responseData);
-      $("#backup_button").html(`<div class="progress" style="height: 15px;">
-                  <div class="progress-bar progress-bar-striped progress-bar-animated" id="backup_progress_bar"
-                    role="progressbar" style="width:{{data['backup_stats']['percent']}}%;"
-                    aria-valuenow="{{data['backup_stats']['percent']}}" aria-valuemin="0" aria-valuemax="100">{{
-                    data['backup_stats']['percent'] }}%</div>
-                </div>
-                <p>Backing up <i class="fas fa-spin fa-spinner"></i> <span
-                    id="total_files">{{data['server_stats']['world_size']}}</span></p>`);
+      $("#backup_button").prop('disabled', true)
     } else {
 
       bootbox.alert({
@@ -445,6 +435,22 @@
     });
     $(".cancel-button").on("click", function () {
       location.href = `/panel/server_detail?id=${server_id}&subpage=backup`
+    });
+    webSocket.on('backup_status', function (backup) {
+      text = ``;
+      $(`#${backup.backup_id}_status`).show();
+      if (backup.percent >= 100) {
+        $(`#${backup.backup_id}_status`).hide()
+        setTimeout(function () {
+          window.location.reload(1);
+        }, 5000);
+      } else {
+        text = `<div class="progress-bar progress-bar-striped progress-bar-animated"
+          role="progressbar" style="width:${backup.percent}%;"
+          aria-valuenow="${backup.percent}" aria-valuemin="0" aria-valuemax="100">${backup.percent}%</div>`
+
+        $(`#${backup.backup_id}_status`).html(text);
+      }
     });
     $("#backup-form").on("submit", async function (e) {
       e.preventDefault();
@@ -634,21 +640,6 @@
       bootbox.alert("You must input a path before selecting this button");
     }
   });
-  if (webSocket) {
-    webSocket.on('backup_status', function (backup) {
-      if (backup.percent >= 100) {
-        document.getElementById('backup_progress_bar').innerHTML = '100%';
-        document.getElementById('backup_progress_bar').style.width = '100%';
-        setTimeout(function () {
-          window.location.reload(1);
-        }, 5000);
-      } else {
-        document.getElementById('backup_progress_bar').innerHTML = backup.percent + '%';
-        document.getElementById('backup_progress_bar').style.width = backup.percent + '%';
-        document.getElementById('total_files').innerHTML = backup.total_files;
-      }
-    });
-  }
 
   function getDirView(event) {
     let path = event.target.parentElement.getAttribute("data-path");

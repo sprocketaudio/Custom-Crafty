@@ -1284,12 +1284,6 @@ class ServerInstance:
     def last_backup_status(self):
         return self.last_backup_failed
 
-    def send_backup_status(self):
-        try:
-            return self.backup_stats
-        except:
-            return {"percent": 0, "total_files": 0}
-
     def list_backups(self, backup_location):
         if not backup_location:
             logger.info(

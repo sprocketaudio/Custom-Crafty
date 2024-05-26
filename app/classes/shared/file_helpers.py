@@ -254,6 +254,12 @@ class FileHelpers:
             "backup_status",
             results,
         )
+        WebSocketManager().broadcast_page_params(
+            "/panel/edit_backup",
+            {"id": str(server_id)},
+            "backup_status",
+            results,
+        )
         # Set the compression mode based on the `compressed` parameter
         compression_mode = ZIP_DEFLATED if compressed else ZIP_STORED
         with ZipFile(path_to_destination, "w", compression_mode) as zip_file:
@@ -312,6 +318,12 @@ class FileHelpers:
                     # send status results to page.
                     WebSocketManager().broadcast_page_params(
                         "/panel/server_detail",
+                        {"id": str(server_id)},
+                        "backup_status",
+                        results,
+                    )
+                    WebSocketManager().broadcast_page_params(
+                        "/panel/edit_backup",
                         {"id": str(server_id)},
                         "backup_status",
                         results,

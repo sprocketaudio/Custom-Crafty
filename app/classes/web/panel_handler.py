@@ -686,11 +686,6 @@ class PanelHandler(BaseHandler):
                         server_id
                     ).is_backingup
                 )
-                page_data["backup_stats"] = (
-                    self.controller.servers.get_server_instance_by_id(
-                        server_id
-                    ).send_backup_status()
-                )
                 # makes it so relative path is the only thing shown
 
                 self.controller.servers.refresh_server_settings(server_id)
@@ -1283,11 +1278,6 @@ class PanelHandler(BaseHandler):
             page_data["backing_up"] = self.controller.servers.get_server_instance_by_id(
                 server_id
             ).is_backingup
-            page_data["backup_stats"] = (
-                self.controller.servers.get_server_instance_by_id(
-                    server_id
-                ).send_backup_status()
-            )
             self.controller.servers.refresh_server_settings(server_id)
             try:
                 page_data["backup_list"] = server.list_backups(
@@ -1360,11 +1350,6 @@ class PanelHandler(BaseHandler):
                 "after": "",
             }
             page_data["backing_up"] = False
-            page_data["backup_stats"] = (
-                self.controller.servers.get_server_instance_by_id(
-                    server_id
-                ).send_backup_status()
-            )
             self.controller.servers.refresh_server_settings(server_id)
 
             page_data["backup_list"] = []
