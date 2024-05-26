@@ -104,11 +104,11 @@ class Schedules(BaseModel):
 #                                   Backups Class
 # **********************************************************************************
 class Backups(BaseModel):
-    backup_id = CharField(primary_key=True, default=Helpers.create_uuid())
+    backup_id = CharField(primary_key=True, default=Helpers.create_uuid)
     backup_name = CharField(default="New Backup")
     backup_location = CharField(default="")
     excluded_dirs = CharField(null=True)
-    max_backups = IntegerField()
+    max_backups = IntegerField(default=0)
     server_id = ForeignKeyField(Servers, backref="backups_server")
     compress = BooleanField(default=False)
     shutdown = BooleanField(default=False)
@@ -384,6 +384,10 @@ class HelpersManagement:
         if backup_model:
             return model_to_dict(backup_model)
         raise IndexError
+
+    @staticmethod
+    def remove_all_server_backups(server_id):
+        Backups.delete().where(Backups.server_id == server_id).execute()
 
     @staticmethod
     def remove_backup_config(backup_id):

@@ -43,7 +43,7 @@
             <div class="col-md-6 col-sm-12">
               <br>
               <br>
-              <div id="{{data['backup_config']['backup_id']}}_status" class="progress"
+              <div id="{{data['backup_config'].get('backup_id', None)}}_status" class="progress"
                 style="height: 15px; display: none;">
               </div>
               {% if data['backing_up'] %}
@@ -61,7 +61,7 @@
               <form id="backup-form" class="forms-sample">
                 <div class="form-group">
                   <label for="backup_name">{{ translate('serverBackups', 'name', data['lang']) }}
-                    {% if data["backup_config"]["default"] %}
+                    {% if data["backup_config"].get("default", None) %}
                     &nbsp;&nbsp; <span class="badge-pill badge-outline-warning">{{ translate('serverBackups', 'default',
                       data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain"
                         data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i

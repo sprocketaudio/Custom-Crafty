@@ -874,16 +874,13 @@ class Controller:
     # **********************************************************************************
 
     def rename_backup_dir(self, old_server_id, new_server_id, new_uuid):
-        server_data = self.servers.get_server_data_by_id(old_server_id)
         server_obj = self.servers.get_server_obj(new_server_id)
-        old_bu_path = server_data["backup_path"]
         ServerPermsController.backup_role_swap(old_server_id, new_server_id)
-        backup_path = old_bu_path
+        backup_path = os.path.join(self.helper.backup_path, old_server_id)
         backup_path = Path(backup_path)
         backup_path_components = list(backup_path.parts)
         backup_path_components[-1] = new_uuid
         new_bu_path = pathlib.PurePath(os.path.join(*backup_path_components))
-        server_obj.backup_path = new_bu_path
         default_backup_dir = os.path.join(self.helper.backup_path, new_uuid)
         try:
             os.rmdir(default_backup_dir)
@@ -975,16 +972,16 @@ class Controller:
                             f"Unable to delete server files for server with ID: "
                             f"{server_id} with error logged: {e}"
                         )
-                    if Helpers.check_path_exists(
-                        self.servers.get_server_data_by_id(server_id)["backup_path"]
-                    ):
-                        FileHelpers.del_dirs(
-                            Helpers.get_os_understandable_path(
-                                self.servers.get_server_data_by_id(server_id)[
-                                    "backup_path"
-                                ]
+                    backup_configs = HelpersManagement.get_backups_by_server(
+                        server_id, True
+                    )
+                    for config in backup_configs:
+                        if Helpers.check_path_exists(config.backup_location):
+                            FileHelpers.del_dirs(
+                                Helpers.get_os_understandable_path(
+                                    config.backup_location
+                                )
                             )
-                        )
 
                 # Cleanup scheduled tasks
                 try:

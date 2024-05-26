@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.models.servers import Servers
 from app.classes.shared.file_helpers import FileHelpers
@@ -82,6 +83,20 @@ class ApiServersServerActionHandler(BaseApiHandler):
         new_server_id = self.helper.create_uuid()
         new_server_path = os.path.join(self.helper.servers_dir, new_server_id)
         new_backup_path = os.path.join(self.helper.backup_path, new_server_id)
+        backup_data = {
+            "backup_name": f"{new_server_name} Backup",
+            "backup_location": new_backup_path,
+            "excluded_dirs": "",
+            "max_backups": 0,
+            "server_id": new_server_id,
+            "compress": False,
+            "shutdown": False,
+            "before": "",
+            "after": "",
+            "default": True,
+            "status": json.dumps({"status": "Standby", "message": ""}),
+            "enabled": True,
+        }
         new_server_command = str(server_data.get("execution_command")).replace(
             server_id, new_server_id
         )
@@ -101,6 +116,8 @@ class ApiServersServerActionHandler(BaseApiHandler):
             user_id,
             server_data.get("type"),
         )
+
+        self.controller.management.add_backup_config(backup_data)
 
         self.controller.management.add_to_audit_log(
             user_id,

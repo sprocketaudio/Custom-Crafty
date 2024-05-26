@@ -146,8 +146,7 @@ class ServersController(metaclass=Singleton):
             PermissionsServers.delete_roles_permissions(role_id, role_data["servers"])
         # Remove roles from server
         PermissionsServers.remove_roles_of_server(server_id)
-        # Remove backup configs tied to server
-        self.management_helper.remove_backup_config(server_id)
+        self.management_helper.remove_all_server_backups(server_id)
         # Finally remove server
         self.servers_helper.remove_server(server_id)
 

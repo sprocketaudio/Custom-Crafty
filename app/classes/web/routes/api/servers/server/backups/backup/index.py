@@ -159,7 +159,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 },
             )
         backup_config = self.controller.management.get_backup_config(backup_id)
-        if backup_config["server_id"] != server_id:
+        if backup_config["server_id"]["server_id"] != server_id:
             return self.finish_json(
                 400,
                 {
@@ -192,9 +192,11 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
             server_data = self.controller.servers.get_server_data_by_id(server_id)
             zip_name = data["filename"]
             # import the server again based on zipfile
-            backup_path = svr_obj.backup_path
-            if Helpers.validate_traversal(backup_path, zip_name):
-                temp_dir = Helpers.unzip_backup_archive(backup_path, zip_name)
+            backup_config = self.controller.management.get_backup_config(backup_id)
+            if Helpers.validate_traversal(backup_config["backup_location"], zip_name):
+                temp_dir = Helpers.unzip_backup_archive(
+                    backup_config["backup_location"], zip_name
+                )
                 if server_data["type"] == "minecraft-java":
                     new_server = self.controller.restore_java_zip_server(
                         svr_obj.server_name,
@@ -216,7 +218,9 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 new_server_id = new_server
                 new_server = self.controller.servers.get_server_data(new_server)
                 self.controller.rename_backup_dir(
-                    server_id, new_server_id, new_server["server_id"]
+                    server_id,
+                    new_server_id,
+                    new_server["server_id"],
                 )
                 # preserve current schedules
                 for schedule in self.controller.management.get_schedules_by_server(
@@ -249,20 +253,17 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 self.controller.servers.update_server(new_server_obj)
 
                 # preserve backup config
-                excluded_dirs = []
-                server_obj = self.controller.servers.get_server_obj(server_id)
-                loop_backup_path = self.helper.wtol_path(server_obj.path)
-                for item in self.controller.management.get_excluded_backup_dirs(
+                server_backups = self.controller.management.get_backups_by_server(
                     server_id
-                ):
-                    item_path = self.helper.wtol_path(item)
-                    bu_path = os.path.relpath(item_path, loop_backup_path)
-                    bu_path = os.path.join(new_server_obj.path, bu_path)
-                    excluded_dirs.append(bu_path)
-                self.controller.management.add_backup_config(
-                    new_server_id,
-                    new_server_obj.backup_path,
                 )
+                for backup in server_backups:
+                    del server_backups[backup]["backup_id"]
+                    server_backups[backup]["server_id"] = new_server_id
+                    if str(server_id) in (server_backups[backup]["backup_location"]):
+                        server_backups[backup]["backup_location"] = str(
+                            server_backups[backup]["backup_location"]
+                        ).replace(str(server_id), str(new_server_id))
+                    self.controller.management.add_backup_config(server_backups[backup])
                 # remove old server's tasks
                 try:
                     self.tasks_manager.remove_all_server_tasks(server_id)
