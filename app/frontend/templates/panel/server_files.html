@@ -67,7 +67,8 @@
                     translate('serverFiles', 'download', data['lang']) }}</a>
                   <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteFile" href="#"
                     style="color: red">{{ translate('serverFiles', 'delete', data['lang']) }}</a>
-                  <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteDir" href="#" style="color: red">{{
+                  <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteDir" href="#"
+                    style="color: red">{{
                     translate('serverFiles', 'delete', data['lang']) }}</a>
                   <a href="javascript:void(0)" class="closebtn" style="color: var(--info);"
                     onclick="document.getElementById('files-tree-nav').style.display = 'none';">{{
@@ -156,7 +157,8 @@
                     right: 35px;
                   }
                 }
-                .tree-file:hover{
+
+                .tree-file:hover {
                   cursor: pointer;
                 }
               </style>
@@ -721,6 +723,84 @@
     }
   }
 
+  async function uploadFile(file, path, onProgress) {
+    const fileId = uuidv4();
+    const token = getCookie("_xsrf")
+    const fileInput = document.getElementById('fileInput');
+    if (!file) {
+      alert("Please select a file first.");
+      return;
+    }
+
+    const chunkSize = 1024 * 1024; // 1MB
+    const totalChunks = Math.ceil(file.size / chunkSize);
+
+    const uploadPromises = [];
+    let res = await fetch(`/api/v2/servers/${serverId}/files/upload/`, {
+      method: 'POST',
+      headers: {
+        'X-XSRFToken': token,
+        'chunked': true,
+        'total_chunks': totalChunks,
+        'location': path,
+        'filename': file.name,
+        'fileId': fileId,
+      },
+      body: null,
+    });
+
+    let responseData = await res.json();
+
+    let file_id = ""
+    if (responseData.status === "ok") {
+      file_id = responseData.data["file-id"]
+    }
+    for (let i = 0; i < totalChunks; i++) {
+      const start = i * chunkSize;
+      const end = Math.min(start + chunkSize, file.size);
+      const chunk = file.slice(start, end);
+
+      const uploadPromise = fetch(`/api/v2/servers/${serverId}/files/upload/`, {
+        method: 'POST',
+        body: chunk,
+        headers: {
+          'Content-Range': `bytes ${start}-${end - 1}/${file.size}`,
+          'Content-Length': chunk.size,
+          'chunked': true,
+          'total_chunks': totalChunks,
+          'filename': file.name,
+          'location': path,
+          'filename': file.name,
+          'fileId': fileId,
+          'chunkId': i,
+        },
+      }).then(response => response.json())
+        .then(data => {
+          if (data.status === "completed") {
+            alert("File uploaded successfully!");
+          } else if (data.status !== "partial") {
+            throw new Error(data.message);
+          }
+        });
+
+      uploadPromises.push(uploadPromise);
+    }
+
+    try {
+      await Promise.all(uploadPromises);
+    } catch (error) {
+      alert("Error uploading file: " + error.message);
+    }
+  }
+
+  function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      const r = Math.random() * 16 | 0,
+        v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
   async function sendFile(file, path, serverId, left, i, onProgress) {
     let xmlHttpRequest = new XMLHttpRequest();
     let token = getCookie("_xsrf")
@@ -881,7 +961,7 @@
                 `;
                 $('#upload-progress-bar-parent').append(progressHtml);
 
-                await sendFile(files.files[i], path, serverId, nFiles - i - 1, i, (progress) => {
+                await uploadFile(files.files[i], path, (progress) => {
                   $(`#upload-progress-bar-${i + 1}`).attr('aria-valuenow', progress)
                   $(`#upload-progress-bar-${i + 1}`).css('width', progress + '%');
                 });

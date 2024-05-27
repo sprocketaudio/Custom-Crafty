@@ -6,6 +6,7 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.shared.helpers import Helpers
+from app.classes.shared.main_controller import WebSocketManager, Controller
 from app.classes.shared.file_helpers import FileHelpers
 from app.classes.web.base_api_handler import BaseApiHandler
 
@@ -577,3 +578,91 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                     },
                 )
         return self.finish_json(200, {"status": "ok"})
+
+
+class ApiServersServerFilesUploadHandler(BaseApiHandler):
+    async def post(self, server_id: str):
+        for header, value in self.request.headers.items():
+            print(f"{header}: {value}")
+        fileHash = self.request.headers.get("fileHash", 0)
+        chunkHash = self.request.headers.get("chunk-hash", 0)
+        file_size = self.request.headers.get("fileSize", None)
+        self.file_id = self.request.headers.get("fileId")
+        self.chunked = self.request.headers.get("chunked", True)
+        self.filename = self.request.headers.get("filename", None)
+        try:
+            total_chunks = int(self.request.headers.get("total_chunks", None))
+        except TypeError:
+            return self.finish_json(
+                400, {"status": "error", "data": "INVALID CHUNK COUNT"}
+            )
+        self.chunk_index = self.request.headers.get("chunkId")
+        self.location = self.request.headers.get("location", None)
+        self.upload_dir = self.location
+        self.temp_dir = os.path.join(self.controller.project_root, "temp", self.file_id)
+        if self.chunked and not self.chunk_index:
+            return self.finish_json(
+                200, {"status": "ok", "data": {"file-id": self.file_id}}
+            )
+
+        # Create the upload and temp directories if they don't exist
+        os.makedirs(self.upload_dir, exist_ok=True)
+        os.makedirs(self.temp_dir, exist_ok=True)
+
+        # Read headers and query parameters
+        content_length = int(self.request.headers.get("Content-Length"))
+        if content_length <= 0:
+            return self.finish_json(
+                400, {"status": "error", "data": {"message": "Invalid content length"}}
+            )
+
+        if not self.filename or self.chunk_index is None or total_chunks is None:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "data": {
+                        "message": "Filename, chunk_index,"
+                        " and total_chunks are required"
+                    },
+                },
+            )
+
+        # File paths
+        file_path = os.path.join(self.upload_dir, self.filename)
+        chunk_path = os.path.join(
+            self.temp_dir, f"{self.filename}.part{self.chunk_index}"
+        )
+
+        # Save the chunk
+        with open(chunk_path, "wb") as f:
+            f.write(self.request.body)
+
+        # Check if all chunks are received
+        received_chunks = [
+            f
+            for f in os.listdir(self.temp_dir)
+            if f.startswith(f"{self.filename}.part")
+        ]
+        if len(received_chunks) == total_chunks:
+            with open(file_path, "wb") as outfile:
+                for i in range(total_chunks):
+                    chunk_file = os.path.join(self.temp_dir, f"{self.filename}.part{i}")
+                    with open(chunk_file, "rb") as infile:
+                        outfile.write(infile.read())
+                    os.remove(chunk_file)
+
+            self.write(
+                json.dumps(
+                    {"status": "completed", "message": "File uploaded successfully"}
+                )
+            )
+        else:
+            self.write(
+                json.dumps(
+                    {
+                        "status": "partial",
+                        "message": f"Chunk {self.chunk_index} received",
+                    }
+                )
+            )

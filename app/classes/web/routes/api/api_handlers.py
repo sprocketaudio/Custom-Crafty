@@ -44,6 +44,7 @@ from app.classes.web.routes.api.servers.server.files import (
     ApiServersServerFilesIndexHandler,
     ApiServersServerFilesCreateHandler,
     ApiServersServerFilesZipHandler,
+    ApiServersServerFilesUploadHandler,
 )
 from app.classes.web.routes.api.servers.server.tasks.task.children import (
     ApiServersServerTasksTaskChildrenHandler,
@@ -241,6 +242,11 @@ def api_handlers(handler_args):
         (
             r"/api/v2/servers/([a-z0-9-]+)/files/zip/?",
             ApiServersServerFilesZipHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/servers/([a-z0-9-]+)/files/upload/?",
+            ApiServersServerFilesUploadHandler,
             handler_args,
         ),
         (
