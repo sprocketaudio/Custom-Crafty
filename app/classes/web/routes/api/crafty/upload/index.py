@@ -17,8 +17,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
             return
 
         upload_type = self.request.headers.get("type")
-        for header, value in self.request.headers.items():
-            print(f"{header}: {value}")
+
         if server_id:
             if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
                 # if the user doesn't have access to the server, return an error
@@ -38,15 +37,18 @@ class ApiFilesUploadHandler(BaseApiHandler):
                     400, {"status": "error", "error": "NOT_AUTHORIZED"}
                 )
             u_type = "server_upload"
-        elif auth_data[4]["superuser"] and not upload_type != "import":
+        elif auth_data[4]["superuser"] and upload_type != "import":
             u_type = "admin_config"
             self.upload_dir = os.path.join(
                 self.controller.project_root,
                 "app/frontend/static/assets/images/auth/custom",
             )
         elif upload_type == "import":
-            if not self.controller.crafty_perms.can_create_server(
-                auth_data[4]["user_id"]
+            if (
+                not self.controller.crafty_perms.can_create_server(
+                    auth_data[4]["user_id"]
+                )
+                and not auth_data[4]["superuser"]
             ):
                 return self.finish_json(
                     400,
@@ -143,6 +145,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
 
         # File paths
         file_path = os.path.join(self.upload_dir, self.filename)
+        print(file_path)
         chunk_path = os.path.join(
             self.temp_dir, f"{self.filename}.part{self.chunk_index}"
         )
