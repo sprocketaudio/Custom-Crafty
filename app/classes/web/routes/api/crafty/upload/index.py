@@ -36,6 +36,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                 return self.finish_json(
                     400, {"status": "error", "error": "NOT_AUTHORIZED"}
                 )
+
             u_type = "server_upload"
         elif auth_data[4]["superuser"] and upload_type == "background":
             u_type = "admin_config"
@@ -89,11 +90,29 @@ class ApiFilesUploadHandler(BaseApiHandler):
             self.upload_dir = self.request.headers.get("location", None)
         self.temp_dir = os.path.join(self.controller.project_root, "temp", self.file_id)
 
+        if u_type == "server_upload":
+            full_path = os.path.join(self.upload_dir, self.filename)
+
+            if not self.helper.is_subdir(
+                full_path,
+                Helpers.get_os_understandable_path(
+                    self.controller.servers.get_server_data_by_id(server_id)["path"]
+                ),
+            ):
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "NOT AUTHORIZED",
+                        "data": {"message": "Traversal detected"},
+                    },
+                )
+
         _total, _used, free = shutil.disk_usage(self.upload_dir)
 
         # Check to see if we have enough space
         if free <= file_size:
-            self.finish_json(
+            return self.finish_json(
                 507,
                 {
                     "status": "error",
