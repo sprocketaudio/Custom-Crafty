@@ -204,7 +204,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 )
             self.finish_json(200, {"status": "ok", "data": file_contents})
 
-    def delete(self, server_id: str):
+    def delete(self, server_id: str, _backup_id=None):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -262,7 +262,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             return self.finish_json(200, {"status": "ok"})
         return self.finish_json(500, {"status": "error", "error": str(proc)})
 
-    def patch(self, server_id: str):
+    def patch(self, server_id: str, _backup_id):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -316,7 +316,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             file_object.write(file_contents)
         return self.finish_json(200, {"status": "ok"})
 
-    def put(self, server_id: str):
+    def put(self, server_id: str, _backup_id):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
