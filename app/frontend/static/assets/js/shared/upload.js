@@ -55,8 +55,15 @@ async function uploadFile(type) {
             .then(data => {
                 if (data.status === "completed") {
                     $("#upload_input").html(`<div class="card-header header-sm d-flex justify-content-between align-items-center" style="width: 100%;"><input value="${file.name}" type="text" id="file-uploaded" disabled></input> 🔒</div>`);
-                    document.getElementById("lower_half").style.visibility = "visible";
-                    document.getElementById("lower_half").hidden = false;
+                    if (type === "import") {
+                        document.getElementById("lower_half").style.visibility = "visible";
+                        document.getElementById("lower_half").hidden = false;
+                    } else if (type === "background") {
+                        setTimeout(function () {
+                            location.href = `/panel/custom_login`
+                        }, 2000)
+
+                    }
                 } else if (data.status !== "partial") {
                     throw new Error(data.message);
                 }
@@ -71,7 +78,7 @@ async function uploadFile(type) {
     try {
         await Promise.all(uploadPromises);
     } catch (error) {
-        alert("Error uploading file: " + error.message);
+        bootbox.alert("Error uploading file: " + error.message);
     }
 }
 
