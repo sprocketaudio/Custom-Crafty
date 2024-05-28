@@ -5,6 +5,7 @@ import pathlib
 import tempfile
 import zipfile
 import hashlib
+from typing import BinaryIO
 import mimetypes
 from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
 import urllib.request
@@ -150,7 +151,11 @@ class FileHelpers:
         return m_type
 
     @staticmethod
-    def calculate_file_hash(file_path):
+    def calculate_file_hash(file_path: str) -> str:
+        """
+        Takes one parameter of file path.
+        It will generate a SHA256 hash for the path and return it.
+        """
         sha256_hash = hashlib.sha256()
         with open(file_path, "rb") as f:
             for byte_block in iter(lambda: f.read(4096), b""):
@@ -158,7 +163,11 @@ class FileHelpers:
         return sha256_hash.hexdigest()
 
     @staticmethod
-    def calculate_buffer_hash(buffer):
+    def calculate_buffer_hash(buffer: BinaryIO) -> str:
+        """
+        Takes one argument of a stream buffer. Will return a
+        sha256 hash of the buffer
+        """
         sha256_hash = hashlib.sha256()
         sha256_hash.update(buffer)
         return sha256_hash.hexdigest()

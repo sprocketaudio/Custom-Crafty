@@ -43,6 +43,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
         accepted_types = []
 
         if server_id:
+            # Check to make sure user is authorized for the server
             if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
                 # if the user doesn't have access to the server, return an error
                 return self.finish_json(
@@ -54,6 +55,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                 ),
                 auth_data[5],
             )
+            # Make sure user has file access for the server
             server_permissions = self.controller.server_perms.get_permissions(mask)
             if EnumPermissionsServer.FILES not in server_permissions:
                 # if the user doesn't have Files permission, return an error
@@ -62,6 +64,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                 )
 
             u_type = "server_upload"
+        # Make sure user is a super user if they're changing panel settings
         elif auth_data[4]["superuser"] and upload_type == "background":
             u_type = "admin_config"
             self.upload_dir = os.path.join(
@@ -70,6 +73,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
             )
             accepted_types = IMAGE_MIME_TYPES
         elif upload_type == "import":
+            # Check that user can make servers
             if (
                 not self.controller.crafty_perms.can_create_server(
                     auth_data[4]["user_id"]
@@ -84,6 +88,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                         "data": {"message": ""},
                     },
                 )
+            # Set directory to upload import dir
             self.upload_dir = os.path.join(
                 self.controller.project_root, "import", "upload"
             )
@@ -117,8 +122,11 @@ class ApiFilesUploadHandler(BaseApiHandler):
         self.temp_dir = os.path.join(self.controller.project_root, "temp", self.file_id)
 
         if u_type == "server_upload":
+            # If this is an upload from a server the path will be what
+            # Is requested
             full_path = os.path.join(self.upload_dir, self.filename)
 
+            # Check to make sure the requested path is inside the server's directory
             if not self.helper.is_subdir(
                 full_path,
                 Helpers.get_os_understandable_path(
@@ -133,7 +141,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                         "data": {"message": "Traversal detected"},
                     },
                 )
-
+        # Check to make sure the file type we're being sent is what we're expecting
         if (
             self.file_helper.check_mime_types(self.filename) not in accepted_types
             and u_type != "server_upload"
@@ -166,20 +174,29 @@ class ApiFilesUploadHandler(BaseApiHandler):
             return self.finish_json(
                 200, {"status": "ok", "data": {"file-id": self.file_id}}
             )
+        # Create the upload and temp directories if they don't exist
+        os.makedirs(self.upload_dir, exist_ok=True)
 
+        # Check for chunked header. We will handle this request differently
+        # if it doesn't exist
         if not self.chunked:
+            # Write the file directly to the upload dir
             with open(os.path.join(self.upload_dir, self.filename), "wb") as file:
                 while True:
                     chunk = self.request.body
                     if not chunk:
                         break
                     file.write(chunk)
+            # We'll check the file hash against the sent hash once the file is
+            # written. We cannot check this buffer.
             if (
                 self.file_helper.calculate_file_hash(
                     os.path.join(self.upload_dir, self.filename)
                 )
                 != self.file_hash
             ):
+                # If the hash is bad we'll delete the malformed file and send
+                # a warning
                 os.remove(os.path.join(self.upload_dir, self.filename))
                 logger.error(
                     f"File upload failed. Filename: {self.filename}"
@@ -206,9 +223,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                     "data": {"message": "File uploaded successfully"},
                 },
             )
-
-        # Create the upload and temp directories if they don't exist
-        os.makedirs(self.upload_dir, exist_ok=True)
+        # Since this is a chunked upload we'll create the temp dir for parts.
         os.makedirs(self.temp_dir, exist_ok=True)
 
         # Read headers and query parameters
@@ -227,6 +242,8 @@ class ApiFilesUploadHandler(BaseApiHandler):
                 },
             )
 
+        # At this point filename, chunk index and total chunks are required
+        # in the request
         if not self.filename or self.chunk_index is None or total_chunks is None:
             logger.error(
                 f"File upload failed. Filename: {self.filename}"
@@ -244,6 +261,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                 },
             )
 
+        # Calculate the hash of the buffer and compare it against the expected hash
         calculated_hash = self.file_helper.calculate_buffer_hash(self.request.body)
         if str(self.chunk_hash) != str(calculated_hash):
             logger.error(
@@ -278,6 +296,8 @@ class ApiFilesUploadHandler(BaseApiHandler):
             for f in os.listdir(self.temp_dir)
             if f.startswith(f"{self.filename}.part")
         ]
+        # When we've reached the total chunks we'll
+        # Compare the hash and write the file
         if len(received_chunks) == total_chunks:
             with open(file_path, "wb") as outfile:
                 for i in range(total_chunks):
