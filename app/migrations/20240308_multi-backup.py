@@ -22,7 +22,10 @@ def migrate(migrator: Migrator, database, **kwargs):
         "Migrations: Adding columns [backup_id, "
         "backup_name, backup_location, enabled, default, action_id, backup_status]"
     )
-    migrator.add_columns("backups", backup_id=peewee.UUIDField(default=uuid.uuid4))
+    migrator.add_columns(
+        "backups",
+        backup_id=peewee.CharField(default=Helpers.create_uuid),
+    )
     migrator.add_columns("backups", backup_name=peewee.CharField(default="Default"))
     migrator.add_columns("backups", backup_location=peewee.CharField(default=""))
     migrator.add_columns("backups", enabled=peewee.BooleanField(default=True))
