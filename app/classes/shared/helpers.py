@@ -20,7 +20,6 @@ import shlex
 import subprocess
 import itertools
 from datetime import datetime, timezone
-import time
 from socket import gethostname
 from contextlib import redirect_stderr, suppress
 import libgravatar
