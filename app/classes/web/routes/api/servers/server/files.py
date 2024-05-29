@@ -6,7 +6,6 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.shared.helpers import Helpers
-from app.classes.shared.main_controller import WebSocketManager, Controller
 from app.classes.shared.file_helpers import FileHelpers
 from app.classes.web.base_api_handler import BaseApiHandler
 
