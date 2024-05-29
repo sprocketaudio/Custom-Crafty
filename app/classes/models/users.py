@@ -119,7 +119,6 @@ class HelperUsers:
     @staticmethod
     def get_user_total():
         count = Users.select().where(Users.username != "system").count()
-        print(count)
         return count
 
     @staticmethod
@@ -261,8 +260,6 @@ class HelperUsers:
 
     @staticmethod
     def update_user(user_id, up_data=None):
-        for item in up_data:
-            print(item, type(item))
         if up_data is None:
             up_data = {}
         if up_data:
