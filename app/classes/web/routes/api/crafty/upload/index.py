@@ -107,11 +107,11 @@ class ApiFilesUploadHandler(BaseApiHandler):
         self.file_hash = self.request.headers.get("fileHash", 0)
         self.chunk_hash = self.request.headers.get("chunkHash", 0)
         self.file_id = self.request.headers.get("fileId")
-        self.chunked = self.request.headers.get("chunked", True)
-        self.filename = self.request.headers.get("filename", None)
+        self.chunked = self.request.headers.get("chunked", False)
+        self.filename = self.request.headers.get("fileName", None)
         try:
             file_size = int(self.request.headers.get("fileSize", None))
-            total_chunks = int(self.request.headers.get("total_chunks", None))
+            total_chunks = int(self.request.headers.get("totalChunks", 0))
         except TypeError:
             return self.finish_json(
                 400, {"status": "error", "error": "TYPE ERROR", "data": {}}
@@ -182,19 +182,15 @@ class ApiFilesUploadHandler(BaseApiHandler):
         if not self.chunked:
             # Write the file directly to the upload dir
             with open(os.path.join(self.upload_dir, self.filename), "wb") as file:
-                while True:
-                    chunk = self.request.body
-                    if not chunk:
-                        break
+                chunk = self.request.body
+                if chunk:
                     file.write(chunk)
             # We'll check the file hash against the sent hash once the file is
             # written. We cannot check this buffer.
-            if (
-                self.file_helper.calculate_file_hash(
-                    os.path.join(self.upload_dir, self.filename)
-                )
-                != self.file_hash
-            ):
+            calculated_hash = self.file_helper.calculate_file_hash(
+                os.path.join(self.upload_dir, self.filename)
+            )
+            if calculated_hash != self.file_hash:
                 # If the hash is bad we'll delete the malformed file and send
                 # a warning
                 os.remove(os.path.join(self.upload_dir, self.filename))
@@ -209,7 +205,9 @@ class ApiFilesUploadHandler(BaseApiHandler):
                         "error": "INVALID HASH",
                         "data": {
                             "message": "Hash recieved does not"
-                            " match reported sent hash.",
+                            " match reported sent hash."
+                            f"Recieved: {calculated_hash} "
+                            f"Expected: {self.file_hash}",
                         },
                     },
                 )
