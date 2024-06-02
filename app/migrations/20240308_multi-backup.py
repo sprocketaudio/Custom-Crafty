@@ -66,7 +66,7 @@ def migrate(migrator: Migrator, database, **kwargs):
             database = db
 
     class NewBackups(peewee.Model):
-        backup_id = peewee.CharField(primary_key=True, default=Helpers.create_uuid())
+        backup_id = peewee.CharField(primary_key=True, default=Helpers.create_uuid)
         backup_name = peewee.CharField(default="New Backup")
         backup_location = peewee.CharField(default="")
         excluded_dirs = peewee.CharField(null=True)
