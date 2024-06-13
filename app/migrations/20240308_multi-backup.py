@@ -8,7 +8,7 @@ import logging
 from app.classes.models.management import Backups, Schedules
 from app.classes.shared.helpers import Helpers
 from app.classes.shared.console import Console
-from app.classes.shared.migration import Migrator, MigrateHistory
+from app.classes.shared.migration import Migrator
 from app.classes.shared.file_helpers import FileHelpers
 
 logger = logging.getLogger(__name__)
