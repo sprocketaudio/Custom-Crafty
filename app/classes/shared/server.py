@@ -1442,9 +1442,10 @@ class ServerInstance:
         while backing_up:
             # Check to see if we're already backing up
             backing_up = self.check_backup_by_id(backup_config["backup_id"])
+            time.sleep(2)
 
         # check if backup was successful
-        backup_status = json.load(
+        backup_status = json.loads(
             HelpersManagement.get_backup_config(backup_config["backup_id"])["status"]
         )["status"]
         if backup_status == "Failed":
