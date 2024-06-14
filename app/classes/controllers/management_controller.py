@@ -200,7 +200,7 @@ class ManagementController:
             updates["backup_location"] = Helpers.wtol_path(updates["backup_location"])
         return HelpersManagement.update_backup_config(backup_id, updates)
 
-    def add_backup_config(self, data):
+    def add_backup_config(self, data) -> str:
         if "backup_location" in data:
             data["backup_location"] = Helpers.wtol_path(data["backup_location"])
         return self.management_helper.add_backup_config(data)

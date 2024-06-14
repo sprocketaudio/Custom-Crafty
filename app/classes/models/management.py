@@ -393,9 +393,10 @@ class HelpersManagement:
     def remove_backup_config(backup_id):
         Backups.delete().where(Backups.backup_id == backup_id).execute()
 
-    def add_backup_config(self, conf):
-        Backups.create(**conf)
+    def add_backup_config(self, conf) -> str:
+        backup = Backups.create(**conf)
         logger.debug("Creating new backup record.")
+        return backup.backup_id
 
     @staticmethod
     def update_backup_config(backup_id, data):
