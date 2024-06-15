@@ -211,7 +211,7 @@
     let text = ""
     let players = server.players_cache;
     for (let i = 0; i < players.length; i++) {
-      text += `<tr id="playerItem-${players[i]["name"]}" class="playerItem--" style="text-align: center;">`;
+      text += `<tr id="playerItem-${players[i]["name"]}" class="playerItem-- text-center">`;
       text += `<td class="no-scroll" style="overflow: scroll;"><strong>${players[i]["name"]}</strong></td>`;
       if (players[i]["status"] === "Online") {
         text += `<td><span class="text-success"><i class="fas fa-signal"></i> ${players[i]['status']}</span></td>`

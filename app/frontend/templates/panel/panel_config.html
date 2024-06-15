@@ -24,7 +24,7 @@
   <div class="row">
     <div class="col-md-12 grid-margin">
       <div class="card">
-        <div class="card-body">
+        <div class="card-body pt-0">
 
 
           {% if data['superuser'] %}
@@ -55,9 +55,7 @@
                   <h4 class="card-title"><i class="fas fa-users"></i> {{ translate('panelConfig', 'users', data['lang'])
                     }}</h4>
                   {% if data['user_data']['hints'] %}
-                  <span class="too_small" title="{{ translate('dashboard', 'cannotSee', data['lang']) }}" ,
-                    data-content="{{ translate('dashboard', 'cannotSeeOnMobile2', data['lang']) }}" ,
-                    data-placement="top"></span>
+                  <span class="too_small" title="{{ translate('dashboard', 'cannotSee', data['lang']) }}" , data-content="{{ translate('dashboard', 'cannotSeeOnMobile2', data['lang']) }}" , data-placement="top"></span>
                   {% end %}
                   <!-- TODO: Translate the following -->
                   <div><a class="nav-link" href="/panel/add_user"><i class="fas fa-plus-circle"></i> &nbsp; {{
@@ -161,9 +159,7 @@
                   <h4 class="card-title"><i class="fas fa-user-tag"></i> {{ translate('panelConfig', 'roles',
                     data['lang']) }}</h4>
                   {% if data['user_data']['hints'] %}
-                  <span class="too_small2" title="{{ translate('dashboard', 'cannotSee', data['lang']) }}" ,
-                    data-content="{{ translate('dashboard', 'cannotSeeOnMobile2', data['lang']) }}" ,
-                    data-placement="top"></span>
+                  <span class="too_small2" title="{{ translate('dashboard', 'cannotSee', data['lang']) }}" , data-content="{{ translate('dashboard', 'cannotSeeOnMobile2', data['lang']) }}" , data-placement="top"></span>
                   {% end %}
                   <div><a class="nav-link" href="/panel/add_role"><i class="fas fa-plus-circle"></i> &nbsp; {{
                       translate('panelConfig', 'newRole', data['lang']) }}</a></div>
@@ -256,8 +252,7 @@
                       data['lang']) }}<small class="text-muted ml-1"> - {{ translate('panelConfig', 'globalExplain',
                         data['lang']) }}</small></label>
                     <div class="input-group">
-                      <input type="text" id="global_server_path" class="form-control" name="global_server_path"
-                        placeholder="/var/opt/servers" value="{{data['servers_dir']}}" directory>
+                      <input type="text" id="global_server_path" class="form-control" name="global_server_path" placeholder="/var/opt/servers" value="{{data['servers_dir']}}" directory>
                       <div class="input-group-append">
                         <span type="button" class="btn btn-outline-default custom-picker">/servers/</span>
                       </div>
@@ -283,16 +278,13 @@
   .clickable {
     color: var(--primary);
   }
+
   .clickable:hover {
     cursor: pointer;
   }
+
   .custom-picker {
     border: 1px solid var(--outline);
-  }
-
-  .popover-body {
-    color: white !important;
-    ;
   }
 
   .loading:after {
@@ -327,7 +319,7 @@
   function validateForm() {
     let password0 = document.getElementById("password0").value;
     let password1 = document.getElementById("password1").value;
-     if (password0 != password1) {
+    if (password0 != password1) {
       $('.passwords-match').popover('show');
       $('.popover-body').click(function () {
         $('.passwords-match').popover("hide");
@@ -341,7 +333,7 @@
       return password1;
     }
   }
-  $(".edit_password").on("click", async function(){
+  $(".edit_password").on("click", async function () {
     const token = getCookie("_xsrf");
     let user_id = $(this).data('id');
     bootbox.confirm(`<form class="form" id='infos' action=''>\
@@ -353,38 +345,38 @@
       <label for="confirm_password">${$(this).data("translate2")}</label>
       <input class="form-control" type='password' id="password1" name='confirm_password' />\
       </div>
-      </form>`, async function(result) {
-          if(result){
-          password = validateForm();
-          if (!password){
-            return;
-          }
-          let res = await fetch(`/api/v2/users/${user_id}`, {
-            method: 'PATCH',
-            headers: {
-            'X-XSRFToken': token
-            },
-            body: JSON.stringify({"password": password}),
-          });
-          let responseData = await res.json();
-          if (responseData.status === "ok") {
-            console.log(responseData.data)
-          } else {
-
-            bootbox.alert({
-              title: responseData.status,
-              message: responseData.error
-            });
-          }
+      </form>`, async function (result) {
+      if (result) {
+        password = validateForm();
+        if (!password) {
+          return;
         }
+        let res = await fetch(`/api/v2/users/${user_id}`, {
+          method: 'PATCH',
+          headers: {
+            'X-XSRFToken': token
+          },
+          body: JSON.stringify({ "password": password }),
+        });
+        let responseData = await res.json();
+        if (responseData.status === "ok") {
+          console.log(responseData.data)
+        } else {
+
+          bootbox.alert({
+            title: responseData.status,
+            message: responseData.error
+          });
+        }
+      }
     });
   });
-  $(document).on("submit", ".bootbox form", function(e) {
+  $(document).on("submit", ".bootbox form", function (e) {
     e.preventDefault();
     $(".bootbox .btn-primary").click();
-});
+  });
 
-  $(".edit_user").on("click", function(){
+  $(".edit_user").on("click", function () {
     const token = getCookie("_xsrf");
     let username = $(this).data('name');
     let user_id = $(this).data('id');
@@ -393,28 +385,28 @@
       <label for="username">${$(this).data("translate")}</label>
       <input class="form-control" type='text' name='username' id="username_field" value=${username} /><br/>\
       </div>
-      </form>`, async function(result) {
-        if(result){
-          let new_username = $("#username_field").val();
-          let res = await fetch(`/api/v2/users/${user_id}`, {
-            method: 'PATCH',
-            headers: {
+      </form>`, async function (result) {
+      if (result) {
+        let new_username = $("#username_field").val();
+        let res = await fetch(`/api/v2/users/${user_id}`, {
+          method: 'PATCH',
+          headers: {
             'X-XSRFToken': token
-            },
-            body: JSON.stringify({"username": new_username}),
-          });
-          let responseData = await res.json();
-          if (responseData.status === "ok") {
-            $(`#user_${user_id}`).html(` ${new_username}`)
-            $(`#username_${user_id}`).data('name', new_username);
-          } else {
+          },
+          body: JSON.stringify({ "username": new_username }),
+        });
+        let responseData = await res.json();
+        if (responseData.status === "ok") {
+          $(`#user_${user_id}`).html(` ${new_username}`)
+          $(`#username_${user_id}`).data('name', new_username);
+        } else {
 
-            bootbox.alert({
-              title: responseData.status,
-              message: responseData.error
-            });
-          }
+          bootbox.alert({
+            title: responseData.status,
+            message: responseData.error
+          });
         }
+      }
     });
   });
   if (webSocket) {

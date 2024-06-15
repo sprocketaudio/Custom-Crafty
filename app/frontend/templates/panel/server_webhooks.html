@@ -52,7 +52,7 @@
                 </div>
                 <div class="card-body">
                   {% if len(data['webhooks']) == 0 %}
-                  <div style="text-align: center; color: grey;">
+                  <div class="text-center text-secondary">
                     <h7>{{ translate('webhooks', 'no-webhook', data['lang']) }} <strong>{{ translate('webhooks', 'newWebhook',data['lang']) }}</strong>.</h7>
                   </div>
                   {% end %}
@@ -157,11 +157,6 @@
     </div>
   </div>
   <style>
-    .popover-body {
-      color: white !important;
-      ;
-    }
-
     .toggle-handle {
       background-color: white !important;
     }

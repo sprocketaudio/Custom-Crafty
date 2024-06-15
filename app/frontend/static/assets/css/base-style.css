@@ -8773,6 +8773,7 @@ a.close.disabled {
 .popover-body {
     padding: 0.5rem 0.75rem;
     color: #212529;
+    color: white !important;
 }
 
 .carousel {
@@ -29094,7 +29095,7 @@ div.tagsinput span.tag a {
     border-right: none;
     border-radius: 6px 0 0 6px;
     height: 44px;
-    line-height: 4px;
+    /*line-height: 4px; Removed for Login page */
     display: inline-block;
     padding-top: 0px;
     padding-bottom: 0px;

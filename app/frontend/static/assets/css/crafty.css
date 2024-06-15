@@ -1,3 +1,36 @@
+/**************************************************************/
+/* CSS From base.html */
+/**************************************************************/
+body:not(.sidebar-icon-only) .navbar-toggler .mdi-chevron-double-right {
+    display: none;
+}
+
+body.sidebar-icon-only .navbar-toggler .mdi-chevron-double-left {
+    display: none;
+}
+
+/**************************************************************/
+
+/**************************************************************/
+/* CSS for MainMenu in partials/_sidebar.html */
+/**************************************************************/
+@media screen and (max-width: 991px) {
+    .sidebar-offcanvas {
+        -webkit-transition: all 0.25s cubic-bezier(.22, .61, .36, 1);
+        transition: all 0.25s cubic-bezier(.22, .61, .36, 1);
+        box-shadow: 0px 8px 17px 2px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12), 0px 5px 5px -3px rgba(0, 0, 0, 0.2);
+    }
+}
+
+li.nav-item.nav-category {
+    margin-top: 10px;
+}
+
+/**************************************************************/
+
+/**************************************************************/
+/* CSS For ? */
+/**************************************************************/
 .select-css option {
     background-color: var(--deep-bg);
     color: var(--base-text)
@@ -141,7 +174,31 @@ body {
 }
 
 /**************************************************************/
-/* CSS for Froms Displays */
+
+/**************************************************************/
+/* CSS for Dashboard */
+/**************************************************************/
+#desc_id {
+    -ms-overflow-style: none;
+    /* for Internet Explorer, Edge */
+    scrollbar-width: none;
+    /* for Firefox */
+    overflow-y: scroll;
+}
+
+#desc_id::-webkit-scrollbar {
+    display: none;
+    /* for Chrome, Safari, and Opera */
+}
+
+.gray {
+    color: gray !important;
+}
+
+/**************************************************************/
+
+/**************************************************************/
+/* CSS for Forms Displays */
 /**************************************************************/
 div>.input-group>.custom-file-input {
     position: relative !important;
@@ -225,7 +282,11 @@ button.btn-primary {
 /**************************************************************/
 /* CSS for Tables Displays */
 /**************************************************************/
-td>ul {
+table.table {
+    overflow: scroll;
+}
+
+div td>ul {
     margin: auto;
 }
 
@@ -258,6 +319,12 @@ div.warnings div.wssError a:hover {
     color: var(--white-smoke);
 }
 
+noscript.noscript-warning {
+    padding: 20px;
+    background-color: rgb(247, 151, 15);
+    /* TODO change background color */
+}
+
 /**************************************************************/
 
 /**************************************************************/
@@ -268,3 +335,12 @@ div.warnings div.wssError a:hover {
 }
 
 /**************************************************************/
+div.form-group.reset-secret {
+    background: rgba(243, 21, 6, 0.3);
+    outline: 1px solid red;
+    padding: 10px;
+}
+
+.bg-dropdown {
+    background-color: var(--dropdown-bg);
+}

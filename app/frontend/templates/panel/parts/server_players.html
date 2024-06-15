@@ -10,7 +10,7 @@
         </thead>
         <tbody id="player-body">
             {% for player in data['cached_players'] %}
-            <tr id="playerItem-{{ player['name'] }}" class="playerItem--" style="text-align: center;">
+            <tr id="playerItem-{{ player['name'] }}" class="playerItem-- text-center">
                 <td class="no-scroll" style="overflow: scroll;">
                     <strong> {{ player['name'] }}</strong>
                 </td>
@@ -19,14 +19,14 @@
                 {% elif player['status'] == 'Offline' %}
                 <td class="no-scroll" style="overflow: scroll;"><span class="text-warning"><i class="fa-regular fa-circle-xmark"></i><span class="offline-status">&nbsp;{{ player['status'] }}</span><span class="conn-break"> Last connection :<br> {{ player['last_seen'] }}</span></span></td>
                 {% end %}
-                <td class="buttons" style="text-align: center;">
+                <td class="buttons text-center">
                     {% if data['server_stats']['running'] %}
                     <button onclick="send_command_to_server(`ban {{ player['name'] }}`)" type="button" class="btn btn-danger controls">Ban</button>
-                    <br class="mobile-break"/>
+                    <br class="mobile-break" />
                     <button onclick="send_command_to_server(`kick {{ player['name'] }}`)" type="button" class="btn btn-outline-danger controls">Kick</button>
                     <br>
                     <button onclick="send_command_to_server(`op {{ player['name'] }}`)" type="button" class="btn btn-warning controls">OP</button>
-                    <br class="mobile-break"/>
+                    <br class="mobile-break" />
                     <button onclick="send_command_to_server(`deop {{ player['name'] }}`)" type="button" class="btn btn-outline-warning controls">De-OP</button>
                     {% else %}
                     <span> Unavailable <br>(Server Offline)</span>
@@ -38,15 +38,22 @@
     </table>
 </div>
 <style>
-    @media (min-width: 600px)  {
-        .mobile-break { display: none;}
+    @media (min-width: 600px) {
+        .mobile-break {
+            display: none;
+        }
+
         .offline-status {
             display: none;
         }
     }
-    @media screen and (max-width: 600px)  {
-        .conn-break { display: none; }
+
+    @media screen and (max-width: 600px) {
+        .conn-break {
+            display: none;
+        }
     }
+
     button.controls {
         width: 70px;
     }

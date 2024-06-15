@@ -535,30 +535,6 @@
 </div>
 <!-- content-wrapper ends -->
 <div id="mobile"></div>
-<style>
-  .popover-body {
-    color: white !important;
-    ;
-  }
-
-  #desc_id {
-    -ms-overflow-style: none;
-    /* for Internet Explorer, Edge */
-    scrollbar-width: none;
-    /* for Firefox */
-    overflow-y: scroll;
-  }
-
-  #desc_id::-webkit-scrollbar {
-    display: none;
-    /* for Chrome, Safari, and Opera */
-  }
-
-  .gray {
-    color: gray !important;
-  }
-</style>
-
 
 {% end %}
 
@@ -609,17 +585,17 @@
     });
     let responseData = await res.json();
     if (responseData.status === "ok") {
-      if (command === "clone_server"){
+      if (command === "clone_server") {
         window.location.reload()
       }
       console.log("Command received successfully")
     } else {
-      setTimeout(function(){
+      setTimeout(function () {
         $('.modal').modal('hide');
-      bootbox.alert({
-        title: responseData.status,
-        message: responseData.error
-      });
+        bootbox.alert({
+          title: responseData.status,
+          message: responseData.error
+        });
       }, 2000)
     }
   }

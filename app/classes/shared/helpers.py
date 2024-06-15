@@ -1154,8 +1154,8 @@ class Helpers:
                     \n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">
                     <input type="radio" name="root_path" value="{dpath}">
                     <span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">
-                      <i style="color: var(--info);" class="far fa-folder"></i>
-                      <i style="color: var(--info);" class="far fa-folder-open"></i>
+                      <i class="text-info far fa-folder"></i>
+                      <i class="text-info far fa-folder-open"></i>
                       {filename}
                       </span>
                     </input></div><li>
@@ -1176,8 +1176,8 @@ class Helpers:
                     \n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">
                     <input type="radio" name="root_path" value="{dpath}">
                     <span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">
-                      <i style="color: var(--info);" class="far fa-folder"></i>
-                      <i style="color: var(--info);" class="far fa-folder-open"></i>
+                      <i class="text-info far fa-folder"></i>
+                      <i class="text-info far fa-folder-open"></i>
                       {filename}
                       </span>
                     </input></div><li>"""

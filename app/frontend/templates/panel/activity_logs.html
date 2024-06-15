@@ -25,15 +25,13 @@
         <div class="card-header header-sm d-flex justify-content-between align-items-center">
           <h4 class="card-title"><i class="fas fa-history"></i> &nbsp;Audit Logs</h4>
           {% if data['user_data']['hints'] %}
-          <span class="too_small" title="{{ translate('dashboard', 'cannotSeeOnMobile', data['lang']) }}" ,
-            data-content="{{ translate('dashboard', 'cannotSeeOnMobile2', data['lang']) }}" ,
-            data-placement="top"></span>
+          <span class="too_small" title="{{ translate('dashboard', 'cannotSeeOnMobile', data['lang']) }}" , data-content="{{ translate('dashboard', 'cannotSeeOnMobile2', data['lang']) }}" , data-placement="top"></span>
           {% end %}
         </div>
         <div class="card-body">
 
           <div class="table-responsive">
-            <table class="table table-hover" id="audit_table" style="overflow: scroll;" width="100%">
+            <table class="table table-hover" id="audit_table" width="100%">
               <thead>
                 <tr class="rounded">
                   <td>Username</td>
@@ -63,16 +61,6 @@
       </div>
     </div>
   </div>
-  <style>
-    .popover-body {
-      color: white !important;
-      ;
-    }
-  </style>
-
-
-
-
 </div>
 <!-- content-wrapper ends -->
 

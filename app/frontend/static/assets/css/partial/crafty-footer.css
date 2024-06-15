@@ -1,0 +1,29 @@
+/**************************************************************/
+/* CSS for Page Footer */
+/**************************************************************/
+a:hover {
+    text-decoration: none;
+}
+
+.blink-text {
+    color: #000;
+    font-weight: bold;
+    font-size: 2rem;
+    animation: blinkingText 2s infinite;
+}
+
+@keyframes blinkingText {
+    0% {
+        color: grey;
+    }
+
+    50% {
+        color: red;
+    }
+
+    100% {
+        color: grey;
+    }
+}
+
+/**************************************************************/
