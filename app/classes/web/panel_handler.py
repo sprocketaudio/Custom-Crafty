@@ -769,17 +769,16 @@ class PanelHandler(BaseHandler):
                 return
             backup_config = self.controller.management.get_backup_config(backup_id)
             server_info = self.controller.servers.get_server_data_by_id(server_id)
+            backup_location = os.path.join(backup_config["backup_location"], backup_id)
             backup_file = os.path.abspath(
                 os.path.join(
-                    Helpers.get_os_understandable_path(
-                        backup_config["backup_location"]
-                    ),
+                    Helpers.get_os_understandable_path(backup_location),
                     file,
                 )
             )
             if not self.helper.is_subdir(
                 backup_file,
-                Helpers.get_os_understandable_path(backup_config["backup_location"]),
+                Helpers.get_os_understandable_path(backup_location),
             ) or not os.path.isfile(backup_file):
                 self.redirect("/panel/error?error=Invalid path detected")
                 return

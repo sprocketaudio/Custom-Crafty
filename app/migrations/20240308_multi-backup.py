@@ -5,7 +5,6 @@ import peewee
 import logging
 
 
-from app.classes.models.management import Backups, Schedules
 from app.classes.shared.helpers import Helpers
 from app.classes.shared.console import Console
 from app.classes.shared.migration import Migrator
@@ -67,6 +66,25 @@ def migrate(migrator: Migrator, database, **kwargs):
             table_name = "servers"
             database = db
 
+    class Backups(peewee.Model):
+        backup_id = peewee.CharField(primary_key=True, default=Helpers.create_uuid)
+        backup_name = peewee.CharField(default="New Backup")
+        backup_location = peewee.CharField(default="")
+        excluded_dirs = peewee.CharField(null=True)
+        max_backups = peewee.IntegerField()
+        server_id = peewee.ForeignKeyField(Servers, backref="backups_server")
+        compress = peewee.BooleanField(default=False)
+        shutdown = peewee.BooleanField(default=False)
+        before = peewee.CharField(default="")
+        after = peewee.CharField(default="")
+        default = peewee.BooleanField(default=False)
+        status = peewee.CharField(default='{"status": "Standby", "message": ""}')
+        enabled = peewee.BooleanField(default=True)
+
+        class Meta:
+            table_name = "backups"
+            database = db
+
     class NewBackups(peewee.Model):
         backup_id = peewee.CharField(primary_key=True, default=Helpers.create_uuid)
         backup_name = peewee.CharField(default="New Backup")
@@ -84,6 +102,27 @@ def migrate(migrator: Migrator, database, **kwargs):
 
         class Meta:
             table_name = "new_backups"
+            database = db
+
+    class Schedules(peewee.Model):
+        schedule_id = peewee.IntegerField(unique=True, primary_key=True)
+        server_id = peewee.ForeignKeyField(Servers, backref="schedule_server")
+        enabled = peewee.BooleanField()
+        action = peewee.CharField()
+        interval = peewee.IntegerField()
+        interval_type = peewee.CharField()
+        start_time = peewee.CharField(null=True)
+        command = peewee.CharField(null=True)
+        action_id = peewee.CharField(null=True)
+        name = peewee.CharField()
+        one_time = peewee.BooleanField(default=False)
+        cron_string = peewee.CharField(default="")
+        parent = peewee.IntegerField(null=True)
+        delay = peewee.IntegerField(default=0)
+        next_run = peewee.CharField(default="")
+
+        class Meta:
+            table_name = "schedules"
             database = db
 
     class NewSchedules(peewee.Model):
@@ -105,6 +144,7 @@ def migrate(migrator: Migrator, database, **kwargs):
 
         class Meta:
             table_name = "new_schedules"
+            database = db
 
     migrator.create_table(NewBackups)
     migrator.create_table(NewSchedules)
