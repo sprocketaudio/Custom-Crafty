@@ -278,6 +278,15 @@ def setup_logging(debug=True):
             encoding="utf-8",
         ).close()
 
+    if not helper.check_file_exists(
+        os.path.join(APPLICATION_PATH, "logs", "audit.log")
+    ):
+        open(
+            os.path.join(APPLICATION_PATH, "logs", "audit.log"),
+            "a",
+            encoding="utf-8",
+        ).close()
+
     if os.path.exists(logging_config_file):
         # open our logging config file
         with open(logging_config_file, "rt", encoding="utf-8") as f:
