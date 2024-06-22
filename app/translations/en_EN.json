@@ -217,6 +217,23 @@
         "copyright": "Copyright",
         "version": "Version"
     },
+    "language": {
+        "cs_CS": "cs_CS",
+        "de_DE": "de_DE",
+        "en_EN": "English",
+        "es_ES": "es_ES",
+        "fr_FR": "fr_FR",
+        "he_IL": "he_IL",
+        "it_IT": "it_IT",
+        "lol_EN": "lol_EN",
+        "lv_LV": "lv_LV",
+        "nl_BE": "nl_BE",
+        "pl_PL": "pl_PL",
+        "th_TH": "th_TH",
+        "tr_TR": "tr_TR",
+        "uk_UA": "uk_UA",
+        "zh_CN": "zh_CN"
+    },
     "login": {
         "defaultPath": "The password you entered is the default credential path, not the password. Please find the default password in that location.",
         "disabled": "User account disabled. Please contact your system administrator for more info.",
