@@ -49,6 +49,7 @@ BASIC_BACKUP_PATCH_SCHEMA = {
     "additionalProperties": False,
     "minProperties": 1,
 }
+ID_MISMATCH = "Server ID backup server ID different"
 
 
 class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
@@ -69,7 +70,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "ID_MISMATCH",
-                    "error_data": "Server ID backup server ID different",
+                    "error_data": ID_MISMATCH,
                 },
             )
         server_permissions = self.controller.server_perms.get_permissions(mask)
@@ -94,7 +95,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "ID_MISMATCH",
-                    "error_data": "Server ID backup server ID different",
+                    "error_data": ID_MISMATCH,
                 },
             )
         if not auth_data:
@@ -165,7 +166,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "ID_MISMATCH",
-                    "error_data": "Server ID backup server ID different",
+                    "error_data": ID_MISMATCH,
                 },
             )
 
@@ -338,7 +339,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "ID_MISMATCH",
-                    "error_data": "Server ID backup server ID different",
+                    "error_data": ID_MISMATCH,
                 },
             )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
@@ -372,7 +373,7 @@ class ApiServersServerBackupsBackupFilesIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "ID_MISMATCH",
-                    "error_data": "Server ID backup server ID different",
+                    "error_data": ID_MISMATCH,
                 },
             )
         if not auth_data:
