@@ -1315,7 +1315,7 @@ class PanelHandler(BaseHandler):
                     exclusions.append(file.replace(server_info["path"] + "/", ""))
             page_data["exclusions"] = exclusions
 
-            if not EnumPermissionsServer.BACKUP in page_data["user_permissions"]:
+            if EnumPermissionsServer.BACKUP not in page_data["user_permissions"]:
                 if not superuser:
                     self.redirect("/panel/error?error=Unauthorized access To Schedules")
                     return
@@ -1374,7 +1374,7 @@ class PanelHandler(BaseHandler):
             )
             page_data["exclusions"] = []
 
-            if not EnumPermissionsServer.BACKUP in page_data["user_permissions"]:
+            if EnumPermissionsServer.BACKUP not in page_data["user_permissions"]:
                 if not superuser:
                     self.redirect("/panel/error?error=Unauthorized access To Schedules")
                     return
