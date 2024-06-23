@@ -367,7 +367,15 @@ if __name__ == "__main__":
             encoding="utf-8",
         ) as cred_file:
             cred_file.write(
-                json.dumps({"username": "admin", "password": PASSWORD}, indent=4)
+                json.dumps(
+                    {
+                        "username": "admin",
+                        "password": PASSWORD,
+                        "info": "This is NOT where you change your password."
+                        " This file is only a means to give you a default password.",
+                    },
+                    indent=4,
+                )
             )
         os.chmod(
             os.path.join(APPLICATION_PATH, "app", "config", "default-creds.txt"), 0o600
