@@ -7,7 +7,7 @@ TBD
 ### Tweaks
 TBD
 ### Lang
-TBD
+- Add remaining `he_IL`, `th_TH` translations for 4.4.0 Release ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/761))
 <br><br>
 
 ## --- [4.4.0] - 2024/05/11
