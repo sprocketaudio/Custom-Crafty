@@ -5,6 +5,7 @@ TBD
 ### Bug fixes
 - Fix zip imports so the root dir selection is functional ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/764))
 - Fix bug where full access gives minimal access ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/768))
+- Ensure audit.log exists or create it on Crafty startup ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/771))
 ### Tweaks
 - Add info note to default creds file ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/760))
 - Remove navigation label from sidebar ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/766))
