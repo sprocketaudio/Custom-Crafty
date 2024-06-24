@@ -279,21 +279,6 @@ div.warnings div.wssError a:hover {
 
 /**************************************************************/
 
-.custom-control-input:checked~.custom-control-label::before {
-    color: black !important;
-    background-color: blueviolet !important;
-    border-color: var(--outline) !important;
-}
-
-.custom-control-label::before {
-    background-color: white !important;
-    top: calc(-0.2rem);
-}
-
-.custom-switch .custom-control-label::after {
-    top: calc(-0.125rem + 1px);
-}
-
 .hidden-input {
     margin-left: -40px;
 }
