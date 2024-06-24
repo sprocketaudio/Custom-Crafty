@@ -1,4 +1,4 @@
-async function uploadFile(type, file = null, path = null, file_num = 0, _onProgress) {
+async function uploadFile(type, file = null, path = null, file_num = 0, _onProgress = null) {
     if (file == null) {
         try {
             file = $("#file")[0].files[0];
@@ -153,8 +153,8 @@ async function uploadFile(type, file = null, path = null, file_num = 0, _onProgr
             let full_path = path + '/' + name;
             let flag = false;
 
-            for (let k = 0; k < items.length; ++k) {
-                if ($(items[k]).attr("data-name") == name) {
+            for (let item of items) {
+                if ($(item).attr("data-name") === name) {
                     flag = true;
                 }
             }

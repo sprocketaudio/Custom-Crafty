@@ -212,7 +212,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                     },
                 )
             logger.info(
-                f"File upload completed. Filename: {self.filename}" f" Type: {u_type}"
+                f"File upload completed. Filename: {self.filename} Type: {u_type}"
             )
             return self.finish_json(
                 200,
@@ -242,7 +242,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
 
         # At this point filename, chunk index and total chunks are required
         # in the request
-        if not self.filename or self.chunk_index is None or total_chunks is None:
+        if not self.filename or self.chunk_index is None:
             logger.error(
                 f"File upload failed. Filename: {self.filename}"
                 f"Type: {u_type} Error: CHUNK INDEX NOT FOUND"
