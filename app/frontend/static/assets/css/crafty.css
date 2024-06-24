@@ -278,3 +278,7 @@ div.warnings div.wssError a:hover {
 }
 
 /**************************************************************/
+
+.hidden-input {
+    margin-left: -40px;
+}

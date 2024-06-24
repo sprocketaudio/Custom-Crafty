@@ -49,6 +49,8 @@ BASIC_BACKUP_PATCH_SCHEMA = {
     "additionalProperties": False,
     "minProperties": 1,
 }
+ID_MISMATCH = "Server ID backup server ID different"
+GENERAL_AUTH_ERROR = "Authorization Error"
 
 
 class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
@@ -69,7 +71,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "ID_MISMATCH",
-                    "error_data": "Server ID backup server ID different",
+                    "error_data": ID_MISMATCH,
                 },
             )
         server_permissions = self.controller.server_perms.get_permissions(mask)
@@ -80,7 +82,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "NOT_AUTHORIZED",
-                    "error_data": "Authorization Error",
+                    "error_data": GENERAL_AUTH_ERROR,
                 },
             )
         self.finish_json(200, backup_conf)
@@ -94,7 +96,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "ID_MISMATCH",
-                    "error_data": "Server ID backup server ID different",
+                    "error_data": ID_MISMATCH,
                 },
             )
         if not auth_data:
@@ -113,7 +115,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "NOT_AUTHORIZED",
-                    "error_data": "Authorization Error",
+                    "error_data": GENERAL_AUTH_ERROR,
                 },
             )
 
@@ -155,7 +157,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "NOT_AUTHORIZED",
-                    "error_data": "Authorization Error",
+                    "error_data": GENERAL_AUTH_ERROR,
                 },
             )
         backup_config = self.controller.management.get_backup_config(backup_id)
@@ -165,7 +167,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "ID_MISMATCH",
-                    "error_data": "Server ID backup server ID different",
+                    "error_data": ID_MISMATCH,
                 },
             )
 
@@ -329,7 +331,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "NOT_AUTHORIZED",
-                    "error_data": "Authorization Error",
+                    "error_data": GENERAL_AUTH_ERROR,
                 },
             )
         if backup_conf["server_id"]["server_id"] != server_id:
@@ -338,7 +340,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "ID_MISMATCH",
-                    "error_data": "Server ID backup server ID different",
+                    "error_data": ID_MISMATCH,
                 },
             )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
@@ -355,7 +357,7 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "NOT_AUTHORIZED",
-                    "error_data": "Authorization Error",
+                    "error_data": GENERAL_AUTH_ERROR,
                 },
             )
         self.controller.management.update_backup_config(backup_id, data)
@@ -372,7 +374,7 @@ class ApiServersServerBackupsBackupFilesIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "ID_MISMATCH",
-                    "error_data": "Server ID backup server ID different",
+                    "error_data": ID_MISMATCH,
                 },
             )
         if not auth_data:
@@ -391,7 +393,7 @@ class ApiServersServerBackupsBackupFilesIndexHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "NOT_AUTHORIZED",
-                    "error_data": "Authorization Error",
+                    "error_data": GENERAL_AUTH_ERROR,
                 },
             )
 

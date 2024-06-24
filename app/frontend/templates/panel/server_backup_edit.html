@@ -96,58 +96,61 @@
                     placeholder="{{ translate('serverBackups', 'maxBackups', data['lang']) }}">
                 </div>
                 <div class="form-group">
-                  <label for="compress" class="form-check-label ml-4 mb-4"></label>
-                  {% if data['backup_config']['compress'] %}
-                  <input type="checkbox" class="form-check-input" id="compress" name="compress" checked=""
-                    value="True">{{ translate('serverBackups', 'compress', data['lang']) }}
-                  {% else %}
-                  <input type="checkbox" class="form-check-input" id="compress" name="compress" value="True">{{
-                  translate('serverBackups', 'compress', data['lang']) }}
-                  {% end %}
+                  <div class="custom-control custom-switch">
+                    {% if data['backup_config']['compress'] %}
+                    <input type="checkbox" class="custom-control-input" id="compress" name="compress" checked=""
+                      value="True">
+                    {% else %}
+                    <input type="checkbox" class="custom-control-input" id="compress" name="compress" value="True">
+                    {% end %}
+                    <label for="compress" class="custom-control-label">{{ translate('serverBackups', 'compress',
+                      data['lang']) }}</label>
+                  </div>
                 </div>
                 <div class="form-group">
-                  <label for="shutdown" class="form-check-label ml-4 mb-4"></label>
-                  {% if data['backup_config']['shutdown'] %}
-                  <input type="checkbox" class="form-check-input" id="shutdown" name="shutdown" checked=""
-                    value="True">{{ translate('serverBackups', 'shutdown', data['lang']) }}
-                  {% else %}
-                  <input type="checkbox" class="form-check-input" id="shutdown" name="shutdown" value="True">{{
-                  translate('serverBackups', 'shutdown', data['lang']) }}
-                  {% end %}
+                  <div class="custom-control custom-switch">
+                    {% if data['backup_config']['shutdown']%}
+                    <input type="checkbox" class="custom-control-input" id="shutdown" name="shutdown" checked=""
+                      value="True">
+                    {% else %}
+                    <input type="checkbox" class="custom-control-input" id="shutdown" name="shutdown" value="True">
+                    {% end %}
+                    <label for="shutdown" class="custom-control-label">{{ translate('serverBackups', 'shutdown',
+                      data['lang']) }}</label>
+                  </div>
                 </div>
                 <div class="form-group">
-                  <label for="command-check" class="form-check-label ml-4 mb-4"></label>
-                  {% if data['backup_config']['before'] %}
-                  <input type="checkbox" class="form-check-input" id="before-check" name="before-check" checked>{{
-                  translate('serverBackups', 'before', data['lang']) }}
-                  <br>
-                  <input type="text" class="form-control" name="before" id="backup_before"
-                    value="{{ data['backup_config']['before'] }}" placeholder="We enter the / for you"
-                    style="display: inline-block;">
-                  {% else %}
-                  <input type="checkbox" class="form-check-input" id="before-check" name="before-check">{{
-                  translate('serverBackups', 'before', data['lang']) }}
-                  <br>
-                  <input type="text" class="form-control" name="before" id="backup_before" value=""
-                    placeholder="We enter the / for you." style="display: none;">
-                  {% end %}
+                  <div class="custom-control custom-switch">
+                    {% if data['backup_config']['before'] %}
+                    <input type="checkbox" class="custom-control-input" id="before-check" name="before-check" checked>
+                    <input type="text" class="form-control hidden-input" name="before" id="backup_before"
+                      value="{{ data['backup_config']['before'] }}" placeholder="We enter the / for you"
+                      style="display: inline-block;">
+                    {% else %}
+                    <input type="checkbox" class="custom-control-input" id="before-check" name="before-check">
+                    <input type="text" class="form-control hidden-input" name="before" id="backup_before" value=""
+                      placeholder="We enter the / for you." style="display: none;">
+                    {% end %}
+                    <label for="before-check" class="custom-control-label">{{
+                      translate('serverBackups', 'before', data['lang']) }}</label>
+                  </div>
                 </div>
                 <div class="form-group">
-                  <label for="command-check" class="form-check-label ml-4 mb-4"></label>
-                  {% if data['backup_config']['after'] %}
-                  <input type="checkbox" class="form-check-input" id="after-check" name="after-check" checked>{{
-                  translate('serverBackups', 'after', data['lang']) }}
-                  <br>
-                  <input type="text" class="form-control" name="after" id="backup_after"
-                    value="{{ data['backup_config']['after'] }}" placeholder="We enter the / for you"
-                    style="display: inline-block;">
-                  {% else %}
-                  <input type="checkbox" class="form-check-input" id="after-check" name="after-check">{{
-                  translate('serverBackups', 'after', data['lang']) }}
-                  <br>
-                  <input type="text" class="form-control" name="after" id="backup_after" value=""
-                    placeholder="We enter the / for you." style="display: none;">
-                  {% end %}
+                  <div class="custom-control custom-switch">
+                    {% if data['backup_config']['after'] %}
+                    <input type="checkbox" class="custom-control-input" id="after-check" name="after-check" checked>
+                    <input type="text" class="form-control hidden-input" name="after" id="backup_after"
+                      value="{{ data['backup_config']['after'] }}" placeholder="We enter the / for you"
+                      style="display: inline-block;">
+                    <br>
+                    {% else %}
+                    <input type="checkbox" class="custom-control-input" id="after-check" name="after-check">
+                    <input type="text" class="form-control hidden-input" name="after" id="backup_after" value=""
+                      placeholder="We enter the / for you." style="display: none;">
+                    {% end %}
+                    <label for="after-check" class="custom-control-label">{{
+                      translate('serverBackups', 'after', data['lang']) }}</label>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label for="server">{{ translate('serverBackups', 'exclusionsTitle', data['lang']) }} <small> - {{
@@ -157,9 +160,8 @@
                     data-server_path="{{ data['server_stats']['server_id']['path']}}" type="button">{{
                     translate('serverBackups', 'clickExclude', data['lang']) }}</button>
                 </div>
-                <div class="modal fade" id="dir_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
-                  aria-hidden="true">
-                  <div class="modal-dialog" role="document">
+                <div class="modal fade" id="dir_select" tabindex="-1" aria-labelledby="dir_select" aria-hidden="true">
+                  <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLongTitle">{{ translate('serverBackups',
@@ -205,9 +207,9 @@
                   <h4 class="card-title">{{ translate('serverBackups', 'currentBackups', data['lang']) }}</h4>
                   <thead>
                     <tr>
-                      <th width="10%">{{ translate('serverBackups', 'options', data['lang']) }}</th>
+                      <th>{{ translate('serverBackups', 'options', data['lang']) }}</th>
                       <th>{{ translate('serverBackups', 'path', data['lang']) }}</th>
-                      <th width="20%">{{ translate('serverBackups', 'size', data['lang']) }}</th>
+                      <th>{{ translate('serverBackups', 'size', data['lang']) }}</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -1140,6 +1140,7 @@ class ServerInstance:
         was_server_running = None
         logger.info(f"Starting server {self.name} (ID {self.server_id}) backup")
         server_users = PermissionsServers.get_server_user_list(self.server_id)
+        # Alert the start of the backup to the authorized users.
         for user in server_users:
             WebSocketManager().broadcast_user(
                 user,
@@ -1149,34 +1150,37 @@ class ServerInstance:
                 ).format(self.name),
             )
         time.sleep(3)
+
+        # Get the backup config
         conf = HelpersManagement.get_backup_config(backup_id)
+        # Adjust the location to include the backup ID for destination.
         backup_location = os.path.join(conf["backup_location"], conf["backup_id"])
+
+        # Check if the backup location even exists.
         if not backup_location:
             Console.critical("No backup path found. Canceling")
             return None
         if conf["before"]:
-            if self.check_running():
-                logger.debug(
-                    "Found running server and send command option. Sending command"
-                )
-                self.send_command(conf["before"])
+            logger.debug(
+                "Found running server and send command option. Sending command"
+            )
+            self.send_command(conf["before"])
+            # Pause to let command run
+            time.sleep(5)
 
         if conf["shutdown"]:
-            if conf["before"]:
-                # pause to let people read message.
-                time.sleep(5)
             logger.info(
                 "Found shutdown preference. Delaying"
                 + "backup start. Shutting down server."
             )
             if not update:
+                was_server_running = False
                 if self.check_running():
                     self.stop_server()
                     was_server_running = True
-            else:
-                was_server_running = False
 
         self.helper.ensure_dir_exists(backup_location)
+
         try:
             backup_filename = (
                 f"{backup_location}/"
@@ -1402,41 +1406,10 @@ class ServerInstance:
                     "string": message,
                 },
             )
-        backup_dir = os.path.join(
-            Helpers.get_os_understandable_path(self.settings["path"]),
-            "crafty_executable_backups",
-        )
-        # checks if backup directory already exists
-        if os.path.isdir(backup_dir):
-            backup_executable = os.path.join(backup_dir, self.settings["executable"])
-        else:
-            logger.info(
-                f"Executable backup directory not found for Server: {self.name}."
-                f" Creating one."
-            )
-            os.mkdir(backup_dir)
-            backup_executable = os.path.join(backup_dir, self.settings["executable"])
-
-        if len(os.listdir(backup_dir)) > 0:
-            # removes old backup
-            logger.info(f"Old backups found for server: {self.name}. Removing...")
-            for item in os.listdir(backup_dir):
-                os.remove(os.path.join(backup_dir, item))
-            logger.info(f"Old backups removed for server: {self.name}.")
-        else:
-            logger.info(f"No old backups found for server: {self.name}")
-
         current_executable = os.path.join(
             Helpers.get_os_understandable_path(self.settings["path"]),
             self.settings["executable"],
         )
-
-        try:
-            # copies to backup dir
-            FileHelpers.copy_file(current_executable, backup_executable)
-        except FileNotFoundError:
-            logger.error("Could not create backup of jarfile. File not found.")
-
         backing_up = True
         # wait for backup
         while backing_up:
