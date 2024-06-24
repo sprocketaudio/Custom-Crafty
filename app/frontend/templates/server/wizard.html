@@ -165,7 +165,7 @@
                         data-styleBase="form-control" data-style="form-control" data-live-search="true"
                         name="server_roles" multiple>
                         {% for r in data['roles'] %}
-                        <option class="roles" name="{{ r['role_id'] }}" type="checkbox" value="{{ r['role_id'] }}">
+                        <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
                           &nbsp; {{ r['role_name'].capitalize()
                           }}
                         </option>
@@ -292,7 +292,7 @@
                     data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles"
                     multiple>
                     {% for r in data['roles'] %}
-                    <option class="roles" name="{{ r['role_id'] }}" type="checkbox" value="{{ r['role_id'] }}">
+                    <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
                       &nbsp; {{ r['role_name'].capitalize()
                       }}
                     </option>
@@ -414,7 +414,7 @@
                       data-styleBase="form-control" data-style="form-control" data-live-search="true"
                       name="server_roles" multiple>
                       {% for r in data['roles'] %}
-                      <option class="roles" name="{{ r['role_id'] }}" type="checkbox" value="{{ r['role_id'] }}">
+                      <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
                         &nbsp; {{ r['role_name'].capitalize()
                         }}
                       </option>
@@ -560,7 +560,7 @@
                   data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles"
                   multiple>
                   {% for r in data['roles'] %}
-                  <option class="roles" name="{{ r['role_id'] }}" type="checkbox" value="{{ r['role_id'] }}">
+                  <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
                     &nbsp; {{ r['role_name'].capitalize()
                     }}
                   </option>
