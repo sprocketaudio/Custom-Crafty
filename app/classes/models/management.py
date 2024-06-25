@@ -397,6 +397,9 @@ class HelpersManagement:
         Backups.delete().where(Backups.backup_id == backup_id).execute()
 
     def add_backup_config(self, conf) -> str:
+        if "excluded_dirs" in conf:
+            dirs_to_exclude = ",".join(conf["excluded_dirs"])
+            conf["excluded_dirs"] = dirs_to_exclude
         backup = Backups.create(**conf)
         logger.debug("Creating new backup record.")
         return backup.backup_id
