@@ -1,4 +1,5 @@
 import os
+import sys
 import pathlib
 from pathlib import Path
 from datetime import datetime
@@ -251,6 +252,19 @@ class Controller:
         # Copy crafty logs to archive dir
         full_log_name = os.path.join(crafty_path, "logs")
         FileHelpers.copy_dir(os.path.join(self.project_root, "logs"), full_log_name)
+        thread_dump = ""
+        for thread in threading.enumerate():
+            if sys.version_info >= (3, 8):
+                thread_dump += (
+                    f"Name: {thread.name}\tIdentifier:"
+                    f" {thread.ident}\tTID/PID: {thread.native_id}\n"
+                )
+            else:
+                print(f"Name: {thread.name}\tIdentifier: {thread.ident}")
+        with open(
+            os.path.join(temp_dir, "crafty_thread_dump.txt"), "a", encoding="utf-8"
+        ) as f:
+            f.write(thread_dump)
         self.support_scheduler.add_job(
             self.log_status,
             "interval",
