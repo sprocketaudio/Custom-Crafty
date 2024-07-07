@@ -654,6 +654,9 @@
         "userTheme": "UI 主题",
         "uses": "使用次数限制（-1==无限制）"
     },
+    "validators": {
+        "passLength": "密码过短。最短长度：8"
+    },
     "webhooks": {
         "areYouSureDel": "您确定要删除此 webhook 吗？",
         "areYouSureRun": "您确定要测试此 webhook 吗？",

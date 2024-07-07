@@ -653,6 +653,9 @@
         "userTheme": "Wygląd interfejsu",
         "uses": "Ilość użyć (-1==Bez limitu)"
     },
+    "validators": {
+        "passLength": "Hasło jest zbyt krótkie. Hasło musi posiadać minimum 8 znaków."
+    },
     "webhooks": {
         "areYouSureDel": "Usunąć ten webhook?",
         "areYouSureRun": "Przetestować ten webhook?",

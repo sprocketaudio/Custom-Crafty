@@ -673,6 +673,9 @@
         "userTheme": "Motiv UI",
         "uses": "Počet povolených použití (-1==bez omezení)"
     },
+    "validators": {
+        "passLength": "Heslo je příliš krátké. Minimální délka je 8 znaků"
+    },
     "webhooks": {
         "areYouSureDel": "Seš si jistý že chceš smazat tento webhook?",
         "areYouSureRun": "Seš si jistý že chceš otestovat tento webhook?",

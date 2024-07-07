@@ -654,6 +654,9 @@
         "userTheme": "THEMEZ",
         "uses": "NUMBER OV USES ALLOWED (-1==NO LIMIT)"
     },
+    "validators": {
+        "passLength": "PASSWRD TOO SMOL. NEEDZ 8 CATZ PLZ"
+    },
     "webhooks": {
         "areYouSureDel": "U SURE U WANTZ TO EATZ DIS WEBHOOK?",
         "areYouSureRun": "U SURE U WANTZ TO TESTZ DIS WEBHOOK?",
