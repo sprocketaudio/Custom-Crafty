@@ -104,7 +104,6 @@ class ApiFilesUploadHandler(BaseApiHandler):
                 },
             )
         # Get the headers from the request
-        self.file_hash = self.request.headers.get("fileHash", 0)
         self.chunk_hash = self.request.headers.get("chunkHash", 0)
         self.file_id = self.request.headers.get("fileId")
         self.chunked = self.request.headers.get("chunked", False)
@@ -190,27 +189,6 @@ class ApiFilesUploadHandler(BaseApiHandler):
             calculated_hash = self.file_helper.calculate_file_hash(
                 os.path.join(self.upload_dir, self.filename)
             )
-            if calculated_hash != self.file_hash:
-                # If the hash is bad we'll delete the malformed file and send
-                # a warning
-                os.remove(os.path.join(self.upload_dir, self.filename))
-                logger.error(
-                    f"File upload failed. Filename: {self.filename}"
-                    f"Type: {u_type} Error: INVALID HASH"
-                )
-                return self.finish_json(
-                    400,
-                    {
-                        "status": "error",
-                        "error": "INVALID HASH",
-                        "data": {
-                            "message": "Hash recieved does not"
-                            " match reported sent hash."
-                            f"Recieved: {calculated_hash} "
-                            f"Expected: {self.file_hash}",
-                        },
-                    },
-                )
             logger.info(
                 f"File upload completed. Filename: {self.filename} Type: {u_type}"
             )
@@ -303,20 +281,6 @@ class ApiFilesUploadHandler(BaseApiHandler):
                     with open(chunk_file, "rb") as infile:
                         outfile.write(infile.read())
                     os.remove(chunk_file)
-            if self.file_helper.calculate_file_hash(file_path) != self.file_hash:
-                os.remove(file_path)
-                return self.finish_json(
-                    400,
-                    {
-                        "status": "error",
-                        "error": "INVALID HASH",
-                        "data": {
-                            "message": "Hash recieved does not"
-                            " match reported sent hash.",
-                            "chunk_id": self.file_id,
-                        },
-                    },
-                )
             logger.info(
                 f"File upload completed. Filename: {self.filename}"
                 f" Path: {file_path} Type: {u_type}"

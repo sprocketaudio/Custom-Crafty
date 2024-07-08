@@ -23,9 +23,8 @@ async function uploadFile(type, file = null, path = null, file_num = 0, _onProgr
         url = `/api/v2/servers/import/upload/`
     }
     console.log(url)
-    const chunkSize = 1024 * 1024; // 1MB
+    const chunkSize = 1024 * 1024 * 10; // 10MB
     const totalChunks = Math.ceil(file.size / chunkSize);
-    const file_hash = await calculateFileHash(file);
 
     const uploadPromises = [];
     let errors = []; // Array to store errors
@@ -35,7 +34,6 @@ async function uploadFile(type, file = null, path = null, file_num = 0, _onProgr
             headers: {
                 'X-XSRFToken': token,
                 'chunked': true,
-                'fileHash': file_hash,
                 'fileSize': file.size,
                 'type': type,
                 'totalChunks': totalChunks,
@@ -70,7 +68,6 @@ async function uploadFile(type, file = null, path = null, file_num = 0, _onProgr
                     'Content-Range': `bytes ${start}-${end - 1}/${file.size}`,
                     'Content-Length': chunk.size,
                     'fileSize': file.size,
-                    'fileHash': file_hash,
                     'chunkHash': chunk_hash,
                     'chunked': true,
                     'type': type,
