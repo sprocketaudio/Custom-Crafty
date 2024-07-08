@@ -7,6 +7,7 @@ TBD
 - Fix bug where full access gives minimal access ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/768))
 - Bump tornado & requests for sec advisories ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/774))
 - Ensure audit.log exists or create it on Crafty startup ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/771))
+- Fix typing issue on ID comparison causing general users to not be able to delete their own API keys ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/775))
 ### Tweaks
 - Add info note to default creds file ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/760))
 - Remove navigation label from sidebar ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/766))
