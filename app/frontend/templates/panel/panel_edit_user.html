@@ -122,7 +122,7 @@ data['lang']) }}{% end %}
                           name="lang" form="user_form">
                           {% for lang in data['languages'] %}
                           {% if not 'incomplete' in lang %}
-                          <option value="{{lang}}">{{lang}}</option>
+                          <option value="{{lang}}" >{{translate('language', lang, 'humanized_index')}}</option>
                           {% else %}
                           <option value="{{lang}}" disabled>{{lang}}</option>
                           {% end %}

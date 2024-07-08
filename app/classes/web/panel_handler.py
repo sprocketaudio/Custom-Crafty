@@ -892,6 +892,8 @@ class PanelHandler(BaseHandler):
                         os.path.join(self.helper.root_dir, "app", "translations")
                     )
                 ):
+                    if file == "humanized_index.json":
+                        continue
                     if file.endswith(".json"):
                         if file.split(".")[0] not in self.helper.get_setting(
                             "disabled_language_files"
@@ -1307,6 +1309,8 @@ class PanelHandler(BaseHandler):
             for file in sorted(
                 os.listdir(os.path.join(self.helper.root_dir, "app", "translations"))
             ):
+                if file == "humanized_index.json":
+                    continue
                 if file.endswith(".json"):
                     if file.split(".")[0] not in self.helper.get_setting(
                         "disabled_language_files"

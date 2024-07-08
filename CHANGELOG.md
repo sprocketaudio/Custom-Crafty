@@ -14,6 +14,7 @@ TBD
 - Add a thread dump to support logs ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/769))
 - Remove text from status page and use symbols ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/770))
 ### Lang
+- Show natural language name instead of country code in User Config Lang select list ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/773))
 - Add remaining `he_IL`, `th_TH` translations for 4.4.0 Release ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/761))
 <br><br>
 
