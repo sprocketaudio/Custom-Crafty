@@ -799,6 +799,18 @@ class TasksManager:
         self.helper.ensure_dir_exists(
             os.path.join(self.controller.project_root, "import", "upload")
         )
+        self.helper.ensure_dir_exists(
+            os.path.join(self.controller.project_root, "temp")
+        )
+        for file in os.listdir(os.path.join(self.controller.project_root, "temp")):
+            if self.helper.is_file_older_than_x_days(
+                os.path.join(self.controller.project_root, "temp", file)
+            ):
+                try:
+                    os.remove(os.path.join(file))
+                except:
+                    logger.debug("Could not clear out file from temp directory")
+
         for file in os.listdir(
             os.path.join(self.controller.project_root, "import", "upload")
         ):
