@@ -808,7 +808,7 @@ class TasksManager:
             ):
                 try:
                     os.remove(os.path.join(file))
-                except:
+                except FileNotFoundError:
                     logger.debug("Could not clear out file from temp directory")
 
         for file in os.listdir(
@@ -819,7 +819,7 @@ class TasksManager:
             ):
                 try:
                     os.remove(os.path.join(file))
-                except:
+                except FileNotFoundError:
                     logger.debug("Could not clear out file from import directory")
 
     def log_watcher(self):
