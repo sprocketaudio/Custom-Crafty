@@ -5,6 +5,7 @@ from prometheus_client import CollectorRegistry, Gauge
 
 from app.classes.models.management import HelpersManagement, HelpersWebhooks
 from app.classes.models.servers import HelperServers
+from app.classes.shared.helpers import Helpers
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +76,7 @@ class ManagementController:
     #                                   Commands Methods
     # **********************************************************************************
 
-    def send_command(self, user_id, server_id, remote_ip, command):
+    def send_command(self, user_id, server_id, remote_ip, command, action_id=None):
         server_name = HelperServers.get_server_friendly_name(server_id)
 
         # Example: Admin issued command start_server for server Survival
@@ -86,7 +87,12 @@ class ManagementController:
             remote_ip,
         )
         self.queue_command(
-            {"server_id": server_id, "user_id": user_id, "command": command}
+            {
+                "server_id": server_id,
+                "user_id": user_id,
+                "command": command,
+                "action_id": action_id,
+            }
         )
 
     def queue_command(self, command_data):
@@ -123,6 +129,7 @@ class ManagementController:
         cron_string="* * * * *",
         parent=None,
         delay=0,
+        action_id=None,
     ):
         return HelpersManagement.create_scheduled_task(
             server_id,
@@ -137,6 +144,7 @@ class ManagementController:
             cron_string,
             parent,
             delay,
+            action_id,
         )
 
     @staticmethod
@@ -175,34 +183,47 @@ class ManagementController:
     #                                   Backups Methods
     # **********************************************************************************
     @staticmethod
-    def get_backup_config(server_id):
-        return HelpersManagement.get_backup_config(server_id)
+    def get_backup_config(backup_id):
+        return HelpersManagement.get_backup_config(backup_id)
 
-    def set_backup_config(
-        self,
-        server_id: int,
-        backup_path: str = None,
-        max_backups: int = None,
-        excluded_dirs: list = None,
-        compress: bool = False,
-        shutdown: bool = False,
-        before: str = "",
-        after: str = "",
-    ):
-        return self.management_helper.set_backup_config(
-            server_id,
-            backup_path,
-            max_backups,
-            excluded_dirs,
-            compress,
-            shutdown,
-            before,
-            after,
+    @staticmethod
+    def get_backups_by_server(server_id, model=False):
+        return HelpersManagement.get_backups_by_server(server_id, model)
+
+    @staticmethod
+    def delete_backup_config(backup_id):
+        HelpersManagement.remove_backup_config(backup_id)
+
+    @staticmethod
+    def update_backup_config(backup_id, updates):
+        if "backup_location" in updates:
+            updates["backup_location"] = Helpers.wtol_path(updates["backup_location"])
+        return HelpersManagement.update_backup_config(backup_id, updates)
+
+    def add_backup_config(self, data) -> str:
+        if "backup_location" in data:
+            data["backup_location"] = Helpers.wtol_path(data["backup_location"])
+        return self.management_helper.add_backup_config(data)
+
+    def add_default_backup_config(self, server_id, backup_path):
+        return self.management_helper.add_backup_config(
+            {
+                "backup_name": "Default Backup",
+                "backup_location": Helpers.wtol_path(backup_path),
+                "max_backups": 0,
+                "before": "",
+                "after": "",
+                "compress": False,
+                "shutdown": False,
+                "server_id": server_id,
+                "excluded_dirs": [],
+                "default": True,
+            }
         )
 
     @staticmethod
-    def get_excluded_backup_dirs(server_id: int):
-        return HelpersManagement.get_excluded_backup_dirs(server_id)
+    def get_excluded_backup_dirs(backup_id: int):
+        return HelpersManagement.get_excluded_backup_dirs(backup_id)
 
     def add_excluded_backup_dir(self, server_id: int, dir_to_add: str):
         self.management_helper.add_excluded_backup_dir(server_id, dir_to_add)

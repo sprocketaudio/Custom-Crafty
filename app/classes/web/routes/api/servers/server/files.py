@@ -72,7 +72,7 @@ file_delete_schema = {
 
 
 class ApiServersServerFilesIndexHandler(BaseApiHandler):
-    def post(self, server_id: str):
+    def post(self, server_id: str, backup_id=None):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -149,21 +149,35 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 filename = html.escape(raw_filename)
                 rel = os.path.join(folder, raw_filename)
                 dpath = os.path.join(folder, filename)
-                if str(dpath) in self.controller.management.get_excluded_backup_dirs(
-                    server_id
-                ):
-                    if os.path.isdir(rel):
-                        return_json[filename] = {
-                            "path": dpath,
-                            "dir": True,
-                            "excluded": True,
-                        }
+                if backup_id:
+                    if str(
+                        dpath
+                    ) in self.controller.management.get_excluded_backup_dirs(backup_id):
+                        if os.path.isdir(rel):
+                            return_json[filename] = {
+                                "path": dpath,
+                                "dir": True,
+                                "excluded": True,
+                            }
+                        else:
+                            return_json[filename] = {
+                                "path": dpath,
+                                "dir": False,
+                                "excluded": True,
+                            }
                     else:
-                        return_json[filename] = {
-                            "path": dpath,
-                            "dir": False,
-                            "excluded": True,
-                        }
+                        if os.path.isdir(rel):
+                            return_json[filename] = {
+                                "path": dpath,
+                                "dir": True,
+                                "excluded": False,
+                            }
+                        else:
+                            return_json[filename] = {
+                                "path": dpath,
+                                "dir": False,
+                                "excluded": False,
+                            }
                 else:
                     if os.path.isdir(rel):
                         return_json[filename] = {
@@ -189,7 +203,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 )
             self.finish_json(200, {"status": "ok", "data": file_contents})
 
-    def delete(self, server_id: str):
+    def delete(self, server_id: str, _backup_id=None):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -247,7 +261,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             return self.finish_json(200, {"status": "ok"})
         return self.finish_json(500, {"status": "error", "error": str(proc)})
 
-    def patch(self, server_id: str):
+    def patch(self, server_id: str, _backup_id):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -301,7 +315,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             file_object.write(file_contents)
         return self.finish_json(200, {"status": "ok"})
 
-    def put(self, server_id: str):
+    def put(self, server_id: str, _backup_id):
         auth_data = self.authenticate_user()
         if not auth_data:
             return

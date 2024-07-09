@@ -1010,6 +1010,11 @@ class Helpers:
         except PermissionError as e:
             logger.critical(f"Check generated exception due to permssion error: {e}")
             return False
+        except FileNotFoundError as e:
+            logger.critical(
+                f"Check generated exception due to file does not exist error: {e}"
+            )
+            return False
 
     def create_self_signed_cert(self, cert_dir=None):
         if cert_dir is None:

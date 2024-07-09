@@ -38,6 +38,7 @@ from app.classes.web.routes.api.servers.server.backups.index import (
 )
 from app.classes.web.routes.api.servers.server.backups.backup.index import (
     ApiServersServerBackupsBackupIndexHandler,
+    ApiServersServerBackupsBackupFilesIndexHandler,
 )
 from app.classes.web.routes.api.servers.server.files import (
     ApiServersServerFilesIndexHandler,
@@ -218,13 +219,13 @@ def api_handlers(handler_args):
             handler_args,
         ),
         (
-            r"/api/v2/servers/([a-z0-9-]+)/backups/backup/?",
+            r"/api/v2/servers/([a-z0-9-]+)/backups/backup/([a-z0-9-]+)/?",
             ApiServersServerBackupsBackupIndexHandler,
             handler_args,
         ),
         (
-            r"/api/v2/servers/([a-z0-9-]+)/files/?",
-            ApiServersServerFilesIndexHandler,
+            r"/api/v2/servers/([a-z0-9-]+)/backups/backup/([a-z0-9-]+)/files/?",
+            ApiServersServerBackupsBackupFilesIndexHandler,
             handler_args,
         ),
         (
@@ -235,6 +236,11 @@ def api_handlers(handler_args):
         (
             r"/api/v2/servers/([a-z0-9-]+)/files/zip/?",
             ApiServersServerFilesZipHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/servers/([a-z0-9-]+)/files(?:/([a-zA-Z0-9-]+))?/?",
+            ApiServersServerFilesIndexHandler,
             handler_args,
         ),
         (
@@ -273,7 +279,8 @@ def api_handlers(handler_args):
             handler_args,
         ),
         (
-            r"/api/v2/servers/([a-z0-9-]+)/action/([a-z_]+)/?",
+            # optional third argument when we need a action ID
+            r"/api/v2/servers/([a-z0-9-]+)/action/([a-z_]+)(?:/([a-z0-9-]+))?/?",
             ApiServersServerActionHandler,
             handler_args,
         ),

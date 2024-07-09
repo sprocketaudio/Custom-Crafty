@@ -2,6 +2,8 @@
 ## --- [4.4.1] - 2024/TBD
 ### New features
 TBD
+### Refactor
+- Backups | Allow multiple backup configurations ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/711))
 ### Bug fixes
 - Fix zip imports so the root dir selection is functional ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/764))
 - Fix bug where full access gives minimal access ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/768))
