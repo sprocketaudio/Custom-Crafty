@@ -653,6 +653,9 @@
         "userTheme": "UI-thema",
         "uses": "Aantal toegestane gebruiken (-1==Geen Limiet)"
     },
+    "validators": {
+        "passLength": "Wachtwoord te kort. Minimumlengte: 8 tekens"
+    },
     "webhooks": {
         "areYouSureDel": "Weet u zeker dat u deze webhook wilt verwijderen?",
         "areYouSureRun": "Weet u zeker dat u deze webhook wilt testen?",

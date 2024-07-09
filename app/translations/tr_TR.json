@@ -652,6 +652,9 @@
         "userTheme": "UI Teması",
         "uses": "İzin verilen kullanım sayısı (-1==Sınır Yok)"
     },
+    "validators": {
+        "passLength": "Şifre çok kısa. Şifre en az 8 karakter olmalı."
+    },
     "webhooks": {
         "areYouSureDel": "Bu webhooku silmek istediğinizden emin misiniz?",
         "areYouSureRun": "Bu webhooku test etmek istediğinizden emin misiniz?",

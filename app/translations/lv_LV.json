@@ -654,6 +654,9 @@
         "userTheme": "UI Tēma",
         "uses": "Dauzums, cik reizes lietot (-1==Bez Limita)"
     },
+    "validators": {
+        "passLength": "Parole pārāk īsa. Minimālais Garums: 8"
+    },
     "webhooks": {
         "areYouSureDel": "Vai tiešām vēlies noņemt šo webhook?",
         "areYouSureRun": "Vai tiešām vēlies testēt šo webhook?",

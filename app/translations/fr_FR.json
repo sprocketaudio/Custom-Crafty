@@ -653,6 +653,9 @@
         "userTheme": "Theme d'Interface Utilisateur",
         "uses": "Nombre d'utilisation Authorisé (-1 == Illimité)"
     },
+    "validators": {
+        "passLength": "Mot de passe trop court. Longueur minimum : 8"
+    },
     "webhooks": {
         "areYouSureDel": "Es-tu sûr de vouloir supprimer ce webhook ?",
         "areYouSureRun": "Es-tu sûr de vouloir tester ce webhook ?",
