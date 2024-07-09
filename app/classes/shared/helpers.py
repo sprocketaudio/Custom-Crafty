@@ -19,7 +19,7 @@ import shutil
 import shlex
 import subprocess
 import itertools
-from datetime import datetime
+from datetime import datetime, timezone
 from socket import gethostname
 from contextlib import redirect_stderr, suppress
 import libgravatar
@@ -638,6 +638,10 @@ class Helpers:
         # set some defaults if we don't get version_data from our helper
         version = f"{major}.{minor}.{sub}"
         return str(version)
+
+    @staticmethod
+    def get_utc_now() -> datetime:
+        return datetime.fromtimestamp(time.time(), tz=timezone.utc)
 
     def encode_pass(self, password):
         return self.passhasher.hash(password)

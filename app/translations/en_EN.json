@@ -665,6 +665,9 @@
         "userTheme": "UI Theme",
         "uses": "Number of uses allowed (-1==No Limit)"
     },
+    "validators": {
+        "passLength": "Password Too Short. Minimum Length: 8"
+    },
     "webhooks": {
         "areYouSureDel": "Are you sure you want to delete this webhook?",
         "areYouSureRun": "Are you sure you want to test this webhook?",

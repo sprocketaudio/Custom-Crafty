@@ -217,7 +217,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
                 )
 
             if (
-                target_key.user_id != auth_data[4]["user_id"]
+                str(target_key.user_id) != str(auth_data[4]["user_id"])
                 and not auth_data[4]["superuser"]
             ):
                 return self.finish_json(

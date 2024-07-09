@@ -669,6 +669,9 @@
         "userTheme": "Design für die Benutzeroberfläche",
         "uses": "Anzahl der erlaubten Verwendungen (-1==Keine Begrenzung)"
     },
+    "validators": {
+        "passLength": "Passwort zu kurz. Mindestlänge: 8"
+    },
     "webhooks": {
         "areYouSureDel": "Sind Sie sicher, dass Sie diesen Webhook löschen möchten?",
         "areYouSureRun": "Sind Sie sicher, dass Sie diesen Webhook testen möchten?",

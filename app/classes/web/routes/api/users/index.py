@@ -2,6 +2,7 @@ import logging
 import json
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+from app.classes.shared.translation import Translation
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.models.roles import Roles, HelperRoles
 from app.classes.models.users import PUBLIC_USER_ATTRS
@@ -54,6 +55,7 @@ class ApiUsersIndexHandler(BaseApiHandler):
         )
 
     def post(self):
+        self.translator = Translation(self.helper)
         new_user_schema = {
             "type": "object",
             "properties": {
@@ -87,12 +89,17 @@ class ApiUsersIndexHandler(BaseApiHandler):
         try:
             validate(data, new_user_schema)
         except ValidationError as e:
+            err = self.translator.translate(
+                "validators",
+                e.schema["error"],
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
         username = data["username"]
@@ -153,7 +160,11 @@ class ApiUsersIndexHandler(BaseApiHandler):
 
         for role in roles:
             role = self.controller.roles.get_role(role)
-            if int(role["manager"]) != int(auth_data[4]["user_id"]) and not superuser:
+            if (
+                str(role.get("manager", "no manager found"))
+                != str(auth_data[4]["user_id"])
+                and not superuser
+            ):
                 return self.finish_json(
                     400, {"status": "error", "error": "INVALID_ROLES_CREATE"}
                 )

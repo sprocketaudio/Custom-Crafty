@@ -669,6 +669,9 @@
         "userTheme": "Tema IU",
         "uses": "Numero di usi permessi (-1==Nessun limite)"
     },
+    "validators": {
+        "passLength": "La password è troppo corta. Lunghezza minima: 8"
+    },
     "webhooks": {
         "areYouSureDel": "Sei sicuro di voler eliminare questo webhook?",
         "areYouSureRun": "Sei sicuro di voler testare questo webhook?",

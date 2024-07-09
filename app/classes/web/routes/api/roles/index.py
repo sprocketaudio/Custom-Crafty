@@ -2,6 +2,7 @@ import typing as t
 from jsonschema import ValidationError, validate
 import orjson
 from playhouse.shortcuts import model_to_dict
+from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.web.base_api_handler import BaseApiHandler
 
 create_role_schema = {
@@ -71,7 +72,7 @@ class ApiRolesIndexHandler(BaseApiHandler):
             return
         (
             _,
-            _,
+            exec_user_permissions_crafty,
             _,
             superuser,
             _,
@@ -81,7 +82,10 @@ class ApiRolesIndexHandler(BaseApiHandler):
         # GET /api/v2/roles?ids=true
         get_only_ids = self.get_query_argument("ids", None) == "true"
 
-        if not superuser:
+        if (
+            not superuser
+            and EnumPermissionsCrafty.ROLES_CONFIG not in exec_user_permissions_crafty
+        ):
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
 
         self.finish_json(
@@ -104,14 +108,17 @@ class ApiRolesIndexHandler(BaseApiHandler):
             return
         (
             _,
-            _,
+            exec_user_permissions_crafty,
             _,
             superuser,
             user,
             _,
         ) = auth_data
 
-        if not superuser:
+        if (
+            not superuser
+            and EnumPermissionsCrafty.ROLES_CONFIG not in exec_user_permissions_crafty
+        ):
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
 
         try:
@@ -138,6 +145,8 @@ class ApiRolesIndexHandler(BaseApiHandler):
 
         role_name = data["name"]
         manager = data.get("manager", None)
+        if not superuser and not manager:
+            manager = auth_data[4]["user_id"]
         if manager == self.controller.users.get_id_by_name("SYSTEM") or manager == 0:
             manager = None
 
