@@ -414,10 +414,13 @@ class ApiServersServerBackupsBackupFilesIndexHandler(BaseApiHandler):
                     "error_data": str(e),
                 },
             )
-
         try:
             FileHelpers.del_file(
-                os.path.join(backup_conf["backup_location"], data["filename"])
+                os.path.join(
+                    backup_conf["backup_location"],
+                    backup_conf["backup_id"],
+                    data["filename"],
+                )
             )
         except Exception as e:
             return self.finish_json(
