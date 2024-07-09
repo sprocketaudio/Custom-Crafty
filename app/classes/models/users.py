@@ -38,7 +38,7 @@ class Users(BaseModel):
     superuser = BooleanField(default=False)
     lang = CharField(default="en_EN")
     support_logs = CharField(default="")
-    valid_tokens_from = DateTimeField(default=datetime.datetime.now)
+    valid_tokens_from = DateTimeField(default=Helpers.get_utc_now)
     server_order = CharField(default="")
     preparing = BooleanField(default=False)
     hints = BooleanField(default=True)
@@ -119,7 +119,6 @@ class HelperUsers:
     @staticmethod
     def get_user_total():
         count = Users.select().where(Users.username != "system").count()
-        print(count)
         return count
 
     @staticmethod
