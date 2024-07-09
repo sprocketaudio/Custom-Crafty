@@ -669,6 +669,9 @@
         "userTheme": "Tema de Interfaz",
         "uses": "Número de usos permitidos. (Sin límite: -1)"
     },
+    "validators": {
+        "passLength": "Contraseña demasiado corta. Longitud mínima: 8"
+    },
     "webhooks": {
         "areYouSureDel": "¿Estás seguro de que quieres eliminar este webhook?",
         "areYouSureRun": "¿Estás seguro de que quieres probar este webhook?",
