@@ -437,11 +437,6 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-sm-12" style="visibility: hidden;" hidden>
-                  <div class="form-group">
-                    <input type="text" class="form-control" id="zip_root_path" name="zip_root_path">
-                  </div>
-                </div>
                 <div class="modal fade" id="dir_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
                   aria-hidden="true">
                   <div class="modal-dialog" role="document">
@@ -586,11 +581,6 @@
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              <div style="visibility: hidden;">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="zip_root_path" name="zip_root_path">
                 </div>
               </div>
               <div class="modal fade" id="dir_upload_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
@@ -1035,6 +1025,13 @@
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
       console.log(formDataObject);
+      var checkedRadio = $('.root-input:checked');
+      let zip_root_path = ""
+      if (checkedRadio.length > 0) {
+        // Get the value of the checked radio button
+        var checkedValue = checkedRadio.val();
+        zip_root_path = checkedValue; // Return the checked value if needed
+      }
       let send_data = {
         "name": formDataObject.name,
         "roles": calcRoles(),
@@ -1047,7 +1044,7 @@
         "minecraft_java_create_data": {
           "create_type": "import_server",
           "import_server_create_data": {
-            "existing_server_path": formDataObject.root_path,
+            "existing_server_path": zip_root_path,
             "jarfile": formDataObject.server_jar,
             "mem_min": formDataObject.mem_min,
             "mem_max": formDataObject.mem_max,
@@ -1071,6 +1068,13 @@
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
       console.log(formDataObject);
+      var checkedRadio = $('.root-input:checked');
+      let zip_root_path = ""
+      if (checkedRadio.length > 0) {
+        // Get the value of the checked radio button
+        var checkedValue = checkedRadio.val();
+        zip_root_path = checkedValue; // Return the checked value if needed
+      }
       let send_data = {
         "name": formDataObject.name,
         "roles": calcRoles(),
@@ -1083,7 +1087,7 @@
         "minecraft_java_create_data": {
           "create_type": "import_server",
           "import_server_create_data": {
-            "existing_server_path": formDataObject.root_path,
+            "existing_server_path": zip_root_path,
             "jarfile": formDataObject.server_jar,
             "mem_min": formDataObject.mem_min,
             "mem_max": formDataObject.mem_max,
