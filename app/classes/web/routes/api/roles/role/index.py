@@ -80,7 +80,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
 
         if (
             not superuser
-            and not EnumPermissionsCrafty.ROLES_CONFIG in exec_user_permissions_crafty
+            and EnumPermissionsCrafty.ROLES_CONFIG not in exec_user_permissions_crafty
         ):
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
 
@@ -131,7 +131,7 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
             return
         (
             _,
-            _,
+            exec_user_permissions_crafty,
             _,
             superuser,
             user,
@@ -139,7 +139,10 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
         ) = auth_data
 
         role = self.controller.roles.get_role(role_id)
-        if not superuser and user["user_id"] != role["manager"]:
+        if not superuser and (
+            user["user_id"] != role["manager"]
+            or EnumPermissionsCrafty.ROLES_CONFIG not in exec_user_permissions_crafty
+        ):
             return self.finish_json(
                 400,
                 {
