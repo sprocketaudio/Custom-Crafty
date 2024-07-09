@@ -20,6 +20,7 @@ TBD
 ### Lang
 - Show natural language name instead of country code in User Config Lang select list ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/773))
 - Add remaining `he_IL`, `th_TH` translations for 4.4.0 Release ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/761))
+- Mark `he_IL` incomplete ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/763))
 <br><br>
 
 ## --- [4.4.0] - 2024/05/11
