@@ -44,6 +44,7 @@ def main():
             if (
                 "_incomplete" not in file
                 and file != "en_EN.json"
+                and file != "humanized_index.json"
                 and file.endswith(".json")
             ):
                 file_path = os.path.join(root, file)
