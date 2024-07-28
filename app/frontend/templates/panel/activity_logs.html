@@ -34,25 +34,21 @@
             <table class="table table-hover" id="audit_table" width="100%">
               <thead>
                 <tr class="rounded">
-                  <td>Username</td>
-                  <td>Time</td>
-                  <td>Action</td>
-                  <td>Server ID</td>
-                  <td>IP</td>
+                  <th>Time</th>
+                  <th>Username</th>
+                  <th>Action</th>
+                  <th>Server ID</th>
+                  <th>IP</th>
                 </tr>
               </thead>
               <tbody>
-                {% for row in data['audit_logs'] %}
                 <tr>
-                  <td>{{ row['user_name'] }}</td>
-                  <td>
-                    {{ row['created'].strftime('%Y-%m-%d %H:%M:%S') }}
+                  <td colspan="5" id="image-div" class="text-center"> <!-- Center image within table -->
+                    <img class="img-center" id="logo-animate" src="../static/assets/images/crafty-logo-square-1024.png"
+                      alt="Crafty Logo, Crafty is loading" width="20%"><br><br>{{ translate('datatables',
+                    'loadingRecords', data['lang'])}}
                   </td>
-                  <td>{{ row['log_msg'] }}</td>
-                  <td>{{ row['server_id'] }}</td>
-                  <td>{{ row['source_ip'] }}</td>
                 </tr>
-                {% end %}
               </tbody>
             </table>
 
@@ -67,17 +63,6 @@
 {% end %}
 
 {% block js %}
-<script>
-
-  $(document).ready(function () {
-    console.log('ready for JS!')
-    $('#audit_table').DataTable({
-      'order': [1, 'desc']
-    }
-    );
-
-  });
-</script>
 <script>
   $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
@@ -99,6 +84,74 @@
     else {
       $('.too_small').popover("hide");
     } // New width
+  });
+
+  $(document).ready(function () {
+    console.log('ready for JS!')
+    // Initialize DataTables
+    // Load initial data
+    getActivity();
+  });
+
+  function updateActivity(data) {
+    let tbody = $('#audit_table tbody');
+    tbody.empty(); // Clear existing rows
+    $.each(data, function (index, value) {
+      let row = $('<tr>');
+      row.append(`<td>${value.time}</td>`);
+      if (value.user_name != "system" && value.user_id != "-1") {
+        row.append(`<td><a href="/panel/edit_user?id=${value.user_id}">${value.user_name}</a></td>`);
+      } else {
+        row.append(`<td>${value.user_name}</td>`);
+      }
+      row.append(`<td>${value.log_msg}</td>`);
+      row.append(`<td>${value.server_id}</td>`);
+      row.append(`<td>${value.source_ip}</td>`);
+      tbody.append(row);
+    });
+    $('#audit_table').DataTable({
+      'order': [[0, 'desc']], // Sort by the first column in descending order
+      filter: true,
+      "searching": true,
+    })
+  }
+
+  async function getActivity() {
+    var token = getCookie("_xsrf");
+    let res = await fetch(`/api/v2/crafty/logs/audit`, {
+      method: 'GET',
+      headers: {
+        'X-XSRFToken': token
+      },
+    });
+    let responseData = await res.json();
+    console.log(responseData);
+    if (responseData.status === "ok") {
+      updateActivity(responseData.data);
+      console.log("activity update")
+    } else {
+      bootbox.alert(responseData.error)
+    }
+  }
+
+  function rotateImage(degree) {
+    $('#logo-animate').animate({ transform: degree }, {
+      step: function (now, fx) {
+        $(this).css({
+          '-webkit-transform': 'rotate(' + now + 'deg)',
+          '-moz-transform': 'rotate(' + now + 'deg)',
+          'transform': 'rotate(' + now + 'deg)'
+        });
+      }
+    });
+    setTimeout(function () {
+      rotateImage(360);
+    }, 2000);
+  }
+  $(document).ready(function () {
+    setTimeout(function () {
+      rotateImage(360);
+    }, 2000);
   });
 </script>
 

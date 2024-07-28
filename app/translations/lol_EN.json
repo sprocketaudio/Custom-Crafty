@@ -20,6 +20,7 @@
         "created": "CREATED",
         "deleteKeyConfirmation": "U SURE U WANTZ TO DELETE DIS? CAN'T UNDO!",
         "deleteKeyConfirmationTitle": "I CAN EATZ IT??? : ${keyId}?",
+        "fullAccess": "All da Doors Open",
         "getToken": "GIT TOKEN",
         "name": "NAME",
         "nameDesc": "WUT WUD U LIEK 2 CALL DIS API TOKEN? ",
@@ -177,11 +178,14 @@
             },
             "thousands": ",",
             "zeroRecords": "No matching records found"
-        }
+        },
+        "loadingRecords": "Loading..."
     },
     "error": {
         "agree": "YESH PLS",
         "bedrockError": "BEDROCKZ DOWNLOADZ NO WORKY. CHECK PLZ.",
+        "bigBucket1": "Big Bucket No Worky. Plz check",
+        "bigBucket2": "for da freshest nooz.",
         "cancel": "NOPEZ",
         "contact": "CONTACK CWAFTY CONTROLLR SUPORT ON DA DIZORD",
         "craftyStatus": "CWAFTY'S STATUSZ",
@@ -203,6 +207,8 @@
         "not-downloaded": "SOZ BUT I FAILDZ CAN'T SEEM TO FINDZ YOUR FISH. PLZ GIB MEZ IT. I HUNGRY.",
         "portReminder": "WE HAS DETECTD DIS AR TEH FURST TIEM {} IZ BEAN RUN. IF U WANTS IT ACESIBLE TO NEIGHBORHOOD CATS PLZ UNLOCK CAT_FLAP, {}, THRU UR ROUTR IF U HAS NOT DUN SO.",
         "privMsg": "AND THEEZ ",
+        "return": "Go Bak to Dashbored",
+        "selfHost": "If u iz self-hostin' dis repo, check ur addy or peep our fix-it guide.",
         "serverJars1": "CAN'T TALK TO SERVER JARS API. CHECKZ",
         "serverJars2": "TO SEE NEWZ STUFFZ.",
         "start-error": "CHAIR {} FAILD 2 START WIF OOF CODE: {}",
@@ -295,10 +301,12 @@
         "serversDesc": "SERVRS DIS ROLE IZ ALLOWD 2 ACCES"
     },
     "serverBackups": {
+        "actions": "DO-STUFFZ",
         "after": "RUNZ COMMANDZ AFTUR BAKUP",
         "backupAtMidnight": "AUTO-BAKUP AT MIDDLENIGHTZ?",
         "backupNow": "BAKUP NOWZ!",
         "backupTask": "OKAI I GETZ FISH, BAK SOONZ",
+        "backups": "SERVER BACKUPS",
         "before": "RUNZ COMMANDZ BEFOUR BAKUP",
         "cancel": "STAHP",
         "clickExclude": "CLICK 2 MARK EXCLUSHUNS",
@@ -307,21 +315,34 @@
         "confirmDelete": "R U SURE U WANTZ ME TO EATZ DIS BAKUP? WIAL BEH LOZT FOREVR (LONGIR THAN KITTEHZ NAPZ)",
         "confirmRestore": "R U SURE U WANTZ 2 RESTORE FRUM DIS BAKUP. ALL CURRENT SERVR FISHZ WILL BE EATZ AN WILL BE UNRECOVERABLE.",
         "currentBackups": "CURRENT STASH OV BAKUPS",
+        "default": "USUAL BACKUP",
+        "defaultExplain": "DA BACKUP THAT CRAFTY USE BEFORE UPDATES. DIS NO CAN CHANGE OR GO AWAY.",
         "delete": "MAK GONE",
         "destroyBackup": "EAT BAKUP \" + file_to_del + \"?",
         "download": "DOWNLOADZ",
+        "edit": "MAKE BETTERS",
+        "enabled": "TURNED ON",
         "excludedBackups": "EXCLUSHUNS: ",
         "excludedChoose": "CHOOSE TEH PATHS U WANTS 2 EXCLUDE FRUM UR BAKUPS",
         "exclusionsTitle": "BAKUP EXCLUSHUNS",
+        "failed": "NOPE'D",
         "maxBackups": "MAX BAKUPS",
         "maxBackupsDesc": "CWAFTY WILL NOT KEEPZ MOAR THAN N BCKUPS, DELETIN TEH MOST OLDZ FURST (ENTR 0 TO BE BIG GREEDY)",
+        "myBackup": "MAH NEW BACKUP",
+        "name": "NAMZ",
+        "newBackup": "MAKEZ NEW BACKUP",
+        "no-backup": "NO BACKUPS. TO MAKE A NEW BACKUP THINGY PLEASE BOOP. NEW BACKUP",
         "options": "OPSHUNS",
         "path": "PETH",
         "restore": "RESTOR",
         "restoring": "RESTORIN BAKUP. DIS CUD TAEK WHILE. PLZ BE PATIENT.",
+        "run": "DO BACKUP NOWZ",
         "save": "DUN",
         "shutdown": "SLEEPY SERVR WEN MAK BAKAUPZ?",
         "size": "HOW BIGZ",
+        "standby": "WAITIN'",
+        "status": "WHAT'S UP",
+        "storage": "HIDING SPOT",
         "storageLocation": "SHINY STASH OV HINGZ",
         "storageLocationDesc": "WER DO U WANTS 2 STASH BAKUPS?"
     },
@@ -486,6 +507,7 @@
     },
     "serverSchedules": {
         "action": "ACTSHUN",
+        "actionId": "PICK ACTION KITTY",
         "areYouSure": "FORGET 2 DO DIS ????",
         "cancel": "STAHP",
         "cannotSee": "CANNY SEE?",
@@ -594,12 +616,12 @@
         "dashboard": "DASHBORD",
         "documentation": "DOCUMENTASHUN",
         "inApp": "IN APPZ DOCS",
-        "navigation": "NAVIGASHUN",
         "newServer": "CONSTWUCT A SERVR",
         "servers": "SERVRS"
     },
     "startup": {
         "almost": "ALMOST DUN. HOLD ON TO YER WHISKERS...",
+        "cache": "Fightin' for a Big Bucket o Fish",
         "internals": "SETTIN' UP AN' STARTIN' CWAFTY'S INSIDE BITZ",
         "internet": "LOOKIN' FOR OUTER SPACE TALKY",
         "server": "WAKIN' UPZ ",
@@ -646,6 +668,9 @@
         "userSettings": "HOOMAN THINGZ",
         "userTheme": "THEMEZ",
         "uses": "NUMBER OV USES ALLOWED (-1==NO LIMIT)"
+    },
+    "validators": {
+        "passLength": "PASSWRD TOO SMOL. NEEDZ 8 CATZ PLZ"
     },
     "webhooks": {
         "areYouSureDel": "U SURE U WANTZ TO EATZ DIS WEBHOOK?",

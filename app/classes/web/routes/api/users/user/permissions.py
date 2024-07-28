@@ -27,6 +27,7 @@ class ApiUsersUserPermissionsHandler(BaseApiHandler):
             _,
             _,
             user,
+            _,
         ) = auth_data
 
         if user_id in ["@me", user["user_id"]]:
@@ -52,6 +53,8 @@ class ApiUsersUserPermissionsHandler(BaseApiHandler):
                     },
                 )
 
+        counter_data = PermissionsCrafty.get_created_quantity_list(user_id)
+
         self.finish_json(
             200,
             {
@@ -59,9 +62,9 @@ class ApiUsersUserPermissionsHandler(BaseApiHandler):
                 "data": {
                     "permissions": res_data.permissions,
                     "counters": {
-                        SERVER_CREATION: res_data.created_server,
-                        USER_CONFIG: res_data.created_user,
-                        ROLES_CONFIG: res_data.created_role,
+                        SERVER_CREATION: counter_data["SERVER_CREATION"],
+                        USER_CONFIG: counter_data["USER_CONFIG"],
+                        ROLES_CONFIG: counter_data["ROLES_CONFIG"],
                     },
                     "limits": {
                         SERVER_CREATION: res_data.limit_server_creation,

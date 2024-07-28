@@ -24,6 +24,7 @@ class ApiCraftyConfigServerDirHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         # GET /api/v2/roles?ids=true
@@ -56,6 +57,7 @@ class ApiCraftyConfigServerDirHandler(BaseApiHandler):
             _,
             _,
             _,
+            _,
         ) = auth_data
 
         if not auth_data:
@@ -68,7 +70,7 @@ class ApiCraftyConfigServerDirHandler(BaseApiHandler):
 
         try:
             data = orjson.loads(self.request.body)
-        except orjson.decoder.JSONDecodeError as e:
+        except orjson.JSONDecodeError as e:
             return self.finish_json(
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
@@ -109,7 +111,7 @@ class ApiCraftyConfigServerDirHandler(BaseApiHandler):
         self.controller.management.add_to_audit_log(
             auth_data[4]["user_id"],
             f"updated master servers dir to {new_dir}/servers",
-            server_id=0,
+            server_id=None,
             source_ip=self.get_remote_ip(),
         )
 

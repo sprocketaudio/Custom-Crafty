@@ -13,6 +13,7 @@ class ApiRolesRoleServersHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         # GET /api/v2/roles/role/servers?ids=true

@@ -99,6 +99,7 @@
         "welcome": "Wolkom by Crafty Controller"
     },
     "datatables": {
+        "loadingRecords": "Laden...",
         "i18n": {
             "aria": {
                 "sortAscending": ": aktivearje om kolom oprinnend te sortearjen",
@@ -488,7 +489,6 @@
         "credits": "Credits",
         "dashboard": "Dashboard",
         "documentation": "Dokumintaasje",
-        "navigation": "Navigaasje",
         "newServer": "Nije server oanmeitsje",
         "servers": "Servers"
     },

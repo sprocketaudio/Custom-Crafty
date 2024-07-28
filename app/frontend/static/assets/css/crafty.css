@@ -45,6 +45,16 @@ nav.sidebar {
     position: fixed;
 }
 
+td {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+td::-webkit-scrollbar {
+    display: none;
+}
 
 @media (min-width: 992px) {
     nav.sidebar {
@@ -343,4 +353,8 @@ div.form-group.reset-secret {
 
 .bg-dropdown {
     background-color: var(--dropdown-bg);
+}
+
+.hidden-input {
+    margin-left: -40px;
 }

@@ -38,7 +38,7 @@ class Users(BaseModel):
     superuser = BooleanField(default=False)
     lang = CharField(default="en_EN")
     support_logs = CharField(default="")
-    valid_tokens_from = DateTimeField(default=datetime.datetime.now)
+    valid_tokens_from = DateTimeField(default=Helpers.get_utc_now)
     server_order = CharField(default="")
     preparing = BooleanField(default=False)
     hints = BooleanField(default=True)
@@ -71,7 +71,7 @@ class ApiKeys(BaseModel):
     user_id = ForeignKeyField(Users, backref="api_token", index=True)
     server_permissions = CharField(default="00000000")
     crafty_permissions = CharField(default="000")
-    superuser = BooleanField(default=False)
+    full_access = BooleanField(default=False)
 
     class Meta:
         table_name = "api_keys"
@@ -119,7 +119,6 @@ class HelperUsers:
     @staticmethod
     def get_user_total():
         count = Users.select().where(Users.username != "system").count()
-        print(count)
         return count
 
     @staticmethod
@@ -408,7 +407,7 @@ class HelperUsers:
     def add_user_api_key(
         name: str,
         user_id: str,
-        superuser: bool = False,
+        full_access: bool = False,
         server_permissions_mask: t.Optional[str] = None,
         crafty_permissions_mask: t.Optional[str] = None,
     ):
@@ -426,7 +425,7 @@ class HelperUsers:
                     if crafty_permissions_mask is not None
                     else {}
                 ),
-                ApiKeys.superuser: superuser,
+                ApiKeys.full_access: full_access,
             }
         ).execute()
 

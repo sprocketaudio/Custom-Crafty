@@ -20,6 +20,7 @@
         "created": "Crée",
         "deleteKeyConfirmation": "Es-tu sûr de vouloir supprimer cette clé API? Tu ne pourras plus revenir en arrière.",
         "deleteKeyConfirmationTitle": "Supprimer la clé API ${keyId}?",
+        "fullAccess": "Accès Complet",
         "getToken": "Obtenir un Jeton",
         "name": "Nom",
         "nameDesc": "Comment appeler ce Jeton d'API ? ",
@@ -177,11 +178,14 @@
             },
             "thousands": ",",
             "zeroRecords": "Aucun enregistrement correspondant trouvcé"
-        }
+        },
+        "loadingRecords": "Chargement ..."
     },
     "error": {
         "agree": "Agree",
         "bedrockError": "Téléchargement Bedrock non disponible. Merci de vérifier",
+        "bigBucket1": "Echec de vérification de l'état de Big Bucket. Veuillez vérifier",
+        "bigBucket2": " pour l'information la plus à jour.",
         "cancel": "Annuler",
         "contact": "Contacter le Support de Crafty Control via Discord",
         "craftyStatus": "Page de statut de Crafty",
@@ -203,6 +207,8 @@
         "not-downloaded": "Nous ne parvenons pas à trouver le fichier exécutable. A-t-il fini de Télécharger ? Les permissions permettent elles l'exécution ?",
         "portReminder": "Nous avons détecté que c'est la première fois que {} est exécuté. Assurez-vous de transférer le port {} via votre routeur/pare-feu pour le rendre accessible à distance depuis Internet.",
         "privMsg": "et le ",
+        "return": "Revenir au Tableau de Bord",
+        "selfHost": "Si vous hébergez vous-même ce repo, veuillez vérifier votre adresse et votre guide de dépannage.",
         "serverJars1": "l'API Server JARs est inaccessible. Merci de vérifier",
         "serverJars2": "pour les informations les plus à jour.",
         "start-error": "Le serveur {} n'a pas pu démarrer avec le code d'erreur : {}",
@@ -295,10 +301,12 @@
         "serversDesc": "Les serveurs auquels ce rôle a accès"
     },
     "serverBackups": {
+        "actions": "Actions",
         "after": "Exécuter une commande après la sauvegarde",
         "backupAtMidnight": "Sauvegarde Automatique à minuit ?",
         "backupNow": "Sauvegarder Maintenant !",
         "backupTask": "Une sauvegarde vient de démarrer.",
+        "backups": "Sauvegarde de Serveur",
         "before": "Exécuter une commande avant la sauvegarde",
         "cancel": "Annuler",
         "clickExclude": "Cliquer pour sélectionner les Exclusions",
@@ -307,21 +315,34 @@
         "confirmDelete": "Es-tu sûr de vouloir supprimer cette sauvegarde ? Tu ne pourras pas revenir en arrière.",
         "confirmRestore": "Êtes-vous sûr de vouloir restaurer à partir de cette sauvegarde. Tous les fichiers du serveur actuel passeront à l'état de sauvegarde et seront irrécupérables.",
         "currentBackups": "Sauvegardes Actuelles",
+        "default": "Sauvegarde par Défaut",
+        "defaultExplain": "La sauvegarde que Crafty utilisera avant la mise à jour. Cela ne peut être changé ou modifié.",
         "delete": "Supprimer",
         "destroyBackup": "Supprimer la sauvegarde \" + file_to_del + \" ?",
         "download": "Télécharger",
+        "edit": "Modifier",
+        "enabled": "Activé",
         "excludedBackups": "Dossiers Exclus : ",
         "excludedChoose": "Choisir les dossiers à exclure de la sauvegarde",
         "exclusionsTitle": "Exclusions de Sauvegarde",
+        "failed": "Echec",
         "maxBackups": "Sauvergardes Max",
         "maxBackupsDesc": "Crafty ne fera pas plus de N sauvegardes, supprimant les plus anciennes (entrer 0 pour toutes les garder)",
+        "myBackup": "Ma Nouvelle Sauvegarde",
+        "name": "Nom",
+        "newBackup": "Créer une Nouvelle Sauvegarde",
+        "no-backup": "Aucune Sauvegarde. Pour aouter une nouvelle configuration de sauvegarde, il faut clicker sur ",
         "options": "Options",
         "path": "Chemin",
         "restore": "Restaurer",
         "restoring": "Restauration de la sauvegarde. Cela peut prendre un peu de temps. S'il vous plaît soyez patient.",
+        "run": "Lancer la Sauvegarde",
         "save": "Sauvegarder",
         "shutdown": "Extinction du serveur pendant la durée de la sauvegarde",
         "size": "Taille",
+        "standby": "Attente",
+        "status": "Statut",
+        "storage": "Emplacement de la Sauvegarde",
         "storageLocation": "Emplacement de Sauvegarde",
         "storageLocationDesc": "Où veux-tu enregister tes sauvegardes ?"
     },
@@ -486,6 +507,7 @@
     },
     "serverSchedules": {
         "action": "Action",
+        "actionId": "Sélectionner une configuration de sauvegarde",
         "areYouSure": "Supprimer la Tâche Planifiée ?",
         "cancel": "Annuler",
         "cannotSee": "Tu ne peux pas tout voir ?",
@@ -594,12 +616,12 @@
         "dashboard": "Tableau de Bord",
         "documentation": "Documentation",
         "inApp": "Documentation Interne",
-        "navigation": "Navigation",
         "newServer": "Créer un Nouveau Serveur",
         "servers": "Serveurs"
     },
     "startup": {
         "almost": "Finalisation. Patienter ...",
+        "cache": "Mise à jour du fichier cache de Big Bucket",
         "internals": "Configuration et Démarrage des composants internes de Crafty",
         "internet": "Vérification de la connexion à Internet",
         "server": "Initialisation ",
@@ -646,6 +668,9 @@
         "userSettings": "Paramètres Utilisateur",
         "userTheme": "Theme d'Interface Utilisateur",
         "uses": "Nombre d'utilisation Authorisé (-1 == Illimité)"
+    },
+    "validators": {
+        "passLength": "Mot de passe trop court. Longueur minimum : 8"
     },
     "webhooks": {
         "areYouSureDel": "Es-tu sûr de vouloir supprimer ce webhook ?",

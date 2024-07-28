@@ -5,7 +5,7 @@ yamllint:
   stage: lint
   image: registry.gitlab.com/pipeline-components/yamllint:latest
   tags:
-    - docker
+    - saas-linux-medium-amd64
   rules:
     - if: "$CODE_QUALITY_DISABLED"
       when: never
@@ -18,7 +18,7 @@ jsonlint:
   stage: lint
   image: registry.gitlab.com/pipeline-components/jsonlint:latest
   tags:
-    - docker
+    - saas-linux-medium-amd64
   rules:
     - if: "$CODE_QUALITY_DISABLED"
       when: never
@@ -33,7 +33,7 @@ black:
   stage: lint
   image: registry.gitlab.com/pipeline-components/black:latest
   tags:
-    - docker
+    - saas-linux-medium-amd64
   rules:
     - if: "$CODE_QUALITY_DISABLED"
       when: never
@@ -46,7 +46,7 @@ pylint:
   stage: lint
   image: registry.gitlab.com/pipeline-components/pylint:latest
   tags:
-    - docker
+    - saas-linux-medium-amd64
   rules:
     - if: "$CODE_QUALITY_DISABLED"
       when: never
@@ -69,7 +69,7 @@ sonarcloud-check:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
   tags:
-    - docker
+    - saas-linux-medium-amd64
   rules:
     - if: "$SONAR_TOKEN == null"
       when: never
@@ -91,7 +91,7 @@ lang-check:
   stage: lint
   image: alpine:latest
   tags:
-    - docker
+    - saas-linux-medium-amd64
   rules:
     - if: "$CODE_QUALITY_DISABLED"
       when: never

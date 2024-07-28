@@ -369,9 +369,12 @@ class MigrationManager(object):
     @cached_property
     def migrator(self) -> Migrator:
         """
-        Create migrator and setup it with fake migrations.
+        Create migrator
         """
         migrator = Migrator(self.database)
+        # Running false migrations to retrives the schemes of
+        # the precedents created tables in the table_dict element
+        # It's useful to run the new migrations
         for name in self.done:
             self.up_one(name, migrator, True)
         return migrator

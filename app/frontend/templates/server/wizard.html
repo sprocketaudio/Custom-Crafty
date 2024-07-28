@@ -20,11 +20,6 @@
     <div class="col-sm-6 grid-margin stretch-card">
       <div class="card" id="creation_wizard">
         <div class="card-body">
-          {% if data["server_api"] and data["online"] %}
-          <a href="https://serverjars.com/" target="_blank" alt="serverjars icon"><img
-              src="../../static/assets/images/serverjars/ICON.svg"
-              style="float: right; width: 40px; position: relative;"></a>
-          {% end %}
 
           <h4>{{ translate('serverWizard', 'newServer', data['lang']) }}</h4>
           <br />
@@ -67,16 +62,19 @@
                 {% end %}
                 {% raw xsrf_form_html() %}
                 <div class="row">
+
                   <div class="col-sm-12">
                     <div class="form-group">
-                      <label for="server_jar">{{ translate('serverWizard', 'serverType', data['lang'])
-                        }}</label>
+                      <label for="server_jar">{{ translate('serverWizard', 'serverType', data['lang']) }}</label>
                       <div class="input-group">
-                        <select required class="form-control form-control-lg select-css" id="server_jar"
-                          name="server_jar" onchange="serverJarChange(this)">
-                          <option value="None">{{ translate('serverWizard', 'selectType', data['lang']) }}</option>
+                        <select required class="form-control form-control-lg select-css" id="server_jar" name="type"
+                          onchange="serverJarChange(this)">
+                          <option value="">{{ translate('serverWizard', 'selectServer', data['lang']) }}</option>
                           {% for s in data['server_types'] %}
-                          <option value="{{ s }}">{{ s.capitalize() }}</option>
+                          {% if data['server_types'][s].get("enabled", False) %}
+                          <option value="{{ s }}">{{ data["server_types"][s].get("friendly_name", s).capitalize() }}
+                            {% end %}
+                          </option>
                           {% end %}
                         </select>
                         {% if data['super_user'] %}
@@ -108,7 +106,8 @@
                     </div>
                   </div>
                   <span data-html="true" class="version-hint text-center"
-                    data-content="⚠️ {{ translate('serverWizard', 'unsupported', data['lang']) }} ⚠️" , data-placement="right"></span>
+                    data-content="⚠️ {{ translate('serverWizard', 'unsupported', data['lang']) }} ⚠️" ,
+                    data-placement="right"></span>
                   <div class="col-sm-12">
                     <div class="form-group">
                       <label for="server_name">{{ translate('serverWizard', 'serverName', data['lang']) }}</label>
@@ -191,10 +190,12 @@
         {% if not data["server_api"] and data["online"] %}
         <div class="api-alert" style="position: absolute; top: -5px; z-index: 100; opacity: .99;">
           <p style="color: white !important;"><i class="fas fa-exclamation-triangle" style="color: red;"></i>&nbsp;{{
-            translate('error', 'serverJars1', data['lang']) }}<a style="color: red;" ;
-              href="https://status.craftycontrol.com/status/craftycontrol" target="_blank" rel="noopener">&nbsp;{{ translate('error',
+            translate('error', 'bigBucket1', data['lang']) }}<a style="color: red;" ;
+              href="https://status.craftycontrol.com/status/craftycontrol" target="_blank" rel="noopener">&nbsp;{{
+              translate('error',
               'craftyStatus', data['lang']) }}</a>
-            &nbsp;{{ translate('error', 'serverJars2', data['lang']) }}</p>
+            &nbsp;{{ translate('error', 'bigBucket2', data['lang']) }}</br></br><small>{{ translate('error', 'selfHost',
+              data['lang'])}}</small></p>
         </div>
         {% end %}
         {% if not data["online"] %}
@@ -436,11 +437,6 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-sm-12" style="visibility: hidden;" hidden>
-                  <div class="form-group">
-                    <input type="text" class="form-control" id="zip_root_path" name="zip_root_path">
-                  </div>
-                </div>
                 <div class="modal fade" id="dir_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
                   aria-hidden="true">
                   <div class="modal-dialog" role="document">
@@ -513,8 +509,8 @@
                     'labelZipFile', data['lang']) }}</label>
                 </div>
                 <div class="input-group-append">
-                  <button type="button" class="btn btn-info upload-button" id="upload-button" onclick="sendFile()"
-                    disabled>{{ translate('serverWizard',
+                  <button type="button" class="btn btn-info upload-button" id="upload-button"
+                    onclick="uploadFile('import')" disabled>{{ translate('serverWizard',
                     'uploadButton', data['lang']) }}</button>
                 </div>
               </div>
@@ -585,11 +581,6 @@
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              <div style="visibility: hidden;">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="zip_root_path" name="zip_root_path">
                 </div>
               </div>
               <div class="modal fade" id="dir_upload_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
@@ -814,6 +805,7 @@
 {% end %}
 
 {% block js %}
+<script src="../../static/assets/js/shared/upload.js"></script>
 <script>
   document.getElementById("root_files_button").addEventListener("click", function (event) {
     if (document.forms["zip"]["server_path"].value != "") {
@@ -827,7 +819,7 @@
         message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
         closeButton: false
       });
-      setTimeout(function(){
+      setTimeout(function () {
         getDirView();
       }, 2000);
     } else {
@@ -845,61 +837,13 @@
       message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
       closeButton: false
     });
-    setTimeout(function(){
-        getDirView();
-      }, 2000);
+    setTimeout(function () {
+      getDirView();
+    }, 2000);
   });
   var upload = false;
   var file;
-  function sendFile() {
-    file = $("#file")[0].files[0]
-    document.getElementById("upload_input").innerHTML = '<div class="progress" style="width: 100%;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">&nbsp;<i class="fa-solid fa-spinner"></i></div></div>'
-    let xmlHttpRequest = new XMLHttpRequest();
-    let token = getCookie("_xsrf")
-    let fileName = file.name
-    let target = '/upload'
-    let mimeType = file.type
-    let size = file.size
-    let type = 'server_import'
 
-    xmlHttpRequest.upload.addEventListener('progress', function (e) {
-
-      if (e.loaded <= size) {
-        var percent = Math.round(e.loaded / size * 100);
-        $(`#upload-progress-bar`).css('width', percent + '%');
-        $(`#upload-progress-bar`).html(percent + '%');
-      }
-    });
-
-    xmlHttpRequest.open('POST', target, true);
-    xmlHttpRequest.setRequestHeader('X-Content-Type', mimeType);
-    xmlHttpRequest.setRequestHeader('X-XSRFToken', token);
-    xmlHttpRequest.setRequestHeader('X-Content-Length', size);
-    xmlHttpRequest.setRequestHeader('X-Content-Disposition', 'attachment; filename="' + fileName + '"');
-    xmlHttpRequest.setRequestHeader('X-Content-Upload-Type', type);
-    xmlHttpRequest.setRequestHeader('X-FileName', fileName);
-    xmlHttpRequest.addEventListener('load', (event) => {
-      if (event.target.responseText == 'success') {
-        console.log('Upload for file', file.name, 'was successful!')
-        $("#upload_input").html(`<div class="card-header header-sm d-flex justify-content-between align-items-center" style="width: 100%;"><input value="${fileName}" type="text" id="file-uploaded" disabled></input> 🔒</div>`);
-        document.getElementById("lower_half").style.visibility = "visible";
-        document.getElementById("lower_half").hidden = false;
-      }
-      else {
-        console.log(JSON.parse(event.target.responseText).info)
-        bootbox.alert({
-          message: JSON.parse(event.target.responseText).info,
-          callback: function () {
-            window.location.reload();
-          }
-        });
-      }
-    }, false);
-    xmlHttpRequest.addEventListener('error', (e) => {
-      console.error('Error while uploading file', file.name + '.', 'Event:', e)
-    }, false);
-    xmlHttpRequest.send(file);
-  }
 </script>
 <script type="text/javascript" src="../../static/assets/js/shared/root-dir.js"></script>
 
@@ -1034,6 +978,13 @@
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
       console.log(formDataObject);
+      var checkedRadio = $('.root-input:checked');
+      let zip_root_path = ""
+      if (checkedRadio.length > 0) {
+        // Get the value of the checked radio button
+        var checkedValue = checkedRadio.val();
+        zip_root_path = checkedValue; // Return the checked value if needed
+      }
       let send_data = {
         "name": formDataObject.name,
         "roles": calcRoles(),
@@ -1046,7 +997,7 @@
         "minecraft_java_create_data": {
           "create_type": "import_server",
           "import_server_create_data": {
-            "existing_server_path": formDataObject.root_path,
+            "existing_server_path": zip_root_path,
             "jarfile": formDataObject.server_jar,
             "mem_min": formDataObject.mem_min,
             "mem_max": formDataObject.mem_max,
@@ -1070,6 +1021,13 @@
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
       console.log(formDataObject);
+      var checkedRadio = $('.root-input:checked');
+      let zip_root_path = ""
+      if (checkedRadio.length > 0) {
+        // Get the value of the checked radio button
+        var checkedValue = checkedRadio.val();
+        zip_root_path = checkedValue; // Return the checked value if needed
+      }
       let send_data = {
         "name": formDataObject.name,
         "roles": calcRoles(),
@@ -1082,7 +1040,7 @@
         "minecraft_java_create_data": {
           "create_type": "import_server",
           "import_server_create_data": {
-            "existing_server_path": formDataObject.root_path,
+            "existing_server_path": zip_root_path,
             "jarfile": formDataObject.server_jar,
             "mem_min": formDataObject.mem_min,
             "mem_max": formDataObject.mem_max,
@@ -1137,7 +1095,7 @@
   function wait_msg(importing) {
     bootbox.alert({
       title: importing ? '{% raw translate("serverWizard", "importing", data["lang"]) %}' : '{% raw translate("serverWizard", "downloading", data["lang"]) %}',
-      message: importing ? '<i class="fas fa-cloud-download"></i> {% raw translate("serverWizard", "bePatient", data["lang"]) %}' : '<i class="fas fa-cloud-download"></i> {% raw translate("serverWizard", "bePatient", data["lang"]) %}<br><br><a href="https://serverjars.com" target="_blank" style="text-align: center;"><img src="../../static/assets/images/serverjars/FULL-WHITE.svg" alt="Powered by serverjars.com" width="40%"></a>',
+      message: importing ? '<i class="fas fa-cloud-download"></i> {% raw translate("serverWizard", "bePatient", data["lang"]) %}' : '<i class="fas fa-cloud-download"></i> {% raw translate("serverWizard", "bePatient", data["lang"]) %}',
     });
   }
 
@@ -1197,33 +1155,28 @@
   */
   function serverTypeChange(selectObj) {
     // get the index of the selected option
-    let idx = document.getElementById('server_type').selectedIndex;
+    let idx = document.getElementById('server_type').value;
+    let idx_list = idx.split("|");
     // get the value of the selected option
     let cSelect = document.getElementById("server");
     let which = {};
     try {
-      which = document.getElementById('server_type').options[idx].value;
+      versions = Object.keys(serverTypesLists[idx_list[0]]["types"][idx_list[1]]["versions"]);
     } catch {
       while (cSelect.options.length > 0) {
         cSelect.remove(0);
       }
       return;
     }
-    let server_type = which.split('|')[0];
-    let server = which.split('|')[1];
-    // use the selected option value to retrieve the list of items from the serverTypesLists array
-    let cList = serverTypesLists[server_type];
-    // get the country select element via its known id
-    cSelect = document.getElementById("server");
-    // remove the current options from the country select
-    while (cSelect.options.length > 0) {
-      cSelect.remove(0);
-    }
-    let newOption;
+
+    $("#server option").each(function () {
+      $(this).remove()
+    })
+
     // create new options ordered by ascending
-    cList[server].forEach(type => {
+    versions.forEach(type => {
       newOption = document.createElement("option");
-      newOption.value = which + "|" + type;  // assumes option string and value are the same
+      newOption.value = idx + "|" + type;  // assumes option string and value are the same
       newOption.text = type;
       // add the new option
       try {
@@ -1234,17 +1187,18 @@
       }
     })
   }
-  $("#server").change(function (){
+
+  $("#server").change(function () {
     let selected_version = $("#server :selected").text().split(".");
-    if(parseInt(selected_version[0]) === 1 && parseInt(selected_version[1]) < 8 ){
+    if (parseInt(selected_version[0]) === 1 && parseInt(selected_version[1]) < 8) {
       $('[data-toggle="popover"]').popover();
-    if ($(window).width() < 1000) {
-      $('.version-hint').attr("data-placement", "top")
+      if ($(window).width() < 1000) {
+        $('.version-hint').attr("data-placement", "top")
+      } else {
+        $('.version-hint').attr("data-placement", "right")
+      }
+      $('.version-hint').popover("show");
     } else {
-      $('.version-hint').attr("data-placement", "right")
-    }
-    $('.version-hint').popover("show");
-    }else{
       $('.version-hint').popover("hide");
     }
   });
@@ -1253,6 +1207,15 @@
     const type_select = document.getElementById('server_jar')
     const tidx = type_select.selectedIndex;
     const val = type_select.options[tidx].value;
+    if (!val) {
+      $("#server_type option").each(function () {
+        $(this).remove()
+      })
+      $("#server option").each(function () {
+        $(this).remove()
+      })
+      return;
+    }
     let jcSelect = {};
     if (val == 'None') {
       jcSelect = document.getElementById("server_type");
@@ -1267,7 +1230,7 @@
     // get the value of the selected option
     let jwhich = selectObj.options[jidx].value;
     // use the selected option value to retrieve the list of items from the serverTypesLists array
-    let jcList = Object.keys(serverTypesLists[jwhich]);
+    let jcList = Object.keys(serverTypesLists[jwhich]["types"]);
     // get the country select element via its known id
     jcSelect = document.getElementById("server_type");
     // remove the current options from the country select

@@ -30,7 +30,7 @@ class ServerHandler(BaseHandler):
         ) = self.current_user
         superuser = exec_user["superuser"]
         if api_key is not None:
-            superuser = superuser and api_key.superuser
+            superuser = superuser and api_key.full_access
 
         if superuser:
             defined_servers = self.controller.servers.list_defined_servers()
@@ -124,7 +124,7 @@ class ServerHandler(BaseHandler):
                     "created": api_key.created,
                     "server_permissions": api_key.server_permissions,
                     "crafty_permissions": api_key.crafty_permissions,
-                    "superuser": api_key.superuser,
+                    "full_access": api_key.full_access,
                 }
                 if api_key is not None
                 else None
@@ -147,12 +147,12 @@ class ServerHandler(BaseHandler):
                 return
             page_data["server_api"] = False
             if page_data["online"]:
-                page_data["server_api"] = self.helper.check_address_status(
-                    "https://serverjars.com/api/fetchTypes"
+                page_data["server_api"] = (
+                    self.controller.big_bucket._check_bucket_alive()
                 )
-            page_data["server_types"] = self.controller.server_jars.get_serverjar_data()
+            page_data["server_types"] = self.controller.big_bucket.get_bucket_data()
             page_data["js_server_types"] = json.dumps(
-                self.controller.server_jars.get_serverjar_data()
+                self.controller.big_bucket.get_bucket_data()
             )
             if page_data["server_types"] is None:
                 page_data["server_types"] = []

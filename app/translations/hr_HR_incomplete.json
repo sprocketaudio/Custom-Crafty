@@ -99,6 +99,7 @@
         "welcome": "Dobrodošli u Crafty Controller"
     },
     "datatables": {
+        "loadingRecords": "Učitavanje...",
         "i18n": {
             "aria": {
                 "sortAscending": ": aktiviraj za sortiranje stupca uzlazno",
@@ -488,7 +489,6 @@
         "credits": "Zasluge",
         "dashboard": "Upravljačka ploča",
         "documentation": "Dokumentacija",
-        "navigation": "Navigacija",
         "newServer": "Stvorite novi poslužitelj",
         "servers": "Poslužitelji"
     },

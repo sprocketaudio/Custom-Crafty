@@ -1,3 +1,5 @@
+import os
+import json
 from app.classes.web.base_api_handler import BaseApiHandler
 
 
@@ -12,6 +14,7 @@ class ApiCraftyLogIndexHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         if not superuser:
@@ -22,9 +25,17 @@ class ApiCraftyLogIndexHandler(BaseApiHandler):
             raise NotImplementedError
 
         if log_type == "audit":
+            with open(
+                os.path.join(self.controller.project_root, "logs", "audit.log"),
+                "r",
+                encoding="utf-8",
+            ) as f:
+                log_lines = [json.loads(line) for line in f]
+                rev_log_lines = log_lines[::-1]
+
             return self.finish_json(
                 200,
-                {"status": "ok", "data": self.controller.management.get_activity_log()},
+                {"status": "ok", "data": rev_log_lines},
             )
 
         if log_type == "session":

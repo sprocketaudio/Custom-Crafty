@@ -6,6 +6,7 @@ import nh3
 import tornado.web
 
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
+from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.models.users import ApiKeys
 from app.classes.shared.helpers import Helpers
 from app.classes.shared.file_helpers import FileHelpers
@@ -182,6 +183,7 @@ class BaseHandler(tornado.web.RequestHandler):
             t.List[str],
             bool,
             t.Dict[str, t.Any],
+            str,
         ]
     ]:
         try:
@@ -190,9 +192,12 @@ class BaseHandler(tornado.web.RequestHandler):
             )
 
             superuser = user["superuser"]
+            server_permissions_api_mask = ""
             if api_key is not None:
-                superuser = superuser and api_key.superuser
-
+                superuser = superuser and api_key.full_access
+                server_permissions_api_mask = api_key.server_permissions
+                if api_key.full_access:
+                    server_permissions_api_mask = "1" * len(EnumPermissionsServer)
             exec_user_role = set()
             if superuser:
                 authorized_servers = self.controller.servers.get_all_defined_servers()
@@ -214,6 +219,7 @@ class BaseHandler(tornado.web.RequestHandler):
                             user["user_id"]
                         )
                     )
+
                 logger.debug(user["roles"])
                 for r in user["roles"]:
                     role = self.controller.roles.get_role(r)
@@ -234,6 +240,7 @@ class BaseHandler(tornado.web.RequestHandler):
                     exec_user_role,
                     superuser,
                     user,
+                    server_permissions_api_mask,
                 )
             logging.debug("Auth unsuccessful")
             auth_log.error(

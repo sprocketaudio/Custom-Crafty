@@ -24,6 +24,7 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             _,
             _,
             user,
+            _,
         ) = auth_data
 
         if user_id in ["@me", user["user_id"]]:
@@ -72,6 +73,7 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             _,
             _,
             user,
+            _,
         ) = auth_data
 
         if (user_id in ["@me", user["user_id"]]) and self.helper.get_setting(
@@ -94,7 +96,7 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
         self.controller.management.add_to_audit_log(
             user["user_id"],
             f"deleted the user {user_id}",
-            server_id=0,
+            server_id=None,
             source_ip=self.get_remote_ip(),
         )
 
@@ -121,6 +123,7 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
 
         try:
@@ -129,7 +132,6 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             return self.finish_json(
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
-
         try:
             validate(data, user_patch_schema)
         except ValidationError as e:
@@ -141,10 +143,8 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                     "error_data": str(e),
                 },
             )
-
         if user_id == "@me":
             user_id = user["user_id"]
-
         if (
             EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
             and str(user["user_id"]) != str(user_id)
@@ -212,6 +212,25 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                 return self.finish_json(
                     400, {"status": "error", "error": "INVALID_ROLES_MODIFY"}
                 )
+            user_modify = self.controller.users.get_user_roles_id(user_id)
+
+            for role in data["roles"]:
+                # Check if user is not a super user and that the exec user is the role
+                # manager or that the role already exists in the user's list
+                if not superuser and (
+                    str(
+                        self.controller.roles.get_role(role).get(
+                            "manager", "no manager found"
+                        )
+                    )
+                    != str(auth_data[4]["user_id"])
+                    and role not in user_modify
+                ):
+                    for item in user_modify:
+                        print(type(role), type(item))
+                    return self.finish_json(
+                        400, {"status": "error", "error": "INVALID_ROLES_MODIFY"}
+                    )
 
         user_obj = HelperUsers.get_user_model(user_id)
         if "password" in data and str(user["user_id"]) != str(user_id):
@@ -283,7 +302,7 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                 f"edited user {user_obj.username} (UID: {user_id})"
                 f"with roles {user_obj.roles}"
             ),
-            server_id=0,
+            server_id=None,
             source_ip=self.get_remote_ip(),
         )
 

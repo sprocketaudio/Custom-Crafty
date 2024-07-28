@@ -43,7 +43,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
                 auth_data[4]["user_id"],
                 f"Generated a new API token for the key {key.name} "
                 f"from user with UID: {key.user_id}",
-                server_id=0,
+                server_id=None,
                 source_ip=self.get_remote_ip(),
             )
             data_key = self.controller.authentication.generate(
@@ -75,7 +75,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
                     "name": key.name,
                     "server_permissions": key.server_permissions,
                     "crafty_permissions": key.crafty_permissions,
-                    "superuser": key.superuser,
+                    "full_access": key.full_access,
                 }
             )
         self.finish_json(
@@ -99,7 +99,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
                     "type": "string",
                     "pattern": "^[01]{3}$",  # 8 bits, see EnumPermissionsCrafty
                 },
-                "superuser": {"type": "boolean"},
+                "full_access": {"type": "boolean"},
             },
             "additionalProperties": False,
             "minProperties": 1,
@@ -113,6 +113,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
             _,
             _superuser,
             user,
+            _,
         ) = auth_data
 
         try:
@@ -163,7 +164,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
         key_id = self.controller.users.add_user_api_key(
             data["name"],
             user_id,
-            data["superuser"],
+            data["full_access"],
             data["server_permissions_mask"],
             data["crafty_permissions_mask"],
         )
@@ -173,7 +174,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
             f"Added API key {data['name']} with crafty permissions "
             f"{data['crafty_permissions_mask']}"
             f" and {data['server_permissions_mask']} for user with UID: {user_id}",
-            server_id=0,
+            server_id=None,
             source_ip=self.get_remote_ip(),
         )
         self.finish_json(200, {"status": "ok", "data": {"id": key_id}})
@@ -188,6 +189,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
             _,
             _,
             _user,
+            _,
         ) = auth_data
         if key_id:
             key = self.controller.users.get_user_api_key(key_id)
@@ -215,7 +217,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
                 )
 
             if (
-                target_key.user_id != auth_data[4]["user_id"]
+                str(target_key.user_id) != str(auth_data[4]["user_id"])
                 and not auth_data[4]["superuser"]
             ):
                 return self.finish_json(
@@ -233,7 +235,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
                 auth_data[4]["user_id"],
                 f"Removed API key {target_key} "
                 f"(ID: {key_id}) from user {auth_data[4]['user_id']}",
-                server_id=0,
+                server_id=None,
                 source_ip=self.get_remote_ip(),
             )
 

@@ -246,11 +246,6 @@
                 </div>
               </div>
             </div>
-            <div style="visibility: hidden;">
-              <div class="form-group">
-                <input type="text" class="form-control" id="zip_root_path" name="zip_root_path">
-              </div>
-            </div>
             <div class="modal fade" id="dir_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
               aria-hidden="true">
               <div class="modal-dialog" role="document">
@@ -318,8 +313,8 @@
                     'labelZipFile', data['lang']) }}</label>
                 </div>
                 <div class="input-group-append">
-                  <button type="button" class="btn btn-info upload-button" id="upload-button" onclick="sendFile()"
-                    disabled>{{ translate('serverWizard',
+                  <button type="button" class="btn btn-info upload-button" id="upload-button"
+                    onclick="uploadFile('import')" disabled>{{ translate('serverWizard',
                     'uploadButton', data['lang']) }}</button>
                 </div>
               </div>
@@ -376,11 +371,6 @@
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              <div style="visibility: hidden;">
-                <div class="form-group">
-                  <input type="text" class="form-control" id="zip_root_path" name="zip_root_path">
                 </div>
               </div>
               <div class="modal fade" id="dir_upload_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
@@ -523,61 +513,8 @@
 {% end %}
 
 {% block js%}
+<script src="../../static/assets/js/shared/upload.js"></script>
 <script>
-  var upload;
-  var file;
-  function sendFile() {
-    file = $("#file")[0].files[0]
-    document.getElementById("upload_input").innerHTML = '<div class="progress" style="width: 100%;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">&nbsp;<i class="fa-solid fa-spinner"></i></div></div>'
-    let xmlHttpRequest = new XMLHttpRequest();
-    let token = getCookie("_xsrf")
-    let fileName = encodeURIComponent(file.name)
-    let target = '/upload'
-    let mimeType = file.type
-    let size = file.size
-    let type = 'server_import'
-
-    xmlHttpRequest.upload.addEventListener('progress', function (e) {
-
-      if (e.loaded <= size) {
-        var percent = Math.round(e.loaded / size * 100);
-        $(`#upload-progress-bar`).css('width', percent + '%');
-        $(`#upload-progress-bar`).html(percent + '%');
-      }
-    });
-
-    xmlHttpRequest.open('POST', target, true);
-    xmlHttpRequest.setRequestHeader('X-Content-Type', mimeType);
-    xmlHttpRequest.setRequestHeader('X-XSRFToken', token);
-    xmlHttpRequest.setRequestHeader('X-Content-Length', size);
-    xmlHttpRequest.setRequestHeader('X-Content-Disposition', 'attachment; filename="' + fileName + '"');
-    xmlHttpRequest.setRequestHeader('X-Content-Upload-Type', type);
-    xmlHttpRequest.setRequestHeader('X-FileName', fileName);
-    xmlHttpRequest.addEventListener('load', (event) => {
-      if (event.target.responseText == 'success') {
-        console.log('Upload for file', file.name, 'was successful!')
-        $("#upload_input").html(`<div class="card-header header-sm d-flex justify-content-between align-items-center" style="width: 100%;"><input value="${decodeURIComponent(fileName)}" type="text" id="file-uploaded" disabled></input> 🔒</div>`);
-        document.getElementById("lower_half").style.visibility = "visible";
-      }
-      else {
-        let response_text = JSON.parse(event.target.responseText);
-        var x = document.querySelector('.bootbox');
-        console.log(JSON.parse(event.target.responseText).info)
-        bootbox.alert({
-          message: JSON.parse(event.target.responseText).info,
-          callback: function () {
-            window.location.reload();
-          }
-        });
-        doUpload = false;
-      }
-    }, false);
-    xmlHttpRequest.addEventListener('error', (e) => {
-      console.error('Error while uploading file', file.name + '.', 'Event:', e)
-    }, false);
-    xmlHttpRequest.send(file);
-  }
-
   document.getElementById("root_upload_button").addEventListener("click", function (event) {
     if (file) {
       upload = true;
@@ -591,7 +528,7 @@
         message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
         closeButton: false
       });
-      setTimeout(function(){
+      setTimeout(function () {
         getDirView();
       }, 2000);
     } else {
@@ -640,7 +577,7 @@
         message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
         closeButton: false
       });
-      setTimeout(function(){
+      setTimeout(function () {
         getDirView();
       }, 2000);
     } else {
@@ -796,7 +733,13 @@
       wait_msg(true);
       e.preventDefault();
       let jarForm = document.getElementById("import-zip");
-
+      var checkedRadio = $('.root-input:checked');
+      let zip_root_path = ""
+      if (checkedRadio.length > 0) {
+        // Get the value of the checked radio button
+        var checkedValue = checkedRadio.val();
+        zip_root_path = checkedValue; // Return the checked value if needed
+      }
       let formData = new FormData(jarForm);
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
@@ -813,7 +756,7 @@
         "minecraft_bedrock_create_data": {
           "create_type": "import_server",
           "import_server_create_data": {
-            "existing_server_path": formDataObject.root_path,
+            "existing_server_path": zip_root_path,
             "executable": formDataObject.server_jar,
           }
         }
@@ -834,6 +777,13 @@
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
       console.log(formDataObject);
+      var checkedRadio = $('.root-input:checked');
+      let zip_root_path = ""
+      if (checkedRadio.length > 0) {
+        // Get the value of the checked radio button
+        var checkedValue = checkedRadio.val();
+        zip_root_path = checkedValue; // Return the checked value if needed
+      }
       let send_data = {
         "name": formDataObject.name,
         "roles": calcRoles(),
@@ -846,7 +796,7 @@
         "minecraft_bedrock_create_data": {
           "create_type": "import_server",
           "import_server_create_data": {
-            "existing_server_path": formDataObject.root_path,
+            "existing_server_path": zip_root_path,
             "executable": formDataObject.server_jar,
           }
         }

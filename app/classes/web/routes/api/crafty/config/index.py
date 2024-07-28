@@ -9,7 +9,6 @@ from app.classes.web.base_api_handler import BaseApiHandler
 config_json_schema = {
     "type": "object",
     "properties": {
-        "http_port": {"type": "integer"},
         "https_port": {"type": "integer"},
         "language": {
             "type": "string",
@@ -32,6 +31,7 @@ config_json_schema = {
         "monitored_mounts": {"type": "array"},
         "dir_size_poll_freq_minutes": {"type": "integer"},
         "crafty_logs_delete_after_days": {"type": "integer"},
+        "big_bucket_repo": {"type": "string"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -68,6 +68,7 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         # GET /api/v2/roles?ids=true
@@ -94,20 +95,14 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
-        (
-            _,
-            _,
-            _,
-            superuser,
-            user,
-        ) = auth_data
+        (_, _, _, superuser, user, _) = auth_data
 
         if not superuser:
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
 
         try:
             data = orjson.loads(self.request.body)
-        except orjson.decoder.JSONDecodeError as e:
+        except orjson.JSONDecodeError as e:
             return self.finish_json(
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
@@ -129,7 +124,7 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
         self.controller.management.add_to_audit_log(
             user["user_id"],
             "edited config.json",
-            server_id=0,
+            server_id=None,
             source_ip=self.get_remote_ip(),
         )
 
@@ -149,6 +144,7 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
             _,
             _,
             superuser,
+            _,
             _,
         ) = auth_data
 
@@ -182,13 +178,14 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
         if not superuser:
             return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
 
         try:
             data = orjson.loads(self.request.body)
-        except orjson.decoder.JSONDecodeError as e:
+        except orjson.JSONDecodeError as e:
             return self.finish_json(
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
@@ -226,7 +223,7 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
         self.controller.management.add_to_audit_log(
             user["user_id"],
             f"customized login photo: {data['photo']}/{data['opacity']}",
-            server_id=0,
+            server_id=None,
             source_ip=self.get_remote_ip(),
         )
         self.controller.management.set_login_opacity(int(data["opacity"]))

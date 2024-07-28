@@ -24,8 +24,6 @@ from app.classes.web.routes.metrics.metrics_handlers import metrics_handlers
 from app.classes.web.server_handler import ServerHandler
 from app.classes.web.websocket_handler import WebSocketHandler
 from app.classes.web.static_handler import CustomStaticHandler
-from app.classes.web.upload_handler import UploadHandler
-from app.classes.web.http_handler import HTTPHandler, HTTPHandlerPage
 from app.classes.web.status_handler import StatusHandler
 
 
@@ -44,7 +42,6 @@ class Webserver:
         file_helper: FileHelpers,
     ):
         self.ioloop = None
-        self.http_server = None
         self.https_server = None
         self.helper = helper
         self.controller = controller
@@ -100,7 +97,6 @@ class Webserver:
         # let's verify we have an SSL cert
         self.helper.create_self_signed_cert()
 
-        http_port = self.helper.get_setting("http_port")
         https_port = self.helper.get_setting("https_port")
 
         debug_errors = self.helper.get_setting("show_errors")
@@ -111,9 +107,6 @@ class Webserver:
         if cookie_secret is False or cookie_secret == "":
             cookie_secret = self.helper.random_string_generator(32)
             HelpersManagement.set_cookie_secret(cookie_secret)
-
-        if not http_port and http_port != 0:
-            http_port = 8000
 
         if not https_port:
             https_port = 8443
@@ -127,7 +120,7 @@ class Webserver:
             ),
         }
 
-        logger.info(f"Starting Web Server on ports http:{http_port} https:{https_port}")
+        logger.info(f"Starting Web Server on ports https:{https_port}")
 
         asyncio.set_event_loop(asyncio.new_event_loop())
 
@@ -148,7 +141,6 @@ class Webserver:
             (r"/panel/(.*)", PanelHandler, handler_args),
             (r"/server/(.*)", ServerHandler, handler_args),
             (r"/ws", WebSocketHandler, handler_args),
-            (r"/upload", UploadHandler, handler_args),
             (r"/status", StatusHandler, handler_args),
             # API Routes V2
             *api_handlers(handler_args),
@@ -173,30 +165,6 @@ class Webserver:
             static_handler_class=CustomStaticHandler,
             serve_traceback=debug_errors,
         )
-        http_handers = [
-            (r"/", HTTPHandler, handler_args),
-            (r"/(.+)", HTTPHandlerPage, handler_args),
-        ]
-        http_app = tornado.web.Application(
-            http_handers,
-            template_path=os.path.join(self.helper.webroot, "templates"),
-            static_path=os.path.join(self.helper.webroot, "static"),
-            debug=debug_errors,
-            cookie_secret=cookie_secret,
-            xsrf_cookies=True,
-            autoreload=False,
-            log_function=self.log_function,
-            default_handler_class=HTTPHandler,
-            login_url="/login",
-            serve_traceback=debug_errors,
-        )
-
-        if http_port != 0:
-            self.http_server = tornado.httpserver.HTTPServer(http_app)
-            self.http_server.listen(http_port)
-        else:
-            logger.info("http port disabled by config")
-
         self.https_server = tornado.httpserver.HTTPServer(app, ssl_options=cert_objects)
         self.https_server.listen(https_port)
 
@@ -218,7 +186,6 @@ class Webserver:
         logger.info("Shutting Down Web Server")
         Console.info("Shutting Down Web Server")
         self.ioloop.stop()
-        self.http_server.stop()
         self.https_server.stop()
         logger.info("Web Server Stopped")
         Console.info("Web Server Stopped")
