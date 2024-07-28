@@ -277,7 +277,7 @@ div>.input-group>.form-control {
 }
 
 .custom-switch .custom-control-label::after {
-    top: calc(-0.125rem + 1px);
+    top: calc(-0.175rem);
 }
 
 .custom-radio .custom-control-label::after {
@@ -365,7 +365,6 @@ noscript.noscript-warning {
 .annoucement-item:hover>a .annoucement-title {
     color: var(--purple);
 }
-
 
 /**************************************************************/
 div.form-group.reset-secret {

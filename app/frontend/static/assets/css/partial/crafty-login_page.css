@@ -28,9 +28,17 @@
     box-shadow: 0 12px 16px 0 hsla(0, 0%, 0%, 0.4);
 }
 
-#error-filed {
-    color: red;
+#error-field {
+    color: var(--red);
     text-align: center;
+    margin-bottom: 2rem;
 }
+
+.loginError {
+    color: var(--red);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
 
 /**************************************************************/
