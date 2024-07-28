@@ -381,6 +381,36 @@ noscript.noscript-warning {
 }
 
 /**************************************************************/
+
+/**************************************************************/
+/* CSS for Virtual Console Displays */
+/**************************************************************/
+
+.virt_console {
+    width: 100%;
+    font-size: .8em;
+    padding: 5px 10px;
+    border: 1px solid var(--outline);
+    background-color: var(--card-banner-bg);
+    height: 500px;
+    overflow: scroll;
+}
+
+/**************************************************************/
+
+/**************************************************************/
+/* CSS for Lists Displays */
+/**************************************************************/
+
+ul>li.list-group-item {
+    background-color: var(--card-banner-bg);
+}
+
+ul>li.list-group-item i {
+    margin: 0;
+}
+
+/**************************************************************/
 div.form-group.reset-secret {
     background: rgba(243, 21, 6, 0.3);
     outline: 1px solid red;
