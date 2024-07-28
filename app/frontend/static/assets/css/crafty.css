@@ -350,6 +350,24 @@ noscript.noscript-warning {
 }
 
 /**************************************************************/
+
+/**************************************************************/
+/* CSS for Annoucements Displays */
+/**************************************************************/
+.annoucement-item>p {
+    float: right;
+}
+
+.annoucement-title {
+    color: var(--info);
+}
+
+.annoucement-item:hover>a .annoucement-title {
+    color: var(--purple);
+}
+
+
+/**************************************************************/
 div.form-group.reset-secret {
     background: rgba(243, 21, 6, 0.3);
     outline: 1px solid red;
