@@ -367,6 +367,20 @@ noscript.noscript-warning {
 }
 
 /**************************************************************/
+
+/**************************************************************/
+/* CSS for API Keys Displays */
+/**************************************************************/
+
+.api-key {
+    white-space: pre-wrap;
+    color: white;
+    word-break: break-all;
+    background: grey;
+    border-radius: 5px;
+}
+
+/**************************************************************/
 div.form-group.reset-secret {
     background: rgba(243, 21, 6, 0.3);
     outline: 1px solid red;
@@ -380,3 +394,5 @@ div.form-group.reset-secret {
 .hidden-input {
     margin-left: -40px;
 }
+
+/**************************************************************/
