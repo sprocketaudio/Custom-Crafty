@@ -26,6 +26,7 @@ TBD
 - Remove text from status page and use symbols ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/770))
 - Add better feedback on when errors appear on user creation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/763))
 - Workaround cpu_freq call catching on obscure cpu architectures ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/776))
+- Change Role selector in server wizard to be a filter list ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/772))
 ### Lang
 - Show natural language name instead of country code in User Config Lang select list ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/773))
 - Add remaining `he_IL`, `th_TH` translations for 4.4.0 Release ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/761))
