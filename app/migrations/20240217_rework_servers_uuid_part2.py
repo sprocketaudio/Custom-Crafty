@@ -5,7 +5,13 @@ import logging
 
 from app.classes.shared.console import Console
 from app.classes.shared.migration import Migrator, MigrateHistory
-from app.classes.models.roles import Roles
+from app.classes.models.management import (
+    Webhooks,
+    Schedules,
+    Backups,
+)
+from app.classes.models.server_permissions import RoleServers
+from app.classes.models.base_model import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -47,78 +53,6 @@ def migrate(migrator: Migrator, database, **kwargs):
             table_name = "servers"
             database = db
 
-    # **********************************************************************************
-    #                                  Role Servers Class
-    # **********************************************************************************
-    class RoleServers(peewee.Model):
-        role_id = peewee.ForeignKeyField(Roles, backref="role_server")
-        server_id = peewee.ForeignKeyField(Servers, backref="role_server")
-        permissions = peewee.CharField(default="00000000")
-
-        class Meta:
-            table_name = "role_servers"
-            primary_key = peewee.CompositeKey("role_id", "server_id")
-            database = db
-
-    # **********************************************************************************
-    #                                   Webhooks Class
-    # **********************************************************************************
-    class Webhooks(peewee.Model):
-        id = peewee.AutoField()
-        server_id = peewee.ForeignKeyField(Servers, backref="webhook_server", null=True)
-        name = peewee.CharField(default="Custom Webhook", max_length=64)
-        url = peewee.CharField(default="")
-        webhook_type = peewee.CharField(default="Custom")
-        bot_name = peewee.CharField(default="Crafty Controller")
-        trigger = peewee.CharField(default="server_start,server_stop")
-        body = peewee.CharField(default="")
-        color = peewee.CharField(default="#005cd1")
-        enabled = peewee.BooleanField(default=True)
-
-        class Meta:
-            table_name = "webhooks"
-            database = db
-
-    # **********************************************************************************
-    #                                   Schedules Class
-    # **********************************************************************************
-    class Schedules(peewee.Model):
-        schedule_id = peewee.IntegerField(unique=True, primary_key=True)
-        server_id = peewee.ForeignKeyField(Servers, backref="schedule_server")
-        enabled = peewee.BooleanField()
-        action = peewee.CharField()
-        interval = peewee.IntegerField()
-        interval_type = peewee.CharField()
-        start_time = peewee.CharField(null=True)
-        command = peewee.CharField(null=True)
-        name = peewee.CharField()
-        one_time = peewee.BooleanField(default=False)
-        cron_string = peewee.CharField(default="")
-        parent = peewee.IntegerField(null=True)
-        delay = peewee.IntegerField(default=0)
-        next_run = peewee.CharField(default="")
-
-        class Meta:
-            table_name = "schedules"
-            database = db
-
-    # **********************************************************************************
-    #                                   Backups Class
-    # **********************************************************************************
-    class Backups(peewee.Model):
-        excluded_dirs = peewee.CharField(null=True)
-        max_backups = peewee.IntegerField()
-        max_backups = peewee.IntegerField()
-        server_id = peewee.ForeignKeyField(Servers, backref="backups_server")
-        compress = peewee.BooleanField(default=False)
-        shutdown = peewee.BooleanField(default=False)
-        before = peewee.CharField(default="")
-        after = peewee.CharField(default="")
-
-        class Meta:
-            table_name = "backups"
-            database = db
-
     this_migration = MigrateHistory.get_or_none(
         MigrateHistory.name == "20240217_rework_servers_uuid_part2"
     )
@@ -136,8 +70,8 @@ def migrate(migrator: Migrator, database, **kwargs):
             return
 
     try:
-        logger.debug("Migrating Data from Int to UUID (Foreign Keys)")
-        Console.debug("Migrating Data from Int to UUID (Foreign Keys)")
+        logger.info("Migrating Data from Int to UUID (Foreign Keys)")
+        Console.info("Migrating Data from Int to UUID (Foreign Keys)")
 
         # Changes on Webhooks Log Table
         for webhook in Webhooks.select():
@@ -188,8 +122,8 @@ def migrate(migrator: Migrator, database, **kwargs):
                 and RoleServers.server_id == old_server_id
             ).execute()
 
-        logger.debug("Migrating Data from Int to UUID (Foreign Keys) : SUCCESS")
-        Console.debug("Migrating Data from Int to UUID (Foreign Keys) : SUCCESS")
+        logger.info("Migrating Data from Int to UUID (Foreign Keys) : SUCCESS")
+        Console.info("Migrating Data from Int to UUID (Foreign Keys) : SUCCESS")
 
     except Exception as ex:
         logger.error("Error while migrating Data from Int to UUID (Foreign Keys)")
@@ -201,16 +135,16 @@ def migrate(migrator: Migrator, database, **kwargs):
         return
 
     try:
-        logger.debug("Migrating Data from Int to UUID (Primary Keys)")
-        Console.debug("Migrating Data from Int to UUID (Primary Keys)")
+        logger.info("Migrating Data from Int to UUID (Primary Keys)")
+        Console.info("Migrating Data from Int to UUID (Primary Keys)")
         # Migrating servers from the old id type to the new one
         for server in Servers.select():
             Servers.update(server_id=server.server_uuid).where(
                 Servers.server_id == server.server_id
             ).execute()
 
-        logger.debug("Migrating Data from Int to UUID (Primary Keys) : SUCCESS")
-        Console.debug("Migrating Data from Int to UUID (Primary Keys) : SUCCESS")
+        logger.info("Migrating Data from Int to UUID (Primary Keys) : SUCCESS")
+        Console.info("Migrating Data from Int to UUID (Primary Keys) : SUCCESS")
 
     except Exception as ex:
         logger.error("Error while migrating Data from Int to UUID (Primary Keys)")
@@ -269,81 +203,9 @@ def rollback(migrator: Migrator, database, **kwargs):
             table_name = "servers"
             database = db
 
-    # **********************************************************************************
-    #                                  Role Servers Class
-    # **********************************************************************************
-    class RoleServers(peewee.Model):
-        role_id = peewee.ForeignKeyField(Roles, backref="role_server")
-        server_id = peewee.ForeignKeyField(Servers, backref="role_server")
-        permissions = peewee.CharField(default="00000000")
-
-        class Meta:
-            table_name = "role_servers"
-            primary_key = peewee.CompositeKey("role_id", "server_id")
-            database = db
-
-    # **********************************************************************************
-    #                                   Webhooks Class
-    # **********************************************************************************
-    class Webhooks(peewee.Model):
-        id = peewee.AutoField()
-        server_id = peewee.ForeignKeyField(Servers, backref="webhook_server", null=True)
-        name = peewee.CharField(default="Custom Webhook", max_length=64)
-        url = peewee.CharField(default="")
-        webhook_type = peewee.CharField(default="Custom")
-        bot_name = peewee.CharField(default="Crafty Controller")
-        trigger = peewee.CharField(default="server_start,server_stop")
-        body = peewee.CharField(default="")
-        color = peewee.CharField(default="#005cd1")
-        enabled = peewee.BooleanField(default=True)
-
-        class Meta:
-            table_name = "webhooks"
-            database = db
-
-    # **********************************************************************************
-    #                                   Schedules Class
-    # **********************************************************************************
-    class Schedules(peewee.Model):
-        schedule_id = peewee.IntegerField(unique=True, primary_key=True)
-        server_id = peewee.ForeignKeyField(Servers, backref="schedule_server")
-        enabled = peewee.BooleanField()
-        action = peewee.CharField()
-        interval = peewee.IntegerField()
-        interval_type = peewee.CharField()
-        start_time = peewee.CharField(null=True)
-        command = peewee.CharField(null=True)
-        name = peewee.CharField()
-        one_time = peewee.BooleanField(default=False)
-        cron_string = peewee.CharField(default="")
-        parent = peewee.IntegerField(null=True)
-        delay = peewee.IntegerField(default=0)
-        next_run = peewee.CharField(default="")
-
-        class Meta:
-            table_name = "schedules"
-            database = db
-
-    # **********************************************************************************
-    #                                   Backups Class
-    # **********************************************************************************
-    class Backups(peewee.Model):
-        excluded_dirs = peewee.CharField(null=True)
-        max_backups = peewee.IntegerField()
-        max_backups = peewee.IntegerField()
-        server_id = peewee.ForeignKeyField(Servers, backref="backups_server")
-        compress = peewee.BooleanField(default=False)
-        shutdown = peewee.BooleanField(default=False)
-        before = peewee.CharField(default="")
-        after = peewee.CharField(default="")
-
-        class Meta:
-            table_name = "backups"
-            database = db
-
     try:
-        logger.debug("Migrating Data from UUID to Int (Primary Keys)")
-        Console.debug("Migrating Data from UUID to Int (Primary Keys)")
+        logger.info("Migrating Data from UUID to Int (Primary Keys)")
+        Console.info("Migrating Data from UUID to Int (Primary Keys)")
         # Migrating servers from the old id type to the new one
         new_id = 0
         for server in Servers.select():
@@ -355,8 +217,8 @@ def rollback(migrator: Migrator, database, **kwargs):
                 Servers.server_id == server.server_id
             ).execute()
 
-        logger.debug("Migrating Data from UUID to Int (Primary Keys) : SUCCESS")
-        Console.debug("Migrating Data from UUID to Int (Primary Keys) : SUCCESS")
+        logger.info("Migrating Data from UUID to Int (Primary Keys) : SUCCESS")
+        Console.info("Migrating Data from UUID to Int (Primary Keys) : SUCCESS")
 
     except Exception as ex:
         logger.error("Error while migrating Data from UUID to Int (Primary Keys)")
@@ -368,8 +230,8 @@ def rollback(migrator: Migrator, database, **kwargs):
         return
 
     try:
-        logger.debug("Migrating Data from UUID to Int (Foreign Keys)")
-        Console.debug("Migrating Data from UUID to Int (Foreign Keys)")
+        logger.info("Migrating Data from UUID to Int (Foreign Keys)")
+        Console.info("Migrating Data from UUID to Int (Foreign Keys)")
         # Changes on Webhooks Log Table
         for webhook in Webhooks.select():
             old_server_id = webhook.server_id_id
@@ -419,8 +281,8 @@ def rollback(migrator: Migrator, database, **kwargs):
                 and RoleServers.server_id == old_server_id
             ).execute()
 
-        logger.debug("Migrating Data from UUID to Int (Foreign Keys) : SUCCESS")
-        Console.debug("Migrating Data from UUID to Int (Foreign Keys) : SUCCESS")
+        logger.info("Migrating Data from UUID to Int (Foreign Keys) : SUCCESS")
+        Console.info("Migrating Data from UUID to Int (Foreign Keys) : SUCCESS")
 
     except Exception as ex:
         logger.error("Error while migrating Data from UUID to Int (Foreign Keys)")

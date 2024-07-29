@@ -6,7 +6,6 @@ import nh3
 import tornado.web
 
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
-from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.models.users import ApiKeys
 from app.classes.shared.helpers import Helpers
 from app.classes.shared.file_helpers import FileHelpers
@@ -196,8 +195,6 @@ class BaseHandler(tornado.web.RequestHandler):
             if api_key is not None:
                 superuser = superuser and api_key.full_access
                 server_permissions_api_mask = api_key.server_permissions
-                if api_key.full_access:
-                    server_permissions_api_mask = "1" * len(EnumPermissionsServer)
             exec_user_role = set()
             if superuser:
                 authorized_servers = self.controller.servers.get_all_defined_servers()

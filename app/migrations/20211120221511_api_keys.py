@@ -1,11 +1,10 @@
 import peewee
 import datetime
-from app.classes.shared.helpers import Helpers
 
 
 def migrate(migrator, database, **kwargs):
     migrator.add_columns(
-        "users", valid_tokens_from=peewee.DateTimeField(default=Helpers.get_utc_now)
+        "users", valid_tokens_from=peewee.DateTimeField(default=datetime.datetime.now)
     )
     migrator.drop_columns("users", ["api_token"])
 

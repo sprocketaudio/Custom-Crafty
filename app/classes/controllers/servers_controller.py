@@ -48,6 +48,7 @@ class ServersController(metaclass=Singleton):
         name: str,
         server_uuid: str,
         server_dir: str,
+        backup_path: str,
         server_command: str,
         server_file: str,
         server_log_file: str,
@@ -82,6 +83,7 @@ class ServersController(metaclass=Singleton):
             server_uuid,
             name,
             server_dir,
+            backup_path,
             server_command,
             server_file,
             server_log_file,
@@ -146,7 +148,8 @@ class ServersController(metaclass=Singleton):
             PermissionsServers.delete_roles_permissions(role_id, role_data["servers"])
         # Remove roles from server
         PermissionsServers.remove_roles_of_server(server_id)
-        self.management_helper.remove_all_server_backups(server_id)
+        # Remove backup configs tied to server
+        self.management_helper.remove_backup_config(server_id)
         # Finally remove server
         self.servers_helper.remove_server(server_id)
 

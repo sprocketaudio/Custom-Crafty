@@ -3,7 +3,7 @@
 {% block title %}Crafty Controller - {{ translate('serverWizard', 'newServer', data['lang']) }}{% end %}
 
 {% block content %}
-<link rel="stylesheet" href="../../static/assets/css/vendors/bootstrap-select-1.13.18.css">
+
 <div class="content-wrapper">
   <ul class="nav nav-pills tab-simple-styled " role="tablist">
     <li class="nav-item term-nav-item">
@@ -62,24 +62,29 @@
                 </div>
 
                 <div class="form-group">
-                  <p class="mb-0 p-0" aria-expanded="true">{{ translate('serverWizard', 'addRole', data['lang'])
-                    }}
-                    <small style="text-transform: none;"> - {{ translate('serverWizard', 'autoCreate',
-                      data['lang']) }}</small>
-                  </p>
-                  <select data-container="body"
-                    data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
-                    data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
-                    class="selectpicker form-control form-control-lg select-css roles_select"
-                    data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles"
-                    multiple>
-                    {% for r in data['roles'] %}
-                    <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
-                      &nbsp; {{ r['role_name'].capitalize()
-                      }}
-                    </option>
-                    {% end %}
-                  </select>
+                  <div id="accordion-1">
+                    <div class="card">
+                      <div class="card-header p-2" id="Role-1">
+                        <p class="mb-0 p-0" data-toggle="collapse" data-target="#collapseRole-1" aria-expanded="true"
+                          aria-controls="collapseRole-1">
+                          <i class="fas fa-chevron-down"></i> {{ translate('serverWizard', 'addRole', data['lang']) }}
+                          <small style="text-transform: none;"> - {{ translate('serverWizard', 'autoCreate',
+                            data['lang']) }}</small>
+                        </p>
+                      </div>
+                      <div id="collapseRole-1" class="collapse" aria-labelledby="Role-1" data-parent="">
+                        <div class="card-body scroll">
+                          <div class="form-group">
+                            {% for r in data['roles'] %}
+                            <span class="d-block menu-option"><label><input name="{{ r['role_id'] }}"
+                                  type="checkbox">&nbsp;
+                                {{ r['role_name'].capitalize() }}</label></span>
+                            {% end %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <button onclick="eula_confirm()" type="button" class="btn btn-primary mr-2">{{ translate('serverWizard',
                   'buildServer',
@@ -141,27 +146,30 @@
               <input type="number" class="form-control" id="port2" name="port" value="19132" step="1" min="1"
                 max="65535" required>
             </div>
-
             <div class="form-group">
-              <p class="mb-0 p-0" aria-expanded="true">{{ translate('serverWizard', 'addRole', data['lang'])
-                }}
-                <small style="text-transform: none;"> - {{ translate('serverWizard', 'autoCreate',
-                  data['lang']) }}</small>
-              </p>
-              <select data-container="body"
-                data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
-                data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
-                class="selectpicker form-control form-control-lg select-css roles_select" data-styleBase="form-control"
-                data-style="form-control" data-live-search="true" name="server_roles" multiple>
-                {% for r in data['roles'] %}
-                <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
-                  &nbsp; {{ r['role_name'].capitalize()
-                  }}
-                </option>
-                {% end %}
-              </select>
+              <div id="accordion-2">
+                <div class="card">
+                  <div class="card-header p-2" id="Role-2">
+                    <p class="mb-0 p-0" data-toggle="collapse" data-target="#collapseRole-2" aria-expanded="true"
+                      aria-controls="collapseRole-2">
+                      <i class="fas fa-chevron-down"></i> {{ translate('serverWizard', 'addRole', data['lang']) }}
+                      <small style="text-transform: none;"> - {{ translate('serverWizard', 'autoCreate',
+                        data['lang']) }}</small>
+                    </p>
+                  </div>
+                  <div id="collapseRole-2" class="collapse" aria-labelledby="Role-2" data-parent="">
+                    <div class="card-body scroll">
+                      <div class="form-group">
+                        {% for r in data['roles'] %}
+                        <span class="d-block menu-option"><label><input name="{{ r['role_id'] }}" type="checkbox">&nbsp;
+                            {{ r['role_name'].capitalize() }}</label></span>
+                        {% end %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-
             <button type="submit" class="btn btn-primary mr-2">{{ translate('serverWizard', 'importServerButton',
               data['lang']) }}</button>
             <button type="reset" class="btn btn-danger mr-2">{{ translate('serverWizard', 'resetForm', data['lang'])
@@ -214,25 +222,34 @@
               <input type="number" class="form-control" id="port3" name="port" value="19132" step="1" min="1"
                 max="65535" required>
             </div>
-
             <div class="form-group">
-              <p class="mb-0 p-0" aria-expanded="true">{{ translate('serverWizard', 'addRole', data['lang'])
-                }}
-                <small style="text-transform: none;"> - {{ translate('serverWizard', 'autoCreate',
-                  data['lang']) }}</small>
-              </p>
-              <select data-container="body"
-                data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
-                data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
-                class="selectpicker form-control form-control-lg select-css roles_select" data-styleBase="form-control"
-                data-style="form-control" data-live-search="true" name="server_roles" multiple>
-                {% for r in data['roles'] %}
-                <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
-                  &nbsp; {{ r['role_name'].capitalize()
-                  }}
-                </option>
-                {% end %}
-              </select>
+              <div id="accordion-3">
+                <div class="card">
+                  <div class="card-header p-2" id="Role-3">
+                    <p class="mb-0 p-0" data-toggle="collapse" data-target="#collapseRole-3" aria-expanded="true"
+                      aria-controls="collapseRole-3">
+                      <i class="fas fa-chevron-down"></i> {{ translate('serverWizard', 'addRole', data['lang'])
+                      }} <small style="text-transform: none;"> - {{ translate('serverWizard', 'autoCreate',
+                        data['lang']) }}</small>
+                    </p>
+                  </div>
+                  <div id="collapseRole-3" class="collapse" aria-labelledby="Role-3" data-parent="">
+                    <div class="card-body scroll">
+                      <div class="form-group">
+                        {% for r in data['roles'] %}
+                        <span class="d-block menu-option"><label><input name="{{ r['role_id'] }}" type="checkbox">&nbsp;
+                            {{ r['role_name'].capitalize() }}</label></span>
+                        {% end %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="visibility: hidden;">
+              <div class="form-group">
+                <input type="text" class="form-control" id="zip_root_path" name="zip_root_path">
+              </div>
             </div>
             <div class="modal fade" id="dir_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
               aria-hidden="true">
@@ -301,8 +318,8 @@
                     'labelZipFile', data['lang']) }}</label>
                 </div>
                 <div class="input-group-append">
-                  <button type="button" class="btn btn-info upload-button" id="upload-button"
-                    onclick="uploadFile('import')" disabled>{{ translate('serverWizard',
+                  <button type="button" class="btn btn-info upload-button" id="upload-button" onclick="sendFile()"
+                    disabled>{{ translate('serverWizard',
                     'uploadButton', data['lang']) }}</button>
                 </div>
               </div>
@@ -336,24 +353,35 @@
               </div>
 
               <div class="form-group">
-                <p class="mb-0 p-0" aria-expanded="true">{{ translate('serverWizard', 'addRole', data['lang'])
-                  }}
-                  <small style="text-transform: none;"> - {{ translate('serverWizard', 'autoCreate',
-                    data['lang']) }}</small>
-                </p>
-                <select data-container="body"
-                  data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
-                  data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
-                  class="selectpicker form-control form-control-lg select-css roles_select"
-                  data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles"
-                  multiple>
-                  {% for r in data['roles'] %}
-                  <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
-                    &nbsp; {{ r['role_name'].capitalize()
-                    }}
-                  </option>
-                  {% end %}
-                </select>
+                <div id="accordion-3">
+                  <div class="card">
+                    <div class="card-header p-2" id="Role-3">
+                      <p class="mb-0 p-0" data-toggle="collapse" data-target="#collapseRole-3" aria-expanded="true"
+                        aria-controls="collapseRole-3">
+                        <i class="fas fa-chevron-down"></i> {{ translate('serverWizard', 'addRole',
+                        data['lang'])
+                        }} <small style="text-transform: none;"> - {{ translate('serverWizard', 'autoCreate',
+                          data['lang']) }}</small>
+                      </p>
+                    </div>
+                    <div id="collapseRole-3" class="collapse" aria-labelledby="Role-3" data-parent="">
+                      <div class="card-body scroll">
+                        <div class="form-group">
+                          {% for r in data['roles'] %}
+                          <span class="d-block menu-option"><label><input name="{{ r['role_id'] }}"
+                                type="checkbox">&nbsp;
+                              {{ r['role_name'].capitalize() }}</label></span>
+                          {% end %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="visibility: hidden;">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="zip_root_path" name="zip_root_path">
+                </div>
               </div>
               <div class="modal fade" id="dir_upload_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
                 aria-hidden="true">
@@ -495,8 +523,61 @@
 {% end %}
 
 {% block js%}
-<script src="../../static/assets/js/shared/upload.js"></script>
 <script>
+  var upload;
+  var file;
+  function sendFile() {
+    file = $("#file")[0].files[0]
+    document.getElementById("upload_input").innerHTML = '<div class="progress" style="width: 100%;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">&nbsp;<i class="fa-solid fa-spinner"></i></div></div>'
+    let xmlHttpRequest = new XMLHttpRequest();
+    let token = getCookie("_xsrf")
+    let fileName = encodeURIComponent(file.name)
+    let target = '/upload'
+    let mimeType = file.type
+    let size = file.size
+    let type = 'server_import'
+
+    xmlHttpRequest.upload.addEventListener('progress', function (e) {
+
+      if (e.loaded <= size) {
+        var percent = Math.round(e.loaded / size * 100);
+        $(`#upload-progress-bar`).css('width', percent + '%');
+        $(`#upload-progress-bar`).html(percent + '%');
+      }
+    });
+
+    xmlHttpRequest.open('POST', target, true);
+    xmlHttpRequest.setRequestHeader('X-Content-Type', mimeType);
+    xmlHttpRequest.setRequestHeader('X-XSRFToken', token);
+    xmlHttpRequest.setRequestHeader('X-Content-Length', size);
+    xmlHttpRequest.setRequestHeader('X-Content-Disposition', 'attachment; filename="' + fileName + '"');
+    xmlHttpRequest.setRequestHeader('X-Content-Upload-Type', type);
+    xmlHttpRequest.setRequestHeader('X-FileName', fileName);
+    xmlHttpRequest.addEventListener('load', (event) => {
+      if (event.target.responseText == 'success') {
+        console.log('Upload for file', file.name, 'was successful!')
+        $("#upload_input").html(`<div class="card-header header-sm d-flex justify-content-between align-items-center" style="width: 100%;"><input value="${decodeURIComponent(fileName)}" type="text" id="file-uploaded" disabled></input> 🔒</div>`);
+        document.getElementById("lower_half").style.visibility = "visible";
+      }
+      else {
+        let response_text = JSON.parse(event.target.responseText);
+        var x = document.querySelector('.bootbox');
+        console.log(JSON.parse(event.target.responseText).info)
+        bootbox.alert({
+          message: JSON.parse(event.target.responseText).info,
+          callback: function () {
+            window.location.reload();
+          }
+        });
+        doUpload = false;
+      }
+    }, false);
+    xmlHttpRequest.addEventListener('error', (e) => {
+      console.error('Error while uploading file', file.name + '.', 'Event:', e)
+    }, false);
+    xmlHttpRequest.send(file);
+  }
+
   document.getElementById("root_upload_button").addEventListener("click", function (event) {
     if (file) {
       upload = true;
@@ -510,7 +591,7 @@
         message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
         closeButton: false
       });
-      setTimeout(function () {
+      setTimeout(function(){
         getDirView();
       }, 2000);
     } else {
@@ -559,7 +640,7 @@
         message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
         closeButton: false
       });
-      setTimeout(function () {
+      setTimeout(function(){
         getDirView();
       }, 2000);
     } else {
@@ -569,6 +650,17 @@
 </script>
 
 <script>
+  function dropDown(event) {
+    event.target.parentElement.children[1].classList.remove("d-none");
+    document.getElementById("overlay").classList.remove("d-none");
+  }
+  function hide(event) {
+    var items = document.getElementsByClassName('menu');
+    for (let i = 0; i < items.length; i++) {
+      items[i].classList.add("d-none");
+    }
+    document.getElementById("overlay").classList.add("d-none");
+  }
 
   function wait_msg(importing) {
     bootbox.alert({
@@ -600,15 +692,13 @@
     }
   }
   function calcRoles() {
-    var combinedValues = [];
-    $('.roles_select').each(function () {
-      var selectedValues = $(this).val();
-      console.log(selectedValues)
-      if (selectedValues) {
-        combinedValues = combinedValues.concat(selectedValues);
+    let role_ids = $('.roles').map(function () {
+      if ($(this).is(':checked')) {
+        return $(this).val();
       }
-    });
-    return combinedValues;
+    }).get();
+    console.log(role_ids)
+    return role_ids
   }
   async function send_server(data) {
     let token = getCookie("_xsrf")
@@ -665,6 +755,7 @@
 
 
       console.log(formDataJsonString);
+
       send_server(formDataJsonString);
     });
 
@@ -705,13 +796,7 @@
       wait_msg(true);
       e.preventDefault();
       let jarForm = document.getElementById("import-zip");
-      var checkedRadio = $('.root-input:checked');
-      let zip_root_path = ""
-      if (checkedRadio.length > 0) {
-        // Get the value of the checked radio button
-        var checkedValue = checkedRadio.val();
-        zip_root_path = checkedValue; // Return the checked value if needed
-      }
+
       let formData = new FormData(jarForm);
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
@@ -728,7 +813,7 @@
         "minecraft_bedrock_create_data": {
           "create_type": "import_server",
           "import_server_create_data": {
-            "existing_server_path": zip_root_path,
+            "existing_server_path": formDataObject.root_path,
             "executable": formDataObject.server_jar,
           }
         }
@@ -749,13 +834,6 @@
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
       console.log(formDataObject);
-      var checkedRadio = $('.root-input:checked');
-      let zip_root_path = ""
-      if (checkedRadio.length > 0) {
-        // Get the value of the checked radio button
-        var checkedValue = checkedRadio.val();
-        zip_root_path = checkedValue; // Return the checked value if needed
-      }
       let send_data = {
         "name": formDataObject.name,
         "roles": calcRoles(),
@@ -768,7 +846,7 @@
         "minecraft_bedrock_create_data": {
           "create_type": "import_server",
           "import_server_create_data": {
-            "existing_server_path": zip_root_path,
+            "existing_server_path": formDataObject.root_path,
             "executable": formDataObject.server_jar,
           }
         }
@@ -782,5 +860,4 @@
   });
 </script>
 <script type="text/javascript" src="../../static/assets/js/shared/root-dir.js"></script>
-<script src="../../static/assets/js/shared/bootstrap-select-1.13.18.js"></script>
 {% end %}

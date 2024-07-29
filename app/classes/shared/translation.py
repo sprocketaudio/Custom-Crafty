@@ -20,7 +20,7 @@ class Translation:
     def get_language_file(self, language: str):
         return os.path.join(self.translations_path, str(language) + ".json")
 
-    def translate(self, page, word, language, error=True):
+    def translate(self, page, word, language):
         fallback_language = "en_EN"
 
         translated_word = self.translate_inner(page, word, language)
@@ -37,9 +37,7 @@ class Translation:
             if hasattr(translated_word, "__iter__"):
                 # Multiline strings
                 return "\n".join(translated_word)
-        if error:
-            return "Error while getting translation"
-        return word
+        return "Error while getting translation"
 
     def translate_inner(self, page, word, language) -> t.Union[t.Any, None]:
         language_file = self.get_language_file(language)

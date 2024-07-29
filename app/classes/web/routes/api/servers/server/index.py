@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 server_patch_schema = {
     "type": "object",
     "properties": {
-        "server_name": {"type": "string", "minLength": 2, "pattern": "^[^/\\\\]*$"},
+        "server_name": {"type": "string", "minLength": 1},
         "backup_path": {"type": "string"},
         "executable": {"type": "string"},
         "log_path": {"type": "string", "minLength": 1},

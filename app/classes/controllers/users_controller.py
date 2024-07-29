@@ -55,7 +55,6 @@ class UsersController:
                 "minLength": self.helper.minimum_password_length,
                 "examples": ["crafty"],
                 "title": "Password",
-                "error": "passLength",
             },
             "email": {
                 "type": "string",

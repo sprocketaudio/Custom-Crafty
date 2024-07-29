@@ -140,7 +140,7 @@ class TasksManager:
                         )
 
                 elif command == "backup_server":
-                    svr.server_backup_threader(cmd["action_id"])
+                    svr.a_backup_server()
 
                 elif command == "update_executable":
                     svr.jar_update()
@@ -240,7 +240,6 @@ class TasksManager:
                                         "system"
                                     ),
                                     "command": schedule.command,
-                                    "action_id": schedule.action_id,
                                 }
                             ],
                         )
@@ -269,7 +268,6 @@ class TasksManager:
                                         "system"
                                     ),
                                     "command": schedule.command,
-                                    "action_id": schedule.action_id,
                                 }
                             ],
                         )
@@ -286,7 +284,6 @@ class TasksManager:
                                         "system"
                                     ),
                                     "command": schedule.command,
-                                    "action_id": schedule.action_id,
                                 }
                             ],
                         )
@@ -306,7 +303,6 @@ class TasksManager:
                                         "system"
                                     ),
                                     "command": schedule.command,
-                                    "action_id": schedule.action_id,
                                 }
                             ],
                         )
@@ -341,7 +337,6 @@ class TasksManager:
             job_data["cron_string"],
             job_data["parent"],
             job_data["delay"],
-            job_data["action_id"],
         )
 
         # Checks to make sure some doofus didn't actually make the newly
@@ -372,7 +367,6 @@ class TasksManager:
                                     "system"
                                 ),
                                 "command": job_data["command"],
-                                "action_id": job_data["action_id"],
                             }
                         ],
                     )
@@ -399,7 +393,6 @@ class TasksManager:
                                     "system"
                                 ),
                                 "command": job_data["command"],
-                                "action_id": job_data["action_id"],
                             }
                         ],
                     )
@@ -416,7 +409,6 @@ class TasksManager:
                                     "system"
                                 ),
                                 "command": job_data["command"],
-                                "action_id": job_data["action_id"],
                             }
                         ],
                     )
@@ -436,7 +428,6 @@ class TasksManager:
                                     "system"
                                 ),
                                 "command": job_data["command"],
-                                "action_id": job_data["action_id"],
                             }
                         ],
                     )
@@ -529,7 +520,6 @@ class TasksManager:
                                     "system"
                                 ),
                                 "command": job_data["command"],
-                                "action_id": job_data["action_id"],
                             }
                         ],
                     )
@@ -553,7 +543,6 @@ class TasksManager:
                                     "system"
                                 ),
                                 "command": job_data["command"],
-                                "action_id": job_data["action_id"],
                             }
                         ],
                     )
@@ -570,7 +559,6 @@ class TasksManager:
                                     "system"
                                 ),
                                 "command": job_data["command"],
-                                "action_id": job_data["action_id"],
                             }
                         ],
                     )
@@ -590,7 +578,6 @@ class TasksManager:
                                     "system"
                                 ),
                                 "command": job_data["command"],
-                                "action_id": job_data["action_id"],
                             }
                         ],
                     )
@@ -666,7 +653,6 @@ class TasksManager:
                                             "system"
                                         ),
                                         "command": schedule.command,
-                                        "action_id": schedule.action_id,
                                     }
                                 ],
                             )
@@ -799,18 +785,6 @@ class TasksManager:
         self.helper.ensure_dir_exists(
             os.path.join(self.controller.project_root, "import", "upload")
         )
-        self.helper.ensure_dir_exists(
-            os.path.join(self.controller.project_root, "temp")
-        )
-        for file in os.listdir(os.path.join(self.controller.project_root, "temp")):
-            if self.helper.is_file_older_than_x_days(
-                os.path.join(self.controller.project_root, "temp", file)
-            ):
-                try:
-                    os.remove(os.path.join(file))
-                except FileNotFoundError:
-                    logger.debug("Could not clear out file from temp directory")
-
         for file in os.listdir(
             os.path.join(self.controller.project_root, "import", "upload")
         ):
@@ -819,7 +793,7 @@ class TasksManager:
             ):
                 try:
                     os.remove(os.path.join(file))
-                except FileNotFoundError:
+                except:
                     logger.debug("Could not clear out file from import directory")
 
     def log_watcher(self):

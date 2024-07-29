@@ -1,5 +1,4 @@
 import os
-import sys
 import pathlib
 from pathlib import Path
 from datetime import datetime
@@ -252,19 +251,6 @@ class Controller:
         # Copy crafty logs to archive dir
         full_log_name = os.path.join(crafty_path, "logs")
         FileHelpers.copy_dir(os.path.join(self.project_root, "logs"), full_log_name)
-        thread_dump = ""
-        for thread in threading.enumerate():
-            if sys.version_info >= (3, 8):
-                thread_dump += (
-                    f"Name: {thread.name}\tIdentifier:"
-                    f" {thread.ident}\tTID/PID: {thread.native_id}\n"
-                )
-            else:
-                print(f"Name: {thread.name}\tIdentifier: {thread.ident}")
-        with open(
-            os.path.join(temp_dir, "crafty_thread_dump.txt"), "a", encoding="utf-8"
-        ) as f:
-            f.write(thread_dump)
         self.support_scheduler.add_job(
             self.log_status,
             "interval",
@@ -566,6 +552,7 @@ class Controller:
             name=data["name"],
             server_uuid=server_fs_uuid,
             server_dir=new_server_path,
+            backup_path=backup_path,
             server_command=server_command,
             server_file=server_file,
             server_log_file=log_location,
@@ -575,7 +562,7 @@ class Controller:
             server_host=monitoring_host,
             server_type=monitoring_type,
         )
-        self.management.add_default_backup_config(
+        self.management.set_backup_config(
             new_server_id,
             backup_path,
         )
@@ -721,6 +708,7 @@ class Controller:
             server_name,
             server_id,
             new_server_dir,
+            backup_path,
             server_command,
             server_jar,
             server_log_file,
@@ -774,6 +762,7 @@ class Controller:
             server_name,
             server_id,
             new_server_dir,
+            backup_path,
             server_command,
             server_exe,
             server_log_file,
@@ -818,6 +807,7 @@ class Controller:
             server_name,
             server_id,
             new_server_dir,
+            backup_path,
             server_command,
             server_exe,
             server_log_file,
@@ -865,6 +855,7 @@ class Controller:
             server_name,
             server_id,
             new_server_dir,
+            backup_path,
             server_command,
             server_exe,
             server_log_file,
@@ -888,13 +879,16 @@ class Controller:
     # **********************************************************************************
 
     def rename_backup_dir(self, old_server_id, new_server_id, new_uuid):
+        server_data = self.servers.get_server_data_by_id(old_server_id)
         server_obj = self.servers.get_server_obj(new_server_id)
+        old_bu_path = server_data["backup_path"]
         ServerPermsController.backup_role_swap(old_server_id, new_server_id)
-        backup_path = os.path.join(self.helper.backup_path, old_server_id)
+        backup_path = old_bu_path
         backup_path = Path(backup_path)
         backup_path_components = list(backup_path.parts)
         backup_path_components[-1] = new_uuid
         new_bu_path = pathlib.PurePath(os.path.join(*backup_path_components))
+        server_obj.backup_path = new_bu_path
         default_backup_dir = os.path.join(self.helper.backup_path, new_uuid)
         try:
             os.rmdir(default_backup_dir)
@@ -908,6 +902,7 @@ class Controller:
         name: str,
         server_uuid: str,
         server_dir: str,
+        backup_path: str,
         server_command: str,
         server_file: str,
         server_log_file: str,
@@ -922,6 +917,7 @@ class Controller:
             name,
             server_uuid,
             server_dir,
+            backup_path,
             server_command,
             server_file,
             server_log_file,
@@ -986,16 +982,16 @@ class Controller:
                             f"Unable to delete server files for server with ID: "
                             f"{server_id} with error logged: {e}"
                         )
-                    backup_configs = HelpersManagement.get_backups_by_server(
-                        server_id, True
-                    )
-                    for config in backup_configs:
-                        if Helpers.check_path_exists(config.backup_location):
-                            FileHelpers.del_dirs(
-                                Helpers.get_os_understandable_path(
-                                    config.backup_location
-                                )
+                    if Helpers.check_path_exists(
+                        self.servers.get_server_data_by_id(server_id)["backup_path"]
+                    ):
+                        FileHelpers.del_dirs(
+                            Helpers.get_os_understandable_path(
+                                self.servers.get_server_data_by_id(server_id)[
+                                    "backup_path"
+                                ]
                             )
+                        )
 
                 # Cleanup scheduled tasks
                 try:

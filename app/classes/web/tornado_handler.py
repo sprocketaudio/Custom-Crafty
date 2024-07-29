@@ -24,6 +24,7 @@ from app.classes.web.routes.metrics.metrics_handlers import metrics_handlers
 from app.classes.web.server_handler import ServerHandler
 from app.classes.web.websocket_handler import WebSocketHandler
 from app.classes.web.static_handler import CustomStaticHandler
+from app.classes.web.upload_handler import UploadHandler
 from app.classes.web.status_handler import StatusHandler
 
 
@@ -141,6 +142,7 @@ class Webserver:
             (r"/panel/(.*)", PanelHandler, handler_args),
             (r"/server/(.*)", ServerHandler, handler_args),
             (r"/ws", WebSocketHandler, handler_args),
+            (r"/upload", UploadHandler, handler_args),
             (r"/status", StatusHandler, handler_args),
             # API Routes V2
             *api_handlers(handler_args),
