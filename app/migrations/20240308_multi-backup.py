@@ -13,6 +13,13 @@ from app.classes.shared.file_helpers import FileHelpers
 logger = logging.getLogger(__name__)
 
 
+def is_valid_backup(backup, all_servers):
+    try:
+        return str(backup.server_id) in all_servers
+    except (TypeError, peewee.DoesNotExist):
+        return False
+
+
 def migrate(migrator: Migrator, database, **kwargs):
     """
     Write your migrations here.
@@ -150,9 +157,17 @@ def migrate(migrator: Migrator, database, **kwargs):
     migrator.create_table(NewSchedules)
 
     migrator.run()
-
+    all_servers = [
+        row.server_id for row in Servers.select(Servers.server_id).distinct()
+    ]
+    all_backups = Backups.select()
+    Console.info("Cleaning up orphan backups for all servers")
+    valid_backups = [
+        backup for backup in all_backups if is_valid_backup(backup, all_servers)
+    ]
     # Copy data from the existing backups table to the new one
-    for backup in Backups.select():
+    for backup in valid_backups:
+        Console.info(f"Trying to get server for backup migration {backup.server_id}")
         # Fetch the related server entry from the Servers table
         server = Servers.get(Servers.server_id == backup.server_id)
         Console.info(f"Migrations: Migrating backup for server {server.server_name}")
@@ -172,13 +187,28 @@ def migrate(migrator: Migrator, database, **kwargs):
             default=True,
             enabled=True,
         )
+        Console.info(
+            f"New backup table created for {server.server_name} with id {new_backup.backup_id}"
+        )
         Helpers.ensure_dir_exists(
             os.path.join(server.backup_path, new_backup.backup_id)
         )
-        FileHelpers.move_dir(
-            os.path.join(server.backup_path),
-            os.path.join(server.backup_path, new_backup.backup_id),
-        )
+        try:
+            Console.info(
+                f"Moving old backups to new backup dir for {server.server_name}"
+            )
+            for file in os.listdir(server.backup_path):
+                if not os.path.isdir(
+                    os.path.join(os.path.join(server.backup_path, file))
+                ):
+                    FileHelpers.move_file(
+                        os.path.join(server.backup_path, file),
+                        os.path.join(server.backup_path, new_backup.backup_id, file),
+                    )
+        except FileNotFoundError as why:
+            logger.error(
+                f"Could not move backup {file} for {server.server_name} to new location with error {why}"
+            )
 
     Console.debug("Migrations: Dropping old backup table")
     # Drop the existing backups table
