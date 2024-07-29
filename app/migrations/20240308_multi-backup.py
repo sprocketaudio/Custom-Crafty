@@ -175,12 +175,10 @@ def migrate(migrator: Migrator, database, **kwargs):
         Helpers.ensure_dir_exists(
             os.path.join(server.backup_path, new_backup.backup_id)
         )
-        for file in os.listdir(server.backup_path):
-            if not os.path.isdir(os.path.join(os.path.join(server.backup_path, file))):
-                FileHelpers.move_file(
-                    os.path.join(server.backup_path, file),
-                    os.path.join(server.backup_path, new_backup.backup_id, file),
-                )
+        FileHelpers.move_dir(
+            os.path.join(server.backup_path),
+            os.path.join(server.backup_path, new_backup.backup_id),
+        )
 
     Console.debug("Migrations: Dropping old backup table")
     # Drop the existing backups table
