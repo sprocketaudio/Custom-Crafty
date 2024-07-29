@@ -64,7 +64,7 @@
               <span class="text-warning"><i class="fas fa-exclamation-triangle"></i></span>
             </td>
             <td id="server_motd_{{ server['stats']['server_id']['server_id'] }}">
-              <span class="text-warning"><i class="fa-solid fa-link-slash"></i> </span>
+              <span class="text-warning">Crafty can't get infos from this Server </span>
             </td>
             <td id="server_version_{{ server['stats']['server_id']['server_id'] }}">
               <span class="text-warning"><i class="fas fa-question"></i></i></span>
@@ -148,7 +148,7 @@
             <div class="row">
               <div class="col-12">
                 <div id="m_server_motd_{{ server['stats']['server_id']['server_id'] }}">
-                  <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> Crafty can't get info from
+                  <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> Crafty can't get infos from
                     this Server </span>
                 </div>
                 <div id="m_server_version_{{ server['stats']['server_id']['server_id'] }}"></div>
@@ -223,9 +223,9 @@
     }
     else {
       server_players.innerHTML = `<span class="text-warning"><i class="fas fa-exclamation-triangle"></i></span>`;
-      server_motd.innerHTML = `<span class="text-warning"><i class="fa-solid fa-link-slash"></i> </span>`;
+      server_motd.innerHTML = `<span class="text-warning">Crafty can't get infos from this Server </span>`;
       server_version.innerHTML = `<span class="text-warning"><i class="fas fa-question"></i></i></span>`;
-      m_server_motd.innerHTML = `<span class="text-warning"><i class="fas fa-exclamation-triangle"></i> <i class="fa-solid fa-link-slash"></i> </span>`;
+      m_server_motd.innerHTML = `<span class="text-warning"><i class="fas fa-exclamation-triangle"></i> Crafty can't get infos from this Server </span>`;
     }
 
     /* Update Online Status */

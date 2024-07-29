@@ -23,7 +23,6 @@ new_server_schema = {
             "type": "string",
             "examples": ["My Server"],
             "minLength": 2,
-            "pattern": "^[^/\\\\]*$",
         },
         "roles": {"title": "Roles to add", "type": "array", "examples": [1, 2, 3]},
         "stop_command": {
