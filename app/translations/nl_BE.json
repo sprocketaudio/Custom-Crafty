@@ -586,6 +586,8 @@
         "minMem": "Minimaal geheugen",
         "myNewServer": "My New Server",
         "newServer": "Nieuwe server maken",
+        "noRole": "Geen rol gevonden met huidige zoekparameters",
+        "noneRoles": "Geen rollen geselecteerd",
         "quickSettings": "Snelle instellingen",
         "quickSettingsDescription": "Maak je geen zorgen, je kunt deze later wijzigen",
         "resetForm": "Formulier resetten",

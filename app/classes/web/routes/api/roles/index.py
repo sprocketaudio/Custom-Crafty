@@ -11,6 +11,7 @@ create_role_schema = {
         "name": {
             "type": "string",
             "minLength": 1,
+            "pattern": r"^[^,\[\]]*$",
         },
         "servers": {
             "type": "array",
@@ -23,7 +24,7 @@ create_role_schema = {
                     },
                     "permissions": {
                         "type": "string",
-                        "pattern": "^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "pattern": r"^[01]{8}$",  # 8 bits, see EnumPermissionsServer
                     },
                 },
                 "required": ["server_id", "permissions"],

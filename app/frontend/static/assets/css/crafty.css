@@ -278,6 +278,9 @@ div.warnings div.wssError a:hover {
 }
 
 /**************************************************************/
+.dropdown-menu {
+    max-width: 100%;
+}
 
 .hidden-input {
     margin-left: -40px;

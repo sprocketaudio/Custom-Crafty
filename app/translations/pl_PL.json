@@ -585,6 +585,8 @@
         "minMem": "Min. RAMu",
         "myNewServer": "Mój nowy serwer",
         "newServer": "Stwórz nowy serwer",
+        "noRole": "Nie znaleziono roli z tym wyszukiwaniem",
+        "noneRoles": "Nie zaznaczono żadnej roli",
         "quickSettings": "Szybkie ustawienia",
         "quickSettingsDescription": "Nie martw się, możesz te ustawienia zmienić później",
         "resetForm": "Resetuj formę",

@@ -587,6 +587,8 @@
         "minMem": "Minimālā Atmiņa",
         "myNewServer": "Mans Jaunais Serveris",
         "newServer": "Izveidot Jaunu Serveri",
+        "noRole": "Nav lomas ar izvēlētiem meklēšanas parametriem",
+        "noneRoles": "Nav Izvēlētas Lomas",
         "quickSettings": "Ātrie Iestatījumi",
         "quickSettingsDescription": "Neuztraucies, tos var izmainīt vēlāk",
         "resetForm": "Notīrīt Formu",

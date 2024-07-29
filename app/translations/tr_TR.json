@@ -585,6 +585,8 @@
         "minMem": "Minimum Bellek",
         "myNewServer": "Benim Yeni Sunucum",
         "newServer": "Yeni Sunucu Oluştur",
+        "noRole": "Şu arama parametresiyle herhangi bir rol bulunamadı:",
+        "noneRoles": "Rol Seçilmedi",
         "quickSettings": "Hızlı Ayarlar",
         "quickSettingsDescription": "Endişelenmeyin, bunları daha sonra değiştirebilirsiniz",
         "resetForm": "Formu Sıfırla",

@@ -605,6 +605,8 @@
         "minMem": "Minimální paměť",
         "myNewServer": "Nový server",
         "newServer": "Vytvořit nový server",
+        "noRole": "Žádna role nebyla nalezena z tím to vstupem",
+        "noneRoles": "Žádne role vybrány",
         "quickSettings": "Rychlé nastavení",
         "quickSettingsDescription": "Nebojte se, můžete je změnit později.",
         "resetForm": "Obnovit nastavení formuláře",

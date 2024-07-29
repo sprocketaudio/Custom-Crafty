@@ -586,6 +586,8 @@
         "minMem": "מינימום זיכרון",
         "myNewServer": "השרת החדש שלי",
         "newServer": "צור שרת חדש",
+        "noRole": "לא נמצא תפקיד עם פרמטר החיפוש הנוכחי",
+        "noneRoles": "לא נבחרו תפקידים",
         "quickSettings": "הגדרות מהירות",
         "quickSettingsDescription": "אל תדאג, אתה יכול לשנות את אלה מאוחר יותר",
         "resetForm": "אפס טופס",
@@ -668,6 +670,9 @@
         "userSettings": "הגדרות משתמש",
         "userTheme": "ערכת נושא UI",
         "uses": "מספר השימושים המותרים (-1==ללא הגבלה)"
+    },
+    "validators": {
+        "passLength": "סיסמא קצרה מדי. אורך מינימלי: 8"
     },
     "webhooks": {
         "areYouSureDel": "האם אתה בטוח שברצונך למחוק את ה-Webhook הזה?",

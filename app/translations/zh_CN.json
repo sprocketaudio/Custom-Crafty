@@ -586,6 +586,8 @@
         "minMem": "最小内存",
         "myNewServer": "我的新服务器",
         "newServer": "创建新服务器",
+        "noRole": "未找到角色。当前搜索参数：",
+        "noneRoles": "未选择角色",
         "quickSettings": "快捷设置",
         "quickSettingsDescription": "别担心，你可以稍后再更改这些设置",
         "resetForm": "重置表单",

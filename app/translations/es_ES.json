@@ -586,6 +586,8 @@
         "minMem": "Memoria mínima",
         "myNewServer": "Mi nuevo Servidor",
         "newServer": "Crear Servidor",
+        "noRole": "No se encontró ningún rol con el parámetro de búsqueda actual",
+        "noneRoles": "No hay roles seleccionados",
         "quickSettings": "Ajustes rápidos",
         "quickSettingsDescription": "No te preocupes, puedes cambiarlos más tarde.",
         "resetForm": "Limpiar formulario",
