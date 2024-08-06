@@ -6,7 +6,7 @@ from app.classes.web.base_api_handler import BaseApiHandler
 server_dir_schema = {
     "type": "object",
     "properties": {
-        "new_dir": {"type": "string"},
+        "new_dir": {"type": "string", "error": "typeString"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -70,20 +70,27 @@ class ApiCraftyConfigServerDirHandler(BaseApiHandler):
 
         try:
             data = orjson.loads(self.request.body)
-        except orjson.JSONDecodeError as e:
+        except orjson.JSONDecodeError as why:
             return self.finish_json(
-                400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
+                400,
+                {"status": "error", "error": "INVALID_JSON", "error_data": str(why)},
             )
 
         try:
             validate(data, server_dir_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = why.path[0] if why.path else None
+            err = f"""{self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {offending_key}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
         if self.helper.dir_migration:
