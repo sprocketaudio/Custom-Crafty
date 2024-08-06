@@ -54,8 +54,7 @@
                 <div class="card-body">
                   {% if len(data['backups']) == 0 %}
                   <div style="text-align: center; color: grey;">
-                    <h7>{{ translate('serverBackups', 'no-backup', data['lang']) }} <strong>{{
-                        translate('serverBackups', 'newBackup',data['lang']) }}</strong>.</h7>
+                    <h7>{{ translate('serverBackups', 'no-backup', data['lang']) }}.</h7>
                   </div>
                   {% end %}
                   {% if len(data['backups']) > 0 %}
