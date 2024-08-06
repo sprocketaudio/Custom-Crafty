@@ -228,7 +228,7 @@
         "login": "Iniciar Sesión",
         "password": "Contraseña",
         "username": "Usuario",
-        "viewStatus": "View Public Status Page"
+        "viewStatus": "Ver página de estado público"
     },
     "notify": {
         "activityLog": "Registros de actividad",
@@ -301,10 +301,12 @@
         "serversDesc": "Servidores a los que este grupo puede acceder"
     },
     "serverBackups": {
+        "actions": "Acciones",
         "after": "Comando ejecutado después del respaldo",
         "backupAtMidnight": "¿Copia de seguridad automática a medianoche?",
         "backupNow": "¡Respalde ahora!",
         "backupTask": "Se ha iniciado una tarea de copia de seguridad.",
+        "backups": "Copias de seguridad del servidor",
         "before": "Comando ejecutado antes del respaldo",
         "cancel": "Cancelar",
         "clickExclude": "Click para seleccionar las Exclusiones",
@@ -313,21 +315,34 @@
         "confirmDelete": "¿Quieres eliminar esta copia de seguridad? Esto no se puede deshacer.",
         "confirmRestore": "¿Seguro que quiere restaurar desde este respaldo?. Todos los archivos del servidor actuales serán cambiados al estado del respaldo y serán irrecuperables.",
         "currentBackups": "Copias de seguridad actuales",
+        "default": "Copia de seguridad predeterminada",
+        "defaultExplain": "La copia de seguridad que Crafty usará antes de actualizar. No se puede cambiar ni eliminar.",
         "delete": "Eliminar",
         "destroyBackup": "¿Destruir copia de seguridad \" + file_to_del + \"?",
         "download": "Descargar",
+        "edit": "Editar",
+        "enabled": "Habilitado",
         "excludedBackups": "Rutas Excluidas: ",
         "excludedChoose": "Elige las rutas que desea excluir de los respaldos",
         "exclusionsTitle": "Exclusiones en respaldos.",
+        "failed": "Fallido",
         "maxBackups": "Cantidad máxima de respaldos",
         "maxBackupsDesc": "Crafty no almacenará más de N copias de seguridad, eliminando la más antigua. (Sin límite: 0)",
+        "myBackup": "Mi Nueva Copia",
+        "name": "Nombre",
+        "newBackup": "Crear Nueva Copia de Seguridad",
+        "no-backup": "No hay copias de seguridad. Para crear una nueva configuración de copias de seguridad, presiona Crear nueva copia",
         "options": "Opciones",
         "path": "Ruta",
         "restore": "Restaurar",
         "restoring": "Restaurando copia de seguridad. Esto puede tomar un tiempo. Sea paciente.",
+        "run": "Ejecutar Copia de seguridad",
         "save": "Guardar",
         "shutdown": "Apagar el servidor durante la duración de la copia del respaldo.",
         "size": "Tamaño",
+        "standby": "En espera",
+        "status": "Estado",
+        "storage": "Ubicación del almacenamiento",
         "storageLocation": "Ubicación de almacenamiento",
         "storageLocationDesc": "¿Dónde quieres almacenar las copias de seguridad?"
     },
@@ -492,6 +507,7 @@
     },
     "serverSchedules": {
         "action": "Acción",
+        "actionId": "Seleccionar acción secundaria",
         "areYouSure": "¿Borrar tarea programada?",
         "cancel": "Cancelar",
         "cannotSee": "¿No puede ver todo?",
@@ -570,6 +586,8 @@
         "minMem": "Memoria mínima",
         "myNewServer": "Mi nuevo Servidor",
         "newServer": "Crear Servidor",
+        "noRole": "No se encontró ningún rol con el parámetro de búsqueda actual",
+        "noneRoles": "No hay roles seleccionados",
         "quickSettings": "Ajustes rápidos",
         "quickSettingsDescription": "No te preocupes, puedes cambiarlos más tarde.",
         "resetForm": "Limpiar formulario",
@@ -600,7 +618,6 @@
         "dashboard": "Panel de control",
         "documentation": "Documentación",
         "inApp": "Documentación de la Aplicación",
-        "navigation": "Navegación",
         "newServer": "Crear nuevo Servidor",
         "servers": "Servidores"
     },
@@ -653,6 +670,9 @@
         "userSettings": "Configuración de Usuario.",
         "userTheme": "Tema de Interfaz",
         "uses": "Número de usos permitidos. (Sin límite: -1)"
+    },
+    "validators": {
+        "passLength": "Contraseña demasiado corta. Longitud mínima: 8"
     },
     "webhooks": {
         "areYouSureDel": "¿Estás seguro de que quieres eliminar este webhook?",

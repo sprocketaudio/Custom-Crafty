@@ -41,7 +41,7 @@ async function getTreeView(path, unzip = false, upload = false) {
     let responseData = await res.json();
     if (responseData.status === "ok") {
         console.log(responseData);
-        process_tree_response(responseData);
+        process_tree_response(responseData, unzip);
         let x = document.querySelector('.bootbox');
         if (x) {
             x.remove()
@@ -61,7 +61,7 @@ async function getTreeView(path, unzip = false, upload = false) {
     }
 }
 
-function process_tree_response(response) {
+function process_tree_response(response, unzip) {
     const styles = window.getComputedStyle(document.getElementById("lower_half"));
     //If this value is still hidden we know the user is executing a zip import and not an upload
     if (styles.visibility === "hidden") {
@@ -70,7 +70,9 @@ function process_tree_response(response) {
         document.getElementById('upload_submit').disabled = false;
     }
     let path = response.data.root_path.path;
-    $(".root-input").val(response.data.root_path.path);
+    if (unzip) {
+        $(".root-input").val(response.data.root_path.path);
+    }
     let text = `<ul class="tree-nested d-block" id="${path}ul">`;
     Object.entries(response.data).forEach(([key, value]) => {
         if (key === "root_path" || key === "db_stats") {
@@ -83,7 +85,7 @@ function process_tree_response(response) {
         if (value.dir) {
             text += `<li class="tree-item" id="${dpath}li"  data-path="${dpath}">
                     <div id="${dpath}" data-path="${dpath}" data-name="${filename}" class="tree-caret tree-ctx-item tree-folder">
-                    <input type="radio" name="root_path" value="${dpath}">
+                    <input type="radio" class="root-input" name="root_path" value="${dpath}">
                     <span id="${dpath}span" class="files-tree-title" data-path="${dpath}" data-name="${filename}" onclick="getDirView(event)">
                       <i style="color: var(--info);" class="far fa-folder"></i>
                       <i style="color: var(--info);" class="far fa-folder-open"></i>

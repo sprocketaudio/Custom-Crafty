@@ -67,7 +67,8 @@
                     translate('serverFiles', 'download', data['lang']) }}</a>
                   <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteFile" href="#"
                     style="color: red">{{ translate('serverFiles', 'delete', data['lang']) }}</a>
-                  <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteDir" href="#" style="color: red">{{
+                  <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteDir" href="#"
+                    style="color: red">{{
                     translate('serverFiles', 'delete', data['lang']) }}</a>
                   <a href="javascript:void(0)" class="closebtn" style="color: var(--info);"
                     onclick="document.getElementById('files-tree-nav').style.display = 'none';">{{
@@ -156,7 +157,8 @@
                     right: 35px;
                   }
                 }
-                .tree-file:hover{
+
+                .tree-file:hover {
                   cursor: pointer;
                 }
               </style>
@@ -721,105 +723,7 @@
     }
   }
 
-  async function sendFile(file, path, serverId, left, i, onProgress) {
-    let xmlHttpRequest = new XMLHttpRequest();
-    let token = getCookie("_xsrf")
-    let fileName = file.name
-    let target = '/upload?server_id=' + serverId
-    let mimeType = file.type
-    let size = file.size
-
-    xmlHttpRequest.upload.addEventListener('progress', function (e) {
-
-      if (e.loaded <= size) {
-        var percent = Math.round(e.loaded / size * 100);
-        $(`#upload-progress-bar-${i + 1}`).css('width', percent + '%');
-        $(`#upload-progress-bar-${i + 1}`).html(percent + '%');
-      }
-    });
-
-    xmlHttpRequest.open('POST', target, true);
-    xmlHttpRequest.setRequestHeader('X-Content-Type', mimeType);
-    xmlHttpRequest.setRequestHeader('X-XSRFToken', token);
-    xmlHttpRequest.setRequestHeader('X-Content-Length', size);
-    xmlHttpRequest.setRequestHeader('X-Content-Disposition', 'attachment; filename="' + fileName + '"');
-    xmlHttpRequest.setRequestHeader('X-Path', path);
-    xmlHttpRequest.setRequestHeader('X-Content-Upload-Type', 'server_files')
-    xmlHttpRequest.setRequestHeader('X-Files-Left', left);
-    xmlHttpRequest.setRequestHeader('X-FileName', fileName);
-    xmlHttpRequest.setRequestHeader('X-ServerId', serverId);
-    xmlHttpRequest.upload.addEventListener('progress', (event) =>
-      onProgress(Math.floor(event.loaded / event.total * 100)), false);
-    xmlHttpRequest.addEventListener('load', (event) => {
-      if (event.target.responseText == 'success') {
-        console.log('Upload for file', file.name, 'was successful!');
-        let caught = false;
-        try {
-          if (document.getElementById(path).classList.contains("clicked")) {
-            var expanded = true;
-          }
-        } catch {
-          var expanded = false;
-        }
-
-        try {
-          var par_el = document.getElementById(path + "ul");
-          var items = par_el.children;
-        } catch (err) {
-          console.log(err)
-          caught = true;
-          var par_el = document.getElementById("files-tree");
-          var items = par_el.children;
-        }
-        let name = file.name;
-        console.log(par_el)
-        let full_path = path + '/' + name
-        let flag = false;
-        for (var k = 0; k < items.length; ++k) {
-          if ($(items[k]).attr("data-name") == name) {
-            flag = true;
-          }
-        }
-        if (!flag) {
-          if (caught && expanded == false) {
-            $(par_el).append('<li id=' + '"' + full_path.toString() + 'li' + '"' + 'class="d-block tree-ctx-item tree-file tree-item" data-path=' + '"' + full_path.toString() + '"' + ' data-name=' + '"' + name.toString() + '"' + ' onclick="clickOnFile(event)" ><span style="margin-right: 6px;"><i class="far fa-file"></i></span>' + name + '</li>');
-          } else if (expanded == true) {
-            $(par_el).append('<li id=' + '"' + full_path.toString() + 'li' + '"' + 'class="tree-ctx-item tree-file tree-item" data-path=' + '"' + full_path.toString() + '"' + ' data-name=' + '"' + name.toString() + '"' + ' onclick="clickOnFile(event)" ><span style="margin-right: 6px;"><i class="far fa-file"></i></span>' + name + '</li>');
-          }
-          setTreeViewContext();
-        }
-        $(`#upload-progress-bar-${i + 1}`).removeClass("progress-bar-striped");
-        $(`#upload-progress-bar-${i + 1}`).addClass("bg-success");
-        $(`#upload-progress-bar-${i + 1}`).html('<i style="color: black;" class="fas fa-box-check"></i>')
-      }
-      else {
-        let response_text = JSON.parse(event.target.responseText);
-        var x = document.querySelector('.bootbox');
-        if (x) {
-          x.remove()
-        }
-        var x = document.querySelector('.modal-content');
-        if (x) {
-          x.remove()
-        }
-        console.log(JSON.parse(event.target.responseText).info)
-        bootbox.alert({
-          message: JSON.parse(event.target.responseText).info,
-          callback: function () {
-            window.location.reload();
-          }
-        });
-        doUpload = false;
-      }
-    }, false);
-    xmlHttpRequest.addEventListener('error', (e) => {
-      console.error('Error while uploading file', file.name + '.', 'Event:', e)
-    }, false);
-    xmlHttpRequest.send(file);
-  }
-
   let uploadWaitDialog;
-  let doUpload = true;
 
   async function uploadFilesE(event) {
     path = event.target.parentElement.getAttribute('data-path');
@@ -842,6 +746,9 @@
             label: "{{ translate('serverFiles', 'upload', data['lang']) }}",
             className: "btn-default",
             callback: async function () {
+              if ($("#files").get(0).files.length === 0) {
+                return hideUploadBox();
+              }
               var height = files.files.length * 50;
 
               var waitMessage = '<p class="text-center mb-0">' +
@@ -858,52 +765,54 @@
               });
 
               let nFiles = files.files.length;
-              for (i = 0; i < nFiles; i++) {
-                if (!doUpload) {
-                  doUpload = true;
-                  hideUploadBox();
-                  break;
-                }
+              const uploadPromises = [];
 
+              for (let i = 0; i < nFiles; i++) {
+                const file = files.files[i];
                 const progressHtml = `
-                <div style="width: 100%; min-width: 100%;">
-                  ${files.files[i].name}:
-                  <br><div
-                    id="upload-progress-bar-${i + 1}"
-                    class="progress-bar progress-bar-striped progress-bar-animated"
-                    role="progressbar"
-                    style="width: 100%; height: 10px;"
-                    aria-valuenow="0"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                  ></div>
-                </div><br>
-                `;
+                            <div style="width: 100%; min-width: 100%;">
+                                ${file.name}:
+                                <br><div
+                                    id="upload-progress-bar-${i + 1}"
+                                    class="progress-bar progress-bar-striped progress-bar-animated"
+                                    role="progressbar"
+                                    style="width: 100%; height: 10px;"
+                                    aria-valuenow="0"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                ></div>
+                            </div><br>
+                            `;
+
                 $('#upload-progress-bar-parent').append(progressHtml);
 
-                await sendFile(files.files[i], path, serverId, nFiles - i - 1, i, (progress) => {
+                const uploadPromise = uploadFile("server_upload", file, path, i, (progress) => {
                   $(`#upload-progress-bar-${i + 1}`).attr('aria-valuenow', progress)
                   $(`#upload-progress-bar-${i + 1}`).css('width', progress + '%');
                 });
+                uploadPromises.push(uploadPromise);
               }
-              hideUploadBox();
-              //$('#upload_file').submit(); //.trigger('submit');
+
+
+              await Promise.all(uploadPromises);
+              setTimeout(() => {
+                hideUploadBox();
+              }, 2000);
+
             }
           }
         }
       });
-
-      var fileList = document.getElementById("files");
-      fileList.addEventListener("change", function (e) {
-        var list = "";
-        let files = Array.from(this.files)
-        files.forEach(file => {
-          list += "<li class='col-xs-12 file-list'>" + file.name + "</li>"
-        })
-
-        document.getElementById("fileList").innerHTML = list;
-      }, false);
     });
+  }
+
+  async function calculateFileHash(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    return hashHex;
   }
 
   function getDirView(event) {
@@ -1211,5 +1120,5 @@
 
 
 </script>
-
+<script src="../../static/assets/js/shared/upload.js"></script>
 {% end %}

@@ -428,10 +428,13 @@
       if (responseData.status === "ok") {
         window.location.href = "/panel/panel_config";
       } else {
-
+        let errordata = responseData.error;
+        if (responseData.error_data){
+          errordata = responseData.error
+        }
         bootbox.alert({
           title: responseData.error,
-          message: responseData.error_data
+          message: errordata
         });
       }
     });

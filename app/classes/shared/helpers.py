@@ -19,7 +19,7 @@ import shutil
 import shlex
 import subprocess
 import itertools
-from datetime import datetime
+from datetime import datetime, timezone
 from socket import gethostname
 from contextlib import redirect_stderr, suppress
 import libgravatar
@@ -508,7 +508,6 @@ class Helpers:
             "max_log_lines": 700,
             "max_audit_entries": 300,
             "disabled_language_files": [],
-            "stream_size_GB": 1,
             "keywords": ["help", "chunk"],
             "allow_nsfw_profile_pictures": False,
             "enable_user_self_delete": False,
@@ -639,6 +638,10 @@ class Helpers:
         # set some defaults if we don't get version_data from our helper
         version = f"{major}.{minor}.{sub}"
         return str(version)
+
+    @staticmethod
+    def get_utc_now() -> datetime:
+        return datetime.fromtimestamp(time.time(), tz=timezone.utc)
 
     def encode_pass(self, password):
         return self.passhasher.hash(password)
@@ -1005,6 +1008,11 @@ class Helpers:
             return True
         except PermissionError as e:
             logger.critical(f"Check generated exception due to permssion error: {e}")
+            return False
+        except FileNotFoundError as e:
+            logger.critical(
+                f"Check generated exception due to file does not exist error: {e}"
+            )
             return False
 
     def create_self_signed_cert(self, cert_dir=None):

@@ -278,6 +278,15 @@ def setup_logging(debug=True):
             encoding="utf-8",
         ).close()
 
+    if not helper.check_file_exists(
+        os.path.join(APPLICATION_PATH, "logs", "audit.log")
+    ):
+        open(
+            os.path.join(APPLICATION_PATH, "logs", "audit.log"),
+            "a",
+            encoding="utf-8",
+        ).close()
+
     if os.path.exists(logging_config_file):
         # open our logging config file
         with open(logging_config_file, "rt", encoding="utf-8") as f:
@@ -367,7 +376,15 @@ if __name__ == "__main__":
             encoding="utf-8",
         ) as cred_file:
             cred_file.write(
-                json.dumps({"username": "admin", "password": PASSWORD}, indent=4)
+                json.dumps(
+                    {
+                        "username": "admin",
+                        "password": PASSWORD,
+                        "info": "This is NOT where you change your password."
+                        " This file is only a means to give you a default password.",
+                    },
+                    indent=4,
+                )
             )
         os.chmod(
             os.path.join(APPLICATION_PATH, "app", "config", "default-creds.txt"), 0o600

@@ -26,7 +26,6 @@ class Servers(BaseModel):
     created = DateTimeField(default=datetime.datetime.now)
     server_name = CharField(default="Server", index=True)
     path = CharField(default="")
-    backup_path = CharField(default="")
     executable = CharField(default="")
     log_path = CharField(default="")
     execution_command = CharField(default="")
@@ -65,7 +64,6 @@ class HelperServers:
         server_id: str,
         name: str,
         server_dir: str,
-        backup_path: str,
         server_command: str,
         server_file: str,
         server_log_file: str,
@@ -81,7 +79,6 @@ class HelperServers:
             name: The name of the server
             server_uuid: This is the UUID of the server
             server_dir: The directory where the server is located
-            backup_path: The path to the backup folder
             server_command: The command to start the server
             server_file: The name of the server file
             server_log_file: The path to the server log file
@@ -111,7 +108,6 @@ class HelperServers:
             server_port=server_port,
             server_ip=server_host,
             stop_command=server_stop,
-            backup_path=backup_path,
             type=server_type,
             created_by=created_by,
         ).server_id

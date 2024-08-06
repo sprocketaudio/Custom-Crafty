@@ -79,6 +79,24 @@
                       <option id="command" value="command">{{ translate('serverScheduleConfig', 'custom' , data['lang'])
                         }}</option>
                     </select>
+                    <div id="ifBackup" style="display: none;">
+                      <br>
+                      <label for="action_id">{{ translate('serverSchedules', 'actionId' , data['lang']) }}<small
+                        class="text-muted ml-1"></small> </label><br>
+                      <select id="action_id" name="action_id"
+                        class="form-control form-control-lg select-css" value="{{ data['schedule']['action_id']  }}">
+                        {% for backup in data["backups"] %}
+                        {% if backup.backup_id == data["schedule"]["action_id"] %}
+                        <option id="{{backup.backup_id}}" value="{{backup.backup_id}}">{{backup.backup_name}}</option>
+                        {% end %}
+                        {% end %}
+                        {% for backup in data["backups"] %}
+                        {% if backup.backup_id != data["schedule"]["action_id"] %}
+                        <option id="{{backup.backup_id}}" value="{{backup.backup_id}}">{{backup.backup_name}}</option>
+                        {% end %}
+                        {% end %}
+                      </select>
+                    </div>
                   </div>
                   <div id="ifBasic">
                     <div class="form-group">
@@ -232,7 +250,7 @@
     }
 
     function replacer(key, value) {
-    if (key != "start_time" && key != "cron_string" && key != "interval_type") {
+    if (key != "start_time" && key != "cron_string" && key != "interval_type" && key != "action_id") {
       if (typeof value == "boolean") {
         return value
       }
@@ -247,7 +265,7 @@
       }
     } else if (value === "" && key == "start_time"){
         return "00:00";
-      }else{
+      }else {
         return value;
       }
     }
@@ -280,6 +298,11 @@
       console.log(formDataObject);
       // Format the plain form data as JSON
       let formDataJsonString = JSON.stringify(formDataObject, replacer);
+
+      let data = JSON.parse(formDataJsonString)
+      if (data["action"] === "backup" && !data["action_id"]){
+        return bootbox.alert("Validation Failed")
+      }
 
       let res = await fetch(`/api/v2/servers/${serverId}/tasks/`, {
         method: 'POST',
@@ -357,6 +380,14 @@
       } else {
         document.getElementById("ifYes").style.display = "none";
         document.getElementById("command_input").required = false;
+      }
+      if (document.getElementById('action').value == "backup"){
+        document.getElementById("ifBackup").style.display = "block";
+        document.getElementById("action_id").required = true;
+      } else {
+        document.getElementById("ifBackup").style.display = "none";
+        document.getElementById("action_id").required = false;
+        $("#action_id").val(null);
       }
     }
     function basicAdvanced() {

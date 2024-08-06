@@ -21,6 +21,9 @@ new_task_schema = {
         "action": {
             "type": "string",
         },
+        "action_id": {
+            "type": "string",
+        },
         "interval": {"type": "integer"},
         "interval_type": {
             "type": "string",
@@ -110,6 +113,18 @@ class ApiServersServerTasksIndexHandler(BaseApiHandler):
                 )
         if "parent" not in data:
             data["parent"] = None
+        if data.get("action_id"):
+            backup_config = self.controller.management.get_backup_config(
+                data["action_id"]
+            )
+            if backup_config["server_id"]["server_id"] != server_id:
+                return self.finish_json(
+                    405,
+                    {
+                        "status": "error",
+                        "error": "Server ID Mismatch",
+                    },
+                )
         task_id = self.tasks_manager.schedule_job(data)
 
         self.controller.management.add_to_audit_log(
