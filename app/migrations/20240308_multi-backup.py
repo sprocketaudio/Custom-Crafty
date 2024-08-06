@@ -207,7 +207,7 @@ def migrate(migrator: Migrator, database, **kwargs):
                     )
         except FileNotFoundError as why:
             logger.error(
-                f"Could not move backup {file} for {server.server_name} to new location with error {why}"
+                f"Could not move backups for {server.server_name} to new location with error {why}"
             )
 
     Console.debug("Migrations: Dropping old backup table")
