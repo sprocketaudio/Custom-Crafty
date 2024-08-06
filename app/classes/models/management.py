@@ -400,6 +400,8 @@ class HelpersManagement:
         if "excluded_dirs" in conf:
             dirs_to_exclude = ",".join(conf["excluded_dirs"])
             conf["excluded_dirs"] = dirs_to_exclude
+        if len(self.get_backups_by_server(conf["server_id"], True)) <= 0:
+            conf["default"] = True
         backup = Backups.create(**conf)
         logger.debug("Creating new backup record.")
         return backup.backup_id

@@ -183,8 +183,7 @@ class FileHelpers:
 
     @staticmethod
     def move_dir(src_path, dest_path):
-        FileHelpers.copy_dir(src_path, dest_path)
-        FileHelpers.del_dirs(src_path)
+        shutil.move(src_path, dest_path)
 
     @staticmethod
     def move_dir_exist(src_path, dest_path):
@@ -193,8 +192,7 @@ class FileHelpers:
 
     @staticmethod
     def move_file(src_path, dest_path):
-        FileHelpers.copy_file(src_path, dest_path)
-        FileHelpers.del_file(src_path)
+        shutil.move(src_path, dest_path)
 
     @staticmethod
     def make_archive(path_to_destination, path_to_zip, comment=""):
