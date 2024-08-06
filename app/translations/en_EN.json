@@ -668,6 +668,7 @@
         "uses": "Number of uses allowed (-1==No Limit)"
     },
     "validators": {
+        "backupName": "Backup name must be a string and a minimum length of 3.",
         "enumErr": "failed validating. Acceptable data includes: ",
         "filesPageLen": "length must be greater than 1 for property",
         "passLength": "Password Too Short. Minimum Length: 8",
