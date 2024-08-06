@@ -1,5 +1,11 @@
 # Changelog
-## --- [4.4.1] - 2024/07/29
+## --- [4.4.1] - 2024/TBD
+
+**-----------------------------------------------------------------------------**
+
+**Initial release was reverted for patching (See Merge Request: [!784](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/784))**
+
+**-----------------------------------------------------------------------------**
 ### Refactor
 - Backups | Allow multiple backup configurations ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/711))
 - UploadAPI | Use Crafty's JWT authentication for file uploads ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/762))
