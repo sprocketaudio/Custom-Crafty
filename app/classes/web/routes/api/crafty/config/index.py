@@ -9,29 +9,27 @@ from app.classes.web.base_api_handler import BaseApiHandler
 config_json_schema = {
     "type": "object",
     "properties": {
-        "https_port": {"type": "integer"},
-        "language": {
-            "type": "string",
-        },
-        "cookie_expire": {"type": "integer"},
-        "show_errors": {"type": "boolean"},
-        "history_max_age": {"type": "integer"},
-        "stats_update_frequency_seconds": {"type": "integer"},
-        "delete_default_json": {"type": "boolean"},
-        "show_contribute_link": {"type": "boolean"},
-        "virtual_terminal_lines": {"type": "integer"},
-        "max_log_lines": {"type": "integer"},
-        "max_audit_entries": {"type": "integer"},
-        "disabled_language_files": {"type": "array"},
-        "stream_size_GB": {"type": "integer"},
-        "keywords": {"type": "array"},
-        "allow_nsfw_profile_pictures": {"type": "boolean"},
-        "enable_user_self_delete": {"type": "boolean"},
-        "reset_secrets_on_next_boot": {"type": "boolean"},
-        "monitored_mounts": {"type": "array"},
-        "dir_size_poll_freq_minutes": {"type": "integer"},
-        "crafty_logs_delete_after_days": {"type": "integer"},
-        "big_bucket_repo": {"type": "string"},
+        "https_port": {"type": "integer", "error": "typeInteger"},
+        "language": {"type": "string", "error": "typeString"},
+        "cookie_expire": {"type": "integer", "error": "typeInteger"},
+        "show_errors": {"type": "boolean", "error": "typeBool"},
+        "history_max_age": {"type": "integer", "error": "typeInteger"},
+        "stats_update_frequency_seconds": {"type": "integer", "error": "typeInteger"},
+        "delete_default_json": {"type": "boolean", "error": "typeBool"},
+        "show_contribute_link": {"type": "boolean", "error": "typeBool"},
+        "virtual_terminal_lines": {"type": "integer", "error": "typeInteger"},
+        "max_log_lines": {"type": "integer", "error": "typeInteger"},
+        "max_audit_entries": {"type": "integer", "error": "typeInteger"},
+        "disabled_language_files": {"type": "array", "error": "typeList"},
+        "stream_size_GB": {"type": "integer", "error": "typeInteger"},
+        "keywords": {"type": "array", "error": "typeList"},
+        "allow_nsfw_profile_pictures": {"type": "boolean", "error": "typeBool"},
+        "enable_user_self_delete": {"type": "boolean", "error": "typeBool"},
+        "reset_secrets_on_next_boot": {"type": "boolean", "error": "typeBool"},
+        "monitored_mounts": {"type": "array", "error": "typeList"},
+        "dir_size_poll_freq_minutes": {"type": "integer", "error": "typeInteger"},
+        "crafty_logs_delete_after_days": {"type": "integer", "error": "typeInteger"},
+        "big_bucket_repo": {"type": "string", "error": "typeString"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -39,8 +37,8 @@ config_json_schema = {
 customize_json_schema = {
     "type": "object",
     "properties": {
-        "photo": {"type": "string"},
-        "opacity": {"type": "string"},
+        "photo": {"type": "string", "error": "typeString"},
+        "opacity": {"type": "string", "error": "typeString"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -49,7 +47,7 @@ customize_json_schema = {
 photo_delete_schema = {
     "type": "object",
     "properties": {
-        "photo": {"type": "string"},
+        "photo": {"type": "string", "error": "typeString"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -110,12 +108,18 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
         try:
             validate(data, config_json_schema)
         except ValidationError as e:
+            offending_key = e.path[0] if e.path else None
+            err = f"""{self.translator.translate(
+                "validators",
+                e.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {offending_key}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
 

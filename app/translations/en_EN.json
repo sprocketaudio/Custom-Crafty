@@ -668,6 +668,10 @@
         "uses": "Number of uses allowed (-1==No Limit)"
     },
     "validators": {
+        "typeBool": "Type error: True or False required for ",
+        "typeInteger": "Type error: Integer required for ",
+        "typeList": "Type error: List required for ",
+        "typeString": "Type error: String required for ",
         "passLength": "Password Too Short. Minimum Length: 8"
     },
     "webhooks": {
