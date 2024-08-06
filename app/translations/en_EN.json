@@ -670,6 +670,10 @@
     "validators": {
         "filesPageLen": "Length must be greater than 1 for property ",
         "passLength": "Password Too Short. Minimum Length: 8",
+        "roleManager": "Role manager must be of type integer (manager ID) or None",
+        "roleName": "Role name must be a string that is greater than 1 character. It must not include any of the following symbols: [ ] , ",
+        "roleServerId": "Server ID property must be a string with a minimum length of 1",
+        "roleServerPerms": "Server permissions must be an 8-bit string",
         "typeBool": "Type error: True or False required for ",
         "typeInteger": "Type error: Integer required for ",
         "typeList": "Type error: List required for ",

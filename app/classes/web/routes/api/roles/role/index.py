@@ -11,25 +11,29 @@ modify_role_schema = {
             "type": "string",
             "minLength": 1,
             "pattern": r"^[^,\[\]]*$",
+            "error": "roleName",
         },
         "servers": {
             "type": "array",
+            "error": "typeList",
             "items": {
                 "type": "object",
                 "properties": {
                     "server_id": {
                         "type": "string",
                         "minimum": 1,
+                        "error": "roleServerId",
                     },
                     "permissions": {
                         "type": "string",
                         "pattern": r"^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "error": "roleServerPerms",
                     },
                 },
                 "required": ["server_id", "permissions"],
             },
         },
-        "manager": {"type": ["integer", "null"]},
+        "manager": {"type": ["integer", "null"], "error": "roleManager"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -41,19 +45,23 @@ basic_modify_role_schema = {
         "name": {
             "type": "string",
             "minLength": 1,
+            "error": "roleName",
         },
         "servers": {
             "type": "array",
+            "error": "typeList",
             "items": {
                 "type": "object",
                 "properties": {
                     "server_id": {
                         "type": "string",
                         "minimum": 1,
+                        "error": "roleServerId",
                     },
                     "permissions": {
                         "type": "string",
-                        "pattern": "^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "pattern": r"^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "error": "roleServerPerms",
                     },
                 },
                 "required": ["server_id", "permissions"],
