@@ -37,9 +37,16 @@ class UsersController:
                     permission.name
                     for permission in PermissionsCrafty.get_permissions_list()
                 ],
+                "error": "enumErr",
+                "fill": True,
             },
-            "quantity": {"type": "number", "minimum": -1, "error": "typeInteger"},
-            "enabled": {"type": "boolean", "error": "typeBool"},
+            "quantity": {
+                "type": "number",
+                "minimum": -1,
+                "error": "typeInteger",
+                "fill": True,
+            },
+            "enabled": {"type": "boolean", "error": "typeBool", "fill": True},
         }
         self.user_jsonschema_props: t.Final = {
             "username": {
