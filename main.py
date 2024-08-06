@@ -132,6 +132,7 @@ def tasks_starter():
     tasks_manager.big_bucket_cache_refresher()
     tasks_manager.steamapps_cache_refresher()
 
+
 def signal_handler(signum, _frame):
     """
     Method handles sigterm and shuts the app down.

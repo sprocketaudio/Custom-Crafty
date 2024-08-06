@@ -46,7 +46,7 @@ class Controller:
         self.helper: Helpers = helper
         self.file_helper: FileHelpers = file_helper
         self.import_helper: ImportHelpers = import_helper
-        
+
         self.big_bucket: BigBucket = BigBucket(helper)
         self.steam_apps: SteamApps = SteamApps(helper)
 

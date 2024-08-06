@@ -112,7 +112,7 @@ class HelperServers:
             stop_command=server_stop,
             type=server_type,
             created_by=created_by,
-            app_id: app_id,
+            app_id=app_id,
         ).server_id
 
     @staticmethod
