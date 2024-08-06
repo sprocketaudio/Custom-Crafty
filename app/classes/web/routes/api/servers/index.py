@@ -80,7 +80,7 @@ new_server_schema = {
             "type": "string",
             "default": "minecraft_java",
             "enum": ["minecraft_java", "minecraft_bedrock", "none"],
-            "error": "serverAPI",
+            "error": "enumErr",
             "fill": True,
             # TODO: SteamCMD, RakNet, etc.
         },
@@ -140,7 +140,7 @@ new_server_schema = {
             "type": "string",
             "default": "minecraft_java",
             "enum": ["minecraft_java", "minecraft_bedrock", "custom"],
-            "error": "serverAPI",
+            "error": "enumErr",
             "fill": True,
         },
         "minecraft_java_create_data": {
@@ -153,13 +153,13 @@ new_server_schema = {
                     "type": "string",
                     "default": "download_jar",
                     "enum": ["download_jar", "import_server", "import_zip"],
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                 },
                 "download_jar_create_data": {
                     "title": "JAR download data",
                     "type": "object",
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                     "required": [
                         "type",
@@ -173,7 +173,7 @@ new_server_schema = {
                         "title": "Jar Category",
                         "type": "string",
                         "examples": ["Mc_java_servers", "Mc_java_proxies"],
-                        "error": "serverAPI",
+                        "error": "enumErr",
                         "fill": True,
                     },
                     "properties": {
@@ -232,7 +232,7 @@ new_server_schema = {
                 "import_server_create_data": {
                     "title": "Import server data",
                     "type": "object",
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                     "required": [
                         "existing_server_path",
@@ -299,7 +299,7 @@ new_server_schema = {
                 "import_zip_create_data": {
                     "title": "Import ZIP server data",
                     "type": "object",
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                     "required": [
                         "zip_path",
@@ -418,13 +418,13 @@ new_server_schema = {
                     "type": "string",
                     "default": "import_server",
                     "enum": ["download_exe", "import_server", "import_zip"],
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                 },
                 "download_exe_create_data": {
                     "title": "Import server data",
                     "type": "object",
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                     "required": [],
                     "properties": {
@@ -438,7 +438,7 @@ new_server_schema = {
                 "import_server_create_data": {
                     "title": "Import server data",
                     "type": "object",
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                     "required": ["existing_server_path", "executable"],
                     "properties": {
@@ -475,7 +475,7 @@ new_server_schema = {
                 "import_zip_create_data": {
                     "title": "Import ZIP server data",
                     "type": "object",
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                     "required": ["zip_path", "zip_root", "command"],
                     "properties": {
@@ -562,7 +562,7 @@ new_server_schema = {
         "custom_create_data": {
             "title": "Custom creation data",
             "type": "object",
-            "error": "serverAPI",
+            "error": "enumErr",
             "fill": True,
             "required": [
                 "working_directory",
@@ -583,7 +583,7 @@ new_server_schema = {
                     "title": "Executable Updation",
                     "description": "Also configurable later on and for other servers",
                     "type": "object",
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                     "required": ["enabled", "file", "url"],
                     "properties": {
@@ -616,7 +616,7 @@ new_server_schema = {
                     "type": "string",
                     "default": "raw_exec",
                     "enum": ["raw_exec", "import_server", "import_zip"],
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                 },
                 "raw_exec_create_data": {
@@ -638,7 +638,7 @@ new_server_schema = {
                 "import_server_create_data": {
                     "title": "Import server data",
                     "type": "object",
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                     "required": ["existing_server_path", "command"],
                     "properties": {
@@ -665,7 +665,7 @@ new_server_schema = {
                 "import_zip_create_data": {
                     "title": "Import ZIP server data",
                     "type": "object",
-                    "error": "serverAPI",
+                    "error": "enumErr",
                     "fill": True,
                     "required": ["zip_path", "zip_root", "command"],
                     "properties": {
@@ -829,14 +829,14 @@ class ApiServersIndexHandler(BaseApiHandler):
         try:
             validate(data, new_server_schema)
         except ValidationError as why:
-            offending_key = None
-            if why.get("fill", None):
+            offending_key = ""
+            if why.schema.get("fill", None):
                 offending_key = why.path[0] if why.path else None
-            err = f"""{self.translator.translate(
+            err = f"""{offending_key} {self.translator.translate(
                 "validators",
                 why.schema.get("error"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
-            )} {offending_key}"""
+            )} {why.schema.get("enum", "")}"""
             return self.finish_json(
                 400,
                 {
