@@ -668,11 +668,12 @@
         "uses": "Number of uses allowed (-1==No Limit)"
     },
     "validators": {
+        "filesPageLen": "Length must be greater than 1 for property ",
+        "passLength": "Password Too Short. Minimum Length: 8",
         "typeBool": "Type error: True or False required for ",
         "typeInteger": "Type error: Integer required for ",
         "typeList": "Type error: List required for ",
-        "typeString": "Type error: String required for ",
-        "passLength": "Password Too Short. Minimum Length: 8"
+        "typeString": "Type error: String required for "
     },
     "webhooks": {
         "areYouSureDel": "Are you sure you want to delete this webhook?",

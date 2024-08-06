@@ -13,10 +13,14 @@ logger = logging.getLogger(__name__)
 files_get_schema = {
     "type": "object",
     "properties": {
-        "page": {"type": "string", "minLength": 1},
-        "folder": {"type": "string"},
-        "upload": {"type": "boolean", "default": "False"},
-        "unzip": {"type": "boolean", "default": "True"},
+        "page": {
+            "type": "string",
+            "minLength": 1,
+            "error": "filesPageLen",
+        },
+        "folder": {"type": "string", "error": "typeString"},
+        "upload": {"type": "boolean", "default": "False", "error": "typeBool"},
+        "unzip": {"type": "boolean", "default": "True", "error": "typeBool"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -47,13 +51,19 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
             )
         try:
             validate(data, files_get_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = why.path[0] if why.path else None
+            err = f"""{self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {offending_key}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
         # TODO: limit some columns for specific permissions?
