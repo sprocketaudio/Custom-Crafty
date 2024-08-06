@@ -12,24 +12,101 @@ logger = logging.getLogger(__name__)
 server_patch_schema = {
     "type": "object",
     "properties": {
-        "server_name": {"type": "string", "minLength": 2, "pattern": "^[^/\\\\]*$"},
-        "backup_path": {"type": "string"},
-        "executable": {"type": "string"},
-        "log_path": {"type": "string", "minLength": 1},
-        "execution_command": {"type": "string", "minLength": 1},
-        "java_selection": {"type": "string"},
-        "auto_start": {"type": "boolean"},
-        "auto_start_delay": {"type": "integer", "minimum": 0},
-        "crash_detection": {"type": "boolean"},
-        "stop_command": {"type": "string"},
-        "executable_update_url": {"type": "string"},
-        "server_ip": {"type": "string", "minLength": 1},
-        "server_port": {"type": "integer"},
-        "shutdown_timeout": {"type": "integer", "minimum": 0},
-        "logs_delete_after": {"type": "integer", "minimum": 0},
-        "ignored_exits": {"type": "string"},
-        "show_status": {"type": "boolean"},
-        "count_players": {"type": "boolean"},
+        "server_name": {
+            "type": "string",
+            "minLength": 2,
+            "pattern": r"^[^/\\\\#]*$",
+            "error": "serverCreateName",
+        },
+        "backup_path": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "executable": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "log_path": {
+            "type": "string",
+            "minLength": 1,
+            "error": "serverLogPath",
+        },
+        "execution_command": {
+            "type": "string",
+            "minLength": 1,
+            "error": "serverExeCommand",
+        },
+        "java_selection": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "auto_start": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "auto_start_delay": {
+            "type": "integer",
+            "minimum": 0,
+            "error": "typeIntMinVal0",
+            "fill": True,
+        },
+        "crash_detection": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "stop_command": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "executable_update_url": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "server_ip": {
+            "type": "string",
+            "minLength": 1,
+            "error": "typeString",
+            "fill": True,
+        },
+        "server_port": {
+            "type": "integer",
+            "error": "typeInt",
+            "fill": True,
+        },
+        "shutdown_timeout": {
+            "type": "integer",
+            "minimum": 0,
+            "error": "typeIntMinVal0",
+            "fill": True,
+        },
+        "logs_delete_after": {
+            "type": "integer",
+            "minimum": 0,
+            "error": "typeIntMinVal0",
+            "fill": True,
+        },
+        "ignored_exits": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "show_status": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "count_players": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -37,17 +114,64 @@ server_patch_schema = {
 basic_server_patch_schema = {
     "type": "object",
     "properties": {
-        "server_name": {"type": "string", "minLength": 1},
-        "executable": {"type": "string"},
-        "java_selection": {"type": "string"},
-        "auto_start": {"type": "boolean"},
-        "auto_start_delay": {"type": "integer", "minimum": 0},
-        "crash_detection": {"type": "boolean"},
-        "stop_command": {"type": "string"},
-        "shutdown_timeout": {"type": "integer"},
-        "logs_delete_after": {"type": "integer", "minimum": 0},
-        "ignored_exits": {"type": "string"},
-        "count_players": {"type": "boolean"},
+        "server_name": {
+            "type": "string",
+            "minLength": 1,
+            "error": "serverCreateName",
+            "fill": True,
+        },
+        "executable": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "java_selection": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "auto_start": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "auto_start_delay": {
+            "type": "integer",
+            "minimum": 0,
+            "error": "typeIntMinVal0",
+            "fill": True,
+        },
+        "crash_detection": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "stop_command": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "shutdown_timeout": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
+        "logs_delete_after": {
+            "type": "integer",
+            "minimum": 0,
+            "error": "typeIntMinVal0",
+            "fill": True,
+        },
+        "ignored_exits": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "count_players": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -89,13 +213,21 @@ class ApiServersServerIndexHandler(BaseApiHandler):
                 validate(data, server_patch_schema)
             else:
                 validate(data, basic_server_patch_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = None
+            if why.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {offending_key}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
 

@@ -23,15 +23,23 @@ new_server_schema = {
             "type": "string",
             "examples": ["My Server"],
             "minLength": 2,
-            "pattern": "^[^/\\\\]*$",
+            "pattern": r"^[^/\\\\#]*$",
+            "error": "serverCreateName",
         },
-        "roles": {"title": "Roles to add", "type": "array", "examples": [1, 2, 3]},
+        "roles": {
+            "title": "Roles to add",
+            "type": "array",
+            "examples": [1, 2, 3],
+            "error": "typeList",
+        },
         "stop_command": {
             "title": "Stop command",
             "description": '"" means the default for the server creation type.',
             "type": "string",
             "default": "",
             "examples": ["stop", "end"],
+            "error": "typeString",
+            "fill": True,
         },
         "log_location": {
             "title": "Log file",
@@ -39,11 +47,15 @@ new_server_schema = {
             "type": "string",
             "default": "",
             "examples": ["./logs/latest.log", "./proxy.log.0"],
+            "error": "typeString",
+            "fill": True,
         },
         "crashdetection": {
             "title": "Crash detection",
             "type": "boolean",
             "default": False,
+            "error": "typeBool",
+            "fill": True,
         },
         "autostart": {
             "title": "Autostart",
@@ -51,6 +63,8 @@ new_server_schema = {
             + " automatically when Crafty is launched.",
             "type": "boolean",
             "default": False,
+            "error": "typeBool",
+            "fill": True,
         },
         "autostart_delay": {
             "title": "Autostart delay",
@@ -58,12 +72,16 @@ new_server_schema = {
             "type": "number",
             "default": 10,
             "minimum": 0,
+            "error": "typeIntMinVal0",
+            "fill": True,
         },
         "monitoring_type": {
             "title": "Server monitoring type",
             "type": "string",
             "default": "minecraft_java",
             "enum": ["minecraft_java", "minecraft_bedrock", "none"],
+            "error": "serverAPI",
+            "fill": True,
             # TODO: SteamCMD, RakNet, etc.
         },
         "minecraft_java_monitoring_data": {
@@ -77,6 +95,8 @@ new_server_schema = {
                     "default": "127.0.0.1",
                     "examples": ["127.0.0.1"],
                     "minLength": 1,
+                    "error": "typeString",
+                    "fill": True,
                 },
                 "port": {
                     "title": "Port",
@@ -84,6 +104,8 @@ new_server_schema = {
                     "examples": [25565],
                     "default": 25565,
                     "minimum": 0,
+                    "error": "typeIntMinVal0",
+                    "fill": True,
                 },
             },
         },
@@ -98,6 +120,8 @@ new_server_schema = {
                     "default": "127.0.0.1",
                     "examples": ["127.0.0.1"],
                     "minLength": 1,
+                    "error": "typeString",
+                    "fill": True,
                 },
                 "port": {
                     "title": "Port",
@@ -105,6 +129,8 @@ new_server_schema = {
                     "examples": [19132],
                     "default": 19132,
                     "minimum": 0,
+                    "error": "typeIntMinVal0",
+                    "fill": True,
                 },
             },
         },
@@ -114,6 +140,8 @@ new_server_schema = {
             "type": "string",
             "default": "minecraft_java",
             "enum": ["minecraft_java", "minecraft_bedrock", "custom"],
+            "error": "serverAPI",
+            "fill": True,
         },
         "minecraft_java_create_data": {
             "title": "Java creation data",
@@ -125,10 +153,14 @@ new_server_schema = {
                     "type": "string",
                     "default": "download_jar",
                     "enum": ["download_jar", "import_server", "import_zip"],
+                    "error": "serverAPI",
+                    "fill": True,
                 },
                 "download_jar_create_data": {
                     "title": "JAR download data",
                     "type": "object",
+                    "error": "serverAPI",
+                    "fill": True,
                     "required": [
                         "type",
                         "version",
@@ -141,6 +173,8 @@ new_server_schema = {
                         "title": "Jar Category",
                         "type": "string",
                         "examples": ["Mc_java_servers", "Mc_java_proxies"],
+                        "error": "serverAPI",
+                        "fill": True,
                     },
                     "properties": {
                         "type": {
@@ -148,12 +182,16 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["Paper"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "version": {
                             "title": "Server JAR Version",
                             "type": "string",
                             "examples": ["1.18.2"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "mem_min": {
                             "title": "Minimum JVM memory (in GiBs)",
@@ -161,6 +199,8 @@ new_server_schema = {
                             "examples": [1],
                             "default": 1,
                             "exclusiveMinimum": 0,
+                            "error": "typeInteger",
+                            "fill": True,
                         },
                         "mem_max": {
                             "title": "Maximum JVM memory (in GiBs)",
@@ -168,6 +208,8 @@ new_server_schema = {
                             "examples": [2],
                             "default": 2,
                             "exclusiveMinimum": 0,
+                            "error": "typeInteger",
+                            "fill": True,
                         },
                         "server_properties_port": {
                             "title": "Port",
@@ -175,17 +217,23 @@ new_server_schema = {
                             "examples": [25565],
                             "default": 25565,
                             "minimum": 0,
+                            "error": "typeInteger",
+                            "fill": True,
                         },
                         "agree_to_eula": {
                             "title": "Agree to the EULA",
                             "type": "boolean",
                             "default": False,
+                            "error": "typeBool",
+                            "fill": True,
                         },
                     },
                 },
                 "import_server_create_data": {
                     "title": "Import server data",
                     "type": "object",
+                    "error": "serverAPI",
+                    "fill": True,
                     "required": [
                         "existing_server_path",
                         "jarfile",
@@ -200,6 +248,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["/var/opt/server"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "jarfile": {
                             "title": "JAR file",
@@ -207,6 +257,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["paper.jar", "jars/vanilla-1.12.jar"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "mem_min": {
                             "title": "Minimum JVM memory (in GiBs)",
@@ -214,6 +266,8 @@ new_server_schema = {
                             "examples": [1],
                             "default": 1,
                             "exclusiveMinimum": 0,
+                            "error": "typeInteger",
+                            "fill": True,
                         },
                         "mem_max": {
                             "title": "Maximum JVM memory (in GiBs)",
@@ -221,6 +275,8 @@ new_server_schema = {
                             "examples": [2],
                             "default": 2,
                             "exclusiveMinimum": 0,
+                            "error": "typeInteger",
+                            "fill": True,
                         },
                         "server_properties_port": {
                             "title": "Port",
@@ -228,17 +284,23 @@ new_server_schema = {
                             "examples": [25565],
                             "default": 25565,
                             "minimum": 0,
+                            "error": "typeInteger",
+                            "fill": True,
                         },
                         "agree_to_eula": {
                             "title": "Agree to the EULA",
                             "type": "boolean",
                             "default": False,
+                            "error": "typeBool",
+                            "fill": True,
                         },
                     },
                 },
                 "import_zip_create_data": {
                     "title": "Import ZIP server data",
                     "type": "object",
+                    "error": "serverAPI",
+                    "fill": True,
                     "required": [
                         "zip_path",
                         "zip_root",
@@ -254,6 +316,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["/var/opt/server.zip"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "zip_root": {
                             "title": "Server root directory",
@@ -261,6 +325,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["/", "/paper-server/", "server-1"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "jarfile": {
                             "title": "JAR file",
@@ -268,6 +334,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["paper.jar", "jars/vanilla-1.12.jar"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "mem_min": {
                             "title": "Minimum JVM memory (in GiBs)",
@@ -275,6 +343,8 @@ new_server_schema = {
                             "examples": [1],
                             "default": 1,
                             "exclusiveMinimum": 0,
+                            "error": "typeInteger",
+                            "fill": True,
                         },
                         "mem_max": {
                             "title": "Maximum JVM memory (in GiBs)",
@@ -282,6 +352,8 @@ new_server_schema = {
                             "examples": [2],
                             "default": 2,
                             "exclusiveMinimum": 0,
+                            "error": "typeInteger",
+                            "fill": True,
                         },
                         "server_properties_port": {
                             "title": "Port",
@@ -289,11 +361,15 @@ new_server_schema = {
                             "examples": [25565],
                             "default": 25565,
                             "minimum": 0,
+                            "error": "typeInteger",
+                            "fill": True,
                         },
                         "agree_to_eula": {
                             "title": "Agree to the EULA",
                             "type": "boolean",
                             "default": False,
+                            "error": "typeBool",
+                            "fill": True,
                         },
                     },
                 },
@@ -342,10 +418,14 @@ new_server_schema = {
                     "type": "string",
                     "default": "import_server",
                     "enum": ["download_exe", "import_server", "import_zip"],
+                    "error": "serverAPI",
+                    "fill": True,
                 },
                 "download_exe_create_data": {
                     "title": "Import server data",
                     "type": "object",
+                    "error": "serverAPI",
+                    "fill": True,
                     "required": [],
                     "properties": {
                         "agree_to_eula": {
@@ -358,6 +438,8 @@ new_server_schema = {
                 "import_server_create_data": {
                     "title": "Import server data",
                     "type": "object",
+                    "error": "serverAPI",
+                    "fill": True,
                     "required": ["existing_server_path", "executable"],
                     "properties": {
                         "existing_server_path": {
@@ -366,6 +448,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["/var/opt/server"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "executable": {
                             "title": "Executable File",
@@ -374,6 +458,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["bedrock_server.exe"],
                             "minlength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "command": {
                             "title": "Command",
@@ -381,12 +467,16 @@ new_server_schema = {
                             "default": "echo foo bar baz",
                             "examples": ["LD_LIBRARY_PATH=. ./bedrock_server"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                     },
                 },
                 "import_zip_create_data": {
                     "title": "Import ZIP server data",
                     "type": "object",
+                    "error": "serverAPI",
+                    "fill": True,
                     "required": ["zip_path", "zip_root", "command"],
                     "properties": {
                         "zip_path": {
@@ -395,6 +485,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["/var/opt/server.zip"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "executable": {
                             "title": "Executable File",
@@ -403,6 +495,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["bedrock_server.exe"],
                             "minlength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "zip_root": {
                             "title": "Server root directory",
@@ -410,6 +504,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["/", "/paper-server/", "server-1"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "command": {
                             "title": "Command",
@@ -417,6 +513,8 @@ new_server_schema = {
                             "default": "echo foo bar baz",
                             "examples": ["LD_LIBRARY_PATH=. ./bedrock_server"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                     },
                 },
@@ -464,6 +562,8 @@ new_server_schema = {
         "custom_create_data": {
             "title": "Custom creation data",
             "type": "object",
+            "error": "serverAPI",
+            "fill": True,
             "required": [
                 "working_directory",
                 "executable_update",
@@ -476,28 +576,38 @@ new_server_schema = {
                     "type": "string",
                     "default": "",
                     "examples": ["/mnt/mydrive/server-configs/", "./subdirectory", ""],
+                    "error": "typeString",
+                    "fill": True,
                 },
                 "executable_update": {
                     "title": "Executable Updation",
                     "description": "Also configurable later on and for other servers",
                     "type": "object",
+                    "error": "serverAPI",
+                    "fill": True,
                     "required": ["enabled", "file", "url"],
                     "properties": {
                         "enabled": {
                             "title": "Enabled",
                             "type": "boolean",
                             "default": False,
+                            "error": "typeBool",
+                            "fill": True,
                         },
                         "file": {
                             "title": "Executable to update",
                             "type": "string",
                             "default": "",
                             "examples": ["./paper.jar"],
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "url": {
                             "title": "URL to download the executable from",
                             "type": "string",
                             "default": "",
+                            "error": "typeString",
+                            "fill": True,
                         },
                     },
                 },
@@ -506,6 +616,8 @@ new_server_schema = {
                     "type": "string",
                     "default": "raw_exec",
                     "enum": ["raw_exec", "import_server", "import_zip"],
+                    "error": "serverAPI",
+                    "fill": True,
                 },
                 "raw_exec_create_data": {
                     "title": "Raw execution command create data",
@@ -518,12 +630,16 @@ new_server_schema = {
                             "default": "echo foo bar baz",
                             "examples": ["caddy start"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         }
                     },
                 },
                 "import_server_create_data": {
                     "title": "Import server data",
                     "type": "object",
+                    "error": "serverAPI",
+                    "fill": True,
                     "required": ["existing_server_path", "command"],
                     "properties": {
                         "existing_server_path": {
@@ -532,6 +648,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["/var/opt/server"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "command": {
                             "title": "Command",
@@ -539,12 +657,16 @@ new_server_schema = {
                             "default": "echo foo bar baz",
                             "examples": ["caddy start"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                     },
                 },
                 "import_zip_create_data": {
                     "title": "Import ZIP server data",
                     "type": "object",
+                    "error": "serverAPI",
+                    "fill": True,
                     "required": ["zip_path", "zip_root", "command"],
                     "properties": {
                         "zip_path": {
@@ -553,6 +675,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["/var/opt/server.zip"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "zip_root": {
                             "title": "Server root directory",
@@ -560,6 +684,8 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["/", "/paper-server/", "server-1"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                         "command": {
                             "title": "Command",
@@ -567,6 +693,8 @@ new_server_schema = {
                             "default": "echo foo bar baz",
                             "examples": ["caddy start"],
                             "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
                         },
                     },
                 },
@@ -700,13 +828,21 @@ class ApiServersIndexHandler(BaseApiHandler):
             )
         try:
             validate(data, new_server_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = None
+            if why.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {offending_key}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
         # Check to make sure port is allowable

@@ -674,9 +674,13 @@
         "roleName": "Role name must be a string that is greater than 1 character. It must not include any of the following symbols: [ ] , ",
         "roleServerId": "Server ID property must be a string with a minimum length of 1",
         "roleServerPerms": "Server permissions must be an 8-bit string",
+        "serverAPI": "Invalid Input detected. Please see API docs for information on ",
         "serverCreateName": "Server name must be a string with a minimum length of 2 and must not include: \\ / or # ",
+        "serverExeCommand": "Server execution command must be a string with a minimum length of 1.",
+        "serverLogPath": "Server log path must be a string with a minimum length of 1",
         "typeBool": "Type error: True or False required for ",
         "typeInteger": "Type error: Integer required for ",
+        "typeIntMinVal0": "Must be an integer with a minimum value of 0 for prop ",
         "typeList": "Type error: List required for ",
         "typeString": "Type error: String required for "
     },
