@@ -1,4 +1,15 @@
 # Changelog
+## --- [4.4.3] - 2024/TBD
+### New features
+TBD
+### Bug fixes
+TBD
+### Tweaks
+TBD
+### Lang
+TBD
+<br><br>
+
 ## --- [4.4.2] - 2024/08/07
 ### Bug fixes
 - Migrations | Fix exception message on file not found for backups migration ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/789))
