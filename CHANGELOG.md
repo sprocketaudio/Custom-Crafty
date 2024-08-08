@@ -1,4 +1,9 @@
 # Changelog
+## --- [4.4.3] - 2024/08/08
+### Bug fixes
+- Fix schedules creation fail due to missing action ID ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/791))
+<br><br>
+
 ## --- [4.4.2] - 2024/08/07
 ### Bug fixes
 - Migrations | Fix exception message on file not found for backups migration ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/789))
