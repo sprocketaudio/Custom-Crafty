@@ -1,5 +1,5 @@
 [![Crafty Logo](app/frontend/static/assets/images/logo_long.svg)](https://craftycontrol.com)
-# Crafty Controller 4.4.3
+# Crafty Controller 4.4.4
 > Python based Control Panel for your Minecraft Server
 
 ## What is Crafty Controller?
