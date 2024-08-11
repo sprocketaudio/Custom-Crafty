@@ -1291,8 +1291,8 @@ class PanelHandler(BaseHandler):
             ).is_backingup
             self.controller.servers.refresh_server_settings(server_id)
             try:
-                page_data["backup_list"] = server.list_backups(
-                    page_data["backup_config"]
+                page_data["backup_list"] = server.backup_mgr.list_backups(
+                    page_data["backup_config"], server.server_id
                 )
             except:
                 page_data["backup_list"] = []
