@@ -152,13 +152,15 @@ class FileHelpers:
 
     @staticmethod
     def calculate_blake2b_hash(
-            value_to_hash: pathlib.Path | bytes, output_format: str = "hex"
+        value_to_hash: pathlib.Path | bytes, output_as_bytes: bool = False
     ) -> str or bytes:
         """
         Calculates blake2b hash from either file at specified Path, or from supplied
         bytes. Output will either be a hex string or bytes. Hex string is the default.
+
         :param value_to_hash: Path to file or bytes to hash.
-        :param output_format: Output format, "hex" for hex in str, "bytes" for bytes.
+        :param output_as_bytes: Boolean to output as bytes. Defaults to False.
+        Otherwise, will output as hex string.
         output. Defaults to "hex".
         :return: blake2b hash string or bytes.
         """
@@ -203,9 +205,9 @@ class FileHelpers:
                 ) from why
 
         # Return hash in specified format.
-        if output_format == "hex":
-            return blake2.hexdigest()
-        return blake2.digest()
+        if output_as_bytes:
+            return blake2.digest()
+        return blake2.hexdigest()
 
     @staticmethod
     def calculate_file_hash_sha256(file_path: str) -> str:
