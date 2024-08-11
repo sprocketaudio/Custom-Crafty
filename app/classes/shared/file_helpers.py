@@ -4,6 +4,7 @@ import logging
 import pathlib
 import tempfile
 import zipfile
+import zlib
 import hashlib
 from typing import BinaryIO
 import mimetypes
@@ -166,7 +167,7 @@ class FileHelpers:
             with value_to_hash.open("rb") as f:
                 while True:
                     # Read 2^16 byte chunks, 64 KiB.
-                    data = value_to_hash.read(65536)
+                    data = f.read(65536)
 
                     # Break if end of file
                     if not data:
@@ -444,3 +445,29 @@ class FileHelpers:
                 zip_ref.extractall(temp_dir)
             if user_id:
                 return temp_dir
+
+    @staticmethod
+    def zlib_compress_bytes(bytes_to_compress: bytes) -> bytes:
+        """Compress provided bytes using zlib default compression settings. Returns
+        compressed bytes.
+
+        Args:
+            bytes_to_compress (bytes): Bytes to compress.
+
+        Returns:
+            bytes: Compressed bytes.
+        """
+        return zlib.compress(bytes_to_compress)
+
+    @staticmethod
+    def zlib_decompress_bytes(bytes_to_decompress: bytes) -> bytes:
+        """Decompress provided bytes using zlib default settings. Returns decompressed
+        bytes.
+
+        Args:
+            bytes_to_decompress (bytes): Compresses bytes to decompress.
+
+        Returns:
+            bytes: Decompressed bytes.
+        """
+        return zlib.decompress(bytes_to_decompress)
