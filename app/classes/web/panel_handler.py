@@ -22,7 +22,7 @@ from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.models.management import HelpersManagement
 from app.classes.controllers.roles_controller import RolesController
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.shared.main_models import DatabaseShortcuts
 from app.classes.web.base_handler import BaseHandler
 from app.classes.web.webhooks.webhook_factory import WebhookFactory

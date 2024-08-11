@@ -17,7 +17,7 @@ from playhouse.migrate import (
 )
 
 from app.classes.shared.console import Console
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import logging
 import requests
 
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 
 logger = logging.getLogger(__name__)
 helper = Helpers()

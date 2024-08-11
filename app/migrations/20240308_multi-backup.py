@@ -5,10 +5,10 @@ import peewee
 import logging
 
 
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.shared.console import Console
 from app.classes.shared.migration import Migrator
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.file_helpers import FileHelpers
 
 logger = logging.getLogger(__name__)
 

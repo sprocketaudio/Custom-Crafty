@@ -14,7 +14,7 @@ from app.classes.models.management import HelpersManagement
 from app.classes.models.users import HelperUsers
 from app.classes.models.server_permissions import PermissionsServers
 from app.classes.shared.console import Console
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)

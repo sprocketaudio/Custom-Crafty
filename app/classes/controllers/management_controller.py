@@ -5,7 +5,7 @@ from prometheus_client import CollectorRegistry, Gauge
 
 from app.classes.models.management import HelpersManagement, HelpersWebhooks
 from app.classes.models.servers import HelperServers
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 
 logger = logging.getLogger(__name__)
 

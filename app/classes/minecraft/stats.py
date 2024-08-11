@@ -10,7 +10,7 @@ from app.classes.minecraft.mc_ping import ping
 from app.classes.models.management import HostStats
 from app.classes.models.servers import HelperServers
 from app.classes.shared.null_writer import NullWriter
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 
 with redirect_stderr(NullWriter()):
     import psutil

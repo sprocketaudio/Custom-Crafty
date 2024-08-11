@@ -30,8 +30,8 @@ from app.classes.controllers.server_perms_controller import ServerPermsControlle
 from app.classes.controllers.servers_controller import ServersController
 from app.classes.shared.authentication import Authentication
 from app.classes.shared.console import Console
-from app.classes.shared.helpers import Helpers
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.helpers import Helpers
+from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.shared.import_helper import ImportHelpers
 from app.classes.minecraft.bigbucket import BigBucket
 from app.classes.shared.websocket_manager import WebSocketManager

@@ -6,13 +6,13 @@ import pathlib
 import typing as t
 
 from app.classes.controllers.roles_controller import RolesController
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.file_helpers import FileHelpers
 
 from app.classes.shared.singleton import Singleton
 from app.classes.shared.server import ServerInstance
 from app.classes.shared.console import Console
 from app.classes.shared.backup_mgr import BackupManager
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.shared.main_models import DatabaseShortcuts
 
 from app.classes.minecraft.stats import Stats

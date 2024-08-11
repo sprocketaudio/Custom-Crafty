@@ -31,10 +31,9 @@ from app.classes.models.server_stats import HelperServerStats
 from app.classes.models.management import HelpersManagement, HelpersWebhooks
 from app.classes.models.users import HelperUsers
 from app.classes.models.server_permissions import PermissionsServers
-from app.classes.shared.backup_mgr import BackupManager
 from app.classes.shared.console import Console
-from app.classes.shared.helpers import Helpers
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.helpers import Helpers
+from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.shared.null_writer import NullWriter
 from app.classes.shared.websocket_manager import WebSocketManager
 from app.classes.web.webhooks.webhook_factory import WebhookFactory

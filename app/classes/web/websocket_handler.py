@@ -5,7 +5,7 @@ from urllib.parse import parse_qsl
 import tornado.websocket
 
 from app.classes.shared.main_controller import Controller
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)

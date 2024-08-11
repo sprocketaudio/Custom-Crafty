@@ -14,7 +14,7 @@ import ssl
 import time
 import certifi
 
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.shared.console import Console
 from app.classes.shared.websocket_manager import WebSocketManager
 

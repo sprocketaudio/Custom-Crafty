@@ -4,7 +4,7 @@ import nh3
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.models.users import HelperUsers
 from app.classes.web.base_handler import BaseHandler
 

@@ -8,8 +8,8 @@ import tornado.web
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.models.users import ApiKeys
-from app.classes.shared.helpers import Helpers
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.helpers import Helpers
+from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.shared.main_controller import Controller
 from app.classes.shared.translation import Translation
 from app.classes.shared.main_models import DatabaseShortcuts

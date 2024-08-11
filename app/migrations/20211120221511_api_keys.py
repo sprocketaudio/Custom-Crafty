@@ -1,6 +1,6 @@
 import peewee
 import datetime
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 
 
 def migrate(migrator, database, **kwargs):

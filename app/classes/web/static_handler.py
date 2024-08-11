@@ -4,7 +4,7 @@ try:
     import tornado.web
 
 except ModuleNotFoundError as e:
-    from app.classes.shared.helpers import helper
+    from app.classes.helpers.helpers import helper
 
     helper.auto_installer_fix(e)
 

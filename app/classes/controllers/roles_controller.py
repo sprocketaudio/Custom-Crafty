@@ -3,7 +3,7 @@ import typing as t
 
 from app.classes.models.roles import HelperRoles
 from app.classes.models.server_permissions import PermissionsServers, RoleServers
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 
 logger = logging.getLogger(__name__)
 
