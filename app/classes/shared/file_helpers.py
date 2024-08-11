@@ -151,7 +151,64 @@ class FileHelpers:
         return m_type
 
     @staticmethod
-    def calculate_file_hash(file_path: str) -> str:
+    def calculate_blake2b_hash(
+            value_to_hash: pathlib.Path | bytes, output_format: str = "hex"
+    ) -> str or bytes:
+        """
+        Calculates blake2b hash from either file at specified Path, or from supplied
+        bytes. Output will either be a hex string or bytes. Hex string is the default.
+        :param value_to_hash: Path to file or bytes to hash.
+        :param output_format: Output format, "hex" for hex in str, "bytes" for bytes.
+        output. Defaults to "hex".
+        :return: blake2b hash string or bytes.
+        """
+        # Check input value
+        if isinstance(value_to_hash, bytes):
+            input_type = 1
+        elif isinstance(value_to_hash, pathlib.Path):
+            input_type = 2
+        else:
+            raise ValueError(
+                f"value_to_hash must be either bytes or str, got: {type(value_to_hash)}"
+            )
+
+        # Hash input value
+        blake2 = hashlib.blake2b()
+
+        if input_type == 1:
+            # Input type is bytes.
+            blake2.update(value_to_hash)
+        else:
+            # Input type is a Path.
+            try:
+                # Catch file errors
+                with value_to_hash.open("rb") as file_to_hash:
+                    # Looping allows reading files larger than python's buffer.
+                    # Using 2 ^ 16 byte buffer, 64 KiB.
+                    while True:
+                        data = file_to_hash.read(65536)
+                        if not data:
+                            break
+                        blake2.update(data)
+
+            # Except file not found and permission errors.
+            except FileNotFoundError as why:
+                raise FileNotFoundError(
+                    f"Path specified is not a file or does not exist. Supplied path:"
+                    f"{value_to_hash}."
+                ) from why
+            except PermissionError as why:
+                raise PermissionError(
+                    f"Insufficient permissions to access file at: {value_to_hash}."
+                ) from why
+
+        # Return hash in specified format.
+        if output_format == "hex":
+            return blake2.hexdigest()
+        return blake2.digest()
+
+    @staticmethod
+    def calculate_file_hash_sha256(file_path: str) -> str:
         """
         Takes one parameter of file path.
         It will generate a SHA256 hash for the path and return it.
