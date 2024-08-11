@@ -151,63 +151,38 @@ class FileHelpers:
         return m_type
 
     @staticmethod
-    def calculate_blake2b_hash(
-        value_to_hash: pathlib.Path | bytes, output_as_bytes: bool = False
-    ) -> str or bytes:
+    def calculate_file_hash_blake2b(value_to_hash: pathlib.Path) -> bytes:
         """
-        Calculates blake2b hash from either file at specified Path, or from supplied
-        bytes. Output will either be a hex string or bytes. Hex string is the default.
+        Calculates blake2b hash from file at specified Path. Output bytes hash.
 
-        :param value_to_hash: Path to file or bytes to hash.
-        :param output_as_bytes: Boolean to output as bytes. Defaults to False.
-        Otherwise, will output as hex string.
-        output. Defaults to "hex".
-        :return: blake2b hash string or bytes.
+        :param value_to_hash: Path to file to hash.
+        :return: blake2b hash bytes.
         """
-        # Check input value
-        if isinstance(value_to_hash, bytes):
-            input_type = 1
-        elif isinstance(value_to_hash, pathlib.Path):
-            input_type = 2
-        else:
-            raise ValueError(
-                f"value_to_hash must be either bytes or str, got: {type(value_to_hash)}"
-            )
-
         # Hash input value
         blake2 = hashlib.blake2b()
 
-        if input_type == 1:
-            # Input type is bytes.
-            blake2.update(value_to_hash)
-        else:
-            # Input type is a Path.
-            try:
-                # Catch file errors
-                with value_to_hash.open("rb") as file_to_hash:
-                    # Looping allows reading files larger than python's buffer.
-                    # Using 2 ^ 16 byte buffer, 64 KiB.
-                    while True:
-                        data = file_to_hash.read(65536)
-                        if not data:
-                            break
-                        blake2.update(data)
+        # Read file and hash. Catches file not found and permission error.
+        try:
+            with value_to_hash.open("rb") as f:
+                while True:
+                    # Read 2^16 byte chunks, 64 KiB.
+                    data = value_to_hash.read(65536)
 
-            # Except file not found and permission errors.
-            except FileNotFoundError as why:
-                raise FileNotFoundError(
-                    f"Path specified is not a file or does not exist. Supplied path:"
-                    f"{value_to_hash}."
-                ) from why
-            except PermissionError as why:
-                raise PermissionError(
-                    f"Insufficient permissions to access file at: {value_to_hash}."
-                ) from why
+                    # Break if end of file
+                    if not data:
+                        break
 
-        # Return hash in specified format.
-        if output_as_bytes:
-            return blake2.digest()
-        return blake2.hexdigest()
+                    blake2.update(data)
+
+        # Except file not found and permission error.
+        except FileNotFoundError as why:
+            raise FileNotFoundError(f"File at {value_to_hash} not found.") from why
+        except PermissionError as why:
+            raise PermissionError(
+                f"Insufficient permissions to read {value_to_hash}."
+            ) from why
+
+        return blake2.digest()
 
     @staticmethod
     def calculate_file_hash_sha256(file_path: str) -> str:
