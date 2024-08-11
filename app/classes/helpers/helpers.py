@@ -25,6 +25,7 @@ from contextlib import redirect_stderr, suppress
 import libgravatar
 from packaging import version as pkg_version
 
+from app.classes.helpers.cryptography_helper import CryptoHelper
 from app.classes.shared.null_writer import NullWriter
 from app.classes.shared.console import Console
 from app.classes.shared.installer import installer
@@ -82,6 +83,7 @@ class Helpers:
         self.ignored_names = ["crafty_managed.txt", "db_stats"]
         self.crafty_starting = False
         self.minimum_password_length = 8
+        self.crypto_helper = CryptoHelper(self)
 
     @staticmethod
     def auto_installer_fix(ex):
