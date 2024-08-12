@@ -18,6 +18,7 @@ from app.classes.shared.console import Console
 from app.classes.helpers.helpers import Helpers
 from app.classes.shared.websocket_manager import WebSocketManager
 from app.classes.helpers.file_helpers import FileHelpers
+from app.classes.web.webhooks.base_webhook import helper
 
 logger = logging.getLogger(__name__)
 
@@ -218,17 +219,26 @@ class BackupManager:
         logger.info(f"Starting snapshot style backup for {server.name}")
 
         # Adjust the location to include the backup ID for destination.
-        backup_location = (
+        backup_target_location = (
             pathlib.Path(backup_config["backup_location"]) / "snapshot_backups"
         )
-
         try:
-            self.ensure_snapshot_directory_is_valid(backup_location)
+            self.ensure_snapshot_directory_is_valid(backup_target_location)
         except PermissionError as why:
             self.fail_backup(why, backup_config, server)
 
+        # Create backup manifest for server files.
+        backup_manifest = self.create_snapshot_backup_manifest(
+            pathlib.Path(server.server_path)
+        )
+
+        # Generate depends file for this backup.
+        self.create_depends_file_from_backup_manifest(
+            backup_manifest, backup_target_location, backup_config["backup_id"]
+        )
+
     @staticmethod
-    def ensure_snapshot_directory_is_valid(self, backup_path: pathlib.Path) -> bool:
+    def ensure_snapshot_directory_is_valid(backup_path: pathlib.Path) -> bool:
         backup_path.mkdir(exist_ok=True)
         backup_readme_path = backup_path / "README.txt"
 
@@ -254,6 +264,9 @@ class BackupManager:
         """Takes a given path with a given base, and removes the base from the path.
 
         Example:
+            # Base: /root/crafty/servers
+            # Full path to file: /root/crafty/servers/path/to/dir
+            # What gets returned: path/to/dir
 
         """
         # Check that path is contained in base
@@ -275,17 +288,69 @@ class BackupManager:
             backup_dir: Path to files that need to be backed up.
 
         Returns: Dict {directories: [], "files": [()]}
+            File hashes are calculated as raw bytes and encoded in base64 strings.
 
         """
         output = {"directories": [], "files": []}
+
+        # Iterate over backups source dir.
         for p in backup_dir.rglob("*"):
+
             if p.is_dir():
+                # For files.
+                # Append local path to dir. For example:
+                # Base: /root/crafty/servers
+                # Full path to file: /root/crafty/servers/path/to/dir
+                # What gets stored: path/to/dir
                 output["directories"].append(
                     str(self.get_local_path_with_base(p, backup_dir))
                 )
+
             else:
-                file_hash = FileHelpers.calculate_file_hash_blake2b(p)
+                # For files.
+                # We must store file hash and path to file.
+                # calculate_file_hash_blake2b returns bytes, b64 is stored as a string.
+                file_hash = helper.crypto_helper.bytes_to_b64(
+                    FileHelpers.calculate_file_hash_blake2b(p)
+                )
+
+                # Store tuple for file with local path and b64 hash.
                 output["files"].append(
                     (file_hash, str(self.get_local_path_with_base(p, backup_dir)))
                 )
         return output
+
+    @staticmethod
+    def create_depends_file_from_backup_manifest(
+        manifest: dict, backup_repository: pathlib.Path, backup_id: str
+    ) -> None:
+        """
+        Creates the .depends file associated with this backup based on the backup's
+        manifest.
+
+        Args:
+            manifest: Backup manifest for this backup.
+            backup_repository: Where the backup is being stored as a pathlib Path
+            object.
+            backup_id: Backup's ID as a string.
+
+        Returns: None
+
+        """
+        print(manifest)
+        # Create file path for depends file
+        depends_file_path = (
+            backup_repository / "manifest_files" / f"{backup_id}.depends"
+        )
+
+        # Ensure manifest_files folder exists
+        depends_file_path.parent.mkdir(exist_ok=True)
+
+        # Write base64 encoded hashes to depends file. This file may not contain
+        # sensitive information as it will not be encrypted.
+        with depends_file_path.open("x", encoding="UTF-8") as f:
+            # Append version number to file.
+            f.write("1\n")
+            # Iterate through files and add b64 hashes to file.
+            for depended_file in manifest["files"]:
+                f.write(depended_file[0] + "\n")
