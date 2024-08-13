@@ -159,7 +159,7 @@
         <div class="card-body">
 
           {% if len(data['servers']) == 0 and len(data['failed_servers']) == 0 %}
-          <div style="text-align: center; color: grey;">
+          <div class="text-align-center text-secondary">
             <h1>{{ translate('dashboard', 'welcome', data['lang']) }}</h1>
             <br>
             <h7>{{ translate('dashboard', 'no-servers', data['lang']) }} {{ translate('dashboard', 'newServer',
