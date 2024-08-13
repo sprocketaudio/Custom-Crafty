@@ -12,6 +12,27 @@ body.sidebar-icon-only .navbar-toggler .mdi-chevron-double-left {
 /**************************************************************/
 
 /**************************************************************/
+/* CSS as bootstrap extensions */
+/**************************************************************/
+.overflow-x-auto {
+    overflow-x: auto;
+}
+
+.overflow-y-auto {
+    overflow-y: auto;
+}
+
+.overflow-scroll {
+    overflow: scroll;
+}
+
+.text-none {
+    text-transform: none;
+}
+
+/**************************************************************/
+
+/**************************************************************/
 /* CSS for MainMenu in partials/_sidebar.html */
 /**************************************************************/
 @media screen and (max-width: 991px) {
@@ -225,6 +246,12 @@ body {
 .server-alert {
     color: var(--red) !important;
 }
+
+/* Useless ?
+.input_motd {
+    max-width: 10px;
+    max-height: 10px;
+}*/
 
 /**************************************************************/
 

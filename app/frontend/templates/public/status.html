@@ -16,7 +16,11 @@
 </style>
 <div class="row justify-content-center">
   <div class="content-wrapper col-md login-modal d-none d-sm-block bg-dropdown">
-    <img src="/static/assets/images/logo_long.png" style='width: 25%; margin-left: 38%;'>
+    <div class="row text-center">
+      <div class="col-12">
+        <img src="/static/assets/images/logo_long.png" class="w-25">
+      </div>
+    </div>
     <hr />
     <div class="table-responsive">
       <table class="table table-hover">
@@ -32,7 +36,7 @@
         <tbody>
           {% for server in data['servers'] %}
           {% if server['server_data']['show_status'] %}
-          <tr>
+          <tr class="h-">
             <td id="server_name_{{ server['stats']['server_id']['server_id'] }}">
               <i class="fas fa-server"></i>
               {{ server['server_data']['server_name'] }}
@@ -85,13 +89,12 @@
         </tbody>
       </table>
     </div>
-    <hr />
   </div>
 </div>
 <!-- View for Small screen -->
 <div class="row justify-content-center align-items-sm-center">
   <div class="content-wrapper login-modal d-sm-none d-block bg-dropdown">
-    <img src="/static/assets/images/logo_long.png" style='width: 100%;'>
+    <img src="/static/assets/images/logo_long.png" class="w-100">
     <hr />
     <div class="accordion" id="accordionServers">
       {% for server in data['servers'] %}
@@ -207,10 +210,10 @@
           m_motd = `<img class="w-25 mr-3" src="/static/assets/images/pack.png" alt="icon" /> `;
         }
 
-        desc_motd = `<span id="input_motd_` + server.id + `" class="input_motd">` + server.desc + `</span> <br />`;
-        m_motd = m_motd + `<div class="media-body"><span id="m_input_motd_` + server.id + `" class="input_motd">` + server.desc + `</span></div>`;
+        desc_motd = `<span id="input_motd_` + server.id + `" class="input_motd align-middle">` + server.desc + `</span> <br />`;
+        m_motd = m_motd + `<div class="media-body"><span id="m_input_motd_` + server.id + `" class="input_motd align-middle">` + server.desc + `</span></div>`;
 
-        motd = `<div class="row"><div class="col-auto">` + img_motd + `</div><div class="col-auto">` + desc_motd + `</div></div>`;
+        motd = `<div class="row"><div class="col-auto">` + img_motd + `</div><div class="col-auto text-left align-items-center align-content-center">` + desc_motd + `</div></div>`;
         server_motd.innerHTML = motd;
         m_server_motd.innerHTML = m_motd;
       }

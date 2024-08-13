@@ -3,7 +3,7 @@
     <div class="card">
       <div class="card-body pt-3 pb-3">
         <div class="row">
-          <div class="col-sm-4 mr-2">
+          <div class="col-sm-4">
             {% if data['server_stats']['running'] %}
             <b>{{ translate('serverStats', 'serverStatus', data['lang']) }}:</b> <span id="status" class="text-success">{{ translate('serverStats', 'online', data['lang']) }}</span><br />
             <b>{{ translate('serverStats', 'serverStarted', data['lang']) }}:</b> <span id="started">{{ data['server_stats']['started'] }}</span><br />
@@ -21,7 +21,7 @@
             <b>{{ translate('serverStats', 'serverTimeZone', data['lang']) }}:</b> <span class="text-info">{{ data['serverTZ'] }}</span>
           </div>
 
-          <div class="col-sm-3 mr-2">
+          <div class="col-sm-3">
             <b>{{ translate('serverStats', 'cpuUsage', data['lang']) }}:</b> <span id="cpu">{{ data['server_stats']['cpu'] }}%</span> <br />
             <b>{{ translate('serverStats', 'memUsage', data['lang']) }}:</b> <span id="mem">{{ data['server_stats']['mem'] }}</span> <br />
             {% if data['server_stats']['int_ping_results'] %}
@@ -31,14 +31,14 @@
             {% end %}
           </div>
 
-          <div class="col-sm-3 mr-2">
+          <div class="col-sm-5">
             {% if data['server_stats']['version'] != 'False' %}
             <b>{{ translate('serverStats', 'version', data['lang']) }}:</b> <span id="version">{{ data['server_stats']['version'] }}</span><br />
-            <b>{{ translate('serverStats', 'description', data['lang']) }}:</b> <span id="input_motd" style="max-width: 10px; max-height: 10px" class="input_motd">{{ translate('serverStats', 'loadingMotd', data['lang']) }}</span>
+            <b>{{ translate('serverStats', 'description', data['lang']) }}:</b> <span id="input_motd" class="input_motd">{{ translate('serverStats', 'loadingMotd', data['lang']) }}</span>
             <br />
             {% else %}
             <b>{{ translate('serverStats', 'version', data['lang']) }}:</b> <span id="version">{{ translate('serverStats', 'unableToConnect', data['lang']) }}</span> <br />
-            <b>{{ translate('serverStats', 'description', data['lang']) }}:</b> <span style="max-width: 10px; max-height: 10px" id="input_motd" class="input_motd">{{ translate('serverStats', 'unableToConnect', data['lang']) }}</span> <br />
+            <b>{{ translate('serverStats', 'description', data['lang']) }}:</b> <span id="input_motd" class="input_motd">{{ translate('serverStats', 'unableToConnect', data['lang']) }}</span> <br />
             {% end %}
             <b>Server Type: <span class="text-info">{{data['server_stats']['server_type']}}</span></b>
 
