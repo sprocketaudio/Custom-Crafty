@@ -6,7 +6,7 @@ a:hover {
 }
 
 .blink-text {
-    color: #000;
+    color: var(--base-text);
     font-weight: bold;
     font-size: 2rem;
     animation: blinkingText 2s infinite;
@@ -14,15 +14,15 @@ a:hover {
 
 @keyframes blinkingText {
     0% {
-        color: grey;
+        color: var(--base-text);
     }
 
     50% {
-        color: red;
+        color: var(--red);
     }
 
     100% {
-        color: grey;
+        color: var(--base-text);
     }
 }
 
