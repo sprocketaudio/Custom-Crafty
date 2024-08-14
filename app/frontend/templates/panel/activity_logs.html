@@ -31,7 +31,7 @@
         <div class="card-body">
 
           <div class="table-responsive">
-            <table class="table table-hover" id="audit_table" width="100%">
+            <table class="table table-hover w-100" id="audit_table">
               <thead>
                 <tr class="rounded">
                   <th>Time</th>
@@ -44,8 +44,7 @@
               <tbody>
                 <tr>
                   <td colspan="5" id="image-div" class="text-center"> <!-- Center image within table -->
-                    <img class="img-center" id="logo-animate" src="../static/assets/images/crafty-logo-square-1024.png"
-                      alt="Crafty Logo, Crafty is loading" width="20%"><br><br>{{ translate('datatables',
+                    <img class="img-center" id="logo-animate" src="../static/assets/images/crafty-logo-square-1024.png" alt="Crafty Logo, Crafty is loading" width="20%"><br><br>{{ translate('datatables',
                     'loadingRecords', data['lang'])}}
                   </td>
                 </tr>

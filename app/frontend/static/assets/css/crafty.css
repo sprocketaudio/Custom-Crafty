@@ -247,7 +247,7 @@ body {
 }
 
 .gray {
-    color: gray !important;
+    color: var(--gray) !important;
 }
 
 .disk-usage {
