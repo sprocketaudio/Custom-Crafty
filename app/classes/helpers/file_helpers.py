@@ -13,6 +13,7 @@ import urllib.request
 import ssl
 import time
 import certifi
+from jsonschema.exceptions import ValidationError
 
 from app.classes.helpers.helpers import Helpers
 from app.classes.shared.console import Console
@@ -394,48 +395,69 @@ class FileHelpers:
         return True
 
     @staticmethod
-    def unzip_file(zip_path, server_update=False):
-        ignored_names = ["server.properties", "permissions.json", "allowlist.json"]
+    def unzip_file(zip_path, server_update: bool = False) -> None:
+        """
+        Unzips zip file at zip_path to location generated at new_dir based on zip
+        contents.
+
+        Args:
+            zip_path: Path to zip file to unzip.
+            server_update: Will skip ignored items list if not set to true. Used for
+            updating bedrock servers.
+
+        Returns: None
+
+        """
+        ignored_names: list = [
+            "server.properties",
+            "permissions.json",
+            "allowlist.json",
+        ]
         # Get directory without zipfile name
         new_dir = pathlib.Path(zip_path).parents[0]
-        # make sure we're able to access the zip file
-        if Helpers.check_file_perms(zip_path) and os.path.isfile(zip_path):
-            # make sure the directory we're unzipping this to exists
-            Helpers.ensure_dir_exists(new_dir)
-            # we'll make a temporary directory to unzip this to.
-            temp_dir = tempfile.mkdtemp()
-            try:
-                with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                    # we'll extract this to the temp dir using zipfile module
-                    zip_ref.extractall(temp_dir)
-                # we'll iterate through the top level directory moving everything
-                # out of the temp directory and into it's final home.
-                for item in os.listdir(temp_dir):
-                    # if the file is one of our ignored names we'll skip it
-                    if item in ignored_names and server_update:
-                        continue
-                    # we handle files and dirs differently or we'll crash out.
-                    if os.path.isdir(os.path.join(temp_dir, item)):
-                        try:
-                            FileHelpers.move_dir_exist(
-                                os.path.join(temp_dir, item),
-                                os.path.join(new_dir, item),
-                            )
-                        except Exception as ex:
-                            logger.error(f"ERROR IN ZIP IMPORT: {ex}")
-                    else:
-                        try:
-                            FileHelpers.move_file(
-                                os.path.join(temp_dir, item),
-                                os.path.join(new_dir, item),
-                            )
-                        except Exception as ex:
-                            logger.error(f"ERROR IN ZIP IMPORT: {ex}")
-            except Exception as ex:
-                Console.error(ex)
-        else:
-            return "false"
-        return
+        # make sure the directory we're unzipping this to exists
+        Helpers.ensure_dir_exists(new_dir)
+        # we'll make a temporary directory to unzip this to.
+        temp_dir = tempfile.mkdtemp()
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                # we'll extract this to the temp dir using zipfile module
+                zip_ref.extractall(temp_dir)
+        # Catch zipfile extract all error or file open errors.
+        except ValueError as why:
+            Console.error(f"Unzip failed with information: {why}")
+            raise RuntimeError(f"Unzip failed for path: {zip_path}") from why
+        except FileNotFoundError as why:
+            Console.error(f"Unzip failed file not found: {zip_path}")
+            raise FileNotFoundError(f"Unable to find file at path: {zip_path}") from why
+        except PermissionError as why:
+            Console.error(f"Bad permissions for file at: {zip_path}")
+            raise PermissionError(f"Bad permissions for file at: {zip_path}") from why
+
+        # we'll iterate through the top level directory moving everything
+        # out of the temp directory and into it's final home.
+        for item in os.listdir(temp_dir):
+            # if the file is one of our ignored names we'll skip it
+            if item in ignored_names and server_update:
+                continue
+
+            # we handle files and dirs differently or we'll crash out.
+            if os.path.isdir(os.path.join(temp_dir, item)):
+                try:
+                    FileHelpers.move_dir_exist(
+                        os.path.join(temp_dir, item),
+                        os.path.join(new_dir, item),
+                    )
+                except shutil.Error as ex:
+                    logger.error(f"ERROR IN ZIP IMPORT: {ex}")
+            else:
+                try:
+                    FileHelpers.move_file(
+                        os.path.join(temp_dir, item),
+                        os.path.join(new_dir, item),
+                    )
+                except shutil.Error as ex:
+                    logger.error(f"ERROR IN ZIP IMPORT: {ex}")
 
     def unzip_server(self, zip_path, user_id):
         if Helpers.check_file_perms(zip_path):

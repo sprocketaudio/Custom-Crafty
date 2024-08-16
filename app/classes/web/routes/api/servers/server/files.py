@@ -565,7 +565,7 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                 },
             )
         if Helpers.check_file_exists(folder):
-            folder = self.file_helper.unzip_file(folder, user_id)
+            self.file_helper.unzip_file(folder, user_id)
         else:
             if user_id:
                 return self.finish_json(
