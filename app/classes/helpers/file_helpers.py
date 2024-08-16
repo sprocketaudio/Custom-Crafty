@@ -13,7 +13,6 @@ import urllib.request
 import ssl
 import time
 import certifi
-from jsonschema.exceptions import ValidationError
 
 from app.classes.helpers.helpers import Helpers
 from app.classes.shared.console import Console
