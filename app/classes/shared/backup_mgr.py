@@ -237,11 +237,6 @@ class BackupManager:
             backup_manifest, backup_target_location, backup_config["backup_id"]
         )
 
-        # Find files that are not already stored in the backup repository.
-        files_to_save = self.find_files_not_in_repository(
-            backup_manifest, backup_target_location
-        )
-
     @staticmethod
     def ensure_snapshot_directory_is_valid(backup_path: pathlib.Path) -> bool:
         backup_path.mkdir(exist_ok=True)
@@ -410,3 +405,56 @@ class BackupManager:
         file_hash = helper.crypto_helper.b64_to_bytes(file_hash)
         file_hash = helper.crypto_helper.bytes_to_hex(file_hash)
         return repository / "data" / file_hash[:2] / str(file_hash[-126:])
+
+    # TODO: Implement this function to save all new chunks using save_chunk.
+    # @staticmethod
+    # def save_chunks_from_manifest(
+    #     self, backup_manifest: dict, backup_repository: pathlib.Path
+    # ):
+    #
+    #     files_to_save = self.find_files_not_in_repository(
+    #         backup_manifest, backup_repository
+    #     )
+    #
+    #     for file_tuple in files_to_save:
+    #         save_chunk(file_tuple[0], file_tuple[1])
+
+    def save_chunk(
+        self,
+        file: bytes,
+        repository_location: pathlib.Path,
+        file_hash: str,
+        use_compression: bool = False,
+    ):
+        # Chunk Schema version
+        output = bytes.fromhex("00")
+
+        # Append zero bytes for compression bool and nonce. Will be used later for
+        # encryption. 1 byte bool and 12 bytes of nonce.
+        output += bytes.fromhex("00000000000000000000000000")
+
+        # Compress chunk if set
+        # Append compression byte to output bytes.
+        if use_compression:
+            file = helper.file_helper.zlib_compress_bytes(file)
+            output += bytes.fromhex("01")
+        else:
+            output += bytes.fromhex("00")
+
+        # Output matches version 1 schema.
+        # version + encryption byte + nonce + compression byte + file bytes
+        # Reuse file var to prevent extra memory. Not sure if python would do that but
+        # avoiding it anyway.
+        file = output + file
+
+        # Get file location and save to location
+        # TODO: This b64 -> bytes -> hex is being done twice for every file to save.
+        #  Change this so that bytes are being passed around and this is minimized.
+        file_hash = helper.crypto_helper.b64_to_bytes(file_hash)
+        file_hash = helper.crypto_helper.bytes_to_hex(file_hash)
+        file_location = self.get_path_from_hash(file_hash, repository_location)
+
+        # Saves file, double check it does not already exist.
+        if not file_location.exists():
+            with file_location.open("wb") as f:
+                f.write(file)
