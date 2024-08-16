@@ -394,7 +394,24 @@ class FileHelpers:
         return True
 
     @staticmethod
-    def unzip_file(zip_path, server_update: bool = False) -> None:
+    def move_item_file_or_dir(old_dir, new_dir, item) -> None:
+        try:
+            if os.path.isdir(os.path.join(old_dir, item)):
+                FileHelpers.move_dir_exist(
+                    os.path.join(old_dir, item),
+                    os.path.join(new_dir, item),
+                )
+            else:
+                FileHelpers.move_file(
+                    os.path.join(old_dir, item),
+                    os.path.join(new_dir, item),
+                )
+        except shutil.Error as why:
+            raise RuntimeError(
+                f"Error moving {old_dir} to {new_dir} with information: {why}"
+            ) from why
+
+    def unzip_file(self, zip_path, server_update: bool = False) -> None:
         """
         Unzips zip file at zip_path to location generated at new_dir based on zip
         contents.
@@ -423,15 +440,9 @@ class FileHelpers:
                 # we'll extract this to the temp dir using zipfile module
                 zip_ref.extractall(temp_dir)
         # Catch zipfile extract all error or file open errors.
-        except ValueError as why:
+        except (ValueError, FileNotFoundError, PermissionError) as why:
             Console.error(f"Unzip failed with information: {why}")
             raise RuntimeError(f"Unzip failed for path: {zip_path}") from why
-        except FileNotFoundError as why:
-            Console.error(f"Unzip failed file not found: {zip_path}")
-            raise FileNotFoundError(f"Unable to find file at path: {zip_path}") from why
-        except PermissionError as why:
-            Console.error(f"Bad permissions for file at: {zip_path}")
-            raise PermissionError(f"Bad permissions for file at: {zip_path}") from why
 
         # we'll iterate through the top level directory moving everything
         # out of the temp directory and into it's final home.
@@ -441,24 +452,13 @@ class FileHelpers:
                 continue
 
             # we handle files and dirs differently or we'll crash out.
-            if os.path.isdir(os.path.join(temp_dir, item)):
-                try:
-                    FileHelpers.move_dir_exist(
-                        os.path.join(temp_dir, item),
-                        os.path.join(new_dir, item),
-                    )
-                except shutil.Error as ex:
-                    logger.error(f"ERROR IN ZIP IMPORT: {ex}")
-            else:
-                try:
-                    FileHelpers.move_file(
-                        os.path.join(temp_dir, item),
-                        os.path.join(new_dir, item),
-                    )
-                except shutil.Error as ex:
-                    logger.error(f"ERROR IN ZIP IMPORT: {ex}")
+            try:
+                self.move_item_file_or_dir(temp_dir, new_dir, item)
+            except shutil.Error as ex:
+                logger.error(f"ERROR IN ZIP IMPORT: {ex}")
 
-    def unzip_server(self, zip_path, user_id):
+    @staticmethod
+    def unzip_server(zip_path, user_id):
         if Helpers.check_file_perms(zip_path):
             temp_dir = tempfile.mkdtemp()
             with zipfile.ZipFile(zip_path, "r") as zip_ref:
