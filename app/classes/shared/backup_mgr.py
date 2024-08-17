@@ -144,12 +144,24 @@ class BackupManager:
             backup_config,
         )
 
-    def fail_backup(self, why: Exception, backup_config: dict, server):
+    @staticmethod
+    def fail_backup(why: Exception, backup_config: dict, server) -> None:
+        """
+        Fails the backup if an error is encountered during the backup.
+
+        Args:
+            why: Exception raised to fail backup.
+            backup_config: Backup config dict
+            server: Server object.
+
+        Returns: None
+
+        """
         logger.exception(
             "Failed to create backup of server"
             f" {server.name} (ID {server.server_id})"
         )
-        results = {
+        results: dict = {
             "percent": 100,
             "total_files": 0,
             "current_file": 0,
@@ -313,9 +325,7 @@ class BackupManager:
 
                 # We must store file hash and path to file.
                 # calculate_file_hash_blake2b returns bytes, b64 is stored as a string.
-                file_hash = helper.crypto_helper.bytes_to_b64(
-                    FileHelpers.calculate_file_hash_blake2b(p)
-                )
+                file_hash = FileHelpers.calculate_file_hash_blake2b(p)
 
                 # Store tuple for file with local path and b64 hash.
                 output["files"].append(
@@ -355,7 +365,7 @@ class BackupManager:
             f.write("1\n")
             # Iterate through files and add b64 hashes to file.
             for depended_file in manifest["files"]:
-                f.write(depended_file[0] + "\n")
+                f.write(helper.crypto_helper.bytes_to_b64(depended_file[0]) + "\n")
 
     def find_files_not_in_repository(
         self, backup_manifest: dict, backup_repository: pathlib.Path
@@ -402,7 +412,6 @@ class BackupManager:
         # Repo path: /path/to/backup/repo/
         # Hash: 1234...890
         # Example: /path/to/backup/repo/data/12/34...890
-        file_hash = helper.crypto_helper.b64_to_bytes(file_hash)
         file_hash = helper.crypto_helper.bytes_to_hex(file_hash)
         return repository / "data" / file_hash[:2] / str(file_hash[-126:])
 
@@ -448,9 +457,6 @@ class BackupManager:
         file = output + file
 
         # Get file location and save to location
-        # TODO: This b64 -> bytes -> hex is being done twice for every file to save.
-        #  Change this so that bytes are being passed around and this is minimized.
-        file_hash = helper.crypto_helper.b64_to_bytes(file_hash)
         file_hash = helper.crypto_helper.bytes_to_hex(file_hash)
         file_location = self.get_path_from_hash(file_hash, repository_location)
 
