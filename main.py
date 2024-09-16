@@ -115,6 +115,23 @@ def controller_setup():
     controller.clear_support_status()
 
 
+def get_migration_notifications():
+    migration_notifications = []
+    for file in os.listdir(
+        os.path.join(APPLICATION_PATH, "app", "migrations", "status")
+    ):
+        if os.path.isfile(file):
+            with open(
+                os.path.join(APPLICATION_PATH, "app", "migrations", "status", file),
+                encoding="utf-8",
+            ) as status_file:
+                status_json = json.load(status_file)
+            for item in status_json:
+                if not status_json[item].get("status"):
+                    migration_notifications.append(item)
+    return migration_notifications
+
+
 def tasks_starter():
     """
     Method starts stats recording, app scheduler, and
@@ -350,6 +367,9 @@ if __name__ == "__main__":
         helper.db_path, pragmas={"journal_mode": "wal", "cache_size": -1024 * 10}
     )
     database_proxy.initialize(database)
+    Helpers.ensure_dir_exists(
+        os.path.join(APPLICATION_PATH, "app", "migrations", "status")
+    )
     migration_manager = MigrationManager(database, helper)
     migration_manager.up()  # Automatically runs migrations
 
@@ -408,7 +428,7 @@ if __name__ == "__main__":
     controller.set_project_root(APPLICATION_PATH)
     tasks_manager = TasksManager(helper, controller, file_helper)
     import3 = Import3(helper, controller)
-
+    helper.migration_notifications = get_migration_notifications()
     # Check to see if client config.json version is different than the
     # Master config.json in helpers.py
     Console.info("Checking for remote changes to config.json")

@@ -1,4 +1,5 @@
 import os
+import json
 import datetime
 import uuid
 import peewee
@@ -166,10 +167,15 @@ def migrate(migrator: Migrator, database, **kwargs):
     valid_backups = [
         backup for backup in all_backups if is_valid_entry(backup, all_servers)
     ]
+    if len(valid_backups) < len(all_backups):
+        backup_migration_status = False
+        print("Orphan backup found")
     Console.info("Cleaning up orphan schedules for all servers")
     valid_schedules = [
         schedule for schedule in all_schedules if is_valid_entry(schedule, all_servers)
     ]
+    if len(valid_schedules) > len(all_schedules):
+        schedule_migration_status = False
     # Copy data from the existing backups table to the new one
     for backup in valid_backups:
         Console.info(f"Trying to get server for backup migration {backup.server_id}")
@@ -265,6 +271,22 @@ def migrate(migrator: Migrator, database, **kwargs):
     Console.debug("Migrations: renaming new_schedules to schedules")
     # Rename the new table to backups
     migrator.rename_table("new_schedules", "schedules")
+
+    with open("status/20240308_multi-backup.json", "w", encoding="utf-8") as file:
+        file.write(
+            json.dumps(
+                {
+                    "backup_migration": {
+                        "status": backup_migration_status,
+                        "pid": uuid.uuid4(),
+                    },
+                    "schedule_migration": {
+                        "status": schedule_migration_status,
+                        "pid": uuid.uuid4(),
+                    },
+                }
+            )
+        )
 
 
 def rollback(migrator: Migrator, database, **kwargs):

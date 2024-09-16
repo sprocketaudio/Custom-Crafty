@@ -79,6 +79,7 @@ class Helpers:
 
         self.translation = Translation(self)
         self.update_available = False
+        self.migration_notifications = []
         self.ignored_names = ["crafty_managed.txt", "db_stats"]
         self.crafty_starting = False
         self.minimum_password_length = 8
@@ -619,6 +620,7 @@ class Helpers:
             data = []
             response = requests.get("https://craftycontrol.com/notify", timeout=2)
             data = json.loads(response.content)
+            data.extend(self.migration_notifications)
             if self.update_available:
                 data.append(self.update_available)
             return data
