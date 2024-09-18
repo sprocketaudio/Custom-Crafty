@@ -1,33 +1,74 @@
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function uploadChunk(file, url, chunk, start, end, chunk_hash, totalChunks, type, path, fileId, i, file_num, updateProgressBar) {
+    return fetch(url, {
+        method: 'POST',
+        body: chunk,
+        headers: {
+            'Content-Range': `bytes ${start}-${end - 1}/${file.size}`,
+            'Content-Length': chunk.size,
+            'fileSize': file.size,
+            'chunkHash': chunk_hash,
+            'chunked': true,
+            'type': type,
+            'totalChunks': totalChunks,
+            'fileName': file.name,
+            'location': path,
+            'fileId': fileId,
+            'chunkId': i,
+        },
+    })
+        .then(async response => {
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(JSON.stringify(errorData) || 'Unknown error occurred');
+            }
+            return response.json(); // Return the JSON data
+        })
+        .then(data => {
+            if (data.status !== "completed" && data.status !== "partial") {
+                throw new Error(data.message || 'Unknown error occurred');
+            }
+            // Update progress bar
+            const progress = (i + 1) / totalChunks * 100;
+            updateProgressBar(Math.round(progress), type, file_num);
+        });
+}
+
 async function uploadFile(type, file = null, path = null, file_num = 0, _onProgress = null) {
     if (file == null) {
         try {
             file = $("#file")[0].files[0];
         } catch {
-            bootbox.alert("Please select a file first.")
+            bootbox.alert("Please select a file first.");
             return;
         }
-
     }
+
     const fileId = uuidv4();
     const token = getCookie("_xsrf");
     if (type !== "server_upload") {
         document.getElementById("upload_input").innerHTML = '<div class="progress" style="width: 100%;"><div id="upload-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">&nbsp;<i class="fa-solid fa-spinner"></i></div></div>';
     }
 
-    let url = ``
+    let url = '';
     if (type === "server_upload") {
         url = `/api/v2/servers/${serverId}/files/upload/`;
     } else if (type === "background") {
-        url = `/api/v2/crafty/admin/upload/`
+        url = `/api/v2/crafty/admin/upload/`;
     } else if (type === "import") {
-        url = `/api/v2/servers/import/upload/`
+        url = `/api/v2/servers/import/upload/`;
     }
-    console.log(url)
+    console.log(url);
+
     const chunkSize = 1024 * 1024 * 10; // 10MB
     const totalChunks = Math.ceil(file.size / chunkSize);
 
-    const uploadPromises = [];
-    let errors = []; // Array to store errors
+    const errors = [];
+    const batchSize = 30; // Number of chunks to upload in each batch
+
     try {
         let res = await fetch(url, {
             method: 'POST',
@@ -55,59 +96,36 @@ async function uploadFile(type, file = null, path = null, file_num = 0, _onProgr
             throw new Error(JSON.stringify(responseData));
         }
 
-        for (let i = 0; i < totalChunks; i++) {
-            const start = i * chunkSize;
-            const end = Math.min(start + chunkSize, file.size);
-            const chunk = file.slice(start, end);
-            const chunk_hash = await calculateFileHash(chunk);
+        for (let i = 0; i < totalChunks; i += batchSize) {
+            const batchPromises = [];
 
-            const uploadPromise = fetch(url, {
-                method: 'POST',
-                body: chunk,
-                headers: {
-                    'Content-Range': `bytes ${start}-${end - 1}/${file.size}`,
-                    'Content-Length': chunk.size,
-                    'fileSize': file.size,
-                    'chunkHash': chunk_hash,
-                    'chunked': true,
-                    'type': type,
-                    'totalChunks': totalChunks,
-                    'fileName': file.name,
-                    'location': path,
-                    'fileId': fileId,
-                    'chunkId': i,
-                },
-            })
-                .then(async response => {
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(JSON.stringify(errorData) || 'Unknown error occurred');
-                    }
-                    return response.json(); // Return the JSON data
-                })
-                .then(data => {
-                    if (data.status !== "completed" && data.status !== "partial") {
-                        throw new Error(data.message || 'Unknown error occurred');
-                    }
-                    // Update progress bar
-                    const progress = (i + 1) / totalChunks * 100;
-                    updateProgressBar(Math.round(progress), type, file_num);
-                })
-                .catch(error => {
-                    errors.push(error); // Store the error
-                });
+            for (let j = 0; j < batchSize && (i + j) < totalChunks; j++) {
+                const start = (i + j) * chunkSize;
+                const end = Math.min(start + chunkSize, file.size);
+                const chunk = file.slice(start, end);
+                const chunk_hash = await calculateFileHash(chunk);
 
-            uploadPromises.push(uploadPromise);
+                const uploadPromise = uploadChunk(file, url, chunk, start, end, chunk_hash, totalChunks, type, path, fileId, i + j, file_num, updateProgressBar)
+                    .catch(error => {
+                        errors.push(error); // Store the error
+                    });
+
+                batchPromises.push(uploadPromise);
+            }
+
+            // Wait for the current batch to complete before proceeding to the next batch
+            await Promise.all(batchPromises);
+
+            // Optional delay between batches to account for rate limiting
+            await delay(2000); // Adjust the delay time (in milliseconds) as needed
         }
-
-        await Promise.all(uploadPromises);
     } catch (error) {
         errors.push(error); // Store the error
     }
 
     if (errors.length > 0) {
         const errorMessage = errors.map(error => JSON.parse(error.message).data.message || 'Unknown error occurred').join('<br>');
-        console.log(errorMessage)
+        console.log(errorMessage);
         bootbox.alert({
             title: 'Error',
             message: errorMessage,

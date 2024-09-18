@@ -1,9 +1,35 @@
 # Changelog
-## --- [4.4.1] - 2024/TBD
+## --- [4.4.4] - 2024/TBD
+### New features
+TBD
+### Bug fixes
+TBD
+### Tweaks
+TBD
+### Lang
+TBD
+<br><br>
+
+## --- [4.4.3] - 2024/08/08
+### Bug fixes
+- Fix schedules creation fail due to missing action ID ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/791))
+<br><br>
+
+## --- [4.4.2] - 2024/08/07
+### Bug fixes
+- Migrations | Fix exception message on file not found for backups migration ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/789))
+- UploadAPI | Upload chunks in batches to avoid overloading browser cache ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/788))
+<br><br>
+
+## --- [4.4.1] - 2024/08/06
+### Patch Fixes
+- Migrations | Fix orphan backup configurations crashing migration operation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/785))
+- Migrations | Fix missing default configuration if no server backup config exists during the migration ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/785))
+- Migrations | Fix extended runtime on move procedure during migration ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/785))
 
 **-----------------------------------------------------------------------------**
 
-**Initial release was reverted for patching (See Merge Request: [!784](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/784))**
+**Initial release was reverted for patching (See Merge Request: [!784](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/784))** *2024/07/28*
 
 **-----------------------------------------------------------------------------**
 ### Refactor
@@ -36,6 +62,7 @@
 - Show natural language name instead of country code in User Config Lang select list ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/773))
 - Add remaining `he_IL`, `th_TH` translations from **4.4.0** Release ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/761) | [Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/763))
 - Fix `fr_FR` syntax issues ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/780) | [Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/778))
+- Add ru_RU Translation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/779))
 - Add `th_TH` translations for [!772](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/772) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/781))
 <br><br>
 
