@@ -56,7 +56,7 @@ class UsersController:
                 "pattern": "^[a-z0-9_]+$",
                 "examples": ["admin"],
                 "title": "Username",
-                "error": "typeString",
+                "error": "userName",
                 "fill": True,
             },
             "password": {
