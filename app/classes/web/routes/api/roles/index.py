@@ -97,7 +97,16 @@ class ApiRolesIndexHandler(BaseApiHandler):
             not superuser
             and EnumPermissionsCrafty.ROLES_CONFIG not in exec_user_permissions_crafty
         ):
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         self.finish_json(
             200,
@@ -130,7 +139,16 @@ class ApiRolesIndexHandler(BaseApiHandler):
             not superuser
             and EnumPermissionsCrafty.ROLES_CONFIG not in exec_user_permissions_crafty
         ):
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = orjson.loads(self.request.body)
@@ -183,7 +201,12 @@ class ApiRolesIndexHandler(BaseApiHandler):
 
         if self.controller.roles.get_roleid_by_name(role_name) is not None:
             return self.finish_json(
-                400, {"status": "error", "error": "ROLE_NAME_ALREADY_EXISTS"}
+                400,
+                {
+                    "status": "error",
+                    "error": "ROLE_NAME_ALREADY_EXISTS",
+                    "error_data": "UNIQUE VALUE ERROR",
+                },
             )
 
         role_id = self.controller.roles.add_role_advanced(role_name, servers, manager)

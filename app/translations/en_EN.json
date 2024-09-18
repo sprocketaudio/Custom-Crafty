@@ -671,6 +671,7 @@
         "backupName": "Backup name must be a string and a minimum length of 3.",
         "enumErr": "failed validating. Acceptable data includes: ",
         "filesPageLen": "length must be greater than 1 for property",
+        "insufficientPerms": "Permission Error: Missing permissions for this resource",
         "passLength": "Password Too Short. Minimum Length: 8",
         "roleManager": "Role manager must be of type integer (manager ID) or None",
         "roleName": "Role name must be a string that is greater than 1 character. It must not include any of the following symbols: [ ] , ",
@@ -685,7 +686,8 @@
         "typeInteger": "must be a number.",
         "typeIntMinVal0": "must be an integer with a minimum value of 0.",
         "typeList": "must be of type list/array ",
-        "typeString": "must be of type string."
+        "typeString": "must be of type string.",
+        "userName": " must be of type string, all LOWERCASE, a minimum of 4 characters and a max of 20 characters"
     },
     "webhooks": {
         "areYouSureDel": "Are you sure you want to delete this webhook?",

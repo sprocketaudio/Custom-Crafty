@@ -272,7 +272,8 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 temp_dir = Helpers.unzip_backup_archive(backup_location, zip_name)
             except (FileNotFoundError, NotADirectoryError) as e:
                 return self.finish_json(
-                    400, {"status": "error", "error": f"NO BACKUP FOUND {e}"}
+                    400,
+                    {"status": "error", "error": "NO BACKUP FOUND", "error_data": e},
                 )
             if server_data["type"] == "minecraft-java":
                 new_server = self.controller.restore_java_zip_server(
@@ -518,7 +519,7 @@ class ApiServersServerBackupsBackupFilesIndexHandler(BaseApiHandler):
             )
         except Exception as e:
             return self.finish_json(
-                400, {"status": "error", "error": f"DELETE FAILED with error {e}"}
+                400, {"status": "error", "error": "DELETE FAILED", "error_data": e}
             )
         self.controller.management.add_to_audit_log(
             auth_data[4]["user_id"],

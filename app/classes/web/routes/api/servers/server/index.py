@@ -186,7 +186,16 @@ class ApiServersServerIndexHandler(BaseApiHandler):
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         server_obj = self.controller.servers.get_server_obj(server_id)
         server = model_to_dict(server_obj)
@@ -233,7 +242,16 @@ class ApiServersServerIndexHandler(BaseApiHandler):
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -243,7 +261,16 @@ class ApiServersServerIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.CONFIG not in server_permissions:
             # if the user doesn't have Config permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         server_obj = self.controller.servers.get_server_obj(server_id)
         java_flag = False
@@ -257,7 +284,12 @@ class ApiServersServerIndexHandler(BaseApiHandler):
                     setattr(server_obj, "execution_command", command)
                 except ValueError:
                     return self.finish_json(
-                        400, {"status": "error", "error": "INVALID EXECUTION COMMAND"}
+                        400,
+                        {
+                            "status": "error",
+                            "error": "INVALID EXECUTION COMMAND",
+                            "error_data": "INVALID COMMAND",
+                        },
                     )
                 java_flag = True
 
@@ -286,7 +318,16 @@ class ApiServersServerIndexHandler(BaseApiHandler):
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -296,7 +337,16 @@ class ApiServersServerIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.CONFIG not in server_permissions:
             # if the user doesn't have Config permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         logger.info(
             (

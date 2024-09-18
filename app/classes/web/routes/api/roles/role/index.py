@@ -93,15 +93,26 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
             not superuser
             and EnumPermissionsCrafty.ROLES_CONFIG not in exec_user_permissions_crafty
         ):
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             self.finish_json(
                 200,
                 {"status": "ok", "data": self.controller.roles.get_role(role_id)},
             )
-        except DoesNotExist:
-            self.finish_json(404, {"status": "error", "error": "ROLE_NOT_FOUND"})
+        except DoesNotExist as why:
+            self.finish_json(
+                404, {"status": "error", "error": "ROLE_NOT_FOUND", "error_data": why}
+            )
 
     def delete(self, role_id: str):
         auth_data = self.authenticate_user()
@@ -120,7 +131,16 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
             str(role.get("manager", "no manager found")) != str(auth_data[4]["user_id"])
             and not superuser
         ):
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         self.controller.roles.remove_role(role_id)
 
@@ -206,11 +226,13 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
                 data.get("servers", None),
                 manager,
             )
-        except DoesNotExist:
-            return self.finish_json(404, {"status": "error", "error": "ROLE_NOT_FOUND"})
-        except IntegrityError:
+        except DoesNotExist as why:
             return self.finish_json(
-                404, {"status": "error", "error": "ROLE_NAME_EXISTS"}
+                404, {"status": "error", "error": "ROLE_NOT_FOUND", "error_data": why}
+            )
+        except IntegrityError as why:
+            return self.finish_json(
+                404, {"status": "error", "error": "ROLE_NAME_EXISTS", "error_data": why}
             )
         self.controller.management.add_to_audit_log(
             user["user_id"],

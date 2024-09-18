@@ -818,7 +818,16 @@ class ApiServersIndexHandler(BaseApiHandler):
         ) = auth_data
 
         if EnumPermissionsCrafty.SERVER_CREATION not in exec_user_crafty_permissions:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = orjson.loads(self.request.body)
@@ -858,7 +867,12 @@ class ApiServersIndexHandler(BaseApiHandler):
                 port = 19132
         if port > 65535 or port < 1:
             self.finish_json(
-                405, {"status": "error", "error": "DATA CONSTRAINT FAILED"}
+                405,
+                {
+                    "status": "error",
+                    "error": "DATA CONSTRAINT FAILED",
+                    "error_data": "1 - 65535",
+                },
             )
             return
         new_server_id = self.controller.create_api_server(data, user["user_id"])

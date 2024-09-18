@@ -169,7 +169,16 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
         get_only_ids = self.get_query_argument("ids", None) == "true"
 
         if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         self.finish_json(
             200,
@@ -192,7 +201,16 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
         (_, _, _, superuser, user, _) = auth_data
 
         if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = orjson.loads(self.request.body)
@@ -255,7 +273,16 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
         get_only_ids = self.get_query_argument("ids", None) == "true"
 
         if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         self.finish_json(
             200,
@@ -284,7 +311,16 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
             _,
         ) = auth_data
         if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = orjson.loads(self.request.body)
@@ -350,7 +386,16 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
             return
 
         if not auth_data[4]["superuser"]:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = json.loads(self.request.body)

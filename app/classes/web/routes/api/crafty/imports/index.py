@@ -52,7 +52,14 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
             and not auth_data[4]["superuser"]
         ):
             # if the user doesn't have Files or Backup permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": "INSUFFICEN PERMISSIONS",
+                },
+            )
 
         try:
             data = json.loads(self.request.body)

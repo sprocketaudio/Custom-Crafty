@@ -125,7 +125,16 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -138,7 +147,16 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             and EnumPermissionsServer.BACKUP not in server_permissions
         ):
             # if the user doesn't have Files or Backup permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = json.loads(self.request.body)
@@ -256,7 +274,16 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -266,7 +293,16 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         try:
             data = json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:
@@ -313,7 +349,9 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         # but not a true boolean value
         if proc == True:  # pylint: disable=singleton-comparison
             return self.finish_json(200, {"status": "ok"})
-        return self.finish_json(500, {"status": "error", "error": str(proc)})
+        return self.finish_json(
+            500, {"status": "error", "error": "SERVER RUNNING", "error_data": str(proc)}
+        )
 
     def patch(self, server_id: str, _backup_id):
         auth_data = self.authenticate_user()
@@ -322,7 +360,16 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -332,7 +379,16 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         try:
             data = json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:
@@ -384,7 +440,16 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -394,7 +459,16 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         try:
             data = json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:
@@ -459,7 +533,16 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -469,7 +552,16 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         try:
             data = json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:
@@ -533,7 +625,16 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -543,7 +644,16 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         try:
             data = json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:
@@ -608,7 +718,16 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -618,7 +737,16 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         try:
             data = json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:

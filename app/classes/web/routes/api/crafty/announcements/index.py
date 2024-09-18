@@ -115,7 +115,14 @@ class ApiAnnounceIndexHandler(BaseApiHandler):
         if str(data["id"]) in str(res):
             cleared_notifs.append(data["id"])
         else:
-            self.finish_json(200, {"status": "error", "error": "INVALID_DATA"})
+            self.finish_json(
+                200,
+                {
+                    "status": "error",
+                    "error": "INVALID_DATA",
+                    "error_data": "INVALID NOTIFICATION ID",
+                },
+            )
             return
         updata = {"cleared_notifs": ",".join(cleared_notifs)}
         self.controller.users.update_user(auth_data[4]["user_id"], updata)
