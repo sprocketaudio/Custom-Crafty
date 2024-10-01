@@ -683,8 +683,8 @@
         "taskIntervalType": "Task Interval Type must be one of the following: ",
         "typeBool": "must be true or false (type boolean)",
         "typeEmail": "must be of type email.",
-        "typeInteger": "must be a number.",
         "typeIntMinVal0": "must be an integer with a minimum value of 0.",
+        "typeInteger": "must be a number.",
         "typeList": "must be of type list/array ",
         "typeString": "must be of type string.",
         "userName": " must be of type string, all LOWERCASE, a minimum of 4 characters and a max of 20 characters"
