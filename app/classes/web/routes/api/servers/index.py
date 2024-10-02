@@ -731,7 +731,7 @@ class ApiServersIndexHandler(BaseApiHandler):
             self.controller.servers.stats.record_stats()
 
             self.finish_json(
-                200,
+                503,
                 {
                     "status": "error",
                     "error": "Could not create server",
