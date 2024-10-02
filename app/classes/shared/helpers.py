@@ -617,7 +617,7 @@ class Helpers:
         return version_data
 
     def check_migrations(self) -> None:
-        if self.read_annc == False:
+        if self.read_annc is False:
             self.read_annc = True
             for file in os.listdir(
                 os.path.join(self.root_dir, "app", "migrations", "status")
