@@ -725,7 +725,19 @@ class ApiServersIndexHandler(BaseApiHandler):
                 405, {"status": "error", "error": "DATA CONSTRAINT FAILED"}
             )
             return
-        new_server_id = self.controller.create_api_server(data, user["user_id"])
+        try:
+            new_server_id = self.controller.create_api_server(data, user["user_id"])
+        except Exception as e:
+            self.controller.servers.stats.record_stats()
+
+            self.finish_json(
+                200,
+                {
+                    "status": "error",
+                    "error": "Could not create server",
+                    "error_data": str(e),
+                },
+            )
 
         self.controller.servers.stats.record_stats()
 
