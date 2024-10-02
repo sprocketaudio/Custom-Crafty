@@ -1053,8 +1053,10 @@ class ServerInstance:
 
         running = self.check_running()
 
-        # if all is okay, we just exit out
+        # if all is okay, we set the restart count to 0 and just exit out
         if running:
+            Console.debug("Successfully found process. Resetting crash counter to 0")
+            self.restart_count = 0
             return
         # check the exit code -- This could be a fix for /stop
         if str(self.process.returncode) in self.settings["ignored_exits"].split(","):
