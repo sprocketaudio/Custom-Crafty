@@ -624,7 +624,9 @@
     if (responseData.status === "ok") {
       window.location.href = '/panel/dashboard';
     } else {
-
+      // Close the "be patient..." dialogue box
+      $('.bootbox-close-button').click();
+      // Alert the user that there was an issue.
       bootbox.alert({
         title: responseData.error,
         message: responseData.error_data

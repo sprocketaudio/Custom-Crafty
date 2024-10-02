@@ -132,22 +132,29 @@ class Helpers:
         target_linux = (
             'https://www.minecraft.net/bedrockdedicatedserver/bin-linux/[^"]*'
         )
-
         try:
             # Get minecraft server download page
             # (hopefully the don't change the structure)
             download_page = get(url, headers=headers, timeout=1)
-
+            download_page.raise_for_status()
             # Search for our string targets
-            win_download_url = re.search(target_win, download_page.text).group(0)
-            linux_download_url = re.search(target_linux, download_page.text).group(0)
+            win_search_result = re.search(target_win, download_page.text)
+            linux_search_result = re.search(target_linux, download_page.text)
+            if win_search_result is None or linux_search_result is None:
+                raise RuntimeError(
+                    "Could not determine download URL from minecraft.net."
+                )
 
+            win_download_url = win_search_result.group(0)
+            linux_download_url = linux_search_result.group(0)
+            print(win_download_url, linux_download_url)
             if os.name == "nt":
                 return win_download_url
 
             return linux_download_url
         except Exception as e:
             logger.error(f"Unable to resolve remote bedrock download url! \n{e}")
+            raise e
         return False
 
     def get_execution_java(self, value, execution_command):
