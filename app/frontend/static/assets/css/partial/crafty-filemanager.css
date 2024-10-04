@@ -2,34 +2,37 @@
 .overlay {
   display: none;
   flex-direction: column;
-  background-color: #9f9daf;
+  background-color: var(--base-bg);
   border-radius: 10px;
   box-shadow: 0 10px 20px rgb(64 64 64 / 5%);
   padding: 10px 0;
   z-index: 10000;
   overflow: scroll;
+
+  /* IE and Edge */
+  -ms-overflow-style: none;
+  /* Firefox */
+  scrollbar-width: none;
 }
 
 .overlay::-webkit-scrollbar {
   display: none;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
-.overlay {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
-}
-
 /* Position the content inside the overlay */
 .overlay-content {
   display: flex;
   flex-direction: column;
-  background-color: #9f9daf;
+  background-color: var(--base-bg);
   border-radius: 10px;
   box-shadow: 0 10px 20px rgb(64 64 64 / 5%);
   padding: 10px 0;
+}
+
+.overlay-title {
+  color: var(--info);
+  text-align: center;
+  padding: 3px;
 }
 
 /* The navigation links inside the overlay */
@@ -42,7 +45,7 @@
   align-items: center;
   position: relative;
   text-decoration: unset;
-  color: #000;
+  color: var(--black);
   font-weight: 500;
   transition: 0.5s linear;
   -webkit-transition: 0.5s linear;
@@ -54,14 +57,14 @@
 /* When you mouse over the navigation links, change their color */
 .overlay a:hover,
 .overlay a:focus {
-  background: grey;
-  color: #4b00ff;
+  background: var(--ram-bg);
+  color: var(--info);
 }
 
 /* Position the close button (top right corner) */
 .overlay .closebtn .closebtn:hover {
-  background-color: red;
-  color: red;
+  background-color: var(--red);
+  color: var(--red);
   z-index: 10000;
 }
 
@@ -124,11 +127,17 @@
 
 html,
 body,
-body > .container-scroller {
+body>.container-scroller {
   overflow: initial;
 }
 
 .editorManager {
   top: 63px;
   position: sticky;
+}
+
+span.separator {
+  width: 90%;
+  border-bottom: 2px solid var(--black);
+  margin: 0 auto;
 }

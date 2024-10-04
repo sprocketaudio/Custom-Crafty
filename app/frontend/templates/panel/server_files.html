@@ -11,9 +11,7 @@ end %} {% block content %}
           {{ translate('serverDetails', 'serverDetails', data['lang']) }} - {{
           data['server_stats']['server_id']['server_name'] }}
           <br />
-          <small
-            >UUID: {{ data['server_stats']['server_id']['server_id'] }}</small
-          >
+          <small>UUID: {{ data['server_stats']['server_id']['server_id'] }}</small>
         </h4>
       </div>
     </div>
@@ -38,113 +36,31 @@ end %} {% block content %}
               <noscript>
                 {{ translate('serverFiles', 'noscript', data['lang']) }}
               </noscript>
-              <div
-                id="files-tree-nav"
-                class="overlay"
-                style="background-color: #9f9daf !important"
-              >
+              <div id="files-tree-nav" class="overlay">
                 <!-- Button to close the overlay navigation -->
 
                 <!-- Overlay content -->
-                <div
-                  id="files-tree-nav-content"
-                  class="overlay-content"
-                  style="background-color: #9f9daf"
-                >
-                  <h4
-                    id="context-title"
-                    style="color: #4b00ff; text-align: center; padding: 3px"
-                  ></h4>
-                  <p
-                    style="
-                      width: 90%;
-                      border-bottom: 2px solid black;
-                      margin: 0 auto;
-                    "
-                  ></p>
-                  <a
-                    onclick="createFileE(event)"
-                    href="javascript:void(0)"
-                    id="createFile"
-                    href="#"
-                    >{{ translate('serverFiles', 'createFile', data['lang'])
-                    }}</a
-                  >
-                  <a
-                    onclick="createDirE(event)"
-                    href="javascript:void(0)"
-                    id="createDir"
-                    href="#"
-                    >{{ translate('serverFiles', 'createDir', data['lang'])
-                    }}</a
-                  >
-                  <a
-                    onclick="renameItemE(event)"
-                    href="javascript:void(0)"
-                    id="renameItem"
-                    href="#"
-                    >{{ translate('serverFiles', 'rename', data['lang']) }}</a
-                  >
-                  <a
-                    onclick="uploadFilesE(event)"
-                    href="javascript:void(0)"
-                    id="upload"
-                    href="#"
-                    >{{ translate('serverFiles', 'upload', data['lang']) }}</a
-                  >
-                  <a
-                    onclick="unzipFilesE(event)"
-                    href="javascript:void(0)"
-                    id="unzip"
-                    href="#"
-                    >{{ translate('serverFiles', 'unzip', data['lang']) }}</a
-                  >
-                  <a
-                    onclick="downloadFileE(event)"
-                    href="javascript:void(0)"
-                    id="downloadFile"
-                    href="#"
-                    >{{ translate('serverFiles', 'download', data['lang']) }}</a
-                  >
-                  <a
-                    onclick="deleteFileE(event)"
-                    href="javascript:void(0)"
-                    id="deleteFile"
-                    href="#"
-                    style="color: red"
-                    >{{ translate('serverFiles', 'delete', data['lang']) }}</a
-                  >
-                  <a
-                    onclick="deleteFileE(event)"
-                    href="javascript:void(0)"
-                    id="deleteDir"
-                    href="#"
-                    style="color: red"
-                    >{{ translate('serverFiles', 'delete', data['lang']) }}</a
-                  >
-                  <a
-                    href="javascript:void(0)"
-                    class="closebtn"
-                    style="color: var(--info)"
-                    onclick="document.getElementById('files-tree-nav').style.display = 'none';"
-                    >{{ translate('serverFiles', 'close', data['lang']) }}</a
-                  >
+                <div id="files-tree-nav-content" class="overlay-content">
+                  <h4 id="context-title" class="overlay-title"></h4>
+                  <span class="separator"></span>
+                  <a onclick="createFileE(event)" href="javascript:void(0)" id="createFile" href="#">{{ translate('serverFiles', 'createFile', data['lang'])
+                    }}</a>
+                  <a onclick="createDirE(event)" href="javascript:void(0)" id="createDir" href="#">{{ translate('serverFiles', 'createDir', data['lang'])
+                    }}</a>
+                  <a onclick="renameItemE(event)" href="javascript:void(0)" id="renameItem" href="#">{{ translate('serverFiles', 'rename', data['lang']) }}</a>
+                  <a onclick="uploadFilesE(event)" href="javascript:void(0)" id="upload" href="#">{{ translate('serverFiles', 'upload', data['lang']) }}</a>
+                  <a onclick="unzipFilesE(event)" href="javascript:void(0)" id="unzip" href="#">{{ translate('serverFiles', 'unzip', data['lang']) }}</a>
+                  <a onclick="downloadFileE(event)" href="javascript:void(0)" id="downloadFile" href="#">{{ translate('serverFiles', 'download', data['lang']) }}</a>
+                  <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteFile" href="#" class="text-danger">{{ translate('serverFiles', 'delete', data['lang']) }}</a>
+                  <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteDir" href="#" class="text-danger">{{ translate('serverFiles', 'delete', data['lang']) }}</a>
+                  <a href="javascript:void(0)" class="closebtn" style="color: var(--info)" onclick="document.getElementById('files-tree-nav').style.display = 'none';">{{ translate('serverFiles', 'close', data['lang']) }}</a>
                 </div>
               </div>
 
               <ul class="tree-view">
                 <li>
-                  <div
-                    id="root_dir"
-                    class="tree-ctx-item"
-                    data-path="{{ data['server_stats']['server_id']['path'] }}"
-                  >
-                    <span
-                      id="{{ data['server_stats']['server_id']['path'] }}span"
-                      class="files-tree-title tree-caret-down root-dir"
-                      data-path="{{ data['server_stats']['server_id']['path'] }}"
-                      onclick="getToggleMain(event)"
-                    >
+                  <div id="root_dir" class="tree-ctx-item" data-path="{{ data['server_stats']['server_id']['path'] }}">
+                    <span id="{{ data['server_stats']['server_id']['path'] }}span" class="files-tree-title tree-caret-down root-dir" data-path="{{ data['server_stats']['server_id']['path'] }}" onclick="getToggleMain(event)">
                       <i class="far fa-folder"></i>
                       <i class="far fa-folder-open"></i>
                       {{ translate('serverFiles', 'files', data['lang']) }}
@@ -169,63 +85,35 @@ end %} {% block content %}
                 <div id="editorParent">
                   {{ translate('serverFiles', 'editingFile', data['lang']) }}
                   <span id="editingFile"></span>
-                  <div
-                    id="editor"
-                    onresize="editor.resize()"
-                    style="resize: both; width: 100%"
-                  >
+                  <div id="editor" onresize="editor.resize()" style="resize: both; width: 100%">
                     file_contents
                   </div>
                   <br />
                 </div>
                 {{ translate('serverFiles', 'keybindings', data['lang']) }}:
                 <div class="btn-group" role="group">
-                  <button
-                    onclick="setKeyboard(event.target)"
-                    class="btn btn-primary"
-                    data-handler-name="null"
-                  >
+                  <button onclick="setKeyboard(event.target)" class="btn btn-primary" data-handler-name="null">
                     {{ translate('serverFiles', 'default', data['lang']) }}
                   </button>
-                  <button
-                    onclick="setKeyboard(event.target)"
-                    class="btn btn-secondary"
-                    data-handler-name="ace/keyboard/vim"
-                  >
+                  <button onclick="setKeyboard(event.target)" class="btn btn-secondary" data-handler-name="ace/keyboard/vim">
                     Vim
                   </button>
-                  <button
-                    onclick="setKeyboard(event.target)"
-                    class="btn btn-secondary"
-                    data-handler-name="ace/keyboard/emacs"
-                  >
+                  <button onclick="setKeyboard(event.target)" class="btn btn-secondary" data-handler-name="ace/keyboard/emacs">
                     Emacs
                   </button>
-                  <button
-                    onclick="setKeyboard(event.target)"
-                    class="btn btn-secondary"
-                    data-handler-name="ace/keyboard/sublime"
-                  >
+                  <button onclick="setKeyboard(event.target)" class="btn btn-secondary" data-handler-name="ace/keyboard/sublime">
                     Sublime
                   </button>
-                  <span class="d-none d-md-block"
-                    >&nbsp;&nbsp;&nbsp;<button
-                      class="btn btn-info"
-                      id="screen-size"
-                    >
+                  <span class="d-none d-md-block">&nbsp;&nbsp;&nbsp;<button class="btn btn-info" id="screen-size">
                       {{ translate('serverFiles', 'size', data['lang']) }}
-                    </button></span
-                  >
+                    </button></span>
                 </div>
                 <h3 id="file_warn"></h3>
                 <button class="btn btn-success" onclick="save()">
                   <i class="fas fa-save"></i> {{ translate('serverFiles',
                   'save', data['lang']) }}
                 </button>
-                <span
-                  style="color: #2fb689; margin-left: 10px"
-                  id="save_status"
-                ></span>
+                <span class="text-success ml-2" id="save_status"></span>
               </div>
             </div>
           </div>
@@ -234,18 +122,11 @@ end %} {% block content %}
     </div>
   </div>
 </div>
-<link
-  rel="stylesheet"
-  href="/static/assets/css/partial/crafty-filemanager.css"
-/>
+<link rel="stylesheet" href="/static/assets/css/partial/crafty-filemanager.css" />
 <!-- content-wrapper ends -->
 
 {% end %} {% block js %}
-<script
-  src="/static/assets/vendors/ace-builds/src-min/ace.js"
-  type="text/javascript"
-  charset="utf-8"
-></script>
+<script src="/static/assets/vendors/ace-builds/src-min/ace.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
   const serverId = new URLSearchParams(document.location.search).get("id");
@@ -509,12 +390,11 @@ end %} {% block content %}
    * @param {boolean} saved
    */
   const setSaveStatus = (saved) => {
-    document.getElementById("save_status").innerHTML = `<i class="${
-      saved ? "fa-solid fa-file-circle-check" : "fa-regular fa-file"
-    }"></i>`;
+    document.getElementById("save_status").innerHTML = `<i class="${saved ? "fa-solid fa-file-circle-check" : "fa-regular fa-file"
+      }"></i>`;
     document.getElementById("save_status").style.color = saved
-      ? "#2fb689"
-      : "gray";
+      ? "var(--success)"
+      : "var(--gray)";
   };
   ["change", "undo", "redo"].forEach((event) =>
     editor.on(event, (event) =>
