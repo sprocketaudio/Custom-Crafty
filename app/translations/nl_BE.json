@@ -234,10 +234,14 @@
         "activityLog": "Activiteitslogboeken",
         "backupComplete": "Back-up succesvol voltooid voor server {}",
         "backupStarted": "Backup gestart voor server {}",
+        "backup_desc": "We hebben gedetecteerd dat de back-upmigratie mogelijk gedeeltelijk of volledig is mislukt. Controleer uw back-uprecords op het tabblad Backups.",
+        "backup_title": "Waarschuwing voor back-upmigratie",
         "downloadLogs": "Ondersteuningslogboeken downloaden?",
         "finishedPreparing": "We zijn klaar met het voorbereiden van uw ondersteuningslogboeken. Klik op download om te downloaden",
         "logout": "Uitloggen",
         "preparingLogs": "  Een ogenblik geduld alstublieft terwijl wij uw logboeken voorbereiden... We sturen een bericht als ze klaar zijn. Dit kan een tijdje duren voor grote implementaties.",
+        "schedule_desc": "We hebben gedetecteerd dat sommige of alle geplande taken niet succesvol zijn overgedragen tijdens de upgrade. Controleer uw schema's op het tabblad Schema's.",
+        "schedule_title": "Waarschuwing voor schemamigratie",
         "supportLogs": "Ondersteuningslogboeken"
     },
     "offline": {

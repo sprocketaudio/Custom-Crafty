@@ -231,10 +231,14 @@
         "activityLog": "Activity Logs",
         "backupComplete": "Backup completed successfully for server {}",
         "backupStarted": "Backup started for server {}",
+        "backup_desc": "We detected the backup migration may have partially or fully failed. Please confirm your backups records on the backups tab.",
+        "backup_title": "Backup Migration Warning",
         "downloadLogs": "Download Support Logs?",
         "finishedPreparing": "We've finished preparing your support logs. Please click download to download",
         "logout": "Logout",
         "preparingLogs": " Please wait while we prepare your logs... We`ll send a notification when they`re ready. This may take a while for large deployments.",
+        "schedule_desc": "We detected some or all of your scheduled tasks were not successfully transfered during the upgrade. Please confirm your schedules in the schedules tab.",
+        "schedule_title": "Schedules Migration Warning",
         "supportLogs": "Support Logs"
     },
     "offline": {

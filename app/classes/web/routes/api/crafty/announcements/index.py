@@ -29,7 +29,7 @@ class ApiAnnounceIndexHandler(BaseApiHandler):
             _,
         ) = auth_data
 
-        data = self.helper.get_announcements()
+        data = self.helper.get_announcements(auth_data[4]["lang"])
         if not data:
             return self.finish_json(
                 424,

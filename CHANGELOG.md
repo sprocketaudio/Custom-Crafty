@@ -1,5 +1,5 @@
 # Changelog
-## --- [4.4.4] - 2024/TBD
+## --- [4.4.5] - 2024/TBD
 ### New features
 TBD
 ### Bug fixes
@@ -8,6 +8,15 @@ TBD
 TBD
 ### Lang
 TBD
+<br><br>
+
+## --- [4.4.4] - 2024/10/03
+### Bug fixes
+- Migrations | Fix orphan schedule configurations crashing migration operation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/796))
+- Fix logic issue causing bedrock wizard's root files buttons to not respond to user click events ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/797))
+- Reset crash detection counter after crash detection process detects successful start ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/798))
+- Update new bedrock DL url and correctly bubble up exception on DL fail - Thanks @sarcastron ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/802))
+- Bump cryptography for GHSA-h4gh-qq45-vh27 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/803))
 <br><br>
 
 ## --- [4.4.3] - 2024/08/08

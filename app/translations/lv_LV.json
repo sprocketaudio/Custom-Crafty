@@ -235,10 +235,14 @@
         "activityLog": "Aktivitātes Logi",
         "backupComplete": "Dublējums veiksmīgi pabeigts priekš servera ",
         "backupStarted": "Dublējums startēts priekš servera ",
+        "backup_desc": "Mēs noteicām ka dublējuma migrācija daļēji vai pilnīgi neizdevās. Lūdzu pārskatiet savus dublējumus dublējumu cilnē.",
+        "backup_title": "Dublējuma Migrācijas Brīdinājums",
         "downloadLogs": "Lejupielādēt Atbalsta Log Failus?",
         "finishedPreparing": "Mēs esam pabeiguši sagatavot jūsu atbalsta log datnes. Lūdzu nospiediet lejupielādet lai lejupielādētu",
         "logout": "Iziet",
         "preparingLogs": " Lūdzu uzgaidiet kamēr mēs sagatavojam jūsu log datnes... Mēs jums nosūtīsim paziņojumu kad tās būs gatavas. Tas var aizņemt kādu laiku priekš lielām instalācijām.",
+        "schedule_desc": "Mēs noteicām ka daži vai visi no jūsu darbību grafikiem nebija veiksmīgi pārnesti atjauninājuma laikā. Lūdzu pārskatiet savus grafikus grafiku cilnē.",
+        "schedule_title": "Grafiku Migrācijas Brīdinājums",
         "supportLogs": "Atbalsta Logi"
     },
     "offline": {

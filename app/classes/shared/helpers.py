@@ -58,6 +58,7 @@ class Helpers:
 
     def __init__(self):
         self.root_dir = os.path.abspath(os.path.curdir)
+        self.read_annc = False
         self.config_dir = os.path.join(self.root_dir, "app", "config")
         self.webroot = os.path.join(self.root_dir, "app", "frontend")
         self.servers_dir = os.path.join(self.root_dir, "servers")
@@ -79,6 +80,7 @@ class Helpers:
 
         self.translation = Translation(self)
         self.update_available = False
+        self.migration_notifications = []
         self.ignored_names = ["crafty_managed.txt", "db_stats"]
         self.crafty_starting = False
         self.minimum_password_length = 8
@@ -130,24 +132,33 @@ class Helpers:
                 "Chrome/104.0.0.0 Safari/537.36"
             ),
         }
-        target_win = 'https://minecraft.azureedge.net/bin-win/[^"]*'
-        target_linux = 'https://minecraft.azureedge.net/bin-linux/[^"]*'
-
+        target_win = 'https://www.minecraft.net/bedrockdedicatedserver/bin-win/[^"]*'
+        target_linux = (
+            'https://www.minecraft.net/bedrockdedicatedserver/bin-linux/[^"]*'
+        )
         try:
             # Get minecraft server download page
             # (hopefully the don't change the structure)
             download_page = get(url, headers=headers, timeout=1)
-
+            download_page.raise_for_status()
             # Search for our string targets
-            win_download_url = re.search(target_win, download_page.text).group(0)
-            linux_download_url = re.search(target_linux, download_page.text).group(0)
+            win_search_result = re.search(target_win, download_page.text)
+            linux_search_result = re.search(target_linux, download_page.text)
+            if win_search_result is None or linux_search_result is None:
+                raise RuntimeError(
+                    "Could not determine download URL from minecraft.net."
+                )
 
+            win_download_url = win_search_result.group(0)
+            linux_download_url = linux_search_result.group(0)
+            print(win_download_url, linux_download_url)
             if os.name == "nt":
                 return win_download_url
 
             return linux_download_url
         except Exception as e:
             logger.error(f"Unable to resolve remote bedrock download url! \n{e}")
+            raise e
         return False
 
     def get_execution_java(self, value, execution_command):
@@ -627,11 +638,49 @@ class Helpers:
 
         return version_data
 
-    def get_announcements(self):
+    def check_migrations(self) -> None:
+        if self.read_annc is False:
+            self.read_annc = True
+            for file in os.listdir(
+                os.path.join(self.root_dir, "app", "migrations", "status")
+            ):
+                with open(
+                    os.path.join(self.root_dir, "app", "migrations", "status", file),
+                    "r",
+                    encoding="utf-8",
+                ) as notif_file:
+                    file_json = json.load(notif_file)
+                    for notif in file_json:
+                        if not file_json[notif].get("status"):
+                            self.migration_notifications.append(file_json[notif])
+
+    def get_announcements(self, lang=None):
         try:
             data = []
             response = requests.get("https://craftycontrol.com/notify", timeout=2)
             data = json.loads(response.content)
+            if not lang:
+                lang = self.get_setting("language")
+            self.check_migrations()
+            for migration_warning in self.migration_notifications:
+                if not migration_warning.get("status"):
+                    data.append(
+                        {
+                            "id": migration_warning.get("pid"),
+                            "title": self.translation.translate(
+                                "notify",
+                                f"{migration_warning.get('type')}_title",
+                                lang,
+                            ),
+                            "date": "",
+                            "desc": self.translation.translate(
+                                "notify",
+                                f"{migration_warning.get('type')}_desc",
+                                lang,
+                            ),
+                            "link": "",
+                        }
+                    )
             if self.update_available:
                 data.append(self.update_available)
             return data

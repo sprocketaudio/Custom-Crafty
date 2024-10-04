@@ -1,4 +1,5 @@
 import os
+import json
 import datetime
 import uuid
 import peewee
@@ -13,9 +14,9 @@ from app.classes.shared.file_helpers import FileHelpers
 logger = logging.getLogger(__name__)
 
 
-def is_valid_backup(backup, all_servers):
+def is_valid_entry(entry, all_servers):
     try:
-        return str(backup.server_id) in all_servers
+        return str(entry.server_id) in all_servers
     except (TypeError, peewee.DoesNotExist):
         return False
 
@@ -24,6 +25,8 @@ def migrate(migrator: Migrator, database, **kwargs):
     """
     Write your migrations here.
     """
+    backup_migration_status = True
+    schedule_migration_status = True
     db = database
     Console.info("Starting Backups migrations")
     Console.info(
@@ -161,10 +164,20 @@ def migrate(migrator: Migrator, database, **kwargs):
         row.server_id for row in Servers.select(Servers.server_id).distinct()
     ]
     all_backups = Backups.select()
+    all_schedules = Schedules.select()
     Console.info("Cleaning up orphan backups for all servers")
     valid_backups = [
-        backup for backup in all_backups if is_valid_backup(backup, all_servers)
+        backup for backup in all_backups if is_valid_entry(backup, all_servers)
     ]
+    if len(valid_backups) < len(all_backups):
+        backup_migration_status = False
+        print("Orphan backup found")
+    Console.info("Cleaning up orphan schedules for all servers")
+    valid_schedules = [
+        schedule for schedule in all_schedules if is_valid_entry(schedule, all_servers)
+    ]
+    if len(valid_schedules) < len(all_schedules):
+        schedule_migration_status = False
     # Copy data from the existing backups table to the new one
     for backup in valid_backups:
         Console.info(f"Trying to get server for backup migration {backup.server_id}")
@@ -221,13 +234,20 @@ def migrate(migrator: Migrator, database, **kwargs):
     Console.debug("Migrations: Dropping backup_path from servers table")
     migrator.drop_columns("servers", ["backup_path"])
 
-    for schedule in Schedules.select():
+    for schedule in valid_schedules:
         action_id = None
         if schedule.command == "backup_server":
             Console.info(
                 f"Migrations: Adding backup ID to task with name {schedule.name}"
             )
-            backup = NewBackups.get(NewBackups.server_id == schedule.server_id)
+            try:
+                backup = NewBackups.get(NewBackups.server_id == schedule.server_id)
+            except:
+                schedule_migration_status = False
+                Console.error(
+                    "Could not find backup with selected server ID. Omitting from register."
+                )
+                continue
             action_id = backup.backup_id
         NewSchedules.create(
             schedule_id=schedule.schedule_id,
@@ -254,6 +274,34 @@ def migrate(migrator: Migrator, database, **kwargs):
     Console.debug("Migrations: renaming new_schedules to schedules")
     # Rename the new table to backups
     migrator.rename_table("new_schedules", "schedules")
+
+    with open(
+        os.path.join(
+            os.path.abspath(os.path.curdir),
+            "app",
+            "migrations",
+            "status",
+            "20240308_multi-backup.json",
+        ),
+        "w",
+        encoding="utf-8",
+    ) as file:
+        file.write(
+            json.dumps(
+                {
+                    "backup_migration": {
+                        "type": "backup",
+                        "status": backup_migration_status,
+                        "pid": str(uuid.uuid4()),
+                    },
+                    "schedule_migration": {
+                        "type": "schedule",
+                        "status": schedule_migration_status,
+                        "pid": str(uuid.uuid4()),
+                    },
+                }
+            )
+        )
 
 
 def rollback(migrator: Migrator, database, **kwargs):
