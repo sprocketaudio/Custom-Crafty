@@ -187,11 +187,11 @@ td::-webkit-scrollbar {
 }
 
 .mc-log-error {
-    color: #af463f;
+    color: var(--danger);
 }
 
 .mc-log-fatal {
-    color: #da0f00;
+    color: var(--red);
 }
 
 .mc-log-keyword {
@@ -211,16 +211,6 @@ body {
     background-color: var(--dark) !important;
     /* Firefox */
 }
-
-/* Webkit */
-/* Didn't really work out
-::-webkit-scrollbar { background-color: #202538; }
-::-webkit-scrollbar-button { background-color: #1D212F; }
-::-webkit-scrollbar-thumb { background-color: #777A86; }
-::-webkit-scrollbar-thumb:hover { background-color: #646773; }
-
-::-webkit-scrollbar-track { background-color: #202538; }
-::-webkit-scrollbar-corner { background-color: #202538; }*/
 
 .actions_serverlist>a>i {
     cursor: pointer;
