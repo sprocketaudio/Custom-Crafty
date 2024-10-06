@@ -30,28 +30,44 @@ body.sidebar-icon-only .navbar-toggler .mdi-chevron-double-left {
     text-transform: none;
 }
 
-.mw-25 {
-    max-width: 25% !important;
+.vw-40 {
+    width: 40vw !important;
 }
 
-.mh-25 {
-    max-height: 25% !important;
+.vh-40 {
+    height: 40vh !important;
+}
+
+.mw-25 {
+    max-width: 25% !important;
 }
 
 .mw-50 {
     max-width: 50% !important;
 }
 
-.mh-50 {
-    max-height: 50% !important;
-}
-
 .mw-75 {
     max-width: 75% !important;
 }
 
+.mw-80 {
+    max-width: 80% !important;
+}
+
+.mh-25 {
+    max-height: 25% !important;
+}
+
+.mh-50 {
+    max-height: 50% !important;
+}
+
 .mh-75 {
     max-height: 75% !important;
+}
+
+.mh-80 {
+    max-height: 80% !important;
 }
 
 /**************************************************************/
