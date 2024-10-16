@@ -3,7 +3,7 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Bump requests to resolve yank for CVE-2024-35195 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/808))
 ### Tweaks
 TBD
 ### Lang
