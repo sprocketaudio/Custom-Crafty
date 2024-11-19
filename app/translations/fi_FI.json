@@ -127,12 +127,12 @@
                 "pdf": "PDF",
                 "print": "Tulosta"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Tietoja ei löytynyt",
             "info": "Näytetään rivit _START_ - _END_ (yhteensä _TOTAL_ )",
             "infoEmpty": "Näytetään 0 - 0 (yhteensä 0)",
             "infoFiltered": "(suodatettu _MAX_ tuloksen joukosta)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Näytä kerralla _MENU_ riviä",
             "loadingRecords": "Ladataan...",
             "paginate": {

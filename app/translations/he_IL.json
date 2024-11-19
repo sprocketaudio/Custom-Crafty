@@ -143,12 +143,12 @@
                 "pdf": "PDF",
                 "print": "הדפסה"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "אין נתונים זמינים בטבלה",
             "info": "רשומות _TOTAL_ מ _END_ עד _START_ מראה",
             "infoEmpty": "מציג 0 עד 0 מתוך 0 ערכים",
             "infoFiltered": "(רשומות _MAX_ מסונן מתוך)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "רשומות _MENU_ הצגת",
             "loadingRecords": "...טוען",
             "paginate": {

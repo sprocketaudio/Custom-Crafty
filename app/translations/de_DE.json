@@ -143,12 +143,12 @@
                 "pdf": "PDF",
                 "print": "Drucken"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Keine Daten in der Tabelle verfügbar",
             "info": "Zeige _START_ bis _END_ von insges. _TOTAL_ Einträge(n)",
             "infoEmpty": "Zeige 0 bis 0 von insges. 0 Einträgen",
             "infoFiltered": "(gefiltert von _MAX_ maximalen Einträgen)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Zeige _MENU_ Einträge",
             "loadingRecords": "Laden...",
             "paginate": {

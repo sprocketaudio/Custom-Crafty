@@ -149,12 +149,12 @@
                 "pdf": "PDF",
                 "print": "Tisk"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "V tabulce nejsou k dispozici žádné údaje",
             "info": "Zobrazeno _START_ až _END_ z _TOTAL_ záznamů",
             "infoEmpty": "Zobrazeno 0 až 0 z 0 záznamů",
             "infoFiltered": "(filtrováno z _MAX_ celkových záznamů)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Zobrazit položky _MENU_",
             "loadingRecords": "Načítání...",
             "paginate": {

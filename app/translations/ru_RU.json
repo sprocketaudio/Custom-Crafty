@@ -142,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "Печать"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Данные в таблице отсутствуют",
             "info": "Отображение от _START_ до _END_ из _TOTAL_ записей",
             "infoEmpty": "Отображение от 0 до 0 из 0 записей",
             "infoFiltered": "(отфильтровано по _MAX_ количеству записей)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Показывать записи _MENU_",
             "loadingRecords": "Загрузка...",
             "paginate": {

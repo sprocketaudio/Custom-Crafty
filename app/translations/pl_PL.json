@@ -143,12 +143,12 @@
                 "pdf": "PDF",
                 "print": "Wydrukuj"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Brak danych w tej tabeli danych",
             "info": "Pokazywanie od _START_ do _END_ z _TOTAL_ wszystkich wejść",
             "infoEmpty": "Pokazywanie 0 do 0 z 0 wejść",
             "infoFiltered": "(Pokazuje z _MAX_ wejść)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Pokazuj _MENU_ wejść",
             "loadingRecords": "Wczytywanie...",
             "paginate": {
