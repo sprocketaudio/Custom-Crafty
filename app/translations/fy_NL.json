@@ -126,12 +126,12 @@
                 "pdf": "PDF",
                 "print": "Ôfdrukke"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Gjin gegevens beskikber yn tabel",
             "info": "Toant _START_ oant _END_ fan _TOTAL_ ynstjoerings",
             "infoEmpty": "Toant 0 oan 0 fan 0 ynstjoerings",
             "infoFiltered": "(filtrearre út _MAX_ totaal ynstjoerings)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Lit _MENU_ ynstjoerings sjen",
             "loadingRecords": "Laden...",
             "paginate": {

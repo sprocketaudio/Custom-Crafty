@@ -3,11 +3,12 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Bump requests to resolve yank for CVE-2024-35195 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/808))
 ### Tweaks
 TBD
 ### Lang
-TBD
+- Weblate Translation Platform Integration
+- Remove incomplete labels from translation files to better support new translation workflow  ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/810))
 <br><br>
 
 ## --- [4.4.4] - 2024/10/03

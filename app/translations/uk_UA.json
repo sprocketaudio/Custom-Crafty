@@ -143,12 +143,12 @@
                 "pdf": "PDF",
                 "print": "Друк"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Немає даних у цій таблиці",
             "info": "Показ _START_ до _END_ з _TOTAL_ рядків",
             "infoEmpty": "Показ 0 до 0 з 0 рядків",
             "infoFiltered": "(відфльтровано з _MAX_ загалом рядків)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Показати _MENU_ рядки",
             "loadingRecords": "Завантаження...",
             "paginate": {

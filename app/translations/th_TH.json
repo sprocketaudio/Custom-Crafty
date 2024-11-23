@@ -143,12 +143,12 @@
                 "pdf": "PDF",
                 "print": "Print"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "ไม่มีข้อมูลในตาราง",
             "info": "แสดงรายการ _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
             "infoEmpty": "แสดงรายการ 0 ถึง 0 จากทั้งหมด 0 รายการ",
             "infoFiltered": "(กรองจากรายการทั้งหมด _MAX_ รายการ)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "แสดง _MENU_ รายการ",
             "loadingRecords": "กำลังโหลด...",
             "paginate": {

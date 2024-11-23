@@ -143,12 +143,12 @@
                 "pdf": "PDF",
                 "print": "Afdrukken"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Geen data beschikbaar in de tabel",
             "info": "_START_ tot _END_ van _TOTAL_ inzendingen weergeven",
             "infoEmpty": "0 tot 0 van 0 items weergeven",
             "infoFiltered": "(gefilterd uit _MAX_ totale inzendingen)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Toon _MENU_ items",
             "loadingRecords": "Bezig met laden...",
             "paginate": {

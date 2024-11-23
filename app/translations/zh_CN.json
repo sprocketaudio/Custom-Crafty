@@ -143,12 +143,12 @@
                 "pdf": "PDF",
                 "print": "打印"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "数据表中没有可用的数据",
             "info": "正在显示从 _START_ 到 _END_ 的共 _TOTAL_ 个项目",
             "infoEmpty": "正在显示从 0 到 0 的共 0 个项目",
             "infoFiltered": "（从 _MAX_ 个项目中筛选出）",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "显示 _MENU_ 个项目",
             "loadingRecords": "正在加载……",
             "paginate": {

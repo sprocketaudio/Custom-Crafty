@@ -143,12 +143,12 @@
                 "pdf": "PDF",
                 "print": "Yazdır"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Tabloda veri bulunmuyor",
             "info": "_TOTAL_ kayıttan _START_ - _END_ arasındaki kayıtlar gösteriliyor",
             "infoEmpty": "0 kayıttan 0 - 0 arasındaki kayıtlar gösteriliyor",
             "infoFiltered": "(_MAX_ kayıt içerisinden filtrelenen)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "_MENU_ kayıt göster",
             "loadingRecords": "Yükleniyor...",
             "paginate": {

@@ -144,12 +144,12 @@
                 "pdf": "PDF",
                 "print": "Drukāt"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Tabulā nav pieejami dati",
             "info": "Attēlo _START_ līdz _END_ no _TOTAL_ ierakstiem",
             "infoEmpty": "Attēlo 0 līdz 0 no 0 ierakstiem",
             "infoFiltered": "(filtrēts no _MAX_ kopējiem ierkstiem)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Attēlo _MENU_ ierakstus",
             "loadingRecords": "Ielādē...",
             "paginate": {
