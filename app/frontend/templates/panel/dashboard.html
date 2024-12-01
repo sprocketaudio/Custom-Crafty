@@ -617,8 +617,8 @@
       setTimeout(function(){
         $('.modal').modal('hide');
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error
+        title: responseData.error,
+        message: responseData.error_data
       });
       }, 2000)
     }
@@ -1024,8 +1024,8 @@
       } else {
 
         bootbox.alert({
-          title: responseData.status,
-          message: responseData.error
+          title: responseData.error,
+          message: responseData.error_data
         });
       }
     }

@@ -261,7 +261,11 @@ class PublicHandler(BaseHandler):
             )
             return self.finish_json(
                 403,
-                {"status": "error", "error": error_msg},
+                {
+                    "status": "error",
+                    "error": "INVALID CREDENTIALS",
+                    "error_data": error_msg,
+                },
             )
         else:
             self.redirect("/login?")

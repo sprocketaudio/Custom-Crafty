@@ -122,7 +122,7 @@ data['lang']) }}{% end %}
                           name="lang" form="user_form">
                           {% for lang in data['languages'] %}
                           {% if not 'incomplete' in lang %}
-                          <option value="{{lang}}" >{{translate('language', lang, 'humanized_index')}}</option>
+                          <option value="{{lang}}" >{{translate('language', lang, 'humanized_index', False)}}</option>
                           {% else %}
                           <option value="{{lang}}" disabled>{{lang}}</option>
                           {% end %}
@@ -547,7 +547,7 @@ data['lang']) }}{% end %}
 
               bootbox.alert({
                 title: responseData.error,
-                message: responseData.error
+                message: responseData.error_data
               });
             }
         }

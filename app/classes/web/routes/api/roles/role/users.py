@@ -16,7 +16,16 @@ class ApiRolesRoleUsersHandler(BaseApiHandler):
         ) = auth_data
 
         if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         all_user_ids = self.controller.users.get_all_user_ids()
 
