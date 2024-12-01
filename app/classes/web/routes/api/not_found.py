@@ -6,7 +6,12 @@ class ApiNotFoundHandler(BaseApiHandler):
     def _not_found(self, page: str) -> None:
         self.finish_json(
             404,
-            {"status": "error", "error": "API_HANDLER_NOT_FOUND", "page": page},
+            {
+                "status": "error",
+                "error": "API_HANDLER_NOT_FOUND",
+                "error_data": f"{page} not found",
+                "page": page,
+            },
         )
 
     head = _not_found  # type: Callable[..., Optional[Awaitable[None]]]

@@ -672,7 +672,26 @@
         "uses": "Aantal toegestane gebruiken (-1==Geen Limiet)"
     },
     "validators": {
-        "passLength": "Wachtwoord te kort. Minimumlengte: 8 tekens"
+        "passLength": "Wachtwoord te kort. Minimumlengte: 8 tekens",
+        "backupName": "De naam van de back-up moet een string zijn en een minimale lengte van 3 hebben.",
+        "enumErr": "validatie mislukt. Accepteerbare gegevens zijn: ",
+        "filesPageLen": "De lengte moet groter zijn dan 1 voor eigenschap",
+        "insufficientPerms": "Machtigingsfout: Ontbrekende machtigingen voor deze resource",
+        "roleManager": "Rollenbeheerder moet van het type integer (manager-ID) of None zijn",
+        "roleName": "De rolnaam moet een string zijn die groter is dan 1 teken. Deze mag geen van de volgende symbolen bevatten: [ ] , ",
+        "roleServerId": "De eigenschap Server ID moet een string zijn met een minimale lengte van 1",
+        "roleServerPerms": "Servermachtigingen moeten een 8-bits string zijn",
+        "serverCreateName": "De servernaam moet een string zijn met een minimale lengte van 2 en mag niet bevatten: \\ / of # ",
+        "serverExeCommand": "Het serveruitvoeringscommando moet een string zijn met een minimale lengte van 1.",
+        "serverLogPath": "Het pad naar het serverlogboek moet een string zijn met een minimale lengte van 1",
+        "taskIntervalType": "Het type taakinterval moet een van de volgende zijn: ",
+        "typeBool": "moet true of false zijn (type boolean)",
+        "typeEmail": "moet van het type e-mail zijn.",
+        "typeInteger": "moet een getal zijn.",
+        "typeIntMinVal0": "moet een geheel getal zijn met een minimale waarde van 0.",
+        "typeList": "moet van het type lijst/array zijn ",
+        "typeString": "moet van het type string zijn.",
+        "userName": " moet van het type string zijn, volledig in KLEINE LETTERS, minimaal 4 tekens en maximaal 20 tekens"
     },
     "webhooks": {
         "areYouSureDel": "Weet u zeker dat u deze webhook wilt verwijderen?",
