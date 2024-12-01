@@ -235,7 +235,11 @@
         "finishedPreparing": "I HAS FINISHD PREPARIN UR FISH. PLZ CLICK DOWNLOAD 2 DOWNLOAD",
         "logout": "GO BYE BYE",
         "preparingLogs": " PLZ WAIT WHILE I GATHR UR FISHZ... ILL MAK NOIZE WHEN THEY`RE READY. DIS CUD TAEK WHILE  IF UR HOUZ IZ HOOJ.",
-        "supportLogs": "SUPPORT FISHIEZ"
+        "supportLogs": "SUPPORT FISHIEZ",
+        "schedule_desc": "WE NOTICED SOME OR ALL UR SCHEDULED FISH DIDN’T MOVE RIGHT DURING DA UPGRADE. PLS CONFIRM ALL UR FISH IN DA SCHEDULES TAB.",
+        "backup_desc": "WE NOTICED DA BACKUP MIGRASHUN MIGHTA GONE BOOM. PLS CHECK UR BACKUP RECORDZ ON DA BACKUP TAB.",
+        "backup_title": "BACKUP MIGRASHUN OOPSIE",
+        "schedule_title": "SCHEDULES MIGRASHUN OOPSIE"
     },
     "offline": {
         "offline": "NOT HEREZ",
