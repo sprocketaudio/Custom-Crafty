@@ -563,7 +563,7 @@
     },
     "serverWizard": {
         "absoluteServerPath": "Ruta absoluta del servidor",
-        "absoluteZipPath": "Ruta absoluta  servidor",
+        "absoluteZipPath": "Ruta absoluta servidor",
         "addRole": "Añadir Servidor a grupos existentes...",
         "autoCreate": "Si ninguno es seleccionado, ¡Crafty creara uno!",
         "bePatient": "Por favor tenga paciencia, mientras se ' + (importing ? 'importa' :  'descarga') + ' el servidor.",
