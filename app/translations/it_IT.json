@@ -235,7 +235,9 @@
         "finishedPreparing": "Abbiamo finito di preparare i tuoi registri di supporto.Per favore clicca Scarica per scaricarli",
         "logout": "Disconnessione",
         "preparingLogs": "Per favore aspetta mentre prepariamo i tuoi registri... Ti invieremo una notifica quando saranno pronti. Potrebbe volerci un po' per installazioni grosse.",
-        "supportLogs": "Registri di supporto"
+        "supportLogs": "Registri di supporto",
+        "backup_desc": "Abbiamo rilevato che la migrazione del backup potrebbe essere parzialmente o completamente fallita. Controlla i backup effettuati nella scheda Backup.",
+        "backup_title": "Avviso migrazione di backup"
     },
     "offline": {
         "offline": "Disconnesso",
