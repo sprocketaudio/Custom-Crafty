@@ -1,7 +1,7 @@
 # yamllint disable rule:line-length
 ---
 win-dev-build:
-  stage: dev-deployment
+  stage: build-and-deploy
   tags:
     - win64
   cache:
@@ -48,7 +48,7 @@ win-dev-build:
       - app\classes\**\*
 
 win-prod-build:
-  stage: prod-deployment
+  stage: build-and-deploy
   tags:
     - win64
   cache:
