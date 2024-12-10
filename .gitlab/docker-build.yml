@@ -23,7 +23,7 @@ docker-build:
     # Scheduled nightly builds on main
     - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       variables:
-        ENVIRONMENT_NAME: "production"
+        ENVIRONMENT_NAME: "nightly"
         DOCKER_TAGS: "$CI_REGISTRY_IMAGE:nightly arcadiatechnology/crafty-4:nightly"
 
   environment:
@@ -105,4 +105,4 @@ docker-build:
     - echo "Please review multi-arch manifests are present:"
     - if [ "$ENVIRONMENT_NAME" = "development" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"; fi
     - if [ "$ENVIRONMENT_NAME" = "production" ] && [ -n "$VERSION" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:$VERSION"; fi
-    - if echo "$DOCKER_TAGS" | grep -q "nightly"; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:nightly"; fi
+    - if [ "$ENVIRONMENT_NAME" = "nightly" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:nightly"; fi
