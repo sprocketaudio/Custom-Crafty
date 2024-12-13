@@ -359,6 +359,11 @@ class FileHelpers:
         return True
 
     @staticmethod
+    def restore_archive(archive_location, destination):
+        with zipfile.ZipFile(archive_location, "r") as zip_ref:
+            zip_ref.extractall(destination)
+
+    @staticmethod
     def unzip_file(zip_path, server_update=False):
         ignored_names = ["server.properties", "permissions.json", "allowlist.json"]
         # Get directory without zipfile name

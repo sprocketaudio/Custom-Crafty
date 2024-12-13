@@ -1228,17 +1228,6 @@ class Helpers:
         return output
 
     @staticmethod
-    def unzip_backup_archive(backup_path, zip_name):
-        zip_path = os.path.join(backup_path, zip_name)
-        if Helpers.check_file_perms(zip_path):
-            temp_dir = tempfile.mkdtemp()
-            with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                # extracts archive to temp directory
-                zip_ref.extractall(temp_dir)
-            return temp_dir
-        return False
-
-    @staticmethod
     def remove_prefix(text, prefix):
         if text.startswith(prefix):
             return text[len(prefix) :]
