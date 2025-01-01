@@ -225,7 +225,8 @@
         "login": "Log In",
         "password": "Password",
         "username": "Username",
-        "viewStatus": "View Public Status Page"
+        "viewStatus": "View Public Status Page",
+        "totp": "Enter The Authenticator Code"
     },
     "notify": {
         "activityLog": "Activity Logs",

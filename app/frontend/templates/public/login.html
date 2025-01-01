@@ -77,8 +77,9 @@
                   box-shadow: 0 12px 16px 0 hsla(0, 0%, 0%, 0.4);
                 }
               </style>
-              <form id="login-form" data-query="{{ data.get('query', None) }}">
+              <form id="login-form">
                 {% raw xsrf_form_html() %}
+                <div id="login-inputs"></div>
                 <div class="form-group">
                   <label class="label">{{ translate('login', 'username', data['lang']) }}</label>
                   <div class="input-group">
@@ -111,7 +112,8 @@
                 </div>
 
                 <div class="text-block text-center my-3">
-                  <span class="text-small font-weight-semibold"><a href="https://craftycontrol.com/">Crafty Control</a> </span>
+                  <span class="text-small font-weight-semibold"><a href="https://craftycontrol.com/">Crafty Control</a>
+                  </span>
                 </div>
 
                 <div class="text-block text-center my-3">
@@ -142,6 +144,16 @@
   <script src="../static/assets/vendors/js/bootbox.min.js"></script>
   <!-- endinject -->
   <script>
+
+    TOTP_INPUT = `<div class="form-group">
+                  <label class="label">{{ translate('login', 'totp', data['lang']) }}</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control login-text-input login-input"
+                      placeholder="000000" name="totp" id="totp"
+                      required="true">
+                  </div>
+                </div>`
+
     $(document).ready(function () {
       let login_opacity_div = document.getElementById('login_opacity');
       let opacity = login_opacity_div.getAttribute('data-value');
@@ -171,7 +183,7 @@
 
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
-      let res = await fetch(`/login`, {
+      let res = await fetch(`/api/v2/auth/login/`, {
         method: 'POST',
         headers: {
           'X-XSRFToken': formDataObject._xsrf,
@@ -184,12 +196,11 @@
       });
       let responseData = await res.json();
       if (responseData.status === "ok") {
-        console.log("OK")
-        if ($("#login-form").data("query")) {
-          location.href = `${$("#login-form").data("query")}`;
-        } else {
-          location.href = `/panel/dashboard`
+        if (responseData.data["totp"]) {
+          $("#login-inputs").html()
         }
+        console.log("OK")
+        location.href = `/panel/dashboard`
       } else {
         $("#error-field").html(responseData.error);
       }

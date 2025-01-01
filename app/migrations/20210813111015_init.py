@@ -185,6 +185,48 @@ def migrate(migrator, database, **kwargs):
             table_name = "backups"
             database = db
 
+    class TOTPData(peewee.Model):
+        """Model for user TOTP methods.
+
+        Consists of:
+        UUID PK
+        Foreign key user ID
+        totp secret
+
+        Args:
+            BaseModel (_type_): _description_
+        """
+
+        entry = peewee.CharField(primary_key=True, default="", index=True)
+        name = peewee.CharField(default="TOTP")
+        user = peewee.ForeignKeyField(Users, backref="totp_user")
+        totp_secret = peewee.CharField()
+
+        class Meta:
+            table_name = "totp_data"
+            database = db
+
+    class TOTPRecovery(peewee.Model):
+        """Model for user TOTP recovery.
+        Consists of:
+        UUID PK
+        user_id foreign key field
+        the recovery secret
+
+        We will try to limit users to only 6 backup codes.
+
+        Args:
+            BaseModel (_type_): _description_
+        """
+
+        entry = peewee.CharField(primary_key=True, default="", index=True)
+        user = peewee.ForeignKeyField(Users, backref="totp_user")
+        recovery_secret = peewee.CharField()
+
+        class Meta:
+            table_name = "totp_recovery"
+            database = db
+
     migrator.create_table(Backups)
     migrator.create_table(Users)
     migrator.create_table(Roles)
@@ -198,6 +240,8 @@ def migrate(migrator, database, **kwargs):
     migrator.create_table(Commands)
     migrator.create_table(Audit_Log)
     migrator.create_table(Schedules)
+    migrator.create_table(TOTPData)
+    migrator.create_table(TOTPRecovery)
 
 
 def rollback(migrator, database, **kwargs):

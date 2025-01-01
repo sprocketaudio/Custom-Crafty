@@ -20,3 +20,4 @@ tzlocal==5.1
 jsonschema==4.19.1
 orjson==3.9.15
 prometheus-client==0.17.1
+pyotp==2.9.0

@@ -12,6 +12,7 @@ from app.classes.shared.tasks import TasksManager
 from app.classes.shared.migration import MigrationManager
 from app.classes.shared.main_controller import Controller
 from app.classes.shared.websocket_manager import WebSocketManager
+from app.classes.controllers.totp_controller import TOTPController
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,24 @@ class MainPrompt(cmd.Cmd):
             self.migration_manager.create(migration_name, False)
         else:
             Console.info("Unknown migration command")
+
+    def do_verify(self, line):
+        try:
+            parts = line.split("|")
+            username = str(parts[0]).lower().strip()
+            code = str(parts[1]).lower().strip()
+            print(username)
+            user_id = self.controller.users.get_id_by_name(username)
+            Console.info(
+                f"TOTP RESULT {self.controller.totp.verify_user_totp(user_id, code)}"
+            )
+        except Exception as e:
+            Console.error(f"BOOOO {e}")
+
+    def do_create_totp(self, line):
+        username = str(line).lower().strip()
+        user_id = self.controller.users.get_id_by_name(username)
+        self.controller.totp.create_user_totp("Test", user_id)
 
     def do_set_passwd(self, line):
         try:
