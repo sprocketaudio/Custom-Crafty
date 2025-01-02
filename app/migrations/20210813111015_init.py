@@ -197,7 +197,7 @@ def migrate(migrator, database, **kwargs):
             BaseModel (_type_): _description_
         """
 
-        entry = peewee.CharField(primary_key=True, default="", index=True)
+        id = peewee.CharField(primary_key=True, default="", index=True)
         name = peewee.CharField(default="TOTP")
         user = peewee.ForeignKeyField(Users, backref="totp_user")
         totp_secret = peewee.CharField()
@@ -219,7 +219,7 @@ def migrate(migrator, database, **kwargs):
             BaseModel (_type_): _description_
         """
 
-        entry = peewee.CharField(primary_key=True, default="", index=True)
+        id = peewee.CharField(primary_key=True, default="", index=True)
         user = peewee.ForeignKeyField(Users, backref="totp_user")
         recovery_secret = peewee.CharField()
 
