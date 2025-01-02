@@ -1,17 +1,8 @@
 import logging
-import datetime
-import typing as t
 
 from peewee import (
     ForeignKeyField,
     CharField,
-    AutoField,
-    IntegerField,
-    DateTimeField,
-    BooleanField,
-    CompositeKey,
-    DoesNotExist,
-    JOIN,
 )
 
 from app.classes.shared.helpers import Helpers
@@ -33,7 +24,7 @@ class TOTPData(BaseModel):
         BaseModel (_type_): _description_
     """
 
-    entry = CharField(primary_key=True, default=Helpers.create_uuid())
+    id = CharField(primary_key=True, default=Helpers.create_uuid)
     name = CharField(default="TOTP")
     user = ForeignKeyField(Users, backref="totp_user")
     totp_secret = CharField()
@@ -55,7 +46,7 @@ class TOTPRecovery(BaseModel):
         BaseModel (_type_): _description_
     """
 
-    entry = CharField(primary_key=True, default=Helpers.create_uuid())
+    id = CharField(primary_key=True, default=Helpers.create_uuid)
     user = ForeignKeyField(Users, backref="recovery_user")
     recovery_secret = CharField()
 
@@ -67,7 +58,26 @@ class HelperTOTP:
     def __init__(self, database):
         self.database = database
 
+    ####################################################################################
+    # TOTP OPTERATIONAL METHODS
+    ####################################################################################
+
     @staticmethod
     def create_user_totp(name: str, user: Users, user_secret: str) -> str:
         totp_id = TOTPData.create(name=name, user=user, totp_secret=user_secret)
         return totp_id
+
+    def delete_totp_entry(self, totp_id: str) -> bool:
+        with self.database.atomic():
+            return TOTPData.delete().where(TOTPData.id == totp_id).execute()
+
+    ####################################################################################
+    # TOTP REOVERY METHODS
+    ####################################################################################
+
+    def add_recovery_codes(self, user: object, codes: list):
+        data = []
+        for code in codes:
+            data.append({"user": user, "recovery_secret": f"{code}"})
+        with self.database.atomic():
+            TOTPRecovery.insert_many(data).execute()

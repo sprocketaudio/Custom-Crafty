@@ -168,6 +168,10 @@ class UsersController:
         return HelperUsers.get_user(user_id)
 
     @staticmethod
+    def get_user_object(user_id) -> object:
+        return HelperUsers.get_by_id(user_id)
+
+    @staticmethod
     def update_server_order(user_id, user_server_order):
         HelperUsers.update_server_order(user_id, user_server_order)
 
