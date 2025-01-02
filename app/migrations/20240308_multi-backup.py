@@ -8,7 +8,7 @@ import logging
 
 from app.classes.shared.helpers import Helpers
 from app.classes.shared.console import Console
-from app.classes.shared.migration import Migrator
+from app.classes.shared.migration import Migrator, MigrateHistory
 from app.classes.shared.file_helpers import FileHelpers
 
 logger = logging.getLogger(__name__)
@@ -25,6 +25,12 @@ def migrate(migrator: Migrator, database, **kwargs):
     """
     Write your migrations here.
     """
+    this_migration = MigrateHistory.get_or_none(
+        MigrateHistory.name == "20240308_multi-backup"
+    )
+    if this_migration is not None:
+        Console.debug("Update database already done, skipping this part")
+        return
     backup_migration_status = True
     schedule_migration_status = True
     db = database
