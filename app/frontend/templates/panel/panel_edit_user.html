@@ -52,6 +52,11 @@ data['lang']) }}{% end %}
                 aria-selected="false">
                 <i class="fas fa-key"></i>{{ translate('userConfig', 'apiKey', data['lang']) }}</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/panel/edit_user_otp?id={{ data['user']['user_id'] }}"
+                  role="tab" aria-selected="true">
+                  <i class="fa-solid fa-shield-halved"></i>{{ translate('userConfig', 'totpHeader', data['lang']) }}</a>
+          </li>
             {% end %}
           </ul>
 

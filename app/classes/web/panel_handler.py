@@ -1504,6 +1504,31 @@ class PanelHandler(BaseHandler):
 
             template = "panel/panel_edit_user_apikeys.html"
 
+        elif page == "edit_user_otp":
+            user_id = self.get_argument("id", None)
+            user_obj = self.controller.users.get_user_object(user_id)
+            page_data["user"] = self.controller.users.get_user_by_id(user_id)
+
+            codes = []
+            user_totp = list(user_obj.totp_user)
+
+            for totp in user_totp:
+                codes.append({"name": totp.name, "id": totp.id})
+
+            page_data["totp"] = codes
+            # self.controller.crafty_perms.list_defined_crafty_permissions()
+
+            if user_id is None:
+                self.redirect("/panel/error?error=Invalid User ID")
+                return
+            if int(user_id) != exec_user["user_id"] and not exec_user["superuser"]:
+                self.redirect(
+                    "/panel/error?error=You are not authorized to view this page."
+                )
+                return
+
+            template = "panel/panel_edit_user_otp.html"
+
         elif page == "remove_user":
             # pylint: disable=no-member
             user_id = nh3.clean(self.get_argument("id", None))

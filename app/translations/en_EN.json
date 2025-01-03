@@ -247,6 +247,18 @@
         "offline": "Offline",
         "pleaseConnect": "Please connect to the internet to use Crafty."
     },
+    "otp": {
+        "name": "Name",
+        "id": "ID",
+        "config": "Config",
+        "delete": "Delete",
+        "deleteConfirm": "Are you sure you want to delete this 2FA method?",
+        "yes": "Yes",
+        "no": "No",
+        "2faCreate": "Add New 2FA Method",
+        "backupCodes": "New 2FA method created. Please copy your backup codes.",
+        "confirm2FA": "Please Confirm Authenticator Code"
+    },
     "panelConfig": {
         "adminControls": "Admin Controls",
         "allowedServers": "Allowed Servers",
@@ -646,6 +658,7 @@
         "delSuper": "You cannot delete a super user",
         "deleteUser": "Delete user: ",
         "deleteUserB": "Delete User",
+        "editTOTP": "Edit user MFA",
         "enabled": "Enabled",
         "gravDesc": "This email is strictly for use with Gravatar™. Crafty will not, under any circumstance make use of this email for anything other than looking up your Gravatar™",
         "gravEmail": "Gravatar™ Email",
@@ -665,6 +678,7 @@
         "selectManager": "Select Manager for User",
         "super": "Super User",
         "totpIdReq": "TOTP ID Required for request",
+        "totpHeader": "TOTP",
         "userLang": "User Language",
         "userName": "User Name",
         "userNameDesc": "What do you want to call this user?",

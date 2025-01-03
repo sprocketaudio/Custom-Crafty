@@ -1,0 +1,234 @@
+{% extends ../base.html %}
+
+{% block meta %}
+{% end %}
+
+{% block title %}Crafty Controller - {{ translate('userConfig', 'editTOTP', data['lang']) }}{% end %}
+
+{% block content %}
+
+<div class="content-wrapper">
+
+    <!-- Page Title Header Starts-->
+    <div class="row page-title-header">
+        <div class="col-12">
+            <div class="page-header">
+                <h4 class="page-title">
+                    {{ translate('userConfig', 'editTOTP', data['lang']) }} - {{ data['user']['user_id'] }}
+                    <br />
+                    <small>UID: {{ data['user']['user_id'] }}</small>
+                </h4>
+            </div>
+        </div>
+
+    </div>
+    <!-- Page Title Header Ends-->
+
+    <div class="row">
+
+        <div class="col-sm-12 grid-margin">
+            <div class="card">
+                <div class="card-body  pt-0">
+                    <ul class="nav nav-tabs col-md-12 tab-simple-styled " role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/panel/edit_user?id={{ data['user']['user_id'] }}&subpage=config"
+                                role="tab" aria-selected="false">
+                                <i class="fas fa-cogs"></i>{{ translate('userConfig', 'config', data['lang']) }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/panel/edit_user_apikeys?id={{ data['user']['user_id'] }}"
+                                role="tab" aria-selected="true">
+                                <i class="fas fa-key"></i>{{ translate('apiKeys', 'apiKeys', data['lang']) }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/panel/edit_user_otp?id={{ data['user']['user_id'] }}"
+                                role="tab" aria-selected="true">
+                                <i class="fa-solid fa-shield-halved"></i>{{ translate('userConfig', 'totpHeader',
+                                data['lang']) }}</a>
+                        </li>
+                    </ul>
+
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="card">
+                                <div class="card-header header-sm d-flex justify-content-between align-items-center">
+                                    <h4 class="card-title"><i class="fas fa-key"></i>{{ translate('apiKeys', 'apiKeys',
+                                        data['lang']) }}</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr class="rounded">
+                                                        <!--<th>ID</th>-->
+                                                        <th>{{ translate('otp', 'name', data['lang']) }}</th>
+                                                        <th>{{ translate('otp', 'id', data['lang']) }}</th>
+                                                        <th>{{ translate('otp', 'config', data['lang']) }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for otp in data['totp'] %}
+                                                    <tr>
+                                                        <td>
+                                                            <span>
+                                                                {{ otp['name'] }}
+                                                            </span>
+                                                        </td>
+                                                        <td>{{ otp['id'] }}</td>
+                                                        <td><button class="btn btn-danger delete-api-key"
+                                                                data-key-id="{{ otp['id'] }}"
+                                                                data-key-name="{{ otp['name'] }}">{{translate('otp',
+                                                                'delete', data['lang'])}}</button>
+                                                        </td>
+                                                    </tr>
+                                                    {% end %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<!-- content-wrapper ends -->
+
+{% end %}
+
+{% block js %}
+<script>
+
+
+    //used to get cookies from browser - this is part of tornados xsrf protection - it's for extra security
+    function getCookie(name) {
+        var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+        return r ? r[1] : undefined;
+    }
+    const userId = new URLSearchParams(document.location.search).get('id')
+    $(document).ready(function () {
+        $("#user_api_form").on("submit", async function (e) {
+            e.preventDefault();
+            const token = getCookie("_xsrf")
+            let apiForm = document.getElementById("user_api_form");
+
+            let formData = new FormData(apiForm);
+
+            //Create an object from the form data entries
+            let formDataObject = Object.fromEntries(formData.entries());
+            //We need to make sure these are sent regardless of whether or not they're checked
+            formDataObject.disabled_language_files = $('#lang_select').val();
+            $('#user_api_form input[type="checkbox"]:checked').each(function () {
+                if ($(this).val() == 'True') {
+                    formDataObject[this.name] = true;
+                } else {
+                    formDataObject[this.name] = false;
+                }
+            });
+            let server_permissions = $('.server_perm').map(function () {
+                if (this.checked) {
+                    return "1";
+                } else {
+                    return "0"
+                }
+            }).get();
+            server_permissions = server_permissions.join("");
+
+            let crafty_permissions = $('.crafty_perm').map(function () {
+                if (this.checked) {
+                    return "1";
+                } else {
+                    return "0"
+                }
+            }).get();
+            crafty_permissions = crafty_permissions.join("");
+            console.log(server_permissions);
+            console.log(crafty_permissions);
+            console.log(formDataObject);
+            // Format the plain form data as JSON
+            let formDataJsonString = JSON.stringify({
+                "name": formDataObject.name,
+                "server_permissions_mask": server_permissions,
+                "crafty_permissions_mask": crafty_permissions,
+                "full_access": $("#full_access").prop('checked'),
+            });
+            console.log(formDataJsonString);
+
+            let res = await fetch(`/api/v2/users/${userId}/key/`, {
+                method: 'PATCH',
+                headers: {
+                    'X-XSRFToken': token
+                },
+                body: formDataJsonString,
+            });
+            let responseData = await res.json();
+            if (responseData.status === "ok") {
+                location.reload();
+            } else {
+
+                bootbox.alert({
+                    title: responseData.error,
+                    message: responseData.error_data
+                });
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        console.log("ready!");
+        $('.delete-api-key').click(async function () {
+            let keyId = $(this).data("key-id");
+            let token = getCookie("_xsrf");
+            let res = await fetch(`/api/v2/users/${userId}/key/${keyId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-XSRFToken': token
+                },
+            });
+            let responseData = await res.json();
+            if (responseData.status === "ok") {
+                location.reload()
+            } else {
+
+                bootbox.alert({
+                    title: responseData.error,
+                    message: responseData.error_data
+                });
+            }
+        })
+        $('.get-a-token').click(async function () {
+            let keyId = $(this).data("key-id");
+            let keyName = $(this).data("key-name");
+            let token = getCookie("_xsrf");
+            let res = await fetch(`/api/v2/users/${userId}/key/${keyId}`, {
+                method: 'GET',
+                headers: {
+                    'X-XSRFToken': token
+                },
+            });
+            let responseData = await res.json();
+            if (responseData.status === "ok") {
+                bootbox.alert({
+                    title: `API token for ${keyName}`,
+                    message: `Here is an API token for ${keyName}:\n<pre style="white-space: pre-wrap;color:white;word-break:break-all;background: grey;border-radius: 5px;">${responseData.data}</pre>`
+                });
+            } else {
+
+                bootbox.alert({
+                    title: responseData.error,
+                    message: responseData.error_data
+                });
+            }
+        });
+    });
+
+</script>
+
+{% end %}
