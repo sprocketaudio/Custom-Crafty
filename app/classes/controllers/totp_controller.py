@@ -36,7 +36,7 @@ class TOTPController:
         for i in range(num_codes):
             code = str(self.helper.random_string_generator(16))
             hashed_codes.append(self.helper.encode_pass(code.lower()))
-            plain_text_codes.append(re.sub(r"(\w{4})", r"\1-", code).upper())
+            plain_text_codes.append(re.sub(r"(\w{4})(?=\w)", r"\1-", code).upper())
             i += 1
         self.totp_helper.add_recovery_codes(user, hashed_codes)
         return plain_text_codes
