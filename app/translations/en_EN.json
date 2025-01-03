@@ -257,7 +257,9 @@
         "no": "No",
         "2faCreate": "Add New 2FA Method",
         "backupCodes": "New 2FA method created. Please copy your backup codes.",
-        "confirm2FA": "Please Confirm Authenticator Code"
+        "confirm2FA": "Please Confirm Authenticator Code",
+        "otpTitle": "2FA Methods",
+        "newOTP": "Add New TOTP"
     },
     "panelConfig": {
         "adminControls": "Admin Controls",
@@ -687,7 +689,7 @@
         "userSettings": "User Settings",
         "userTheme": "UI Theme",
         "uses": "Number of uses allowed (-1==No Limit)",
-        "optReq": "TOTP is required for super users. You cannot remove your only TOTP method."
+        "otpReq": "TOTP is required for super users. You cannot remove your only TOTP method."
     },
     "validators": {
         "backupName": "Backup name must be a string and a minimum length of 3.",

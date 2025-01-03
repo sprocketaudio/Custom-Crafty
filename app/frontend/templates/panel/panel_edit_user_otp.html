@@ -6,7 +6,6 @@
 {% block title %}Crafty Controller - {{ translate('userConfig', 'editTOTP', data['lang']) }}{% end %}
 
 {% block content %}
-
 <div class="content-wrapper">
 
     <!-- Page Title Header Starts-->
@@ -52,8 +51,13 @@
                         <div class="col-md-12 col-sm-12">
                             <div class="card">
                                 <div class="card-header header-sm d-flex justify-content-between align-items-center">
-                                    <h4 class="card-title"><i class="fas fa-key"></i>{{ translate('apiKeys', 'apiKeys',
+                                    <h4 class="card-title"><i class="fas fa-key"></i>&nbsp;{{ translate('otp',
+                                        'otpTitle',
                                         data['lang']) }}</h4>
+                                    <div><button class="btn btn-primary" id="createButton"><i
+                                                class="fas fa-plus-circle"></i>
+                                            &nbsp; {{
+                                            translate('otp', 'newOTP', data['lang']) }}</button></div>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
@@ -69,16 +73,20 @@
                                                 </thead>
                                                 <tbody>
                                                     {% for otp in data['totp'] %}
-                                                    <tr>
+                                                    <tr id="{{otp['id']}}">
                                                         <td>
                                                             <span>
                                                                 {{ otp['name'] }}
                                                             </span>
                                                         </td>
                                                         <td>{{ otp['id'] }}</td>
-                                                        <td><button class="btn btn-danger delete-api-key"
-                                                                data-key-id="{{ otp['id'] }}"
-                                                                data-key-name="{{ otp['name'] }}">{{translate('otp',
+                                                        <td><button class="btn btn-danger delete-totp"
+                                                                data-totp-id="{{ otp['id'] }}"
+                                                                data-totp-name="{{ otp['name'] }}"
+                                                                data-delete-warn="{{translate('otp', 'deleteConfirm', data['lang'])}}"
+                                                                data-yes="{{translate('otp', 'yes',
+                                                                data['lang'])}}"
+                                                                data-no="{{ translate('otp', 'no', data['lang'])}}">{{translate('otp',
                                                                 'delete', data['lang'])}}</button>
                                                         </td>
                                                     </tr>
@@ -97,7 +105,6 @@
         </div>
     </div>
 
-
 </div>
 <!-- content-wrapper ends -->
 
@@ -105,130 +112,137 @@
 
 {% block js %}
 <script>
+    // Function to generate the TOTP QR code URL
+    function generateTotpQrCode(secret, user, issuer) {
+        const otpAuthUrl = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(user)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}`;
 
-
-    //used to get cookies from browser - this is part of tornados xsrf protection - it's for extra security
-    function getCookie(name) {
-        var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
-        return r ? r[1] : undefined;
+        $('#qrcode').empty(); // Clear any existing QR code
+        new QRCode(document.getElementById('qrcode'), {
+            text: otpAuthUrl,
+            width: 300, // Adjust size
+            height: 300,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.L
+        });
     }
-    const userId = new URLSearchParams(document.location.search).get('id')
-    $(document).ready(function () {
-        $("#user_api_form").on("submit", async function (e) {
-            e.preventDefault();
-            const token = getCookie("_xsrf")
-            let apiForm = document.getElementById("user_api_form");
 
-            let formData = new FormData(apiForm);
+    // Function to create the modal response content
+    function createResponseDiv(data) {
+        let backupcodes = ``;
+        data["backup_codes"].forEach(element => {
+            backupcodes += `<li>${element}</li>`;
+        });
+        const contentHTML = `
+            <div class="col-sm-12 col-md-6">
+                <div id="qrcode"></div>
+                <span id="secret">${data["otp"]["totp_secret"]}</span>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <ul id="backupcodes">${backupcodes}</ul>
+            </div>
+        `;
+        let responseDIV = document.createElement("div");
+        responseDIV.setAttribute("id", "resContainer");
+        $(responseDIV).html(contentHTML);
 
-            //Create an object from the form data entries
-            let formDataObject = Object.fromEntries(formData.entries());
-            //We need to make sure these are sent regardless of whether or not they're checked
-            formDataObject.disabled_language_files = $('#lang_select').val();
-            $('#user_api_form input[type="checkbox"]:checked').each(function () {
-                if ($(this).val() == 'True') {
-                    formDataObject[this.name] = true;
-                } else {
-                    formDataObject[this.name] = false;
+        return responseDIV;
+    }
+
+    const userId = new URLSearchParams(document.location.search).get('id');
+    const token = getCookie("_xsrf");
+
+    // Create TOTP on button click
+    $("#createButton").click(function () {
+        bootbox.prompt({
+            title: "Enter the name for the new TOTP setup",
+            centerVertical: true,
+            callback: async function (result) {
+                if (!result) {
+                    return;
                 }
-            });
-            let server_permissions = $('.server_perm').map(function () {
-                if (this.checked) {
-                    return "1";
-                } else {
-                    return "0"
-                }
-            }).get();
-            server_permissions = server_permissions.join("");
-
-            let crafty_permissions = $('.crafty_perm').map(function () {
-                if (this.checked) {
-                    return "1";
-                } else {
-                    return "0"
-                }
-            }).get();
-            crafty_permissions = crafty_permissions.join("");
-            console.log(server_permissions);
-            console.log(crafty_permissions);
-            console.log(formDataObject);
-            // Format the plain form data as JSON
-            let formDataJsonString = JSON.stringify({
-                "name": formDataObject.name,
-                "server_permissions_mask": server_permissions,
-                "crafty_permissions_mask": crafty_permissions,
-                "full_access": $("#full_access").prop('checked'),
-            });
-            console.log(formDataJsonString);
-
-            let res = await fetch(`/api/v2/users/${userId}/key/`, {
-                method: 'PATCH',
-                headers: {
-                    'X-XSRFToken': token
-                },
-                body: formDataJsonString,
-            });
-            let responseData = await res.json();
-            if (responseData.status === "ok") {
-                location.reload();
-            } else {
-
-                bootbox.alert({
-                    title: responseData.error,
-                    message: responseData.error_data
+                let res = await fetch(`/api/v2/users/${userId}/totp/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-XSRFToken': token
+                    },
+                    body: JSON.stringify({ "name": result }),
                 });
+                let responseData = await res.json();
+                if (responseData.status === "ok") {
+                    let resdiv = createResponseDiv(responseData.data);
+                    bootbox.dialog({
+                        title: 'Your TOTP QR Code',
+                        message: resdiv, // Display the generated QR code
+                        buttons: {
+                            close: {
+                                label: 'Close',
+                                className: 'btn-secondary',
+                                callback: function () {
+                                    // Optional: Any cleanup logic
+                                }
+                            }
+                        }
+                    });
+
+                    // Generate the QR Code with the TOTP secret, user name, and issuer
+                    generateTotpQrCode(responseData.data["otp"]["totp_secret"], responseData.data["otp"]["user"]["username"], "CraftyController");
+                } else {
+                    bootbox.alert({
+                        title: responseData.error,
+                        message: responseData.error_data
+                    });
+                }
             }
         });
     });
 
-    $(document).ready(function () {
-        console.log("ready!");
-        $('.delete-api-key').click(async function () {
-            let keyId = $(this).data("key-id");
-            let token = getCookie("_xsrf");
-            let res = await fetch(`/api/v2/users/${userId}/key/${keyId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-XSRFToken': token
+    $('.delete-totp').click(function () {
+        let keyId = $(this).data("totp-id");
+        let yes = $(this).data("yes");
+        let no = $(this).data("no");
+        let warn = $(this).data("delete-warn")
+        let name = $(this).data("totp-name")
+        return bootbox.confirm({
+            message: `${warn}<br><br>${name}`,
+            buttons: {
+                confirm: {
+                    label: yes,
+                    className: 'btn-danger'
                 },
-            });
-            let responseData = await res.json();
-            if (responseData.status === "ok") {
-                location.reload()
-            } else {
-
-                bootbox.alert({
-                    title: responseData.error,
-                    message: responseData.error_data
-                });
-            }
-        })
-        $('.get-a-token').click(async function () {
-            let keyId = $(this).data("key-id");
-            let keyName = $(this).data("key-name");
-            let token = getCookie("_xsrf");
-            let res = await fetch(`/api/v2/users/${userId}/key/${keyId}`, {
-                method: 'GET',
-                headers: {
-                    'X-XSRFToken': token
-                },
-            });
-            let responseData = await res.json();
-            if (responseData.status === "ok") {
-                bootbox.alert({
-                    title: `API token for ${keyName}`,
-                    message: `Here is an API token for ${keyName}:\n<pre style="white-space: pre-wrap;color:white;word-break:break-all;background: grey;border-radius: 5px;">${responseData.data}</pre>`
-                });
-            } else {
-
-                bootbox.alert({
-                    title: responseData.error,
-                    message: responseData.error_data
-                });
+                cancel: {
+                    label: no,
+                    className: 'btn-secondary'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    deleteTOTP(keyId)
+                }
             }
         });
     });
 
+    // Delete TOTP on button click
+    async function deleteTOTP(keyId) {
+        console.log("CONFIRM DEAD")
+        let res = await fetch(`/api/v2/users/${userId}/totp/${keyId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-XSRFToken': token
+            },
+        });
+        let responseData = await res.json();
+        if (responseData.status === "ok") {
+            $(`#${keyId}`).remove();
+        } else {
+            bootbox.alert({
+                title: responseData.error,
+                message: responseData.error_data
+            });
+        }
+    };
 </script>
+<script src="../../static/assets/vendors/js/qrcode.min.js"></script>
 
 {% end %}

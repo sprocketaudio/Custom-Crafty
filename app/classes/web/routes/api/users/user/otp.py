@@ -234,14 +234,14 @@ class APIUsersTOTPHandler(BaseApiHandler):
                     "status": "error",
                     "error": "NOT_AUTHORIZED",
                     "error_data": self.helper.translation.translate(
-                        "userConfig", "optReq", self.helper.get_setting("language")
+                        "userConfig", "otpReq", self.helper.get_setting("language")
                     ),
                 },
             )
         self.controller.totp.delete_user_totp(totp_id)
         self.controller.management.add_to_audit_log(
             user.user_id,
-            f"deleted the user {user_id}",
+            f"deleted the user TOTP {totp_id}",
             server_id=None,
             source_ip=self.get_remote_ip(),
         )
