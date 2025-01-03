@@ -78,12 +78,13 @@ class APIUsersTOTPIndexHandler(BaseApiHandler):
         otp_name = data["name"]
         otp = self.controller.totp.create_user_totp(otp_name, user_id)
         recovery = self.controller.totp.create_missing_backup_codes(user_id)
-
+        otp_dict = model_to_dict(otp)
+        otp_dict["user"].pop("password", None)
         return self.finish_json(
             200,
             {
                 "status": "ok",
-                "data": {"otp": model_to_dict(otp), "backup_codes": recovery},
+                "data": {"otp": otp_dict, "backup_codes": recovery},
             },
         )
 
