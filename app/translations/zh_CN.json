@@ -602,7 +602,7 @@
         "serverName": "服务器名称",
         "serverPath": "服务器路径",
         "serverPort": "服务器端口",
-        "serverSelect": "服务器选择",
+        "serverSelect": "服务端选择",
         "serverType": "服务器类型",
         "serverUpload": "上传打包为 Zip 文件的服务器",
         "serverVersion": "服务器版本",
