@@ -20,8 +20,13 @@ login_schema = {
         "password": {"type": "string", "minLength": 4},
         "totp": {
             "type": "string",
-            "minLength": 6,
-            "maxLength": 6,
+            "pattern": r"^(\d{6})$",
+            "error": "2FAerror",
+        },
+        "backup_code": {
+            "type": "string",
+            "pattern": r"^(.{19})$",
+            "error": "2FAerror",
         },
     },
     "required": ["username", "password"],
@@ -41,26 +46,35 @@ class ApiAuthLoginHandler(BaseApiHandler):
             return self.finish_json(
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
-
+        print(data)
         try:
             validate(data, login_schema)
-        except ValidationError as e:
+        except ValidationError as why:
             logger.error(
                 "Invalid JSON schema for API"
                 f" login attempt from {self.get_remote_ip()}"
             )
+            offending_key = ""
+            if why.schema.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{offending_key} {self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.helper.get_setting("language"),
+            )} {why.schema.get("enum", "")}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
 
         username = data["username"]
         password = data["password"]
         totp = data.get("totp")
+        backup_code = data.get("backup_code")
         # pylint: disable=no-member
         user_data = Users.get_or_none(Users.username == username)
 
@@ -105,7 +119,35 @@ class ApiAuthLoginHandler(BaseApiHandler):
         totp_enabled = len(list(user_data.totp_user)) > 0
         # Check if user has TOTP and if we got any type of TOTP data in the login
         # payload
-        if totp_enabled and totp:
+        if totp_enabled and not totp and backup_code:
+            # Check for backup code
+            lowered_backup_code = str(backup_code).replace("-", "").lower()
+            for code in user_data.recovery_user:
+                totp_login_result = self.helper.verify_pass(
+                    lowered_backup_code, code.recovery_secret
+                )
+
+                # If we match a valid backup code we'll break out of the loop
+                if totp_login_result:
+                    valid_backup_code = code
+                    break
+            try:
+                self.controller.totp.remove_recovery_code(
+                    user_data.user_id, valid_backup_code
+                )
+            except RuntimeError:
+                self.finish_json(
+                    401,
+                    {
+                        "status": "error",
+                        "error": "INCORRECT_CREDENTIALS",
+                        "error_data": self.helper.translation.translate(
+                            "login", "incorrect", self.helper.get_setting("language")
+                        ),
+                    },
+                )
+            login_result = pass_login_result is True and totp_login_result is True
+        elif totp_enabled and totp:
             totp_login_result = self.controller.totp.verify_user_totp(
                 user_data.user_id, totp
             )

@@ -81,3 +81,7 @@ class HelperTOTP:
             data.append({"user": user, "recovery_secret": f"{code}"})
         with self.database.atomic():
             TOTPRecovery.insert_many(data).execute()
+
+    def remove_recovery_code(self, secret):
+        with self.database.atomic():
+            TOTPRecovery.delete().where(TOTPRecovery.id == secret).execute()

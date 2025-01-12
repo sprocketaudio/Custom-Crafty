@@ -40,3 +40,8 @@ class TOTPController:
             i += 1
         self.totp_helper.add_recovery_codes(user, hashed_codes)
         return plain_text_codes
+
+    def remove_recovery_code(self, user_id, recovery_code):
+        if user_id != recovery_code.user.user_id:
+            raise RuntimeError("Unable to verify user")
+        self.totp_helper.remove_recovery_code(recovery_code.id)
