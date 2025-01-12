@@ -6,6 +6,7 @@
 {% block title %}Crafty Controller - {{ translate('userConfig', 'editTOTP', data['lang']) }}{% end %}
 
 {% block content %}
+<link href="/static/assets/css/mfa.css" rel="stylesheet">
 <div class="content-wrapper">
 
     <!-- Page Title Header Starts-->
@@ -54,7 +55,9 @@
                                     <h4 class="card-title"><i class="fas fa-key"></i>&nbsp;{{ translate('otp',
                                         'otpTitle',
                                         data['lang']) }}</h4>
-                                    <div><button class="btn btn-primary" id="createButton"><i
+                                    <div><button class="btn btn-primary" id="createButton" data-backup-codes="{{
+                                        translate('otp', 'backupCodes', data['lang']) }}" data-backup-codes-max="{{
+                                            translate('otp', 'backupCodesMax', data['lang']) }}"><i
                                                 class="fas fa-plus-circle"></i>
                                             &nbsp; {{
                                             translate('otp', 'newOTP', data['lang']) }}</button></div>
@@ -129,17 +132,37 @@
 
     // Function to create the modal response content
     function createResponseDiv(data) {
-        let backupcodes = ``;
+        let backupcodes = `<ul class="list-group">`;
         data["backup_codes"].forEach(element => {
-            backupcodes += `<li>${element}</li>`;
+            backupcodes += `<li class="list-group-item">${element}</li>`;
         });
+        backupcodes += `</ul>`
+        if (data["backup_codes"].length == 0) {
+            backupcodes = `<div style="text-align: center; color: grey;">
+                            ${$("#createButton").data("backup-codes-max")}
+                            </div>`
+        }
+
         const contentHTML = `
-            <div class="col-sm-12 col-md-6">
-                <div id="qrcode"></div>
-                <span id="secret">${data["otp"]["totp_secret"]}</span>
-            </div>
-            <div class="col-sm-12 col-md-6">
-                <ul id="backupcodes">${backupcodes}</ul>
+            <div class="bootbox-custom-layout row">
+                <div class="left-panel col-md-6 col-12 d-flex flex-column align-items-center justify-content-center">
+                    <div id="qrcode" class="mb-3"></div>
+                    <ul class="list-group">
+                    <li class="list-group-item" id="secret">${data["otp"]["totp_secret"]}</li>
+                    <ul>
+                    
+                    <!-- Input and Verify button inline -->
+                    <div class="d-flex align-items-center mt-3">
+                        <input type="text" class="form-control me-2" placeholder="Enter code">
+                        <button class="btn btn-primary">Verify</button>
+                    </div>
+                </div>
+                <div class="right-panel col-md-6 col-12">
+                    <h4>${$("#createButton").data("backup-codes")}</h4>
+                    <ul class="list-group">
+                        ${backupcodes}
+                    </ul>
+                </div>
             </div>
         `;
         let responseDIV = document.createElement("div");
@@ -173,17 +196,20 @@
                     let resdiv = createResponseDiv(responseData.data);
                     bootbox.dialog({
                         title: 'Your TOTP QR Code',
+                        size: "large",
+                        closeButton: false,
                         message: resdiv, // Display the generated QR code
                         buttons: {
                             close: {
                                 label: 'Close',
-                                className: 'btn-secondary',
+                                className: 'bb-close-button',
                                 callback: function () {
                                     // Optional: Any cleanup logic
                                 }
                             }
                         }
                     });
+                    $(`.bb-close-button`).prop("disabled", true);
 
                     // Generate the QR Code with the TOTP secret, user name, and issuer
                     generateTotpQrCode(responseData.data["otp"]["totp_secret"], responseData.data["otp"]["user"]["username"], "CraftyController");

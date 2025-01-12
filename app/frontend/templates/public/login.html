@@ -112,7 +112,7 @@
                     </div>
                     <select required class="form-control form-control-lg select-css" id="2fa-type" name="type">
                       <option value="totp">{{ translate('login', 'totpSelect', data['lang']) }}</option>
-                      <option value="backupCode">{{ translate('login', 'backupCodeTitle', data['lang']) }}</option>
+                      <option value="backup_code">{{ translate('login', 'backupCodeTitle', data['lang']) }}</option>
                     </select>
                   </div>
                 </div>
@@ -206,10 +206,11 @@
         "password": formDataObject.password,
       }
       if (formDataObject.totp != "") {
+        let key = $("#2fa-type").val();
         body = {
           "username": formDataObject.username,
           "password": formDataObject.password,
-          "totp": formDataObject.totp,
+          [key]: formDataObject.totp,
         }
       }
       let res = await fetch(`/api/v2/auth/login/`, {

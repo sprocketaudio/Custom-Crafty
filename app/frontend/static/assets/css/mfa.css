@@ -1,0 +1,30 @@
+.bootbox-custom-layout {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.bootbox-custom-layout .left-panel {
+    flex: 1;
+    text-align: center;
+}
+
+.bootbox-custom-layout .right-panel {
+    flex: 1;
+}
+
+.bootbox-custom-layout .qr-code {
+    width: 100%;
+    max-width: 200px;
+    /* Adjust as needed */
+    margin: auto;
+}
+
+.bootbox-custom-layout .list-group {
+    margin-top: 10px;
+}
+
+.bootbox .modal-dialog {
+    max-width: 900px;
+    /* Wider modal */
+}

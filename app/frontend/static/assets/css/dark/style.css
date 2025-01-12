@@ -7899,7 +7899,7 @@ a.badge-dark.focus {
   display: block;
   padding: 0.75rem 1.25rem;
   margin-bottom: -1px;
-  background-color: var(--select-bg);
+  background-color: var(--outline);
   border: 1px solid rgba(0, 0, 0, 0.125);
 }
 

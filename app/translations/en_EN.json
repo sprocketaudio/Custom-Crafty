@@ -263,6 +263,8 @@
         "no": "No",
         "2faCreate": "Add New 2FA Method",
         "backupCodes": "New 2FA method created. Please copy your backup codes.",
+        "backupCodesMax": "A maximum of 6 back codes has already been reached.",
+        "saveWarn": "Make sure to save these backup codes or you could lose access",
         "confirm2FA": "Please Confirm Authenticator Code",
         "otpTitle": "2FA Methods",
         "newOTP": "Add New 2 Factor Auth"
@@ -698,6 +700,7 @@
         "otpReq": "TOTP is required for super users. You cannot remove your only TOTP method."
     },
     "validators": {
+        "2FAerror": "2 Factor code must be 6 digits (i.e. 000000) or a backup code of 16 characters separated every 4 by - (i.e. ABCD-EFGH-IJKL-MNOP)",
         "backupName": "Backup name must be a string and a minimum length of 3.",
         "enumErr": "failed validating. Acceptable data includes: ",
         "filesPageLen": "length must be greater than 1 for property",
