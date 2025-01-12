@@ -218,16 +218,22 @@
         "version": "Version"
     },
     "login": {
+        "2fa": "(If 2FA is Enabled)",
+        "2faRecovery": "Recover 2FA",
+        "backupCodeTitle": "Backup Code",
+        "backupCode": "Enter Backup Code",
+        "cancel": "Cancel",
         "defaultPath": "The password you entered is the default credential path, not the password. Please find the default password in that location.",
         "disabled": "User account disabled. Please contact your system administrator for more info.",
         "forgotPassword": "Forgot Password",
+        "totpSelect": "TOTP",
         "incorrect": "Incorrect username, password, or 2FA",
         "login": "Log In",
         "password": "Password",
+        "passwordRecovery": "Recover Password",
         "username": "Username",
         "viewStatus": "View Public Status Page",
-        "totp": "Enter Authenticator Code",
-        "2fa": "(If 2FA is Enabled)"
+        "totp": "Enter Authenticator Code"
     },
     "notify": {
         "activityLog": "Activity Logs",
@@ -259,7 +265,7 @@
         "backupCodes": "New 2FA method created. Please copy your backup codes.",
         "confirm2FA": "Please Confirm Authenticator Code",
         "otpTitle": "2FA Methods",
-        "newOTP": "Add New TOTP"
+        "newOTP": "Add New 2 Factor Auth"
     },
     "panelConfig": {
         "adminControls": "Admin Controls",
@@ -680,7 +686,7 @@
         "selectManager": "Select Manager for User",
         "super": "Super User",
         "totpIdReq": "TOTP ID Required for request",
-        "totpHeader": "TOTP",
+        "totpHeader": "Multi Factor Auth",
         "userLang": "User Language",
         "userName": "User Name",
         "userNameDesc": "What do you want to call this user?",

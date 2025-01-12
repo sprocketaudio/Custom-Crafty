@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/static/assets/vendors/flag-icon-css/css/flag-icon.min.css">
   <link rel="stylesheet" href="/static/assets/vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="/static/assets/vendors/typicons/typicons.css">
+  <link rel="stylesheet" href="/static/assets/css/login.css">
   <link rel="stylesheet" href="/static/assets/vendors/css/vendor.bundle.base.css">
   <link rel="manifest" href="/static/assets/crafty.webmanifest">
 
@@ -97,12 +98,22 @@
                   </div>
                 </div>
                 <div class="form-group">
-                  <label class="label">{{ translate('login', 'totp', data['lang']) }}&nbsp;<span
-                      class="badge badge-pill badge-info">{{ translate('login', '2fa', data['lang'])
+                  <label class="label" data-backupcode="{{ translate('login', 'backupCode', data['lang']) }}"
+                    data-2fa="{{ translate('login', 'totp', data['lang']) }}" id="multi-label"><span
+                      id="auth-code-label">{{
+                      translate('login', 'totp', data['lang']) }}</span>&nbsp;<span
+                      class="badge badge-pill badge-info">{{
+                      translate('login', '2fa', data['lang'])
                       }}</span></label>
-                  <div class="input-group">
-                    <input type="text" class="form-control login-text-input login-input" placeholder="000000"
-                      name="totp" id="totp">
+                  <div class="input-group flex-container">
+                    <div id="totp_container">
+                      <input type="text" class="form-control login-text-input login-input" placeholder="000000"
+                        name="totp" id="totp">
+                    </div>
+                    <select required class="form-control form-control-lg select-css" id="2fa-type" name="type">
+                      <option value="totp">{{ translate('login', 'totpSelect', data['lang']) }}</option>
+                      <option value="backupCode">{{ translate('login', 'backupCodeTitle', data['lang']) }}</option>
+                    </select>
                   </div>
                 </div>
                 <div class="form-group">
@@ -175,6 +186,13 @@
       bootbox.alert(responseData.data)
 
     }
+    $("#2fa-type").on("change", function () {
+      if ($("#2fa-type").val() === "backupCode") {
+        $("#auth-code-label").html($("#multi-label").data("backupcode"))
+      } else {
+        $("#auth-code-label").html($("#multi-label").data("2fa"))
+      }
+    })
     $("#login-form").on("submit", async function (e) {
       e.preventDefault();
       let loginForm = document.getElementById("login-form");
