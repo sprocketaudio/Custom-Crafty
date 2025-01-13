@@ -251,3 +251,50 @@ class APIUsersTOTPHandler(BaseApiHandler):
             200,
             {"status": "ok"},
         )
+
+
+class APIUsersTOTPRecovery(BaseApiHandler):
+    def get(self, user_id: str, totp_id=None):
+        auth_data = self.authenticate_user()
+        if not auth_data:
+            return
+        (
+            _,
+            exec_user_crafty_permissions,
+            _,
+            _,
+            user,
+            _,
+        ) = auth_data
+        if totp_id:
+            return
+
+        if user_id in ["@me", user["user_id"]]:
+            user_id = user["user_id"]
+            res_user = self.controller.users.get_user_object(user_id)
+        elif EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                },
+            )
+        else:
+            # has User_Config permission and isn't viewing self
+            res_user = self.controller.users.get_user_object(user_id)
+            if not res_user:
+                return self.finish_json(
+                    404,
+                    {
+                        "status": "error",
+                        "error": "USER_NOT_FOUND",
+                    },
+                )
+
+        user_totp = list(res_user.recovery_user)
+
+        self.finish_json(
+            200,
+            {"status": "ok", "data": {"backup_codes": user_totp}},
+        )

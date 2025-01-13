@@ -118,6 +118,7 @@ class ApiAuthLoginHandler(BaseApiHandler):
         totp_enabled = len(list(user_data.totp_user)) > 0
         # Check if user has TOTP and if we got any type of TOTP data in the login
         # payload
+        valid_backup_code = False
         if totp_enabled and not totp and backup_code:
             # Check for backup code
             lowered_backup_code = str(backup_code).replace("-", "").lower()
@@ -131,9 +132,10 @@ class ApiAuthLoginHandler(BaseApiHandler):
                     valid_backup_code = code
                     break
             try:
-                self.controller.totp.remove_recovery_code(
-                    user_data.user_id, valid_backup_code
-                )
+                if valid_backup_code:
+                    self.controller.totp.remove_recovery_code(
+                        user_data.user_id, valid_backup_code
+                    )
             except RuntimeError:
                 self.finish_json(
                     401,
@@ -152,7 +154,7 @@ class ApiAuthLoginHandler(BaseApiHandler):
             )
             # Check if both password auth and totp auth passed
             login_result = pass_login_result is True and totp_login_result is True
-        elif not totp_enabled and not totp:
+        elif (not totp_enabled and not totp) and (not totp_enabled and not backup_code):
             # If the user doesn't have TOTP enabled and they didn't send a TOTP code
             # We'll pass them through
             login_result = pass_login_result
@@ -178,7 +180,27 @@ class ApiAuthLoginHandler(BaseApiHandler):
             )
             token = self.controller.authentication.generate(user_data.user_id)
             self.set_current_user(user_data.user_id, token)
-            self.finish_json(
+            if valid_backup_code:
+                return self.finish_json(
+                    200,
+                    {
+                        "status": "ok",
+                        "data": {
+                            "token": token,
+                            "user_id": str(user_data.user_id),
+                            "page": "/panel/dashboard",
+                            "warning": self.helper.translation.translate(
+                                "login",
+                                "burnedBackupCode",
+                                self.controller.users.get_user_lang_by_id(
+                                    user_data.user_id
+                                ),
+                            ),
+                        },
+                    },
+                )
+
+            return self.finish_json(
                 200,
                 {
                     "status": "ok",

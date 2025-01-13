@@ -67,6 +67,7 @@ from app.classes.web.routes.api.users.user.permissions import (
 from app.classes.web.routes.api.users.user.otp import (
     APIUsersTOTPHandler,
     APIUsersTOTPIndexHandler,
+    APIUsersTOTPRecovery,
 )
 from app.classes.web.routes.api.users.user.api import ApiUsersUserKeyHandler
 from app.classes.web.routes.api.users.user.pfp import ApiUsersUserPfpHandler
@@ -170,6 +171,16 @@ def api_handlers(handler_args):
         (
             r"/api/v2/users/(@me)/?",
             ApiUsersUserIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/(@me)/totp/recovery/renew/?",
+            APIUsersTOTPRecovery,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/([0-9]+)/totp/recovery/renew/?",
+            APIUsersTOTPRecovery,
             handler_args,
         ),
         (

@@ -223,10 +223,21 @@
       });
       let responseData = await res.json();
       if (responseData.status === "ok") {
-        console.log("OK")
-        location.href = `/panel/dashboard`
+        if (responseData.data.warning) {
+          bootbox.alert({
+            message: responseData.data.warning,
+            callback: function () {
+              console.log("message answered");
+              // Redirect after the alert is acknowledged
+              location.href = responseData.data.page;
+            }
+          });
+        } else {
+          // Redirect immediately if no warning
+          location.href = responseData.data.page;
+        }
       } else {
-        $("#error-field").html(responseData.error);
+        $("#error-field").html(responseData.error_data);
       }
     });
   </script>

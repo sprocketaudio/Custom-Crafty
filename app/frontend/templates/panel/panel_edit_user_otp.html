@@ -55,7 +55,11 @@
                                     <h4 class="card-title"><i class="fas fa-key"></i>&nbsp;{{ translate('otp',
                                         'otpTitle',
                                         data['lang']) }}</h4>
-                                    <div><button class="btn btn-primary" id="createButton" data-backup-codes="{{
+                                    <div><button class="btn btn-primary" id="renewCodes"><i
+                                                class="fas fa-plus-circle"></i>
+                                            &nbsp; {{
+                                            translate('otp', 'renewRecovery', data['lang']) }}</button>&nbsp;<button
+                                            class="btn btn-primary" id="createButton" data-backup-codes="{{
                                         translate('otp', 'backupCodes', data['lang']) }}" data-backup-codes-max="{{
                                             translate('otp', 'backupCodesMax', data['lang']) }}"><i
                                                 class="fas fa-plus-circle"></i>
@@ -129,6 +133,26 @@
             correctLevel: QRCode.CorrectLevel.L
         });
     }
+    $("#renewCodes").click(async function () {
+        let res = await fetch(`/api/v2/users/${userId}/totp/recovery/renew/`, {
+            method: 'GET',
+            headers: {
+                'X-XSRFToken': token
+            },
+        });
+        let responseData = await res.json();
+        let backupcodes = `<ul class="list-group">`;
+        responseData["backup_codes"].forEach(element => {
+            backupcodes += `<li class="list-group-item">${element}</li>`;
+        });
+        backupcodes += `</ul>`
+        if (data["backup_codes"].length == 0) {
+            backupcodes = `<div style="text-align: center; color: grey;">
+                    ${$("#createButton").data("backup-codes-max")}
+            </div>`
+        }
+        bootbox.alert(backupcodes);
+    });
 
     // Function to create the modal response content
     function createResponseDiv(data) {

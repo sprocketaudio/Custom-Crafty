@@ -222,6 +222,7 @@
         "2faRecovery": "Recover 2FA",
         "backupCodeTitle": "Backup Code",
         "backupCode": "Enter Backup Code",
+        "burnedBackupCode": "You have burned one of your backup codes. Please reroll your backup codes to avoid being locked out",
         "cancel": "Cancel",
         "defaultPath": "The password you entered is the default credential path, not the password. Please find the default password in that location.",
         "disabled": "User account disabled. Please contact your system administrator for more info.",
@@ -267,6 +268,7 @@
         "saveWarn": "Make sure to save these backup codes or you could lose access",
         "confirm2FA": "Please Confirm Authenticator Code",
         "otpTitle": "2FA Methods",
+        "renewRecovery": "Renew Recovery Codes",
         "newOTP": "Add New 2 Factor Auth"
     },
     "panelConfig": {
