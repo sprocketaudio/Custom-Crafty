@@ -43,24 +43,36 @@ end %} {% block content %}
                 <div id="files-tree-nav-content" class="overlay-content">
                   <h4 id="context-title" class="overlay-title"></h4>
                   <span class="separator"></span>
-                  <a onclick="createFileE(event)" href="javascript:void(0)" id="createFile" href="#">{{ translate('serverFiles', 'createFile', data['lang'])
+                  <a onclick="createFileE(event)" href="javascript:void(0)" id="createFile" href="#">{{
+                    translate('serverFiles', 'createFile', data['lang'])
                     }}</a>
-                  <a onclick="createDirE(event)" href="javascript:void(0)" id="createDir" href="#">{{ translate('serverFiles', 'createDir', data['lang'])
+                  <a onclick="createDirE(event)" href="javascript:void(0)" id="createDir" href="#">{{
+                    translate('serverFiles', 'createDir', data['lang'])
                     }}</a>
-                  <a onclick="renameItemE(event)" href="javascript:void(0)" id="renameItem" href="#">{{ translate('serverFiles', 'rename', data['lang']) }}</a>
-                  <a onclick="uploadFilesE(event)" href="javascript:void(0)" id="upload" href="#">{{ translate('serverFiles', 'upload', data['lang']) }}</a>
-                  <a onclick="unzipFilesE(event)" href="javascript:void(0)" id="unzip" href="#">{{ translate('serverFiles', 'unzip', data['lang']) }}</a>
-                  <a onclick="downloadFileE(event)" href="javascript:void(0)" id="downloadFile" href="#">{{ translate('serverFiles', 'download', data['lang']) }}</a>
-                  <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteFile" href="#" class="text-danger">{{ translate('serverFiles', 'delete', data['lang']) }}</a>
-                  <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteDir" href="#" class="text-danger">{{ translate('serverFiles', 'delete', data['lang']) }}</a>
-                  <a href="javascript:void(0)" class="closebtn text-info" onclick="document.getElementById('files-tree-nav').style.display = 'none';">{{ translate('serverFiles', 'close', data['lang']) }}</a>
+                  <a onclick="renameItemE(event)" href="javascript:void(0)" id="renameItem" href="#">{{
+                    translate('serverFiles', 'rename', data['lang']) }}</a>
+                  <a onclick="uploadFilesE(event)" href="javascript:void(0)" id="upload" href="#">{{
+                    translate('serverFiles', 'upload', data['lang']) }}</a>
+                  <a onclick="unzipFilesE(event)" href="javascript:void(0)" id="unzip" href="#">{{
+                    translate('serverFiles', 'unzip', data['lang']) }}</a>
+                  <a onclick="downloadFileE(event)" href="javascript:void(0)" id="downloadFile" href="#">{{
+                    translate('serverFiles', 'download', data['lang']) }}</a>
+                  <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteFile" href="#"
+                    class="text-danger">{{ translate('serverFiles', 'delete', data['lang']) }}</a>
+                  <a onclick="deleteFileE(event)" href="javascript:void(0)" id="deleteDir" href="#"
+                    class="text-danger">{{ translate('serverFiles', 'delete', data['lang']) }}</a>
+                  <a href="javascript:void(0)" class="closebtn text-info"
+                    onclick="document.getElementById('files-tree-nav').style.display = 'none';">{{
+                    translate('serverFiles', 'close', data['lang']) }}</a>
                 </div>
               </div>
 
               <ul class="tree-view">
                 <li>
                   <div id="root_dir" class="tree-ctx-item" data-path="{{ data['server_stats']['server_id']['path'] }}">
-                    <span id="{{ data['server_stats']['server_id']['path'] }}span" class="files-tree-title tree-caret-down root-dir" data-path="{{ data['server_stats']['server_id']['path'] }}" onclick="getToggleMain(event)">
+                    <span id="{{ data['server_stats']['server_id']['path'] }}span"
+                      class="files-tree-title tree-caret-down root-dir"
+                      data-path="{{ data['server_stats']['server_id']['path'] }}" onclick="getToggleMain(event)">
                       <i class="far fa-folder"></i>
                       <i class="far fa-folder-open"></i>
                       {{ translate('serverFiles', 'files', data['lang']) }}
@@ -95,13 +107,16 @@ end %} {% block content %}
                   <button onclick="setKeyboard(event.target)" class="btn btn-primary" data-handler-name="null">
                     {{ translate('serverFiles', 'default', data['lang']) }}
                   </button>
-                  <button onclick="setKeyboard(event.target)" class="btn btn-secondary" data-handler-name="ace/keyboard/vim">
+                  <button onclick="setKeyboard(event.target)" class="btn btn-secondary"
+                    data-handler-name="ace/keyboard/vim">
                     Vim
                   </button>
-                  <button onclick="setKeyboard(event.target)" class="btn btn-secondary" data-handler-name="ace/keyboard/emacs">
+                  <button onclick="setKeyboard(event.target)" class="btn btn-secondary"
+                    data-handler-name="ace/keyboard/emacs">
                     Emacs
                   </button>
-                  <button onclick="setKeyboard(event.target)" class="btn btn-secondary" data-handler-name="ace/keyboard/sublime">
+                  <button onclick="setKeyboard(event.target)" class="btn btn-secondary"
+                    data-handler-name="ace/keyboard/sublime">
                     Sublime
                   </button>
                   <span class="d-none d-md-block">&nbsp;&nbsp;&nbsp;<button class="btn btn-info" id="screen-size">
@@ -273,8 +288,8 @@ end %} {% block content %}
       setSaveStatus(true);
     } else {
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error,
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
   }
@@ -445,8 +460,8 @@ end %} {% block content %}
       setSaveStatus(true);
     } else {
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error,
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
   }
@@ -466,8 +481,8 @@ end %} {% block content %}
       setTreeViewContext();
     } else {
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error,
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
   }
@@ -487,8 +502,8 @@ end %} {% block content %}
       setTreeViewContext();
     } else {
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error,
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
   }
@@ -508,8 +523,8 @@ end %} {% block content %}
       setTreeViewContext();
     } else {
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error,
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
   }
@@ -530,8 +545,8 @@ end %} {% block content %}
       document.getElementById("files-tree-nav").style.display = "none";
     } else {
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error,
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
   }
@@ -551,8 +566,8 @@ end %} {% block content %}
       setTreeViewContext();
     } else {
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error,
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
   }
@@ -693,8 +708,8 @@ end %} {% block content %}
       process_tree_response(responseData);
     } else {
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error,
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
   }

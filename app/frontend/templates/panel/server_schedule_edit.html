@@ -291,9 +291,9 @@
           window.location.href = `/panel/server_detail?id=${serverId}&subpage=schedules`;
         } else {
 
-          bootbox.alert({
-            title: responseData.status,
-            message: responseData.error
+        bootbox.alert({
+          title: responseData.error,
+          message: responseData.error_data
           });
         }
       });

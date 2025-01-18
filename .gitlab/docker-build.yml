@@ -1,81 +1,42 @@
 # yamllint disable rule:line-length
 ---
-docker-build-dev:
+docker-build:
   image: docker:latest
   services:
     - name: docker:dind
-  stage: dev-deployment
+  stage: build-and-deploy
   tags:
     - docker_priv
-  rules:
-    - if: $CI_COMMIT_BRANCH == 'dev'
-  environment:
-    name: development
-  before_script:
-    - |
-      apk --no-cache add jq
-      MAJOR=$(cat app/config/version.json | jq '.major' )
-      MINOR=$(cat app/config/version.json | jq '.minor' )
-      SUB=$(cat app/config/version.json | jq '.sub' )
-    - |
-      apk --no-cache add curl
-      latest_tag=$(curl -s https://api.github.com/repos/docker/buildx/releases/latest | sed -Ene '/^ *"tag_name": *"(v.+)",$/s//\1/p')
-      echo "Using buildx version $latest_tag"
-      curl -sSLo docker-buildx "https://github.com/docker/buildx/releases/download/$latest_tag/buildx-$latest_tag.linux-amd64"
-      chmod a+x docker-buildx
-      mkdir -p ~/.docker/cli-plugins
-      mv docker-buildx ~/.docker/cli-plugins/docker-buildx
-      docker version
-    - docker run --rm --privileged aptman/qus -- -r
-    - docker run --rm --privileged aptman/qus -s -- -p aarch64 x86_64
-    - echo $CI_JOB_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-    - echo $DOCKERHUB_TOKEN | docker login -u "$DOCKERHUB_USER" --password-stdin $DOCKERHUB_REGISTRY
-  script:
-    - |
-      tag=":$CI_COMMIT_REF_SLUG"
-      VERSION="${MAJOR}.${MINOR}.${SUB}"
-    - |
-      echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
-      echo "Crafty Version: $VERSION"
-    - docker context create tls-environment
-    - docker buildx create --name zedBuilder --use tls-environment
-    - docker buildx build
-      --cache-from type=registry,ref="$CI_REGISTRY_IMAGE${tag}"
-      --build-arg BUILDKIT_INLINE_CACHE=1
-      --build-arg "BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ")"
-      --build-arg "BUILD_REF=${CI_COMMIT_SHA}"
-      --build-arg "CRAFTY_VER=${VERSION}"
-      --provenance false
-      --tag "$CI_REGISTRY_IMAGE${tag}"
-      --tag "arcadiatechnology/crafty-4${tag}"
-      --platform linux/arm64/v8,linux/amd64
-      --push .
-  after_script:
-    - |
-      docker buildx rm zedBuilder && echo "Successfully Stopped builder instance" || echo "Failed to stop builder instance."
-      docker context rm tls-environment || true
-      echo "Please review multi-arch manifests are present:"
-      docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
 
-docker-build-prod:
-  image: docker:latest
-  services:
-    - name: docker:dind
-  stage: prod-deployment
-  tags:
-    - docker_priv
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # Development branch
+    - if: $CI_COMMIT_BRANCH == 'dev'
+      variables:
+        ENVIRONMENT_NAME: "development"
+        DOCKER_TAGS: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG arcadiatechnology/crafty-4:$CI_COMMIT_REF_SLUG"
+    # Production branch (main) when not scheduled
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule"
+      variables:
+        ENVIRONMENT_NAME: "production"
+        # We'll set the version in the script and append stable tags
+        DOCKER_TAGS: "" # We'll determine in script
+    # Scheduled nightly builds on main
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        ENVIRONMENT_NAME: "nightly"
+        DOCKER_TAGS: "$CI_REGISTRY_IMAGE:nightly arcadiatechnology/crafty-4:nightly"
+
   environment:
-    name: production
+    name: $ENVIRONMENT_NAME
+
   before_script:
     - |
-      apk --no-cache add jq
-      MAJOR=$(cat app/config/version.json | jq '.major' )
-      MINOR=$(cat app/config/version.json | jq '.minor' )
-      SUB=$(cat app/config/version.json | jq '.sub' )
+      apk --no-cache add jq curl
+      MAJOR=$(cat app/config/version.json | jq -r '.major')
+      MINOR=$(cat app/config/version.json | jq -r '.minor')
+      SUB=$(cat app/config/version.json | jq -r '.sub')
+      VERSION="${MAJOR}.${MINOR}.${SUB}"
     - |
-      apk --no-cache add curl
       latest_tag=$(curl -s https://api.github.com/repos/docker/buildx/releases/latest | sed -Ene '/^ *"tag_name": *"(v.+)",$/s//\1/p')
       echo "Using buildx version $latest_tag"
       curl -sSLo docker-buildx "https://github.com/docker/buildx/releases/download/$latest_tag/buildx-$latest_tag.linux-amd64"
@@ -87,30 +48,61 @@ docker-build-prod:
     - docker run --rm --privileged aptman/qus -s -- -p aarch64 x86_64
     - echo $CI_JOB_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - echo $DOCKERHUB_TOKEN | docker login -u "$DOCKERHUB_USER" --password-stdin $DOCKERHUB_REGISTRY
+    - docker context create tls-environment-$CI_JOB_ID
+    - docker buildx create --name zedBuilder-$CI_JOB_ID --use tls-environment-$CI_JOB_ID
+
   script:
+    - echo "Running on branch '$CI_COMMIT_BRANCH', environment- $ENVIRONMENT_NAME"
+    - echo "Crafty Version- $VERSION"
+
+    # If DOCKER_TAGS is empty (production default branch and not schedule), we set stable tags:
+    # This scenario adds both VERSION and 'latest' tags.
     - |
-      VERSION="${MAJOR}.${MINOR}.${SUB}"
+      if [ "$ENVIRONMENT_NAME" = "production" ] && [ -z "$DOCKER_TAGS" ]; then
+        DOCKER_TAGS="$CI_REGISTRY_IMAGE:${VERSION} \
+                     $CI_REGISTRY_IMAGE:latest \
+                     arcadiatechnology/crafty-4:${VERSION} \
+                     arcadiatechnology/crafty-4:latest"
+      fi
+
+    - echo "Using the following tags- $DOCKER_TAGS"
+
+    # Prepare build command
+    # We break DOCKER_TAGS into separate --tag arguments
+    - TARGS=""
+    - for t in $DOCKER_TAGS; do TARGS="$TARGS --tag $t"; done
+    - echo "Tag arguments- $TARGS"
+
+    # Conditional build command: omit cache if schedule
     - |
-      echo "Running on branch '$CI_COMMIT_BRANCH'"
-      echo "Crafty Version: $VERSION"
-    - docker context create tls-environment
-    - docker buildx create --name zedBuilder --use tls-environment
-    - docker buildx build
-      --cache-from type=registry,ref="$CI_REGISTRY_IMAGE:latest"
-      --build-arg BUILDKIT_INLINE_CACHE=1
-      --build-arg "BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ")"
-      --build-arg "BUILD_REF=${CI_COMMIT_SHA}"
-      --build-arg "CRAFTY_VER=${VERSION}"
-      --provenance false
-      --tag "$CI_REGISTRY_IMAGE:$VERSION"
-      --tag "$CI_REGISTRY_IMAGE:latest"
-      --tag "arcadiatechnology/crafty-4:$VERSION"
-      --tag "arcadiatechnology/crafty-4:latest"
-      --platform linux/arm64/v8,linux/amd64
-      --push .
+      if [ "$CI_PIPELINE_SOURCE" = "schedule" ]; then
+        echo "Omitting cache for nightly build."
+        docker buildx build \
+          --build-arg "BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ")" \
+          --build-arg "BUILD_REF=${CI_COMMIT_SHA}" \
+          --build-arg "CRAFTY_VER=${VERSION}" \
+          --provenance false \
+          $TARGS \
+          --platform linux/arm64/v8,linux/amd64 \
+          --push .
+      else
+        echo "Using cache for build."
+        docker buildx build \
+          --cache-from type=registry,ref="$CI_REGISTRY_IMAGE:dev" \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
+          --build-arg "BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ")" \
+          --build-arg "BUILD_REF=${CI_COMMIT_SHA}" \
+          --build-arg "CRAFTY_VER=${VERSION}" \
+          --provenance false \
+          $TARGS \
+          --platform linux/arm64/v8,linux/amd64 \
+          --push .
+      fi
+
   after_script:
-    - |
-      docker buildx rm zedBuilder && echo "Successfully Stopped builder instance" || echo "Failed to stop builder instance."
-      docker context rm tls-environment || true
-      echo "Please review multi-arch manifests are present:"
-      docker buildx imagetools inspect "$CI_REGISTRY_IMAGE${tag}"
+    - docker buildx rm zedBuilder-$CI_JOB_ID && echo "Successfully Stopped builder instance" || echo "Failed to stop builder instance."
+    - docker context rm tls-environment-$CI_JOB_ID || true
+    - echo "Please review multi-arch manifests are present:"
+    - if [ "$ENVIRONMENT_NAME" = "development" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"; fi
+    - if [ "$ENVIRONMENT_NAME" = "production" ] && [ -n "$VERSION" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:$VERSION"; fi
+    - if [ "$ENVIRONMENT_NAME" = "nightly" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:nightly"; fi

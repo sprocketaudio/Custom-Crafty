@@ -29,7 +29,6 @@
         "permName": "Atļaujas Nosaukums",
         "perms": "Atļaujas",
         "server": "Serveris: ",
-        "superUser": "Super Lietotājs",
         "yes": "Jā"
     },
     "base": {
@@ -59,7 +58,6 @@
         "backgroundUpload": "Fona attēla augšupielāde",
         "customLoginPage": "Pielāgo Pieteikšanās Lapa",
         "delete": "Dzēst",
-        "installing": "Uztāda...",
         "labelLoginImage": "Izvēlies savu Pieteikšanās Lapas Fonu",
         "loginBackground": "Pieteikšanās Fona Attēls",
         "loginImage": "Augšupielādē fona attēlu priekš pieteikšanās ekrāna.",
@@ -210,8 +208,6 @@
         "privMsg": "un ",
         "return": "Atgriezties uz pārskatu",
         "selfHost": "Ja jūs paši uzturat šo repozitoriju, pārbaudiet savu adresi vai apskatiet mūsu kļūdu novēršanas dokumentāciju.",
-        "serverJars1": "Serveru JAR API nav sasniedzams. Lūdzu pārbaudiet",
-        "serverJars2": "priekš jaunākās informācijas.",
         "start-error": "Serveris {} neveiskmīgi startējās ar kļūdas kodu: {}",
         "superError": "Jums ir jābūt super lietotājam lai veiktu šo darbību.",
         "terribleFailure": "Kas par neveiksmi!"
@@ -559,7 +555,6 @@
     "serverTerm": {
         "commandInput": "Ievadi savu komandu",
         "delay-explained": "Serviss/aģents tika nesen startēts, un aizkavē Minecraft servera instances startu",
-        "downloading": "Lejupielādē...",
         "importing": "Importē...",
         "installing": "Uzstāda...",
         "restart": "Restartēt",
@@ -677,7 +672,26 @@
         "uses": "Dauzums, cik reizes lietot (-1==Bez Limita)"
     },
     "validators": {
-        "passLength": "Parole pārāk īsa. Minimālais Garums: 8"
+        "passLength": "Parole pārāk īsa. Minimālais Garums: 8",
+        "backupName": "Dublējuma nosaukumam jābūt tekstam (string) ar minimālo garumu 3.",
+        "enumErr": "pārbaude neizdevās. Pieņemamie dati ietver: ",
+        "filesPageLen": "garumam jābūt lielākam par 1 priekš vienības",
+        "insufficientPerms": "Piekļuves Kļūda: Nepietiekama atļauja priekš šī resursa",
+        "roleManager": "Lomas pārvaldniekam jābūt skaitlim (pārvaldnieka ID) vai Nekam (None)",
+        "roleName": "Lomas nosaukumam jābūt tekstam (string) kas ir garāks par 1 rakstzīmi. Tas nevar iekļaut sekojošos simbolus: [ ] , ",
+        "roleServerId": "Servera ID vienībai jābūt tekstam (string) ar minimālo garumu 1",
+        "roleServerPerms": "Servera atļaujām jābūt 8-bitu tekstam (string)",
+        "serverCreateName": "Servera nosaukumam jābūt tekstam (string) ar minimumālo garumu 2 un tas nevar saturēt: \\ / vai # ",
+        "serverExeCommand": "Servera izpildes komandai jābūt tekstam (string) ar minimālo garumu 1.",
+        "serverLogPath": "Servera log datņu ceļam ir jābūt tekstam (string) ar minimālo garumu 1",
+        "taskIntervalType": "Notikumu Intervala Tipam jābūt vienam no sekojošiem: ",
+        "typeBool": "jābūt patiesam vai nepatiesam (true vai false, boolean tips)",
+        "typeEmail": "jābūt tipam e-pasts.",
+        "typeInteger": "jābūt skaitlim.",
+        "typeIntMinVal0": "jābūt skaitlim (integer) ar minimālo vērtību 0.",
+        "typeList": "jābūt tipam saraksts/masīvs (list/array) ",
+        "typeString": "jābūt tipam teksts (string).",
+        "userName": " jābūt tipam teksts (string), tikai ar MAZAJIEM BURTIEM, ar 4 rakstzīmju minimālo un 20 rakstzīmju maksimālo garumu"
     },
     "webhooks": {
         "areYouSureDel": "Vai tiešām vēlies noņemt šo webhook?",

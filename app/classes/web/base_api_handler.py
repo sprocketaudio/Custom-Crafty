@@ -11,7 +11,14 @@ class BaseApiHandler(BaseHandler):
 
     # {{{ 405 Method Not Allowed as JSON
     def _unimplemented_method(self, *_args: str, **_kwargs: str) -> None:
-        self.finish_json(405, {"status": "error", "error": "METHOD_NOT_ALLOWED"})
+        self.finish_json(
+            405,
+            {
+                "status": "error",
+                "error": "METHOD_NOT_ALLOWED",
+                "error_data": "METHOD NOT ALLOWED",
+            },
+        )
 
     head = _unimplemented_method  # type: Callable[..., Optional[Awaitable[None]]]
     get = _unimplemented_method  # type: Callable[..., Optional[Awaitable[None]]]

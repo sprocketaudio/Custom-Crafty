@@ -28,7 +28,6 @@
         "permName": "Namme fan tastimming",
         "perms": "Tastimmingen",
         "server": "Server: ",
-        "superUser": "Superbrûker",
         "yes": "Ja"
     },
     "base": {
@@ -437,7 +436,6 @@
     "serverTerm": {
         "commandInput": "Fier jo kommando yn",
         "delay-explained": "De tsjinst / agint is koartlyn begon en fertraget it begjin fan 'e Minecraft-server",
-        "downloading": "Ynladen...",
         "restart": "Opnij starte",
         "sendCommand": "Kommando stjoere",
         "start": "Starte",

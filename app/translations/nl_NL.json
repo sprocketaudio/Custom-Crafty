@@ -28,7 +28,6 @@
         "permName": "Toestemming naam",
         "perms": "Toestemmingen",
         "server": "Server: ",
-        "superUser": "Super Gebruiker",
         "yes": "Ja"
     },
     "base": {
@@ -437,7 +436,6 @@
     "serverTerm": {
         "commandInput": "Commando invoeren",
         "delay-explained": "De service/agent is recentelijk gestart en stelt de start uit van de Minecraft-serverinstantie",
-        "downloading": "Aan het downloaden...",
         "restart": "Restarten",
         "sendCommand": "Commando versturen",
         "start": "Starten",

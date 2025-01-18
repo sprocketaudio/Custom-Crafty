@@ -29,7 +29,6 @@
         "permName": "Nome Permesso",
         "perms": "Permessi",
         "server": "Server: ",
-        "superUser": "Super User",
         "yes": "Sì"
     },
     "base": {
@@ -209,8 +208,6 @@
         "privMsg": "e il ",
         "return": "Torna alla pagina iniziale",
         "selfHost": "se stai ospitando te questo repo, controlla il tuo indirizzo o consulta la nostra guida di risoluzione dei problemi.",
-        "serverJars1": "API JAR del server non raggiungibile. Si prega di controllare",
-        "serverJars2": "per informazioni più aggiornate.",
         "start-error": "Server {} failed to start with error code: {}",
         "superError": "Devi essere un super utente per eseguire questa azione.",
         "terribleFailure": "What a Terrible Failure!"
@@ -238,7 +235,9 @@
         "finishedPreparing": "Abbiamo finito di preparare i tuoi registri di supporto.Per favore clicca Scarica per scaricarli",
         "logout": "Disconnessione",
         "preparingLogs": "Per favore aspetta mentre prepariamo i tuoi registri... Ti invieremo una notifica quando saranno pronti. Potrebbe volerci un po' per installazioni grosse.",
-        "supportLogs": "Registri di supporto"
+        "supportLogs": "Registri di supporto",
+        "backup_desc": "Abbiamo rilevato che la migrazione del backup potrebbe essere parzialmente o completamente fallita. Controlla i backup effettuati nella scheda Backup.",
+        "backup_title": "Avviso migrazione di backup"
     },
     "offline": {
         "offline": "Disconnesso",
@@ -554,7 +553,6 @@
     "serverTerm": {
         "commandInput": "Inserisci il comando",
         "delay-explained": "Il servizio/agente è stato avviato di recente e sta ritardando l'avvio del server di Minecraft",
-        "downloading": "Scaricando...",
         "importing": "Importazione...",
         "installing": "Installazione...",
         "restart": "Riavvia",
@@ -672,7 +670,10 @@
         "uses": "Numero di usi permessi (-1==Nessun limite)"
     },
     "validators": {
-        "passLength": "La password è troppo corta. Lunghezza minima: 8"
+        "passLength": "La password è troppo corta. Lunghezza minima: 8",
+        "enumErr": "Validazione fallita. Valori accettabili includono: ",
+        "serverExeCommand": "Il comando di esecuzione del server dev’essere una stringa con lunghezza minima di 1.",
+        "serverLogPath": "Il percorso del registro del server dev’essere una stringa con lunghezza minima di 1"
     },
     "webhooks": {
         "areYouSureDel": "Sei sicuro di voler eliminare questo webhook?",

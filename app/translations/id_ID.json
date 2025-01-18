@@ -28,7 +28,6 @@
         "permName": "Nama Izin",
         "perms": "Izin",
         "server": "Server: ",
-        "superUser": "Super User",
         "yes": "Iya"
     },
     "base": {
@@ -444,7 +443,6 @@
     "serverTerm": {
         "commandInput": "Masukan Perintah Anda",
         "delay-explained": "Layanan / agen baru-baru ini dimulai dan menunda dimulainya instans server minecraft",
-        "downloading": "Mengunduh...",
         "restart": "Mulai Ulang",
         "sendCommand": "Kirim Perintah",
         "start": "Mulai",

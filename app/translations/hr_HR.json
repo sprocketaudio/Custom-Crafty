@@ -28,7 +28,6 @@
         "permName": "Naziv dopuštenja",
         "perms": "Dopuštenja",
         "server": "Poslužitelj: ",
-        "superUser": "Superkorisnik",
         "yes": "Da"
     },
     "base": {
@@ -437,7 +436,6 @@
     "serverTerm": {
         "commandInput": "Unesi naredbu",
         "delay-explained": "Usluga je nedavno započeta i odgađa pokretanje instance poslužitelja Minecrafta",
-        "downloading": "Preuzimanje...",
         "restart": "Ponovno pokreni",
         "sendCommand": "Pošalji naredbu",
         "start": "Pokreni",

@@ -55,7 +55,9 @@
                   <h4 class="card-title"><i class="fas fa-users"></i> {{ translate('panelConfig', 'users', data['lang'])
                     }}</h4>
                   {% if data['user_data']['hints'] %}
-                  <span class="too_small" title="{{ translate('dashboard', 'cannotSee', data['lang']) }}" , data-content="{{ translate('dashboard', 'cannotSeeOnMobile2', data['lang']) }}" , data-placement="top"></span>
+                  <span class="too_small" title="{{ translate('dashboard', 'cannotSee', data['lang']) }}" ,
+                    data-content="{{ translate('dashboard', 'cannotSeeOnMobile2', data['lang']) }}" ,
+                    data-placement="top"></span>
                   {% end %}
                   <!-- TODO: Translate the following -->
                   <div><a class="nav-link" href="/panel/add_user"><i class="fas fa-plus-circle"></i> &nbsp; {{
@@ -77,7 +79,8 @@
                       <tbody>
                         {% for user in data['users'] %}
                         <tr>
-                          <td><i class="fas fa-user"></i><span id="user_{{user.user_id}}">{{ user.username }}</span></td>
+                          <td><i class="fas fa-user"></i><span id="user_{{user.user_id}}">{{ user.username }}</span>
+                          </td>
                           <td>
                             {% if user.enabled %}
                             <span class="text-success">
@@ -104,9 +107,18 @@
                               {% end %}
                             </ul>
                           </td>
-                          <td><span data-translate="{{translate('userConfig', 'userName', data['lang'])}}" data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}" id="username_{{user.user_id}}" class="edit_user clickable" data-name="{{user.username}}" data-id="{{user.user_id}}"><i class="fa-solid fa-user"></i></span>
-                            &nbsp;&nbsp;<span data-translate1="{{translate('userConfig', 'password', data['lang'])}}" data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}" data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}" class="edit_password clickable" data-id="{{user.user_id}}"><i class="fa-solid fa-lock"></i></span>
-                            &nbsp;&nbsp;<a data-toggle="tooltip" title="{{ translate('userConfig', 'pageTitle', data['lang'])}}" href="/panel/edit_user?id={{user.user_id}}"><i class="fas fa-pencil-alt"></i></a>
+                          <td><span data-translate="{{translate('userConfig', 'userName', data['lang'])}}"
+                              data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}"
+                              id="username_{{user.user_id}}" class="edit_user clickable" data-name="{{user.username}}"
+                              data-id="{{user.user_id}}"><i class="fa-solid fa-user"></i></span>
+                            &nbsp;&nbsp;<span data-translate1="{{translate('userConfig', 'password', data['lang'])}}"
+                              data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}"
+                              data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}"
+                              class="edit_password clickable" data-id="{{user.user_id}}"><i
+                                class="fa-solid fa-lock"></i></span>
+                            &nbsp;&nbsp;<a data-toggle="tooltip"
+                              title="{{ translate('userConfig', 'pageTitle', data['lang'])}}"
+                              href="/panel/edit_user?id={{user.user_id}}"><i class="fas fa-pencil-alt"></i></a>
                           </td>
                         </tr>
                         {% end %}
@@ -139,9 +151,18 @@
                               {% end %}
                             </ul>
                           </td>
-                          <td><span data-translate="{{translate('userConfig', 'userName', data['lang'])}}" data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}" id="username_{{user.user_id}}" class="edit_user clickable" data-name="{{user.username}}" data-id="{{user.user_id}}"><i class="fa-solid fa-user"></i></span>
-                            &nbsp;&nbsp;<span data-translate1="{{translate('userConfig', 'password', data['lang'])}}" data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}" data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}" class="edit_password clickable" data-id="{{user.user_id}}"><i class="fa-solid fa-lock"></i></span>
-                            &nbsp;&nbsp;<a data-toggle="tooltip" title="{{ translate('userConfig', 'pageTitle', data['lang'])}}" href="/panel/edit_user?id={{user.user_id}}"><i class="fas fa-pencil-alt"></i></a>
+                          <td><span data-translate="{{translate('userConfig', 'userName', data['lang'])}}"
+                              data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}"
+                              id="username_{{user.user_id}}" class="edit_user clickable" data-name="{{user.username}}"
+                              data-id="{{user.user_id}}"><i class="fa-solid fa-user"></i></span>
+                            &nbsp;&nbsp;<span data-translate1="{{translate('userConfig', 'password', data['lang'])}}"
+                              data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}"
+                              data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}"
+                              class="edit_password clickable" data-id="{{user.user_id}}"><i
+                                class="fa-solid fa-lock"></i></span>
+                            &nbsp;&nbsp;<a data-toggle="tooltip"
+                              title="{{ translate('userConfig', 'pageTitle', data['lang'])}}"
+                              href="/panel/edit_user?id={{user.user_id}}"><i class="fas fa-pencil-alt"></i></a>
                           </td>
                         </tr>
                         {% end %}
@@ -159,7 +180,9 @@
                   <h4 class="card-title"><i class="fas fa-user-tag"></i> {{ translate('panelConfig', 'roles',
                     data['lang']) }}</h4>
                   {% if data['user_data']['hints'] %}
-                  <span class="too_small2" title="{{ translate('dashboard', 'cannotSee', data['lang']) }}" , data-content="{{ translate('dashboard', 'cannotSeeOnMobile2', data['lang']) }}" , data-placement="top"></span>
+                  <span class="too_small2" title="{{ translate('dashboard', 'cannotSee', data['lang']) }}" ,
+                    data-content="{{ translate('dashboard', 'cannotSeeOnMobile2', data['lang']) }}" ,
+                    data-placement="top"></span>
                   {% end %}
                   <div><a class="nav-link" href="/panel/add_role"><i class="fas fa-plus-circle"></i> &nbsp; {{
                       translate('panelConfig', 'newRole', data['lang']) }}</a></div>
@@ -252,7 +275,8 @@
                       data['lang']) }}<small class="text-muted ml-1"> - {{ translate('panelConfig', 'globalExplain',
                         data['lang']) }}</small></label>
                     <div class="input-group">
-                      <input type="text" id="global_server_path" class="form-control" name="global_server_path" placeholder="/var/opt/servers" value="{{data['servers_dir']}}" directory>
+                      <input type="text" id="global_server_path" class="form-control" name="global_server_path"
+                        placeholder="/var/opt/servers" value="{{data['servers_dir']}}" directory>
                       <div class="input-group-append">
                         <span type="button" class="btn btn-outline-default custom-picker">/servers/</span>
                       </div>
@@ -365,7 +389,7 @@
 
           bootbox.alert({
             title: responseData.status,
-            message: responseData.error
+            message: responseData.error_data
           });
         }
       }
@@ -402,89 +426,88 @@
         } else {
 
           bootbox.alert({
-            title: responseData.status,
-            message: responseData.error
+            title: responseData.error,
+            message: responseData.error_data
           });
         }
       }
     });
-  });
-  if (webSocket) {
-    webSocket.on('move_status', function (message) {
-      if (message === "done") {
-        $("#submit-list").removeClass("loading");
-        $("#submit-list").html("");
-        $("#submit-status").html('<i class="fa fa-check"></i>');
-      } else {
-        $("#submit-status").html('<i class="fa fa-spinner fa-spin"></i>');
-        $("#submit-list").html(message);
-        $("#submit-list").addClass("loading");
-      }
-    });
-  }
-
-  $("#server-path").submit(async function (e) {
-    const token = getCookie("_xsrf")
-    e.preventDefault();
-
-    $("#submit-status").html('<i class="fa fa-spinner fa-spin"></i>');
-
-    let path = $("#global_server_path").val();
-    let res = await fetch(`/api/v2/crafty/config/servers_dir`, {
-      method: 'PATCH',
-      headers: {
-        'X-XSRFToken': token
-      },
-      body: JSON.stringify({ "new_dir": path }),
-    });
-    let responseData = await res.json();
-    if (responseData.status === "ok") {
-      return
-    } else {
-
-      bootbox.alert({
-        title: responseData.status,
-        message: responseData.error
+    if (webSocket) {
+      webSocket.on('move_status', function (message) {
+        if (message === "done") {
+          $("#submit-list").removeClass("loading");
+          $("#submit-list").html("");
+          $("#submit-status").html('<i class="fa fa-check"></i>');
+        } else {
+          $("#submit-status").html('<i class="fa fa-spinner fa-spin"></i>');
+          $("#submit-list").html(message);
+          $("#submit-list").addClass("loading");
+        }
       });
     }
-  });
 
-  $(document).ready(function () {
-    $('[data-toggle="popover"]').popover();
-    if ($(window).width() < 1000) {
-      $('.too_small').popover("show");
-      $('.too_small2').popover("show");
-    }
+    $("#server-path").submit(async function (e) {
+      const token = getCookie("_xsrf")
+      e.preventDefault();
 
-  });
-  $(window).ready(function () {
-    $('body').click(function () {
-      $('.too_small').popover("hide");
-      $('.too_small2').popover("hide");
+      $("#submit-status").html('<i class="fa fa-spinner fa-spin"></i>');
+
+      let path = $("#global_server_path").val();
+      let res = await fetch(`/api/v2/crafty/config/servers_dir`, {
+        method: 'PATCH',
+        headers: {
+          'X-XSRFToken': token
+        },
+        body: JSON.stringify({ "new_dir": path }),
+      });
+      let responseData = await res.json();
+      if (responseData.status === "ok") {
+        return
+      } else {
+
+        bootbox.alert({
+          title: responseData.error,
+          message: responseData.error_data
+        });
+      }
     });
-  });
-  $(window).resize(function () {
-    // This will execute whenever the window is resized
-    if ($(window).width() < 1000) {
-      $('.too_small').popover("show");
-    }
-    else {
-      $('.too_small').popover("hide");
-    } // New width
-    if ($(window).width() < 1000) {
-      $('.too_small2').popover("show");
-    }
-    else {
-      $('.too_small2').popover("hide");
-    } // New width
-  });
-  $('#file').change(function () {
-    console.log("File changed");
-    if ($('#file').val()) {
-      $('#upload-button').prop("disabled", false);
-      console.log("File changed good");
-    }
-  });
+
+    $(document).ready(function () {
+      $('[data-toggle="popover"]').popover();
+      if ($(window).width() < 1000) {
+        $('.too_small').popover("show");
+        $('.too_small2').popover("show");
+      }
+
+    });
+    $(window).ready(function () {
+      $('body').click(function () {
+        $('.too_small').popover("hide");
+        $('.too_small2').popover("hide");
+      });
+    });
+    $(window).resize(function () {
+      // This will execute whenever the window is resized
+      if ($(window).width() < 1000) {
+        $('.too_small').popover("show");
+      }
+      else {
+        $('.too_small').popover("hide");
+      } // New width
+      if ($(window).width() < 1000) {
+        $('.too_small2').popover("show");
+      }
+      else {
+        $('.too_small2').popover("hide");
+      } // New width
+    });
+    $('#file').change(function () {
+      console.log("File changed");
+      if ($('#file').val()) {
+        $('#upload-button').prop("disabled", false);
+        console.log("File changed good");
+      }
+    });
 </script>
 
 {% end %}

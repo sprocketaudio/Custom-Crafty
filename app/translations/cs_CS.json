@@ -29,7 +29,6 @@
         "permName": "Název oprávnění",
         "perms": "Oprávnění",
         "server": "Server: ",
-        "superUser": "Super uživatel",
         "yes": "Ano"
     },
     "base": {
@@ -130,9 +129,6 @@
                 "copyKeys": "Stisknutím kláves Ctrl nebo u2318 + C zkopírujete data tabulky do systémové schránky.<br><br>Chcete-li tuto zprávu zrušit, klikněte na ni nebo stiskněte klávesu ESC.",
                 "copySuccess": {
                     "1": "Zkopírován 1 řádek do schránky",
-                    "2": "Zkopírovány 2 řádky do schránky",
-                    "3": "Zkopírovány 3 řádky do schránky",
-                    "4": "Zkopírovány 4 řádky do schránky",
                     "_": "Zkopírováno %d řádků do schránky"
                 },
                 "copyTitle": "Zkopírovat do schránky",
@@ -141,9 +137,6 @@
                 "pageLength": {
                     "-1": "Zobrazit všechny řádky",
                     "1": "Zobrazit 1 řádek",
-                    "2": "Zobrazit 2 řádky",
-                    "3": "Zobrazit 3 řádky",
-                    "4": "Zobrazit 4 řádky",
                     "_": "Zobrazit %d řádků"
                 },
                 "pdf": "PDF",
@@ -169,25 +162,16 @@
                 "cells": {
                     "0": "Kliknutím na buňku ji vyberete",
                     "1": "Vybraná %d buňka",
-                    "2": "Vybrané %d buňky",
-                    "3": "Vybrané %d buňky",
-                    "4": "Vybrané %d buňky",
                     "_": "Vybráno %d buněk"
                 },
                 "columns": {
                     "0": "Kliknutím na sloupec jej vyberete",
                     "1": "Vybraný %d sloupec",
-                    "2": "Vybrané %d sloupce",
-                    "3": "Vybrané %d sloupce",
-                    "4": "Vybrané %d sloupce",
                     "_": "Vybráno %d sloupců"
                 },
                 "rows": {
                     "0": "Kliknutím na řádek jej vyberete",
                     "1": "Vybraný %d řádek",
-                    "2": "Vybrané %d řádky",
-                    "3": "Vybrané %d řádky",
-                    "4": "Vybrané %d řádky",
                     "_": "Vybráno %d řádků"
                 }
             },
@@ -224,8 +208,6 @@
         "privMsg": "a ",
         "return": "vrátit se na hlavní stránku",
         "selfHost": "Pokud Hostujete sami toto uložiště prosím zkontrolujte adresu nebo si přečtěte náš průvodce odstraňováním problémů.",
-        "serverJars1": "Server JAR api je nepřístupná. Prosím zkontrolujte",
-        "serverJars2": "pro aktualní informace.",
         "start-error": "Server {} se nepodařilo spustit s kódem chyby: {}",
         "superError": "Pro dokončení této akce musíte být super uživatel.",
         "terribleFailure": "Jaké strašné selhání!"
@@ -253,7 +235,8 @@
         "finishedPreparing": "Dokončili jsme přípravu protokolů podpory. Klikněte na tlačítko Stáhnout pro stažení",
         "logout": "Odhlásit se",
         "preparingLogs": " Počkejte prosím, než připravíme vaše protokoly... Až budou připraveny, pošleme vám oznámení. U rozsáhlých zavádění to může chvíli trvat.",
-        "supportLogs": "Protokoly podpory"
+        "supportLogs": "Protokoly podpory",
+        "backup_desc": ""
     },
     "offline": {
         "offline": "Offline",
@@ -264,7 +247,6 @@
         "allowedServers": "Povolené servery",
         "apply": "Použít",
         "assignedRoles": "Přidělené role",
-        "backgroundUpload": "Nahrání pozadí",
         "cancel": "Zrušit",
         "clearComms": "Vymazat nevykonané příkazy",
         "custom": "Upravit Crafty",
@@ -275,20 +257,16 @@
         "globalExplain": "Kde má Crafty ukládat všechny soubory serverů. (Cestu doplníme o /server/[uuid serveru])",
         "globalServer": "Globalní cesta k serverům",
         "json": "Config.json",
-        "loginBackground": "Přihlašovací obrázek na pozadí",
-        "loginImage": "Nahrajte obrázek na pozadí přihlašovací obrazovky.",
         "match": "Hesla musí být stejná",
         "newRole": "Přidat novou roli",
         "newUser": "Přidat nového uživatele",
         "noMounts": "Ukazatel zaplněnosti disků na hlavní stránce",
         "pageTitle": "Nastavení panelu",
-        "preview": "Náhled",
         "role": "Role",
         "roleUsers": "Uživatelé s rolí",
         "roles": "Role",
         "save": "Uložit",
         "select": "Vyberte",
-        "selectImage": "Vyberte obrázek",
         "superConfirm": "Postupujte pouze v případě, že chcete, aby měl tento uživatel přístup ke VŠEM (ke všem uživatelským účtům, serverům, nastavení panelu atd.). Může vám dokonce odebrat práva superuživatele.",
         "superConfirmTitle": "Povolit superuživatele? Jste si jisti?",
         "title": "Crafty Konfigurace",
@@ -642,7 +620,7 @@
     },
     "startup": {
         "almost": "Dokončuji. Držte se...",
-        "cache": "Znovu načítam  mezipaměť Big Bucket",
+        "cache": "Znovu načítam mezipaměť Big Bucket",
         "internals": "Nastavuji a startuji Crafty interní komponenty",
         "internet": "Kontroluju připojení k internetu",
         "server": "Konfigurace ",

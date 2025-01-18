@@ -55,8 +55,8 @@ async function getTreeView(path, unzip = false, upload = false) {
     } else {
 
         bootbox.alert({
-            title: responseData.status,
-            message: responseData.error
+            title: responseData.error,
+            message: responseData.error_data
         });
     }
 }

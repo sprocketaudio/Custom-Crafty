@@ -29,7 +29,6 @@
         "permName": "Nom de la Permission",
         "perms": "Permissions",
         "server": "Serveur: ",
-        "superUser": "Super Utilisateur",
         "yes": "Oui"
     },
     "base": {
@@ -209,8 +208,6 @@
         "privMsg": "et le ",
         "return": "Revenir au Tableau de Bord",
         "selfHost": "Si vous hébergez vous-même ce repo, veuillez vérifier votre adresse et votre guide de dépannage.",
-        "serverJars1": "l'API Server JARs est inaccessible. Merci de vérifier",
-        "serverJars2": "pour les informations les plus à jour.",
         "start-error": "Le serveur {} n'a pas pu démarrer avec le code d'erreur : {}",
         "superError": "Tu dois être un super utilisateur pour effectuer cette action.",
         "terribleFailure": "C'est une Terrible Erreur !"
@@ -554,7 +551,6 @@
     "serverTerm": {
         "commandInput": "Entre ta commande",
         "delay-explained": "Le service/agent a récemment démarré et retarde le démarrage de l'instance du serveur minecraft",
-        "downloading": "Téléchargement ...",
         "importing": "Importation ...",
         "installing": "Installation ...",
         "restart": "Redémarrer",

@@ -11,25 +11,30 @@ modify_role_schema = {
             "type": "string",
             "minLength": 1,
             "pattern": r"^[^,\[\]]*$",
+            "error": "roleName",
         },
         "servers": {
             "type": "array",
+            "error": "typeList",
+            "fill": True,
             "items": {
                 "type": "object",
                 "properties": {
                     "server_id": {
                         "type": "string",
                         "minimum": 1,
+                        "error": "roleServerId",
                     },
                     "permissions": {
                         "type": "string",
                         "pattern": r"^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "error": "roleServerPerms",
                     },
                 },
                 "required": ["server_id", "permissions"],
             },
         },
-        "manager": {"type": ["integer", "null"]},
+        "manager": {"type": ["integer", "null"], "error": "roleManager"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -41,19 +46,24 @@ basic_modify_role_schema = {
         "name": {
             "type": "string",
             "minLength": 1,
+            "error": "roleName",
         },
         "servers": {
             "type": "array",
+            "error": "typeList",
+            "fill": True,
             "items": {
                 "type": "object",
                 "properties": {
                     "server_id": {
                         "type": "string",
                         "minimum": 1,
+                        "error": "roleServerId",
                     },
                     "permissions": {
                         "type": "string",
-                        "pattern": "^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "pattern": r"^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "error": "roleServerPerms",
                     },
                 },
                 "required": ["server_id", "permissions"],
@@ -83,15 +93,26 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
             not superuser
             and EnumPermissionsCrafty.ROLES_CONFIG not in exec_user_permissions_crafty
         ):
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             self.finish_json(
                 200,
                 {"status": "ok", "data": self.controller.roles.get_role(role_id)},
             )
-        except DoesNotExist:
-            self.finish_json(404, {"status": "error", "error": "ROLE_NOT_FOUND"})
+        except DoesNotExist as why:
+            self.finish_json(
+                404, {"status": "error", "error": "ROLE_NOT_FOUND", "error_data": why}
+            )
 
     def delete(self, role_id: str):
         auth_data = self.authenticate_user()
@@ -110,7 +131,16 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
             str(role.get("manager", "no manager found")) != str(auth_data[4]["user_id"])
             and not superuser
         ):
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         self.controller.roles.remove_role(role_id)
 
@@ -165,13 +195,21 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
                 validate(data, modify_role_schema)
             else:
                 validate(data, basic_modify_role_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = ""
+            if why.schema.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{offending_key} {self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {why.schema.get("enum", "")}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
 
@@ -188,11 +226,13 @@ class ApiRolesRoleIndexHandler(BaseApiHandler):
                 data.get("servers", None),
                 manager,
             )
-        except DoesNotExist:
-            return self.finish_json(404, {"status": "error", "error": "ROLE_NOT_FOUND"})
-        except IntegrityError:
+        except DoesNotExist as why:
             return self.finish_json(
-                404, {"status": "error", "error": "ROLE_NAME_EXISTS"}
+                404, {"status": "error", "error": "ROLE_NOT_FOUND", "error_data": why}
+            )
+        except IntegrityError as why:
+            return self.finish_json(
+                404, {"status": "error", "error": "ROLE_NAME_EXISTS", "error_data": why}
             )
         self.controller.management.add_to_audit_log(
             user["user_id"],

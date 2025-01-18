@@ -28,7 +28,6 @@
         "permName": "Nome da Permissão",
         "perms": "Permissões",
         "server": "Servidor: ",
-        "superUser": "Super Usuário",
         "yes": "Sim"
     },
     "base": {
@@ -445,7 +444,6 @@
     "serverTerm": {
         "commandInput": "Insira seu comando",
         "delay-explained": "O serviço/agente iniciou recentemente e está atrasando o início da instância do servidor de minecraft",
-        "downloading": "Baixando...",
         "restart": "Reiniciar",
         "sendCommand": "Enviar comando",
         "start": "Iniciar",
