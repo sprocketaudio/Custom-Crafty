@@ -9,7 +9,8 @@ TBD
 ### Bug fixes
 - Bump requests to resolve yank for CVE-2024-35195 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/808))
 - Better handle malformed mcping data ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/799))
-- Resolves type issue when posting no keywords in the "keyword" field in config.json tab ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/819))
+- Resolve type issue when posting no keywords in the "keyword" field in config.json tab ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/819))
+- Resolve issue where sometimes backup migration `20240308_multi-backup` would run twice ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/820))
 ### Tweaks
 - Dyamically change child action translation for backups ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/806))
 - Remove EXIF image data on app Background Photos ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/805))
