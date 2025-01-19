@@ -45,6 +45,7 @@ class PublicHandler(BaseHandler):
             "query": "",
             "background": self.controller.cached_login,
             "login_opacity": self.controller.management.get_login_opacity(),
+            "themes": self.helper.get_themes(),
         }
 
         if self.request.query:

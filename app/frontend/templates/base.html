@@ -17,8 +17,14 @@
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Sarabun" media="screen">
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.22/fh-3.1.7/r-2.2.6/sc-2.0.3/sp-1.2.2/datatables.min.css" />
   <link rel="stylesheet" href="/static/assets/vendors/css/vendor.bundle.base.css">
+
+  <link rel="stylesheet" href="/static/assets/css/internal/root.css">
+  <link rel="stylesheet" href="/static/assets/css/internal/anti-lockout.css">
+  <link rel="stylesheet" href="/static/assets/css/themes/default.css">
+  <link rel="stylesheet" href="/static/assets/css/base-style.css">
   <link rel="stylesheet" href="/static/assets/css/crafty.css">
   <link rel="stylesheet" href="/static/assets/css/crafty-toggle-btn.css">
+  <link rel="stylesheet" href="/static/assets/css/partial/crafty-notification.css">
 
   <link rel="manifest" href="/static/assets/crafty.webmanifest">
   <meta name="mobile-web-app-capable" content="yes">
@@ -37,12 +43,15 @@
   <!-- End Plugin css for this page-->
 
   <!-- Layout styles -->
-  <link rel="stylesheet" href="/static/assets/css/dark/style.css">
+  {% for theme in data['themes'] %}
+  <link rel="stylesheet" href="/static/assets/css/themes/{{ theme }}.css">
+  {% end %}
+  <link rel="stylesheet" href="/static/assets/css/base-style.css">
+  <link rel="stylesheet" href="/static/assets/css/crafty.css">
   <!-- End Layout styles -->
 
   <link rel="shortcut icon" type="image/svg+xml" href="/static/assets/images/logo_small.svg">
   <link rel="alternate icon" href="/static/assets/images/favicon.png" />
-  <link rel="stylesheet" href="/static/assets/css/crafty.css">
 
   <!-- Alpine.js - The modern jQuery alternative -->
   <script defer src="../static/assets/vendors/js/cdn.min.js"></script>
@@ -69,21 +78,12 @@
           <img src="/static/assets/images/logo_small.svg" alt="logo" /> </a>
       </div>
       <div class="navbar-menu-wrapper d-flex align-items-center">
-        <style>
-          body:not(.sidebar-icon-only) .navbar-toggler .mdi-chevron-double-right {
-            display: none;
-          }
-
-          body.sidebar-icon-only .navbar-toggler .mdi-chevron-double-left {
-            display: none;
-          }
-        </style>
         <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
           <span class="mdi mdi-chevron-double-left"></span>
           <span class="mdi mdi-chevron-double-right"></span>
         </button>
         &nbsp;&nbsp;&nbsp;
-        <span class="badge-pill badge-outline-primary" id="server-name-nav" style="display: none;"></span>
+        <span class="badge-pill badge-outline-primary d-none" id="server-name-nav"></span>
 
 
         {% include notify.html %}
@@ -100,7 +100,7 @@
       <div class="main-panel">
 
         <div class="warnings">
-          <noscript class="noscript-warning" style="padding: 20px; background-color: rgb(247, 151, 15);">
+          <noscript class="noscript-warning">
             <div>{% raw translate('base', 'doesNotWorkWithoutJavascript', data['lang']) %}</div>
           </noscript>
         </div>
@@ -116,65 +116,6 @@
     </div>
     <!-- page-body-wrapper ends -->
   </div>
-
-
-  <style>
-    .notifications {
-      position: fixed;
-      width: 200px;
-      top: 70px;
-      right: 0px;
-    }
-
-    .notification {
-      position: relative;
-      margin-right: 1rem;
-      background: var(--card-banner-bg);
-      -webkit-transition: right 0.75s, opacity 0.75s, top 0.75s;
-      -moz-transition: right 0.75s, opacity 0.75s, top 0.75s;
-      -o-transition: right 0.75s, opacity 0.75s, top 0.75s;
-      transition: right 0.75s, opacity 0.75s, top 0.75s;
-      right: -20rem;
-      opacity: 0.1;
-    }
-
-    .toast-header {
-      background-color: var(--card-banner-bg);
-      color: var(--base-text);
-    }
-
-    .toast-body {
-      background-color: var(--dropdown-bg);
-      color: var(--base-text);
-    }
-
-    .notification img {
-      max-height: 20px;
-    }
-
-    .notification strong {
-      line-height: 20px;
-    }
-
-    .notification.active {
-      right: 0rem;
-      opacity: 1;
-    }
-
-    .notification.remove {
-      right: 0rem;
-      opacity: 0.1;
-      top: -2rem;
-    }
-
-    .notification span {
-      line-height: 20px;
-      font-size: 15px;
-      user-select: none;
-      cursor: pointer;
-    }
-  </style>
-
 
   <div class="notifications"></div>
 
@@ -256,9 +197,9 @@
 
     const sendWssError = () => wsOpen || warn(
       'WebSockets are required for Crafty to work. This websocket connection has been closed. Are you using a reverse proxy?',
-      link='https://docs.craftycontrol.com/pages/getting-started/proxies/',
-      link_msg="See our documentation for details",
-      className='wssError'
+      link = 'https://docs.craftycontrol.com/pages/getting-started/proxies/',
+      link_msg = "See our documentation for details",
+      className = 'wssError'
     )
 
     function startWebSocket() {
@@ -460,7 +401,7 @@
     }
 
 
-    function warn(message, link = null, link_msg=null, className = null, bg_color="#f7970f") {
+    function warn(message, link = null, link_msg = null, className = null, bg_color = "#f7970f") {
       var closeEl = document.createElement('span');
       var strongEL = document.createElement('strong');
       var msgEl = document.createElement('div');
@@ -581,13 +522,13 @@
 
     $(document).ready(function () {
       console.log('%c[Crafty Controller] %cReady for JS!', 'font-weight: 900; color: #800080;', 'font-weight: 900; color: #eee;');
-      if ($(document.documentElement).data("username") === "anti-lockout-user"){
+      if ($(document.documentElement).data("username") === "anti-lockout-user") {
         warn(
-        '⚠️You are in a recovery account. Access is limited!',
-        link='/logout',
-        link_msg="Click here to log out after you change your password. ⚠️",
-        className='anti-lockout',
-        bg_color='#6887dc'
+          '⚠️You are in a recovery account. Access is limited!',
+          link = '/logout',
+          link_msg = "Click here to log out after you change your password. ⚠️",
+          className = 'anti-lockout',
+          bg_color = '#6887dc'
         )
       }
       $('#support_logs').click(function () {

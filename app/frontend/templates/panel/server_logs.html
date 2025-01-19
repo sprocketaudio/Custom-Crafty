@@ -41,8 +41,7 @@
 
           <div class="col-md-12">
             <div class="input-group">
-              <div id="virt_console" class=""
-                style="width: 100%; font-size: .8em; padding: 5px 10px; border: 1px solid var(--outline); background-color:var(--card-banner-bg);height:500px; overflow: scroll;">
+              <div id="virt_console" class="virt_console">
               </div>
             </div>
             <br />
@@ -51,12 +50,9 @@
             <br />
             <br />
             <h4>{{ translate('serverDetails', 'filterList', data['lang']) }}</h4>
-            <ul id="ignored-words" style="list-style: None;"></ul>
+            <ul id="ignored-words" class="list-group"></ul>
             <br />
-
-
           </div>
-
         </div>
       </div>
     </div>
@@ -148,8 +144,8 @@
     // Display filtered word
     words.push(word);
     $("#ignored-words").append(
-      `<li id=${safe_word.replaceAll(" ", "-")}>` +
-      "<div class='card-header header-sm d-flex justify-content-between align-items-center'>" +
+      `<li id=${safe_word.replaceAll(" ", "-")} class="list-group-item">` +
+      "<div class='text-sm d-flex justify-content-between align-items-center'>" +
       `${word}&nbsp;<button class='btn btn-danger' onclick='deleteWord("${word}")' >` +
       "<i class='fas fa-trash'></i></button></div></li>"
     );
@@ -163,8 +159,8 @@
       let safe_word = sanitize(word);
 
       $("#ignored-words").append(
-        `<li id=${safe_word.replaceAll(" ", "-")}>` +
-        "<div class='card-header header-sm d-flex justify-content-between align-items-center'>" +
+        `<li id=${safe_word.replaceAll(" ", "-")}  class="list-group-item">` +
+        "<div class='text-sm d-flex justify-content-between align-items-center'>" +
         `${word}&nbsp;<button class='btn btn-danger' onclick='deleteWord("${word}")' >` +
         "<i class='fas fa-trash'></i></button></div></li>"
       );

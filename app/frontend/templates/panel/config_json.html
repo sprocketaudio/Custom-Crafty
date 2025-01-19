@@ -6,8 +6,7 @@
 {% block title %}Crafty Controller - {{ translate('panelConfig', 'pageTitle', data['lang']) }}{% end %}
 
 {% block content %}
-<link rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.10/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.10/css/bootstrap-select.min.css">
 
 
 <div class="content-wrapper">
@@ -50,17 +49,16 @@
           </div>
           <!-- Page Title Header Ends-->
 
-          <form id="config-form" class="forms-sample" method="post" action="/panel/config_json">
-
+          <form id="config-form" method="post" action="/panel/config_json">
             {% for item in data['config-json'].items() %}
             {% if item[0] == "reset_secrets_on_next_boot" %}
-            <div class="form-group" style="background: rgba(243, 21, 6, 0.3); outline: 1px solid red; padding: 10px;">
+            <div class="form-group reset-secret">
               {% else %}
               <div class="form-group">
                 {% end %}
-                <label class="form" for="{{item[0]}}">{{item[0]}}
-                  <small class="text-muted ml-1">
-                  </small> </label><br />
+                <label class="form" for="{{item[0]}}">
+                  {{item[0]}}
+                </label>
                 {% if item[0] == 'language' %}
                 <select name="{{item[0]}}" class="form-control">
                   {% for lang in data['availables_languages'] %}
@@ -73,11 +71,9 @@
                 </select>
                 {% elif item[0] == 'disabled_language_files' %}
                 <div class="input-group">
-                  <button type="button" class="btn btn-outline-default custom-picker"
-                    onclick="$('option', $('#lang_select')).each(function(element) {$(this).removeAttr('selected').prop('selected', false); $('.selectpicker').selectpicker('refresh')});">{{
+                  <button type="button" class="btn btn-outline-default custom-picker" onclick="$('option', $('#lang_select')).each(function(element) {$(this).removeAttr('selected').prop('selected', false); $('.selectpicker').selectpicker('refresh')});">{{
                     translate('panelConfig', 'enableLang', data['lang']) }}</button>
-                  <select id="lang_select" class="form-control selectpicker show-tick custom-picker"
-                    data-icon-base="fas" data-tick-icon="fa-check" multiple data-style="custom-picker">
+                  <select id="lang_select" class="form-control selectpicker show-tick custom-picker" data-icon-base="fas" data-tick-icon="fa-check" multiple data-style="custom-picker">
                     {% for lang in data['all_languages'] %}
                     {% if lang in item[1] %}
                     <option selected>{{lang}}</option>
@@ -86,17 +82,13 @@
                     {% end %}
                     {% end %}
                   </select>
-                  <textarea id="disabled_lang" name="{{item[0]}}" class="form-control list hidden"
-                    rows="{{ len(data['all_languages']) }}" value="{{','.join(item[1])}}"
-                    hidden>{{','.join(item[1])}}</textarea>
+                  <textarea id="disabled_lang" name="{{item[0]}}" class="form-control list hidden" rows="{{ len(data['all_languages']) }}" value="{{','.join(item[1])}}" hidden>{{','.join(item[1])}}</textarea>
                 </div>
                 {% elif item[0] == 'monitored_mounts'%}
                 <div class="input-group">
-                  <button type="button" class="btn btn-outline-default custom-picker"
-                    onclick="$('option', $('#mount_select')).each(function(element) {$(this).removeAttr('selected').prop('selected', false); $('.selectpicker').selectpicker('refresh')});">{{
+                  <button type="button" class="btn btn-outline-default custom-picker" onclick="$('option', $('#mount_select')).each(function(element) {$(this).removeAttr('selected').prop('selected', false); $('.selectpicker').selectpicker('refresh')});">{{
                     translate('panelConfig', 'noMounts', data['lang']) }}</button>
-                  <select id="mount_select" class="form-control selectpicker show-tick" data-icon-base="fas"
-                    data-tick-icon="fa-check" multiple data-style="custom-picker">
+                  <select id="mount_select" class="form-control selectpicker show-tick" data-icon-base="fas" data-tick-icon="fa-check" multiple data-style="custom-picker">
                     {% for mount in data['all_partitions'] %}
                     {% if mount in item[1] %}
                     <option selected>{{mount}}</option>
@@ -105,33 +97,40 @@
                     {% end %}
                     {% end %}
                   </select>
-                  <textarea id="monitored_mounts" name="{{item[0]}}" class="form-control list hidden"
-                    rows="{{ len(data['all_partitions']) }}" value="{{','.join(item[1])}}"
-                    hidden>{{','.join(item[1])}}</textarea>
+                  <textarea id="monitored_mounts" name="{{item[0]}}" class="form-control list hidden" rows="{{ len(data['all_partitions']) }}" value="{{','.join(item[1])}}" hidden>{{','.join(item[1])}}</textarea>
                 </div>
                 {% elif isinstance(item[1], list) %}
-                <textarea id="{{item[0]}}" value="{{','.join(item[1])}}" type="text" name="{{item[0]}}"
-                  class="form-control list">{{','.join(item[1])}}</textarea>
+                <textarea id="{{item[0]}}" value="{{','.join(item[1])}}" type="text" name="{{item[0]}}" class="form-control list">{{','.join(item[1])}}</textarea>
                 {% elif isinstance(item[1], bool) %}
-                <div style="margin-left: 30px;">
-                  {% if item[1] == True %}
-                  <input type="radio" class="form-check-input" name="{{item[0]}}" id="True" value="True" checked>
-                   <label for="True">True</label><br>
-                  <input type="radio" class="form-check-input" name="{{item[0]}}" id="False" value="False">
-                   <label for="False">False</label>
-                  {% else %}
-                  <input type="radio" class="form-check-input" name="{{item[0]}}" id="True" value="True">
-                   <label for="True">True</label><br>
-                  <input type="radio" class="form-check-input" name="{{item[0]}}" id="False" value="False" checked>
-                   <label for="False">False</label>
-                  {% end %}
+
+                {% if item[1] == True %}
+                <div class="custom-control custom-radio">
+                  <input class="custom-control-input" type="radio" name="{{item[0]}}" id="{{item[0]}}_True" value="True" checked>
+                  <label class="custom-control-label" for="{{item[0]}}_True">
+                    True
+                  </label>
                 </div>
-                {% elif isinstance(item[1], int) %}
-                <input type="number" class="form-control" name="{{item[0]}}" id="{{item[0]}}" value="{{ item[1]  }}"
-                  step="1" min="0" required>
+                <div class="custom-control custom-radio">
+                  <input class="custom-control-input" type="radio" name="{{item[0]}}" id="{{item[0]}}_False" value="False">
+                  <label class="custom-control-label" for="{{item[0]}}_False">False</label>
+                </div>
                 {% else %}
-                <input type="text" class="form-control" name="{{item[0]}}" id="{{item[0]}}" value="{{ item[1]  }}"
-                  step="2" min="0" required>
+                <div class="custom-control custom-radio">
+                  <input class="custom-control-input" type="radio" name="{{item[0]}}" id="{{item[0]}}_True" value="True">
+                  <label class="custom-control-label" for="{{item[0]}}_True">True</label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input class="custom-control-input" type="radio" name="{{item[0]}}" id="{{item[0]}}_False" value="False" checked>
+                  <label class="custom-control-label" for="{{item[0]}}_False">
+                    False
+                  </label>
+                </div>
+                {% end %}
+
+                {% elif isinstance(item[1], int) %}
+                <input type="number" class="form-control" name="{{item[0]}}" id="{{item[0]}}" value="{{ item[1]  }}" step="1" min="0" required>
+                {% else %}
+                <input type="text" class="form-control" name="{{item[0]}}" id="{{item[0]}}" value="{{ item[1]  }}" step="2" min="0" required>
                 {% end %}
               </div>
               {% end %}
@@ -141,28 +140,7 @@
       </div>
     </div>
   </div>
-
-
 </div>
-
-<style>
-  .dropdown-menu.inner {
-    display: inline-block !important;
-  }
-
-  .popover-body {
-    color: white !important;
-    ;
-  }
-
-  input[type="radio"] {
-    -ms-transform: scale(1.5);
-    /* IE 9 */
-    -webkit-transform: scale(1.5);
-    /* Chrome, Safari, Opera */
-    transform: scale(1.5);
-  }
-</style>
 <!-- content-wrapper ends -->
 
 {% end %}

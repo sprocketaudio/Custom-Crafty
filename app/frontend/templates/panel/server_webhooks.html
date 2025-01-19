@@ -41,7 +41,7 @@
           </span>
 
           <div class="row">
-            <div class="col-md-12 col-sm-12" style="overflow-x:auto;">
+            <div class="col-md-12 col-sm-12 overflow-x-auto">
               <div class="card">
                 <div class="card-header header-sm d-flex justify-content-between align-items-center">
                   <h4 class="card-title"><i class="fa-regular fa-bell"></i> {{ translate('webhooks', 'webhooks', data['lang']) }} </h4>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="card-body">
                   {% if len(data['webhooks']) == 0 %}
-                  <div style="text-align: center; color: grey;">
+                  <div class="text-center text-secondary">
                     <h7>{{ translate('webhooks', 'no-webhook', data['lang']) }} <strong>{{ translate('webhooks', 'newWebhook',data['lang']) }}</strong>.</h7>
                   </div>
                   {% end %}
@@ -82,7 +82,7 @@
                           <td id="{{webhook.webhook_type}}" class="type">
                             <p>{{webhook.webhook_type}}</p>
                           </td>
-                          <td id="{{webhook.trigger}}" class="trigger" style="overflow: scroll; max-width: 30px;">
+                          <td id="{{webhook.trigger}}" class="trigger overflow-scroll" style="max-width: 30px;">
                             <ul>
                               {% for trigger in webhook.trigger.split(",") %}
                               {% if trigger in data["triggers"] %}
@@ -157,11 +157,6 @@
     </div>
   </div>
   <style>
-    .popover-body {
-      color: white !important;
-      ;
-    }
-
     .toggle-handle {
       background-color: white !important;
     }

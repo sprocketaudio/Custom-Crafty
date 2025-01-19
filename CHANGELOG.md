@@ -5,6 +5,7 @@ TBD
 ### Refactor
 - Refactor and standardize all JSON validator errors returning human readable translations ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/786))
 - Improve docker-build CI/CD, supporting nightly builds ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/813))
+- Standardize and centralize CSS throughout front end, Allows for easier management of themes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/726))
 ### Bug fixes
 - Bump requests to resolve yank for CVE-2024-35195 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/808))
 - Better handle malformed mcping data ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/799))

@@ -12,6 +12,7 @@ class StatusHandler(BaseHandler):
             "lang": self.helper.get_setting("language"),
             "lang_page": self.helper.get_lang_page(self.helper.get_setting("language")),
             "servers": self.controller.servers.get_all_servers_stats(),
+            "themes": self.helper.get_themes(),
         }
         running = 0
         for srv in page_data["servers"]:
