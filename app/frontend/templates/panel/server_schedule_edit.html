@@ -105,7 +105,7 @@
                           data['lang']) }}</option>
                       </select>
                     </div>
-                    <div id="ifDays d-block">
+                    <div id="ifDays" class="d-block">
                       <div class="form-group">
                         <label for="time">{{ translate('serverScheduleConfig', 'time' , data['lang']) }} <small class="text-muted ml-1"> - {{ translate('serverScheduleConfig', 'time-explain' ,
                             data['lang']) }}</small> </label>
@@ -113,21 +113,21 @@
                       </div>
                     </div>
                   </div>
-                  <div id="ifYes d-none">
+                  <div id="ifYes" class="d-none">
                     <div class="form-group">
                       <label for="command">{{ translate('serverScheduleConfig', 'command' , data['lang']) }} <small class="text-muted ml-1"> - {{ translate('serverScheduleConfig', 'command-explain' ,
                           data['lang']) }}</small> </label>
                       <input type="input" class="form-control" name="command" id="command_input" value="{{ data['schedule']['command']  }}" placeholder="Command" required>
                     </div>
                   </div>
-                  <div id="ifAdvanced d-none">
+                  <div id="ifAdvanced" class="d-none">
                     <div class="form-group">
                       <label for="cron">{{ translate('serverScheduleConfig', 'cron' , data['lang']) }} <small class="text-muted ml-1"> - {{ translate('serverScheduleConfig', 'cron-explain' , data['lang'])
                           }}</small> </label>
                       <input type="input" class="form-control" name="cron_string" id="cron" value="{{ data['schedule']['cron_string']  }}" placeholder="* * * * *">
                     </div>
                   </div>
-                  <div id="ifReaction d-none">
+                  <div id="ifReaction" class="d-none">
                     <div class="form-group">
                       <label for="delay">{{ translate('serverScheduleConfig', 'offset' , data['lang']) }} <small class="text-muted ml-1"> - {{ translate('serverScheduleConfig', 'offset-explain' ,
                           data['lang']) }}</small> </label>
@@ -349,10 +349,12 @@
 
     function yesnoCheck() {
       if (document.getElementById('action').value == "command") {
-        document.getElementById("ifYes").style.display = "block";
+        document.getElementById("ifYes").classList.add("d-block");
+        document.getElementById("ifYes").classList.remove("d-none");       
         document.getElementById("command_input").required = true;
       } else {
-        document.getElementById("ifYes").style.display = "none";
+        document.getElementById("ifYes").classList.add("d-none");
+        document.getElementById("ifYes").classList.remove("d-block");
         document.getElementById("command_input").required = false;
       }
       if (document.getElementById('action').value == "backup") {
@@ -368,40 +370,56 @@
     }
     function basicAdvanced() {
       if (document.getElementById('difficulty').value == "advanced") {
-        document.getElementById("ifAdvanced").style.display = "block";
-        document.getElementById("ifReaction").style.display = "none";
-        document.getElementById("ifBasic").style.display = "none";
+        document.getElementById("ifAdvanced").classList.add("d-block");
+        document.getElementById("ifReaction").classList.add("d-none");
+        document.getElementById("ifBasic").classList.add("d-none");
+        document.getElementById("ifAdvanced").classList.remove("d-none");
+        document.getElementById("ifReaction").classList.remove("d-block");
+        document.getElementById("ifBasic").classList.remove("d-block");
         document.getElementById("delay").required = false;
         document.getElementById("parent").required = false;
         document.getElementById("interval").required = false;
         document.getElementById("time").required = false;
+        document.getElementById("ifDays").classList.add("d-none");
+        document.getElementById("ifDays").classList.remove("d-block");
       } else if (document.getElementById('difficulty').value == "reaction") {
-        document.getElementById("ifReaction").style.display = "block";
-        document.getElementById("ifBasic").style.display = "none";
-        document.getElementById("ifAdvanced").style.display = "none";
+        document.getElementById("ifReaction").classList.add("d-block");
+        document.getElementById("ifBasic").classList.add("d-none");
+        document.getElementById("ifAdvanced").classList.add("d-none");
+        document.getElementById("ifReaction").classList.remove("d-none");
+        document.getElementById("ifBasic").classList.remove("d-block");
+        document.getElementById("ifAdvanced").classList.remove("d-block");
         document.getElementById("delay").required = true;
         document.getElementById("parent").required = true;
         document.getElementById("interval").required = false;
         document.getElementById("time").required = false;
+        document.getElementById("ifDays").classList.add("d-none");
+        document.getElementById("ifDays").classList.remove("d-block");
         $("#cron").val("");
       }
       else {
-        document.getElementById("ifAdvanced").style.display = "none";
-        document.getElementById("ifReaction").style.display = "none";
-        document.getElementById("ifBasic").style.display = "block";
+        document.getElementById("ifAdvanced").classList.add("d-none");
+        document.getElementById("ifReaction").classList.add("d-none");
+        document.getElementById("ifAdvanced").classList.remove("d-block");
+        document.getElementById("ifReaction").classList.remove("d-block");
+        document.getElementById("ifBasic").classList.add("d-block");
+        document.getElementById("ifBasic").classList.remove("d-none");
         document.getElementById("delay").required = false;
         document.getElementById("parent").required = false;
         document.getElementById("interval").required = true;
         document.getElementById("time").required = true;
+        ifDays();
         $("#cron").val("");
       }
     }
     function ifDays() {
       if (document.getElementById('interval_type').value == "days") {
-        document.getElementById("ifDays").style.display = "block";
+        document.getElementById("ifDays").classList.add("d-block");
+        document.getElementById("ifDays").classList.remove("d-none");
         document.getElementById("time").required = true;
       } else {
-        document.getElementById("ifDays").style.display = "none";
+        document.getElementById("ifDays").classList.add("d-none");
+        document.getElementById("ifDays").classList.remove("d-block");
         document.getElementById("time").required = false;
       }
     }
