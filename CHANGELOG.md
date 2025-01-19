@@ -1,4 +1,15 @@
 # Changelog
+## --- [4.4.6] - 2024/TBD
+### New features
+TBD
+### Bug fixes
+TBD
+### Tweaks
+TBD
+### Lang
+TBD
+<br><br>
+
 ## --- [4.4.5] - 2024/01/19
 ### Refactor
 - Refactor and standardize all JSON validator errors returning human readable translations ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/786))
