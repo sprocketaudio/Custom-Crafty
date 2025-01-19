@@ -431,83 +431,85 @@
           });
         }
       }
+    }
+    )
+  });
+  if (webSocket) {
+    webSocket.on('move_status', function (message) {
+      if (message === "done") {
+        $("#submit-list").removeClass("loading");
+        $("#submit-list").html("");
+        $("#submit-status").html('<i class="fa fa-check"></i>');
+      } else {
+        $("#submit-status").html('<i class="fa fa-spinner fa-spin"></i>');
+        $("#submit-list").html(message);
+        $("#submit-list").addClass("loading");
+      }
     });
-    if (webSocket) {
-      webSocket.on('move_status', function (message) {
-        if (message === "done") {
-          $("#submit-list").removeClass("loading");
-          $("#submit-list").html("");
-          $("#submit-status").html('<i class="fa fa-check"></i>');
-        } else {
-          $("#submit-status").html('<i class="fa fa-spinner fa-spin"></i>');
-          $("#submit-list").html(message);
-          $("#submit-list").addClass("loading");
-        }
+  }
+
+  $("#server-path").submit(async function (e) {
+    const token = getCookie("_xsrf")
+    e.preventDefault();
+
+    $("#submit-status").html('<i class="fa fa-spinner fa-spin"></i>');
+
+    let path = $("#global_server_path").val();
+    let res = await fetch(`/api/v2/crafty/config/servers_dir`, {
+      method: 'PATCH',
+      headers: {
+        'X-XSRFToken': token
+      },
+      body: JSON.stringify({ "new_dir": path }),
+    });
+    let responseData = await res.json();
+    if (responseData.status === "ok") {
+      return
+    } else {
+
+      bootbox.alert({
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
+  });
 
-    $("#server-path").submit(async function (e) {
-      const token = getCookie("_xsrf")
-      e.preventDefault();
+  $(document).ready(function () {
+    $('[data-toggle="popover"]').popover();
+    if ($(window).width() < 1000) {
+      $('.too_small').popover("show");
+      $('.too_small2').popover("show");
+    }
 
-      $("#submit-status").html('<i class="fa fa-spinner fa-spin"></i>');
-
-      let path = $("#global_server_path").val();
-      let res = await fetch(`/api/v2/crafty/config/servers_dir`, {
-        method: 'PATCH',
-        headers: {
-          'X-XSRFToken': token
-        },
-        body: JSON.stringify({ "new_dir": path }),
-      });
-      let responseData = await res.json();
-      if (responseData.status === "ok") {
-        return
-      } else {
-
-        bootbox.alert({
-          title: responseData.error,
-          message: responseData.error_data
-        });
-      }
+  });
+  $(window).ready(function () {
+    $('body').click(function () {
+      $('.too_small').popover("hide");
+      $('.too_small2').popover("hide");
     });
-
-    $(document).ready(function () {
-      $('[data-toggle="popover"]').popover();
-      if ($(window).width() < 1000) {
-        $('.too_small').popover("show");
-        $('.too_small2').popover("show");
-      }
-
-    });
-    $(window).ready(function () {
-      $('body').click(function () {
-        $('.too_small').popover("hide");
-        $('.too_small2').popover("hide");
-      });
-    });
-    $(window).resize(function () {
-      // This will execute whenever the window is resized
-      if ($(window).width() < 1000) {
-        $('.too_small').popover("show");
-      }
-      else {
-        $('.too_small').popover("hide");
-      } // New width
-      if ($(window).width() < 1000) {
-        $('.too_small2').popover("show");
-      }
-      else {
-        $('.too_small2').popover("hide");
-      } // New width
-    });
-    $('#file').change(function () {
-      console.log("File changed");
-      if ($('#file').val()) {
-        $('#upload-button').prop("disabled", false);
-        console.log("File changed good");
-      }
-    });
+  });
+  $(window).resize(function () {
+    // This will execute whenever the window is resized
+    if ($(window).width() < 1000) {
+      $('.too_small').popover("show");
+    }
+    else {
+      $('.too_small').popover("hide");
+    } // New width
+    if ($(window).width() < 1000) {
+      $('.too_small2').popover("show");
+    }
+    else {
+      $('.too_small2').popover("hide");
+    } // New width
+  });
+  $('#file').change(function () {
+    console.log("File changed");
+    if ($('#file').val()) {
+      $('#upload-button').prop("disabled", false);
+      console.log("File changed good");
+    }
+  });
 </script>
 
 {% end %}
