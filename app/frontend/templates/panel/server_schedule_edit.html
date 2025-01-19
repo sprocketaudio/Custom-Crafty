@@ -74,8 +74,10 @@
                     </select>
                     <div id="ifBackup" class="d-none">
                       <br>
-                      <label for="action_id">{{ translate('serverSchedules', 'actionId' , data['lang']) }}<small class="text-muted ml-1"></small> </label><br>
-                      <select id="action_id" name="action_id" class="form-control form-control-lg select-css" value="{{ data['schedule']['action_id']  }}">
+                      <label id="action_id_label" for="action_id" data-backup-translate="{{ translate('serverSchedules', 'backupPol', data['lang']) }}" data-action-translate="{{ translate('serverSchedules', 'actionId', data['lang']) }}"><small
+                        class="text-muted ml-1"></small> </label><br>
+                      <select id="action_id" name="action_id"
+                        class="form-control form-control-lg select-css" value="{{ data['schedule']['action_id']  }}">
                         {% for backup in data["backups"] %}
                         {% if backup.backup_id == data["schedule"]["action_id"] %}
                         <option id="{{backup.backup_id}}" value="{{backup.backup_id}}">{{backup.backup_name}}</option>
@@ -350,7 +352,7 @@
     function yesnoCheck() {
       if (document.getElementById('action').value == "command") {
         document.getElementById("ifYes").classList.add("d-block");
-        document.getElementById("ifYes").classList.remove("d-none");       
+        document.getElementById("ifYes").classList.remove("d-none");
         document.getElementById("command_input").required = true;
       } else {
         document.getElementById("ifYes").classList.add("d-none");
@@ -361,11 +363,13 @@
         document.getElementById("ifBackup").classList.add("d-block");
         document.getElementById("ifBackup").classList.remove("d-none");
         document.getElementById("action_id").required = true;
+        $("#action_id_label").html($("#action_id_label").attr("data-backup-translate"));
       } else {
         document.getElementById("ifBackup").classList.remove("d-block");
         document.getElementById("ifBackup").classList.add("d-none");
         document.getElementById("action_id").required = false;
         $("#action_id").val(null);
+        $("#action_id_label").html($("#action_id_label").attr("data-action-translate"));
       }
     }
     function basicAdvanced() {
