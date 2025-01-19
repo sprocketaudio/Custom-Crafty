@@ -508,7 +508,7 @@
     },
     "serverSchedules": {
         "action": "ACTSHUN",
-        "actionId": "PICK ACTION KITTY",
+        "actionId": "ACTION KITTY",
         "areYouSure": "FORGET 2 DO DIS ????",
         "cancel": "STAHP",
         "cannotSee": "CANNY SEE?",
@@ -532,7 +532,8 @@
         "no": "NOPE",
         "no-schedule": "THER BE NO SCHEDULEZ FOR DIS SERVER RIGHT MEOW. 2 GET STARTD, BOOP",
         "scheduledTasks": "SCHEDULED TASKZ",
-        "yes": "YESH"
+        "yes": "YESH",
+        "backupPol": "BAKUPS RULEZ"
     },
     "serverStats": {
         "cpuUsage": "CPU USAGE",
