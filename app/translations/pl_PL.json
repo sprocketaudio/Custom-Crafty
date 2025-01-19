@@ -29,7 +29,6 @@
         "permName": "Nazwa permisji",
         "perms": "Permisje",
         "server": "Serwer: ",
-        "superUser": "Super użytkownik",
         "yes": "Tak"
     },
     "base": {
@@ -143,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "Wydrukuj"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Brak danych w tej tabeli danych",
             "info": "Pokazywanie od _START_ do _END_ z _TOTAL_ wszystkich wejść",
             "infoEmpty": "Pokazywanie 0 do 0 z 0 wejść",
             "infoFiltered": "(Pokazuje z _MAX_ wejść)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Pokazuj _MENU_ wejść",
             "loadingRecords": "Wczytywanie...",
             "paginate": {
@@ -209,8 +208,6 @@
         "privMsg": "i także ",
         "return": "Powrót do panelu",
         "selfHost": "Jeśli zarządasz tą repozytorią upewnij się że adres hest poprawny, w innym przypadku odwiedź strone rozwiązywania problemów.",
-        "serverJars1": "API Server Jars jest niedostępne. Proszę sprawdź",
-        "serverJars2": "dla najnowzsych informacji.",
         "start-error": "Serwer {} nie mógł się odpalić z powodu: {}",
         "superError": "Potrzebujesz uprawnienie Adminitsratora aby zakończyć tę akcję.",
         "terribleFailure": "Okropny błąd!"

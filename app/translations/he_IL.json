@@ -29,7 +29,6 @@
         "permName": "שם הגישה",
         "perms": "גישות",
         "server": "שרת: ",
-        "superUser": "משתמש על",
         "yes": "כן"
     },
     "base": {
@@ -143,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "הדפסה"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "אין נתונים זמינים בטבלה",
             "info": "רשומות _TOTAL_ מ _END_ עד _START_ מראה",
             "infoEmpty": "מציג 0 עד 0 מתוך 0 ערכים",
             "infoFiltered": "(רשומות _MAX_ מסונן מתוך)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "רשומות _MENU_ הצגת",
             "loadingRecords": "...טוען",
             "paginate": {
@@ -209,8 +208,6 @@
         "privMsg": "וה",
         "return": "חזרה לפאנל",
         "selfHost": "אם אתה מארח בעצמך את הריפו הזה, אנא בדוק את הכתובת שלך או התייעץ עם מדריך פתרון הבעיות שלנו.",
-        "serverJars1": "API של צנצנות השרת אינו נגיש. אנא בדוק",
-        "serverJars2": "למידע מעודכן ביותר.",
         "start-error": "השרת {} לא הצליח להתחיל עם קוד שגיאה: {}",
         "superError": "חובה להיות משתמש על כדי לבצע פעולה זו.",
         "terribleFailure": "איזה כישלון נורא!"
@@ -554,7 +551,6 @@
     "serverTerm": {
         "commandInput": "הקלידו את הפקודה שלכם",
         "delay-explained": "השירות/סוכן התחיל לאחרונה והוא מעכב את הדלקת שרת המיינקראפט",
-        "downloading": "...מוריד",
         "importing": "מייבא...",
         "installing": "מתקין...",
         "restart": "הפעלה מחדש",

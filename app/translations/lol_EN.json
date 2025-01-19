@@ -7,7 +7,7 @@
     "accessDenied": {
         "accessDenied": "ACCES DENID",
         "contact": "CONTACK CWAFTY CONTROLLR SUPORT ON DA DWISCORDZ",
-        "contactAdmin": "PLZ TALKZ TO UR SERVR HOOMAN FOR DIS, OR IF U FINKZ U SHUD GET IN, ASK SUPORT",
+        "contactAdmin": "PLZ TALKZ TO UR SERVR HOOMAN FOR DIS, OR IF U FINKZ U SHUD GET IN, ASK SUPORT.",
         "noAccess": "U DO NOT HAZ ACCES 2 DIS LITTERBOX"
     },
     "apiKeys": {
@@ -29,7 +29,6 @@
         "permName": "PERMISSION NAME",
         "perms": "PERMISSIONS",
         "server": "SERVER: ",
-        "superUser": "SUPA DOOPA USR",
         "yes": "YESH!"
     },
     "base": {
@@ -143,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "Print"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "No data available in table",
             "info": "Showing _START_ to _END_ of _TOTAL_ entries",
             "infoEmpty": "Showing 0 to 0 of 0 entries",
             "infoFiltered": "(filtered from _MAX_ total entries)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Show _MENU_ entries",
             "loadingRecords": "Loading...",
             "paginate": {
@@ -209,8 +208,6 @@
         "privMsg": "AND THEEZ ",
         "return": "Go Bak to Dashbored",
         "selfHost": "If u iz self-hostin' dis repo, check ur addy or peep our fix-it guide.",
-        "serverJars1": "CAN'T TALK TO SERVER JARS API. CHECKZ",
-        "serverJars2": "TO SEE NEWZ STUFFZ.",
         "start-error": "CHAIR {} FAILD 2 START WIF OOF CODE: {}",
         "superError": "U MUST BE A BIG CAT TO DO DIS.",
         "terribleFailure": "SUMTIN DUN BWOKE"
@@ -238,7 +235,11 @@
         "finishedPreparing": "I HAS FINISHD PREPARIN UR FISH. PLZ CLICK DOWNLOAD 2 DOWNLOAD",
         "logout": "GO BYE BYE",
         "preparingLogs": " PLZ WAIT WHILE I GATHR UR FISHZ... ILL MAK NOIZE WHEN THEY`RE READY. DIS CUD TAEK WHILE  IF UR HOUZ IZ HOOJ.",
-        "supportLogs": "SUPPORT FISHIEZ"
+        "supportLogs": "SUPPORT FISHIEZ",
+        "schedule_desc": "WE NOTICED SOME OR ALL UR SCHEDULED FISH DIDN’T MOVE RIGHT DURING DA UPGRADE. PLS CONFIRM ALL UR FISH IN DA SCHEDULES TAB.",
+        "backup_desc": "WE NOTICED DA BACKUP MIGRASHUN MIGHTA GONE BOOM. PLS CHECK UR BACKUP RECORDZ ON DA BACKUP TAB.",
+        "backup_title": "BACKUP MIGRASHUN OOPSIE",
+        "schedule_title": "SCHEDULES MIGRASHUN OOPSIE"
     },
     "offline": {
         "offline": "NOT HEREZ",
@@ -554,7 +555,6 @@
     "serverTerm": {
         "commandInput": "ENTR YOUR COMARNED",
         "delay-explained": "TEH SERVICE/AGENT HUS RESENTLY STARTD AN IZ DELAYIN TEH STARTD OV TEH SERVR",
-        "downloading": "WAIT PLZ!?!?!",
         "importing": "BRINGINGZ IN...",
         "installing": "PUTTINGZ TOGETHER...",
         "restart": "COPYZ",
@@ -672,7 +672,26 @@
         "uses": "NUMBER OV USES ALLOWED (-1==NO LIMIT)"
     },
     "validators": {
-        "passLength": "PASSWRD TOO SMOL. NEEDZ 8 CATZ PLZ"
+        "passLength": "PASSWRD TOO SMOL. NEEDZ 8 CATZ PLZ",
+        "backupName": "BACKUP NAME GOTTA BE WURDZ, AT LEAST 3 FISH.",
+        "enumErr": "OOFS IN VALIDATING. GOOD STUFF INCLUDES: ",
+        "serverExeCommand": "SERVER EXECUTION COMMAND GOTTA BE WURDZ, AT LEAST 1 FISH LONG.",
+        "filesPageLen": "LENGTH GOTTA BE MORE THAN 1 FOR DIS PROPERTY",
+        "insufficientPerms": "PERMISSION ERROR: U NEED MORE PERMISSIONZ FOR DIS RESOURCE",
+        "roleManager": "ROLE MANAGER GOTTA BE NUMBERS (MANAGER ID) OR NUFFIN",
+        "roleServerId": "SERVER ID GOTTA BE WURDZ, AT LEAST 1 FISH LONG",
+        "roleServerPerms": "SERVER PERMISSIONS GOTTA BE AN 8-BIT WURDZ",
+        "serverCreateName": "SERVER NAME GOTTA BE WURDZ, AT LEAST 2 FISH LONG AND CAN’T HAVE: \\\\ / or # ",
+        "taskIntervalType": "TASK INTERVAL TYPE GOTTA BE ONE OF: ",
+        "typeBool": "GOTTA BE MEOW OR NEOW (TYPE BOOLEAN)",
+        "typeEmail": "GOTTA BE EMAIL TYPE.",
+        "typeIntMinVal0": "GOTTA BE A WHOLE FISH AT LEAST... 0.",
+        "typeInteger": "GOTTA BE A NUMBR.",
+        "typeList": "GOTTA BE A ARAY ",
+        "typeString": "GOTTA BE STRINGY THINGY.",
+        "roleName": "ROLE NAME GOTTA BE WURDZ, MORE THAN 1 FISH. CAN’T HAVE THESE: [ ] , ",
+        "serverLogPath": "SERVER LOG PATH GOTTA BE WURDZ, AT LEAST 1 FISH LONG",
+        "userName": " GOTTA BE STRINGY THINGY, ALL LOW, AT LEAST 4 FISH, MAX 20 FISHIES"
     },
     "webhooks": {
         "areYouSureDel": "U SURE U WANTZ TO EATZ DIS WEBHOOK?",

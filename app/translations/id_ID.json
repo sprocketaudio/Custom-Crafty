@@ -28,7 +28,6 @@
         "permName": "Nama Izin",
         "perms": "Izin",
         "server": "Server: ",
-        "superUser": "Super User",
         "yes": "Iya"
     },
     "base": {
@@ -127,12 +126,12 @@
                 "pdf": "PDF",
                 "print": "Print"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Tidak Ada Data Yang Ada Di Meja",
             "info": "Showing _START_ to _END_ of _TOTAL_ entries",
             "infoEmpty": "Showing 0 to 0 of 0 entries",
             "infoFiltered": "(filtered from _MAX_ total entries)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Show _MENU_ entries",
             "loadingRecords": "Loading...",
             "paginate": {
@@ -444,7 +443,6 @@
     "serverTerm": {
         "commandInput": "Masukan Perintah Anda",
         "delay-explained": "Layanan / agen baru-baru ini dimulai dan menunda dimulainya instans server minecraft",
-        "downloading": "Mengunduh...",
         "restart": "Mulai Ulang",
         "sendCommand": "Kirim Perintah",
         "start": "Mulai",

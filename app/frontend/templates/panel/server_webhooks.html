@@ -359,8 +359,8 @@
     } else {
       console.log(responseData);
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
   }
@@ -379,8 +379,8 @@
       window.location.reload();
     } else {
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
   }

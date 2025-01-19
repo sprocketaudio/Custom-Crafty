@@ -142,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "Print"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "No data available in table",
             "info": "Showing _START_ to _END_ of _TOTAL_ entries",
             "infoEmpty": "Showing 0 to 0 of 0 entries",
             "infoFiltered": "(filtered from _MAX_ total entries)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Show _MENU_ entries",
             "loadingRecords": "Loading...",
             "paginate": {
@@ -672,7 +672,26 @@
         "uses": "Number of uses allowed (-1==No Limit)"
     },
     "validators": {
-        "passLength": "Password Too Short. Minimum Length: 8"
+        "backupName": "Backup name must be a string and a minimum length of 3.",
+        "enumErr": "failed validating. Acceptable data includes: ",
+        "filesPageLen": "length must be greater than 1 for property",
+        "insufficientPerms": "Permission Error: Missing permissions for this resource",
+        "passLength": "Password Too Short. Minimum Length: 8",
+        "roleManager": "Role manager must be of type integer (manager ID) or None",
+        "roleName": "Role name must be a string that is greater than 1 character. It must not include any of the following symbols: [ ] , ",
+        "roleServerId": "Server ID property must be a string with a minimum length of 1",
+        "roleServerPerms": "Server permissions must be an 8-bit string",
+        "serverCreateName": "Server name must be a string with a minimum length of 2 and must not include: \\ / or # ",
+        "serverExeCommand": "Server execution command must be a string with a minimum length of 1.",
+        "serverLogPath": "Server log path must be a string with a minimum length of 1",
+        "taskIntervalType": "Task Interval Type must be one of the following: ",
+        "typeBool": "must be true or false (type boolean)",
+        "typeEmail": "must be of type email.",
+        "typeIntMinVal0": "must be an integer with a minimum value of 0.",
+        "typeInteger": "must be a number.",
+        "typeList": "must be of type list/array ",
+        "typeString": "must be of type string.",
+        "userName": " must be of type string, all LOWERCASE, a minimum of 4 characters and a max of 20 characters"
     },
     "webhooks": {
         "areYouSureDel": "Are you sure you want to delete this webhook?",

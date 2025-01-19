@@ -134,13 +134,21 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             )
         try:
             validate(data, user_patch_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = ""
+            if why.schema.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{offending_key} {self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {why.schema.get("enum", "")}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
         if user_id == "@me":
@@ -161,7 +169,12 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
         if "username" in data:
             if data["username"].lower() in ["system", ""]:
                 return self.finish_json(
-                    400, {"status": "error", "error": "INVALID_USERNAME"}
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_USERNAME",
+                        "error_data": "INVALID USERNAME",
+                    },
                 )
             if self.controller.users.get_id_by_name(
                 data["username"]
@@ -171,7 +184,12 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                 user_id
             ):
                 return self.finish_json(
-                    400, {"status": "error", "error": "USER_EXISTS"}
+                    400,
+                    {
+                        "status": "error",
+                        "error": "USER_EXISTS",
+                        "error_data": "UNIQUE CONSTAINT FAILED",
+                    },
                 )
 
         if "superuser" in data:
@@ -179,7 +197,14 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                 # Checks if user is trying to change super user status
                 # of self without superuser. We don't want that.
                 return self.finish_json(
-                    400, {"status": "error", "error": "INVALID_SUPERUSER_MODIFY"}
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_SUPERUSER_MODIFY",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
                 )
             if not superuser:
                 # The user is not superuser so they can't change the superuser status
@@ -190,13 +215,27 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                 # Checks if user is trying to change permissions
                 # of self without superuser. We don't want that.
                 return self.finish_json(
-                    400, {"status": "error", "error": "INVALID_PERMISSIONS_MODIFY"}
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_PERMISSIONS_MODIFY",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
                 )
             if EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
                 # Checks if user is trying to change permissions of someone
                 # else without User Config permission. We don't want that.
                 return self.finish_json(
-                    400, {"status": "error", "error": "INVALID_PERMISSIONS_MODIFY"}
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_PERMISSIONS_MODIFY",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
                 )
 
         if "roles" in data:
@@ -204,13 +243,27 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                 # Checks if user is trying to change roles of
                 # self without superuser. We don't want that.
                 return self.finish_json(
-                    400, {"status": "error", "error": "INVALID_ROLES_MODIFY"}
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_ROLES_MODIFY",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
                 )
             if EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
                 # Checks if user is trying to change roles of someone
                 # else without User Config permission. We don't want that.
                 return self.finish_json(
-                    400, {"status": "error", "error": "INVALID_ROLES_MODIFY"}
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_ROLES_MODIFY",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
                 )
             user_modify = self.controller.users.get_user_roles_id(user_id)
 
@@ -229,7 +282,14 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                     for item in user_modify:
                         print(type(role), type(item))
                     return self.finish_json(
-                        400, {"status": "error", "error": "INVALID_ROLES_MODIFY"}
+                        400,
+                        {
+                            "status": "error",
+                            "error": "INVALID_ROLES_MODIFY",
+                            "error_data": self.helper.translation.translate(
+                                "error", "no-file", auth_data[4]["lang"]
+                            ),
+                        },
                     )
 
         user_obj = HelperUsers.get_user_model(user_id)
@@ -237,7 +297,14 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             if str(user["user_id"]) != str(user_obj.manager) and not user["superuser"]:
                 # TODO: edit your own password
                 return self.finish_json(
-                    400, {"status": "error", "error": "INVALID_PASSWORD_MODIFY"}
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_PASSWORD_MODIFY",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
                 )
 
         if "roles" in data:

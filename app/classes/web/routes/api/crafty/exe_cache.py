@@ -16,7 +16,14 @@ class ApiCraftyJarCacheIndexHandler(BaseApiHandler):
         ) = auth_data
 
         if not auth_data[4]["superuser"]:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": "NOT A SUPER USER",
+                },
+            )
 
         self.controller.big_bucket.manual_refresh_cache()
         self.finish_json(

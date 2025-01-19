@@ -23,13 +23,12 @@
         "fullAccess": "Tam Erişim",
         "getToken": "Bir Token Al",
         "name": "Ad",
-        "nameDesc": "Bu API tokeninin adı ne olsun?",
+        "nameDesc": "Bu API tokeninin adı ne olsun? ",
         "no": "Hayır",
         "pageTitle": "Kullanıcı API Anahtarlarını Düzenle",
         "permName": "Yetki İsmi",
         "perms": "Yetkiler",
         "server": "Sunucu: ",
-        "superUser": "Süper Kullanıcı",
         "yes": "Evet"
     },
     "base": {
@@ -75,7 +74,7 @@
         "backups": "Yedeklemeler",
         "bePatientClone": "Sunucuyu klonlarken lütfen sabırlı olunuz.<br /> Bu ekran birazdan kendini yenileyecektir",
         "bePatientRestart": "Sunucuyu yeniden başlatırken lütfen sabırlı olunuz.<br /> Bu ekran birazdan kendini yenileyecektir",
-        "bePatientStart": "Sunucuyu başlatırken başlatırken lütfen sabırlı olunuz.<br /> Bu ekran birazdan kendini yenileyecektir",
+        "bePatientStart": "Sunucuyu başlatırken lütfen sabırlı olunuz.<br /> Bu ekran birazdan kendini yenileyecektir.",
         "bePatientStop": "Sunucuyu durdururken başlatırken lütfen sabırlı olunuz.<br /> Bu ekran birazdan kendini yenileyecektir",
         "cannotSee": "Gözükmeyen şeyler mi var?",
         "cannotSeeOnMobile": "Mobilde gözükmeyen şeyler mi var?",
@@ -143,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "Yazdır"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Tabloda veri bulunmuyor",
             "info": "_TOTAL_ kayıttan _START_ - _END_ arasındaki kayıtlar gösteriliyor",
             "infoEmpty": "0 kayıttan 0 - 0 arasındaki kayıtlar gösteriliyor",
             "infoFiltered": "(_MAX_ kayıt içerisinden filtrelenen)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "_MENU_ kayıt göster",
             "loadingRecords": "Yükleniyor...",
             "paginate": {
@@ -209,8 +208,6 @@
         "privMsg": "ve ",
         "return": "Arayüze Geri Dön",
         "selfHost": "Bu depoyu kendiniz barındırıyorsanız lütfen adresinizi kontrol ediniz veya sorun giderme kılavuzumuza bakınız.",
-        "serverJars1": "Sunucu JARs API'ına erişilemiyor.",
-        "serverJars2": "en güncel bilgilere sahiptir",
         "start-error": "{} sunucusu başlamatılamadı. Hata kodu: {}",
         "superError": "Bu işlemi tamamlamak için süper kullanıcı olmanız gerekir.",
         "terribleFailure": "Ne Korkunç Bir Hata!"
@@ -238,7 +235,11 @@
         "finishedPreparing": "Destek günlüklerinizi hazırlamayı tamamladık. İndirmek için lütfen indir'e tıklayın",
         "logout": "Oturumu Kapat",
         "preparingLogs": " Günlüklerinizi hazırlarken lütfen bekleyin... Hazır olduklarında bir bildirim göndereceğiz. Bu, büyük dağıtımlar için biraz zaman alabilir.",
-        "supportLogs": "Destek Günlükleri"
+        "supportLogs": "Destek Günlükleri",
+        "backup_desc": "Yedek taşımasının kısmen veya tamamen başarısız olmuş olabileceğini tespit ettik. Lütfen yedekler sekmesindeki yedek kayıtlarınızı kontrol edin.",
+        "schedule_desc": "Yükseltme sırasında zamanlanmış görevlerinizin bir kısmının veya tamamının başarıyla aktarılmadığını tespit ettik. Lütfen zamanlamalar sekmesinden zamanlamalarınızı onaylayın.",
+        "backup_title": "Yedek Taşıma Uyarısı",
+        "schedule_title": "Zamanlama Taşıma Uyarısı"
     },
     "offline": {
         "offline": "Çevrimdışı",
@@ -304,7 +305,7 @@
         "actions": "Eylemler",
         "after": "Yedeklemeden sonra bir komut çalıştır",
         "backupAtMidnight": "Gece yarısında otomatik yedekleme yapılsın mı?",
-        "backupNow": "Backup Now!",
+        "backupNow": "Şimdi Yedekle!",
         "backupTask": "Bir yedekleme görevi başlatıldı.",
         "backups": "Sunucu Yedekleri",
         "before": "Yedeklemeden önce bir komut çalıştır",
@@ -529,7 +530,7 @@
         "newSchedule": "Yeni Zamanlama",
         "nextRun": "Sonraki Çalışma",
         "no": "Hayır",
-        "no-schedule": "Şu anda bu sunucu için herhangi bir zamanlama bulunmamaktadır. Başlamak için: ",
+        "no-schedule": "Şu anda bu sunucu için herhangi bir zamanlama bulunmamaktadır. Başlamak için:",
         "scheduledTasks": "Zamanlanmış Görevler",
         "yes": "Evet"
     },

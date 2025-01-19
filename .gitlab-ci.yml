@@ -5,8 +5,7 @@
 stages:
   - lint
   - test
-  - prod-deployment
-  - dev-deployment
+  - build-and-deploy
   - release
 
 variables:

@@ -77,7 +77,16 @@ class ApiUsersIndexHandler(BaseApiHandler):
         ) = auth_data
 
         if EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = json.loads(self.request.body)
@@ -88,12 +97,15 @@ class ApiUsersIndexHandler(BaseApiHandler):
 
         try:
             validate(data, new_user_schema)
-        except ValidationError as e:
-            err = self.translator.translate(
+        except ValidationError as why:
+            offending_key = ""
+            if why.schema.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                e.schema["error"],
+                why.schema.get("error"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
-            )
+            )} {why.schema.get("enum", "")}"""
             return self.finish_json(
                 400,
                 {
@@ -125,11 +137,23 @@ class ApiUsersIndexHandler(BaseApiHandler):
 
         if username.lower() in ["system", ""]:
             return self.finish_json(
-                400, {"status": "error", "error": "INVALID_USERNAME"}
+                400,
+                {
+                    "status": "error",
+                    "error": "INVALID_USERNAME",
+                    "error_data": "INVALID USERNAME",
+                },
             )
 
         if self.controller.users.get_id_by_name(username) is not None:
-            return self.finish_json(400, {"status": "error", "error": "USER_EXISTS"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "USER_EXISTS",
+                    "error_data": "UNIQUE VALUE ERROR",
+                },
+            )
 
         if roles is None:
             roles = set()
@@ -155,7 +179,14 @@ class ApiUsersIndexHandler(BaseApiHandler):
 
         if new_superuser and not superuser:
             return self.finish_json(
-                400, {"status": "error", "error": "INVALID_SUPERUSER_CREATE"}
+                400,
+                {
+                    "status": "error",
+                    "error": "INVALID_SUPERUSER_CREATE",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
             )
 
         for role in roles:
@@ -166,7 +197,14 @@ class ApiUsersIndexHandler(BaseApiHandler):
                 and not superuser
             ):
                 return self.finish_json(
-                    400, {"status": "error", "error": "INVALID_ROLES_CREATE"}
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_ROLES_CREATE",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
                 )
 
         # TODO: do this in the most efficient way

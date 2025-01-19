@@ -29,7 +29,6 @@
         "permName": "Berechtigungs Name",
         "perms": "Berechtigungen",
         "server": "Server: ",
-        "superUser": "Super Benutzer",
         "yes": "Ja"
     },
     "base": {
@@ -143,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "Drucken"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Keine Daten in der Tabelle verfügbar",
             "info": "Zeige _START_ bis _END_ von insges. _TOTAL_ Einträge(n)",
             "infoEmpty": "Zeige 0 bis 0 von insges. 0 Einträgen",
             "infoFiltered": "(gefiltert von _MAX_ maximalen Einträgen)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Zeige _MENU_ Einträge",
             "loadingRecords": "Laden...",
             "paginate": {
@@ -209,8 +208,6 @@
         "privMsg": "und der/die/das ",
         "return": "Zurück zum Dashboard",
         "selfHost": "Wenn Sie dieses Repo selbst hosten, überprüfen Sie bitte Ihre Adresse oder konsultieren Sie unsere Anleitung zur Fehlerbehebung.",
-        "serverJars1": "Server-JAR-API nicht erreichbar. Bitte überprüfen Sie ",
-        "serverJars2": "um die aktuellsten Informationen zu erhalten.",
         "start-error": "Der Server {} konnte wegen dem Fehlercode: {} nicht gestartet werden",
         "superError": "Sie müssen ein Administrator sein, um diese Aktion abzuschließen.",
         "terribleFailure": "Was für ein furchtbarer Fehler!"
@@ -222,7 +219,7 @@
     },
     "login": {
         "defaultPath": "Der eingegebene Text ist der Pfad zum Passwort, nicht das Passwort selbst. Das Standartpasswort kann unter diesen Pfad eingesehen werden.",
-        "disabled": "Account gesperrt. Für weitere Informationen den Serveradministrator kontaktieren",
+        "disabled": "Account gesperrt. Für weitere Informationen den Serveradministrator kontaktieren.",
         "forgotPassword": "Passwort vergessen",
         "incorrect": "Benutzername oder Passwort falsch",
         "login": "Einloggen",
@@ -238,11 +235,15 @@
         "finishedPreparing": "Wir haben die Bereitstellung der Supportprotokolle abgeschlossen. Bitte klicke 'Herunterladen' um diese herunterzuladen",
         "logout": "Abmelden",
         "preparingLogs": " Bitte warten, während wir die Protokolle vorbereiten... Wir schicken eine Benachrichtigung, wenn sie fertig sind. Dies kann bei großen Projekten eine Weile dauern.",
-        "supportLogs": "Supportprotokolle"
+        "supportLogs": "Supportprotokolle",
+        "backup_desc": "Wir haben fesgestellt, dass die Migration des Backups teilweise oder vollständig fehlgeschlagen ist. Bitte Backups im Backup Menü überprüfen.",
+        "schedule_desc": "Wir haben festgestellt, dass geplante Aufgaben während des Upgrades nicht erfolgreich übertragen wurden. Bitte die geplanten Aufgaben im Zeitplan überprüfen.",
+        "backup_title": "Backup Migrations Warnung",
+        "schedule_title": "Zeitplan Migrations Warnung"
     },
     "offline": {
         "offline": "Offline",
-        "pleaseConnect": "Bitte stellen sie eine Internetverbindung her, um Crafty nutzen zu können"
+        "pleaseConnect": "Bitte stellen sie eine Internetverbindung her, um Crafty nutzen zu können."
     },
     "panelConfig": {
         "adminControls": "Administrations-Werkzeuge",
@@ -554,7 +555,6 @@
     "serverTerm": {
         "commandInput": "Geben Sie Ihren Befehl ein",
         "delay-explained": "Der Dienst wurde kürzlich gestartet und verzögert den Start der Minecraft-Serverinstanz",
-        "downloading": "Lädt herunter...",
         "importing": "Importieren...",
         "installing": "Installation läuft...",
         "restart": "Neustart",
@@ -672,7 +672,26 @@
         "uses": "Anzahl der erlaubten Verwendungen (-1==Keine Begrenzung)"
     },
     "validators": {
-        "passLength": "Passwort zu kurz. Mindestlänge: 8"
+        "passLength": "Passwort zu kurz. Mindestlänge: 8",
+        "typeInteger": "muss eine Zahl sein.",
+        "typeList": "muss eine Liste (array) sein ",
+        "roleManager": "Rollenmanager muss vom Typ Ganzzahl (Manager ID) oder ohne Wert sein",
+        "typeIntMinVal0": "muss eine ganze Zahl und mindestens 0 sein.",
+        "backupName": "Der Name des Backups muss eine Zeichenkette mit mindestens drei Zeichen sein.",
+        "serverCreateName": "Server Name muss eine Zeichenkette mit der Mindestlänge 1 sein und darf die folgenden Zeichen nicht beinhalten: \\ / # ",
+        "userName": " muss vom Typ Zeichenkette, in kleinbuchstaben und zwischen 4 und 20 Zeichen lang sein",
+        "enumErr": "Validierung fehlgeschlagen. Erfolgreiche Prüfung der folgenden Daten: ",
+        "filesPageLen": "Länge der Eigenschaft muss größer als 1 sein",
+        "roleName": "Rollenmanager muss eine Zeichenkette Länger als 1 sein und darf folgende Symbole nicht enthalten: [], ",
+        "roleServerId": "Server ID muss eine Zeichenkette mit der Mindestlänge 1 sein",
+        "roleServerPerms": "Serverberechtigung muss eine 8 Bit Zeichenkette sein",
+        "serverLogPath": "Server log Pfad muss eine Zeichenkette mit einer Mindestlänge von 1 sein",
+        "taskIntervalType": "Aufgaben Intervall muss einer der folgenden sein: ",
+        "typeBool": "muss wahr oder falsch sein (typ boolean)",
+        "typeEmail": "muss eine Email sein.",
+        "insufficientPerms": "Berechtigungsfehler: Fehlende Berechtigungen für diese Ressource",
+        "serverExeCommand": "Server Ausführungbefehl muss eine Zeichenkette mit der Mindestlänge 1 sein.",
+        "typeString": "muss vom Typ Zeichenkette sein."
     },
     "webhooks": {
         "areYouSureDel": "Sind Sie sicher, dass Sie diesen Webhook löschen möchten?",
