@@ -77,8 +77,8 @@ class Server:
 class Players(list):
     def __init__(self, data):
         super().__init__(Player(x) for x in data.get("sample", []))
-        self.max = data["max"]
-        self.online = data["online"]
+        self.max = data.get("max", 0)
+        self.online = data.get("online", 0)
 
     def report(self):
         players = []
@@ -93,8 +93,8 @@ class Players(list):
 
 class Player:
     def __init__(self, data):
-        self.id = data["id"]
-        self.name = data["name"]
+        self.id = data.get("id", "")
+        self.name = data("name", "Anonymous")
 
     def __str__(self):
         return self.name
@@ -174,7 +174,7 @@ def ping(ip, port):
         logger.debug(f"Server reports this data on ping: {data}")
         try:
             return Server(json.loads(data))
-        except KeyError:
+        except (KeyError, json.decoder.JSONDecodeError):
             return {}
     finally:
         sock.close()

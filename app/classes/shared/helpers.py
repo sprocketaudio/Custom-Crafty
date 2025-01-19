@@ -85,6 +85,8 @@ class Helpers:
         self.crafty_starting = False
         self.minimum_password_length = 8
 
+        self.theme_list = self.load_themes()
+
     @staticmethod
     def auto_installer_fix(ex):
         logger.critical(f"Import Error: Unable to load {ex.name} module", exc_info=True)
@@ -595,9 +597,20 @@ class Helpers:
             )
         return False
 
-    @staticmethod
-    def get_themes():
-        return ["default", "dark", "light", "ronald"]
+    def load_themes(self):
+        theme_list = []
+        themes_path = os.path.join(self.webroot, "static", "assets", "css", "themes")
+        theme_files = [
+            file
+            for file in os.listdir(themes_path)
+            if os.path.isfile(os.path.join(themes_path, file))
+        ]
+        for theme in theme_files:
+            theme_list.append(theme.split(".css")[0])
+        return theme_list
+
+    def get_themes(self):
+        return self.theme_list
 
     @staticmethod
     def get_local_ip():
@@ -1198,8 +1211,8 @@ class Helpers:
                     \n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">
                     <input type="radio" name="root_path" value="{dpath}">
                     <span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">
-                      <i style="color: var(--info);" class="far fa-folder"></i>
-                      <i style="color: var(--info);" class="far fa-folder-open"></i>
+                      <i class="text-info far fa-folder"></i>
+                      <i class="text-info far fa-folder-open"></i>
                       {filename}
                       </span>
                     </input></div><li>
@@ -1220,8 +1233,8 @@ class Helpers:
                     \n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">
                     <input type="radio" name="root_path" value="{dpath}">
                     <span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">
-                      <i style="color: var(--info);" class="far fa-folder"></i>
-                      <i style="color: var(--info);" class="far fa-folder-open"></i>
+                      <i class="text-info far fa-folder"></i>
+                      <i class="text-info far fa-folder-open"></i>
                       {filename}
                       </span>
                     </input></div><li>"""

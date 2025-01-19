@@ -40,31 +40,26 @@
             {% include "parts/m_server_controls_list.html %}
           </span>
           <div class="row">
-            <div class="col-md-12 col-sm-12" style="overflow-x:auto;">
+            <div class="col-md-12 col-sm-12 overflow-x-auto">
               <div class="card">
                 <div class="card-header header-sm d-flex justify-content-between align-items-center">
                   <h4 class="card-title"><i class="fa-regular fa-bell"></i> {{ translate('serverBackups', 'backups',
                     data['lang']) }} </h4>
                   {% if data['user_data']['hints'] %}
-                  <span class="too_small" title="{{ translate('serverSchedules', 'cannotSee', data['lang']) }}" ,
-                    data-content="{{ translate('serverSchedules', 'cannotSeeOnMobile', data['lang']) }}" ,
-                    data-placement="bottom"></span>
+                  <span class="too_small" title="{{ translate('serverSchedules', 'cannotSee', data['lang']) }}" , data-content="{{ translate('serverSchedules', 'cannotSeeOnMobile', data['lang']) }}" , data-placement="bottom"></span>
                   {% end %}
-                  <div><a class="btn btn-info"
-                      href="/panel/add_backup?id={{ data['server_stats']['server_id']['server_id'] }}"><i
-                        class="fas fa-plus-circle"></i> {{ translate('serverBackups', 'newBackup', data['lang']) }}</a>
+                  <div><a class="btn btn-info" href="/panel/add_backup?id={{ data['server_stats']['server_id']['server_id'] }}"><i class="fas fa-plus-circle"></i> {{ translate('serverBackups', 'newBackup', data['lang']) }}</a>
                   </div>
                 </div>
                 <div class="card-body">
                   {% if len(data['backups']) == 0 %}
-                  <div style="text-align: center; color: grey;">
+                  <div class="text-align-center text-secondary">
                     <h7>{{ translate('serverBackups', 'no-backup', data['lang']) }}.</h7>
                   </div>
                   {% end %}
                   {% if len(data['backups']) > 0 %}
                   <div class="d-none d-lg-block">
-                    <table class="table table-hover responsive-table" aria-label="backups list" id="backup_table"
-                      style="table-layout:fixed;">
+                    <table class="table table-hover responsive-table" aria-label="backups list" id="backup_table" style="table-layout:fixed;">
                       <thead>
                         <tr class="rounded">
                           <th scope="col" style="width: 15%; min-width: 10px;">{{ translate('serverBackups', 'name',
@@ -87,28 +82,22 @@
                             <br>
                             {% if backup.default %}
                             <span class="badge-pill badge-outline-warning">{{ translate('serverBackups', 'default',
-                              data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain"
-                                data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i
-                                  class="fa-solid fa-question"></i></button></small>
+                              data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain" data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i class="fa-solid fa-question"></i></button></small>
                             {% end %}
                           </td>
                           <td>
                             <div id="{{backup.backup_id}}_status">
-                              <button class="btn btn-outline-success backup-status" data-status="{{ backup.status }}"
-                                data-Standby="{{ translate('serverBackups', 'standby', data['lang'])}}"
-                                data-Failed="{{ translate('serverBackups', 'failed', data['lang'])}}"></button>
+                              <button class="btn btn-outline-success backup-status" data-status="{{ backup.status }}" data-Standby="{{ translate('serverBackups', 'standby', data['lang'])}}" data-Failed="{{ translate('serverBackups', 'failed', data['lang'])}}"></button>
                             </div>
                           </td>
                           <td id="{{backup.backup_location}}" class="type">
-                            <p style="overflow: scroll;" class="no-scroll">{{backup.backup_location}}</p>
+                            <p class="no-scroll">{{backup.backup_location}}</p>
                           </td>
-                          <td id="{{backup.max_backups}}" class="trigger" style="overflow: scroll; max-width: 30px;">
+                          <td id="{{backup.max_backups}}" class="trigger overflow-scroll" style="max-width: 30px;">
                             <p>{{backup.max_backups}}</p>
                           </td>
                           <td id="backup_edit" class="action">
-                            <button
-                              onclick="window.location.href=`/panel/edit_backup?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.backup_id}}`"
-                              class="btn btn-info">
+                            <button onclick="window.location.href=`/panel/edit_backup?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.backup_id}}`" class="btn btn-info">
                               <i class="fas fa-pencil-alt"></i>
                             </button>
                             {% if not backup.default %}
@@ -116,9 +105,7 @@
                               <i class="fas fa-trash" aria-hidden="true"></i>
                             </button>
                             {% end %}
-                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip"
-                              title="{{ translate('serverBackups', 'run', data['lang']) }}"
-                              class="btn btn-outline-warning run-backup backup_now_button">
+                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip" title="{{ translate('serverBackups', 'run', data['lang']) }}" class="btn btn-outline-warning run-backup backup_now_button">
                               <i class="fa-solid fa-forward"></i>
                             </button>
                           </td>
@@ -128,8 +115,7 @@
                     </table>
                   </div>
                   <div class="d-block d-lg-none">
-                    <table aria-label="backups list" class="table table-hover responsive-table" id="backup_table_mini"
-                      style="table-layout:fixed;">
+                    <table aria-label="backups list" class="table table-hover responsive-table" id="backup_table_mini" style="table-layout:fixed;">
                       <thead>
                         <tr class="rounded">
                           <th style="width: 40%; min-width: 10px;">Name
@@ -145,22 +131,16 @@
                             <p>{{backup.backup_name}}</p>
                             <br>
                             <div id="{{backup.backup_id}}_status">
-                              <button class="btn btn-outline-success backup-status" data-status="{{ backup.status }}"
-                                data-Standby="{{ translate('serverBackups', 'standby', data['lang'])}}"
-                                data-Failed="{{ translate('serverBackups', 'failed', data['lang'])}}"></button>
+                              <button class="btn btn-outline-success backup-status" data-status="{{ backup.status }}" data-Standby="{{ translate('serverBackups', 'standby', data['lang'])}}" data-Failed="{{ translate('serverBackups', 'failed', data['lang'])}}"></button>
                             </div>
                             <br>
                             {% if backup.default %}
                             <span class="badge-pill badge-outline-warning">{{ translate('serverBackups', 'default',
-                              data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain"
-                                data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i
-                                  class="fa-solid fa-question"></i></button></small>
+                              data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain" data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i class="fa-solid fa-question"></i></button></small>
                             {% end %}
                           </td>
                           <td id="backup_edit" class="action">
-                            <button
-                              onclick="window.location.href=`/panel/edit_backup?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.backup_id}}`"
-                              class="btn btn-info">
+                            <button onclick="window.location.href=`/panel/edit_backup?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.backup_id}}`" class="btn btn-info">
                               <i class="fas fa-pencil-alt"></i>
                             </button>
                             {% if not backup.default %}
@@ -168,9 +148,7 @@
                               <i class="fas fa-trash" aria-hidden="true"></i>
                             </button>
                             {% end %}
-                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip"
-                              title="{{ translate('serverBackups', 'run', data['lang']) }}"
-                              class="btn btn-outline-warning test-socket backup_now_button">
+                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip" title="{{ translate('serverBackups', 'run', data['lang']) }}" class="btn btn-outline-warning test-socket backup_now_button">
                               <i class="fa-solid fa-forward"></i>
                             </button>
                           </td>
@@ -193,47 +171,7 @@
 
 
 </div>
-<style>
-  /* Remove default bullets */
-  .tree-view,
-  .tree-nested {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    margin-left: 10px;
-  }
-
-  /* Style the items */
-  .tree-item,
-  .files-tree-title {
-    cursor: pointer;
-    user-select: none;
-    /* Prevent text selection */
-  }
-
-  /* Create the caret/arrow with a unicode, and style it */
-  .tree-caret .fa-folder {
-    display: inline-block;
-  }
-
-  .tree-caret .fa-folder-open {
-    display: none;
-  }
-
-  /* Rotate the caret/arrow icon when clicked on (using JavaScript) */
-  .tree-caret-down .fa-folder {
-    display: none;
-  }
-
-  .tree-caret-down .fa-folder-open {
-    display: inline-block;
-  }
-
-  /* Hide the nested list */
-  .tree-nested {
-    display: none;
-  }
-</style>
+<link rel="stylesheet" href="/static/assets/css/partial/crafty-backup.css">
 <!-- content-wrapper ends -->
 
 {% end %}
@@ -510,8 +448,8 @@
                             \n<div id="${dpath}" data-path="${dpath}" data-name="${filename}" class="tree-caret tree-ctx-item tree-folder">
                             <input type="checkbox" class="checkBoxClass excluded" value="${dpath}" ${checked}>
                             <span id="${dpath}span" class="files-tree-title" data-path="${dpath}" data-name="${filename}" onclick="getDirView(event)">
-                            <i style="color: var(--info);" class="far fa-folder"></i>
-                            <i style="color: var(--info);" class="far fa-folder-open"></i>
+                            <i class="text-info far fa-folder"></i>
+                            <i class="text-info far fa-folder-open"></i>
                             <strong>${filename}</strong>
                             </span>
                             </input></div><li>`

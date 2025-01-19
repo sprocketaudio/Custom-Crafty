@@ -43,12 +43,10 @@
             <div class="col-md-6 col-sm-12">
               <br>
               <br>
-              <div id="{{data['backup_config'].get('backup_id', None)}}_status" class="progress"
-                style="height: 15px; display: none;">
+              <div id="{{data['backup_config'].get('backup_id', None)}}_status" class="progress" style="height: 15px; display: none;">
               </div>
               {% if data['backing_up'] %}
-              <p>Backing up <i class="fas fa-spin fa-spinner"></i> <span
-                  id="total_files">{{data['server_stats']['world_size']}}</span></p>
+              <p>Backing up <i class="fas fa-spin fa-spinner"></i> <span id="total_files">{{data['server_stats']['world_size']}}</span></p>
               {% end %}
 
               <br>
@@ -63,43 +61,32 @@
                   <label for="backup_name">{{ translate('serverBackups', 'name', data['lang']) }}
                     {% if data["backup_config"].get("default", None) %}
                     &nbsp;&nbsp; <span class="badge-pill badge-outline-warning">{{ translate('serverBackups', 'default',
-                      data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain"
-                        data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i
-                          class="fa-solid fa-question"></i></button></small>
+                      data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain" data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i class="fa-solid fa-question"></i></button></small>
                     {% end %}
                   </label>
                   {% if data["backup_config"].get("backup_id", None) %}
-                  <input type="text" class="form-control" name="backup_name" id="backup_name"
-                    value="{{ data['backup_config']['backup_name']  }}">
+                  <input type="text" class="form-control" name="backup_name" id="backup_name" value="{{ data['backup_config']['backup_name']  }}">
                   {% else %}
-                  <input type="text" class="form-control" name="backup_name" id="backup_name"
-                    placeholder="{{ translate('serverBackups', 'myBackup', data['lang']) }}">
+                  <input type="text" class="form-control" name="backup_name" id="backup_name" placeholder="{{ translate('serverBackups', 'myBackup', data['lang']) }}">
                   {% end %}
                   <br>
                   <br>
                   {% if data['super_user'] %}
-                  <label for="server_name">{{ translate('serverBackups', 'storageLocation', data['lang']) }} <small
-                      class="text-muted ml-1"> - {{ translate('serverBackups', 'storageLocationDesc', data['lang'])
+                  <label for="server_name">{{ translate('serverBackups', 'storageLocation', data['lang']) }} <small class="text-muted ml-1"> - {{ translate('serverBackups', 'storageLocationDesc', data['lang'])
                       }}</small> </label>
-                  <input type="text" class="form-control" name="backup_location" id="backup_location"
-                    value="{{ data['backup_config']['backup_location']  }}"
-                    placeholder="{{ translate('serverBackups', 'storageLocation', data['lang']) }}">
+                  <input type="text" class="form-control" name="backup_location" id="backup_location" value="{{ data['backup_config']['backup_location']  }}" placeholder="{{ translate('serverBackups', 'storageLocation', data['lang']) }}">
                   {% end %}
                 </div>
 
                 <div class="form-group">
-                  <label for="server_path">{{ translate('serverBackups', 'maxBackups', data['lang']) }} <small
-                      class="text-muted ml-1"> - {{ translate('serverBackups', 'maxBackupsDesc', data['lang'])
+                  <label for="server_path">{{ translate('serverBackups', 'maxBackups', data['lang']) }} <small class="text-muted ml-1"> - {{ translate('serverBackups', 'maxBackupsDesc', data['lang'])
                       }}</small> </label>
-                  <input type="text" class="form-control" name="max_backups" id="max_backups"
-                    value="{{ data['backup_config']['max_backups']  }}"
-                    placeholder="{{ translate('serverBackups', 'maxBackups', data['lang']) }}">
+                  <input type="text" class="form-control" name="max_backups" id="max_backups" value="{{ data['backup_config']['max_backups']  }}" placeholder="{{ translate('serverBackups', 'maxBackups', data['lang']) }}">
                 </div>
                 <div class="form-group">
                   <div class="custom-control custom-switch">
                     {% if data['backup_config']['compress'] %}
-                    <input type="checkbox" class="custom-control-input" id="compress" name="compress" checked=""
-                      value="True">
+                    <input type="checkbox" class="custom-control-input" id="compress" name="compress" checked="" value="True">
                     {% else %}
                     <input type="checkbox" class="custom-control-input" id="compress" name="compress" value="True">
                     {% end %}
@@ -110,8 +97,7 @@
                 <div class="form-group">
                   <div class="custom-control custom-switch">
                     {% if data['backup_config']['shutdown']%}
-                    <input type="checkbox" class="custom-control-input" id="shutdown" name="shutdown" checked=""
-                      value="True">
+                    <input type="checkbox" class="custom-control-input" id="shutdown" name="shutdown" checked="" value="True">
                     {% else %}
                     <input type="checkbox" class="custom-control-input" id="shutdown" name="shutdown" value="True">
                     {% end %}
@@ -123,13 +109,10 @@
                   <div class="custom-control custom-switch">
                     {% if data['backup_config']['before'] %}
                     <input type="checkbox" class="custom-control-input" id="before-check" name="before-check" checked>
-                    <input type="text" class="form-control hidden-input" name="before" id="backup_before"
-                      value="{{ data['backup_config']['before'] }}" placeholder="We enter the / for you"
-                      style="display: inline-block;">
+                    <input type="text" class="form-control hidden-input d-inline-block" name="before" id="backup_before" value="{{ data['backup_config']['before'] }}" placeholder="We enter the / for you">
                     {% else %}
                     <input type="checkbox" class="custom-control-input" id="before-check" name="before-check">
-                    <input type="text" class="form-control hidden-input" name="before" id="backup_before" value=""
-                      placeholder="We enter the / for you." style="display: none;">
+                    <input type="text" class="form-control hidden-input" name="before" id="backup_before" value="" placeholder="We enter the / for you." style="display: none;">
                     {% end %}
                     <label for="before-check" class="custom-control-label">{{
                       translate('serverBackups', 'before', data['lang']) }}</label>
@@ -139,14 +122,11 @@
                   <div class="custom-control custom-switch">
                     {% if data['backup_config']['after'] %}
                     <input type="checkbox" class="custom-control-input" id="after-check" name="after-check" checked>
-                    <input type="text" class="form-control hidden-input" name="after" id="backup_after"
-                      value="{{ data['backup_config']['after'] }}" placeholder="We enter the / for you"
-                      style="display: inline-block;">
+                    <input type="text" class="form-control hidden-input d-inline-block" name="after" id="backup_after" value="{{ data['backup_config']['after'] }}" placeholder="We enter the / for you">
                     <br>
                     {% else %}
                     <input type="checkbox" class="custom-control-input" id="after-check" name="after-check">
-                    <input type="text" class="form-control hidden-input" name="after" id="backup_after" value=""
-                      placeholder="We enter the / for you." style="display: none;">
+                    <input type="text" class="form-control hidden-input" name="after" id="backup_after" value="" placeholder="We enter the / for you." style="display: none;">
                     {% end %}
                     <label for="after-check" class="custom-control-label">{{
                       translate('serverBackups', 'after', data['lang']) }}</label>
@@ -156,8 +136,7 @@
                   <label for="server">{{ translate('serverBackups', 'exclusionsTitle', data['lang']) }} <small> - {{
                       translate('serverBackups', 'excludedChoose', data['lang']) }}</small></label>
                   <br>
-                  <button class="btn btn-primary mr-2" id="root_files_button"
-                    data-server_path="{{ data['server_stats']['server_id']['path']}}" type="button">{{
+                  <button class="btn btn-primary mr-2" id="root_files_button" data-server_path="{{ data['server_stats']['server_id']['path']}}" type="button">{{
                     translate('serverBackups', 'clickExclude', data['lang']) }}</button>
                 </div>
                 <div class="modal fade" id="dir_select" tabindex="-1" aria-labelledby="dir_select" aria-hidden="true">
@@ -171,8 +150,7 @@
                         </button>
                       </div>
                       <div class="modal-body">
-                        <div class="tree-ctx-item" id="main-tree-div" data-path=""
-                          style="overflow: scroll; max-height:75%;">
+                        <div class="tree-ctx-item overflow-scroll mh-75" id="main-tree-div" data-path="">
                           <input type="checkbox" id="main-tree-input" name="root_path" value="" disabled>
                           <span id="main-tree" class="files-tree-title tree-caret-down root-dir" data-path="">
                             <i class="far fa-folder"></i>
@@ -183,10 +161,8 @@
                         </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" id="modal-cancel" class="btn btn-secondary" data-dismiss="modal"><i
-                            class="fa-solid fa-xmark"></i></button>
-                        <button type="button" id="modal-okay" data-dismiss="modal" class="btn btn-primary"><i
-                            class="fa-solid fa-thumbs-up"></i></button>
+                        <button type="button" id="modal-cancel" class="btn btn-secondary" data-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>
+                        <button type="button" id="modal-okay" data-dismiss="modal" class="btn btn-primary"><i class="fa-solid fa-thumbs-up"></i></button>
                       </div>
                     </div>
                   </div>
@@ -216,16 +192,13 @@
                     {% for backup in data['backup_list'] %}
                     <tr>
                       <td>
-                        <a href="/panel/download_backup?file={{ backup['path'] }}&id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{ data['backup_config']['backup_id']}}"
-                          class="btn btn-primary">
+                        <a href="/panel/download_backup?file={{ backup['path'] }}&id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{ data['backup_config']['backup_id']}}" class="btn btn-primary">
                           <i class="fas fa-download" aria-hidden="true"></i>
                           {{ translate('serverBackups', 'download', data['lang']) }}
                         </a>
                         <br>
                         <br>
-                        <button data-file="{{ backup['path'] }}"
-                          data-backup_location="{{ data['backup_config']['backup_location'] }}"
-                          class="btn btn-danger del_button">
+                        <button data-file="{{ backup['path'] }}" data-backup_location="{{ data['backup_config']['backup_location'] }}" class="btn btn-danger del_button">
                           <i class="fas fa-trash" aria-hidden="true"></i>
                           {{ translate('serverBackups', 'delete', data['lang']) }}
                         </button>
@@ -269,47 +242,7 @@
 
 
 </div>
-<style>
-  /* Remove default bullets */
-  .tree-view,
-  .tree-nested {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    margin-left: 10px;
-  }
-
-  /* Style the items */
-  .tree-item,
-  .files-tree-title {
-    cursor: pointer;
-    user-select: none;
-    /* Prevent text selection */
-  }
-
-  /* Create the caret/arrow with a unicode, and style it */
-  .tree-caret .fa-folder {
-    display: inline-block;
-  }
-
-  .tree-caret .fa-folder-open {
-    display: none;
-  }
-
-  /* Rotate the caret/arrow icon when clicked on (using JavaScript) */
-  .tree-caret-down .fa-folder {
-    display: none;
-  }
-
-  .tree-caret-down .fa-folder-open {
-    display: inline-block;
-  }
-
-  /* Hide the nested list */
-  .tree-nested {
-    display: none;
-  }
-</style>
+<link rel="stylesheet" href="/static/assets/css/partial/crafty-backup.css">
 <!-- content-wrapper ends -->
 
 {% end %}
@@ -701,8 +634,8 @@
                             \n<div id="${dpath}" data-path="${dpath}" data-name="${filename}" class="tree-caret tree-ctx-item tree-folder">
                             <input type="checkbox" class="checkBoxClass excluded" value="${dpath}" ${checked}>
                             <span id="${dpath}span" class="files-tree-title" data-path="${dpath}" data-name="${filename}" onclick="getDirView(event)">
-                            <i style="color: var(--info);" class="far fa-folder"></i>
-                            <i style="color: var(--info);" class="far fa-folder-open"></i>
+                            <i class="text-info far fa-folder"></i>
+                            <i class="text-info far fa-folder-open"></i>
                             <strong>${filename}</strong>
                             </span>
                             </input></div><li>`
