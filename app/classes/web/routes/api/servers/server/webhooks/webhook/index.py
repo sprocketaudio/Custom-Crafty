@@ -17,16 +17,45 @@ webhook_patch_schema = {
         "webhook_type": {
             "type": "string",
             "enum": WebhookFactory.get_supported_providers(),
+            "error": "typeString",
+            "fill": True,
         },
-        "name": {"type": "string"},
-        "url": {"type": "string"},
-        "bot_name": {"type": "string"},
-        "trigger": {"type": "array"},
-        "body": {"type": "string"},
-        "color": {"type": "string", "default": "#005cd1"},
+        "name": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "url": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "bot_name": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "trigger": {
+            "type": "array",
+            "error": "typeString",
+            "fill": True,
+        },
+        "body": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "color": {
+            "type": "string",
+            "default": "#005cd1",
+            "error": "typeString",
+            "fill": True,
+        },
         "enabled": {
             "type": "boolean",
             "default": True,
+            "error": "typeBool",
+            "fill": True,
         },
     },
     "additionalProperties": False,
@@ -48,13 +77,27 @@ class ApiServersServerWebhooksManagementIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.CONFIG not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         if (
             not str(webhook_id)
             in self.controller.management.get_webhooks_by_server(server_id).keys()
         ):
             return self.finish_json(
-                400, {"status": "error", "error": "NO WEBHOOK FOUND"}
+                400,
+                {
+                    "status": "error",
+                    "error": "NO WEBHOOK FOUND",
+                    "error_data": "NOT FOUND",
+                },
             )
         self.finish_json(
             200,
@@ -77,13 +120,27 @@ class ApiServersServerWebhooksManagementIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.CONFIG not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             self.controller.management.delete_webhook(webhook_id)
         except Exception:
             return self.finish_json(
-                400, {"status": "error", "error": "NO WEBHOOK FOUND"}
+                400,
+                {
+                    "status": "error",
+                    "error": "NO WEBHOOK FOUND",
+                    "error_data": "NOT FOUND",
+                },
             )
         self.controller.management.add_to_audit_log(
             auth_data[4]["user_id"],
@@ -108,19 +165,36 @@ class ApiServersServerWebhooksManagementIndexHandler(BaseApiHandler):
 
         try:
             validate(data, webhook_patch_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = ""
+            if why.schema.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{offending_key} {self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {why.schema.get("enum", "")}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -130,7 +204,16 @@ class ApiServersServerWebhooksManagementIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.CONFIG not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         data["server_id"] = server_id
         if "trigger" in data.keys():
@@ -163,7 +246,16 @@ class ApiServersServerWebhooksManagementIndexHandler(BaseApiHandler):
         )
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -173,7 +265,16 @@ class ApiServersServerWebhooksManagementIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.CONFIG not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         webhook = self.controller.management.get_webhook_by_id(webhook_id)
         try:
             webhook_provider = WebhookFactory.create_provider(webhook["webhook_type"])
@@ -188,6 +289,8 @@ class ApiServersServerWebhooksManagementIndexHandler(BaseApiHandler):
                 bot_name="Crafty Webhooks Tester",
             )
         except Exception as e:
-            self.finish_json(500, {"status": "error", "error": str(e)})
+            self.finish_json(
+                500, {"status": "error", "error": "WEBHOOK ERROR", "error_data": str(e)}
+            )
 
         self.finish_json(200, {"status": "ok"})

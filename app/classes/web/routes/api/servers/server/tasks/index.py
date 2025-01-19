@@ -13,18 +13,32 @@ logger = logging.getLogger(__name__)
 new_task_schema = {
     "type": "object",
     "properties": {
-        "name": {"type": "string"},
+        "name": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
         "enabled": {
             "type": "boolean",
             "default": True,
+            "error": "typeBool",
+            "fill": True,
         },
         "action": {
             "type": "string",
+            "error": "typeString",
+            "fill": True,
         },
         "action_id": {
             "type": "string",
+            "error": "typeString",
+            "fill": True,
         },
-        "interval": {"type": "integer"},
+        "interval": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
         "interval_type": {
             "type": "string",
             "enum": [
@@ -37,13 +51,43 @@ new_task_schema = {
                 # CRON tasks:
                 "",
             ],
+            "error": "enumErr",
+            "fill": True,
         },
-        "start_time": {"type": "string", "pattern": r"\d{1,2}:\d{1,2}"},
-        "command": {"type": ["string", "null"]},
-        "one_time": {"type": "boolean", "default": False},
-        "cron_string": {"type": "string", "default": ""},
-        "parent": {"type": ["integer", "null"]},
-        "delay": {"type": "integer", "default": 0},
+        "start_time": {
+            "type": "string",
+            "pattern": r"\d{1,2}:\d{1,2}",
+            "error": "typeString",
+            "fill": True,
+        },
+        "command": {
+            "type": ["string", "null"],
+            "error": "typeString",
+            "fill": True,
+        },
+        "one_time": {
+            "type": "boolean",
+            "default": False,
+            "error": "typeBool",
+            "fill": True,
+        },
+        "cron_string": {
+            "type": "string",
+            "default": "",
+            "error": "typeString",
+            "fill": True,
+        },
+        "parent": {
+            "type": ["integer", "null"],
+            "error": "typeInteger",
+            "fill": True,
+        },
+        "delay": {
+            "type": "integer",
+            "default": 0,
+            "error": "typeInteger",
+            "fill": True,
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -68,19 +112,36 @@ class ApiServersServerTasksIndexHandler(BaseApiHandler):
 
         try:
             validate(data, new_task_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = ""
+            if why.schema.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{offending_key} {self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {why.schema.get("enum", "")}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         mask = self.controller.server_perms.get_lowest_api_perm_mask(
             self.controller.server_perms.get_user_permissions_mask(
                 auth_data[4]["user_id"], server_id
@@ -90,7 +151,16 @@ class ApiServersServerTasksIndexHandler(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.SCHEDULE not in server_permissions:
             # if the user doesn't have Schedule permission, return an error
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         data["server_id"] = server_id
         if not data.get("start_time"):
             data["start_time"] = "00:00"

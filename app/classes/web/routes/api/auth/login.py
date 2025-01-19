@@ -68,7 +68,12 @@ class ApiAuthLoginHandler(BaseApiHandler):
             )
             return self.finish_json(
                 401,
-                {"status": "error", "error": "INCORRECT_CREDENTIALS", "token": None},
+                {
+                    "status": "error",
+                    "error": "INCORRECT_CREDENTIALS",
+                    "error_data": "INVALID CREDENTIALS",
+                    "token": None,
+                },
             )
 
         if not user_data.enabled:
@@ -78,7 +83,13 @@ class ApiAuthLoginHandler(BaseApiHandler):
                 f" IP {self.get_remote_ip()} account disabled"
             )
             self.finish_json(
-                403, {"status": "error", "error": "ACCOUNT_DISABLED", "token": None}
+                403,
+                {
+                    "status": "error",
+                    "error": "ACCOUNT_DISABLED",
+                    "error_data": "ACCOUNT DISABLED",
+                    "token": None,
+                },
             )
             return
 
@@ -123,5 +134,9 @@ class ApiAuthLoginHandler(BaseApiHandler):
             )
             self.finish_json(
                 401,
-                {"status": "error", "error": "INCORRECT_CREDENTIALS"},
+                {
+                    "status": "error",
+                    "error": "INCORRECT_CREDENTIALS",
+                    "error_data": "INCORRECT CREDENTIALS",
+                },
             )

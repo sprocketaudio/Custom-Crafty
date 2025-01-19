@@ -28,7 +28,6 @@
         "permName": "Naziv dopuštenja",
         "perms": "Dopuštenja",
         "server": "Poslužitelj: ",
-        "superUser": "Superkorisnik",
         "yes": "Da"
     },
     "base": {
@@ -126,12 +125,12 @@
                 "pdf": "PDF",
                 "print": "Isprintaj"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Nema dostupnih podataka u tablici",
             "info": "Prikazuje se _START_ do _END_ od _TOTAL_ unosa",
             "infoEmpty": "Prikazuje se 0 do 0 od 0 unosa",
             "infoFiltered": "(filtrirano od ukupno _MAX_ unosa)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Prikaži _MENU_ unose",
             "loadingRecords": "Učitavanje...",
             "paginate": {
@@ -437,7 +436,6 @@
     "serverTerm": {
         "commandInput": "Unesi naredbu",
         "delay-explained": "Usluga je nedavno započeta i odgađa pokretanje instance poslužitelja Minecrafta",
-        "downloading": "Preuzimanje...",
         "restart": "Ponovno pokreni",
         "sendCommand": "Pošalji naredbu",
         "start": "Pokreni",

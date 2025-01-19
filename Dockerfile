@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND="noninteractive"
 
@@ -36,7 +36,7 @@ WORKDIR /crafty
 COPY --chown=crafty:root requirements.txt ./
 RUN python3 -m venv ./.venv \
     && . .venv/bin/activate \
-    && pip3 install --no-cache-dir --upgrade setuptools==50.3.2 pip==22.0.3 \
+    && pip3 install --no-cache-dir --upgrade setuptools==75.6.0 pip==24.3.1 \
     && pip3 install --no-cache-dir -r requirements.txt \
     && deactivate
 USER root

@@ -1,6 +1,7 @@
 import os
 import logging
 import shutil
+from PIL import Image
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.shared.helpers import Helpers
 from app.classes.web.base_api_handler import BaseApiHandler
@@ -47,7 +48,14 @@ class ApiFilesUploadHandler(BaseApiHandler):
             if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
                 # if the user doesn't have access to the server, return an error
                 return self.finish_json(
-                    400, {"status": "error", "error": "NOT_AUTHORIZED"}
+                    400,
+                    {
+                        "status": "error",
+                        "error": "NOT_AUTHORIZED",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
                 )
             mask = self.controller.server_perms.get_lowest_api_perm_mask(
                 self.controller.server_perms.get_user_permissions_mask(
@@ -60,7 +68,14 @@ class ApiFilesUploadHandler(BaseApiHandler):
             if EnumPermissionsServer.FILES not in server_permissions:
                 # if the user doesn't have Files permission, return an error
                 return self.finish_json(
-                    400, {"status": "error", "error": "NOT_AUTHORIZED"}
+                    400,
+                    {
+                        "status": "error",
+                        "error": "NOT_AUTHORIZED",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
                 )
 
             u_type = "server_upload"
@@ -111,9 +126,9 @@ class ApiFilesUploadHandler(BaseApiHandler):
         try:
             file_size = int(self.request.headers.get("fileSize", None))
             total_chunks = int(self.request.headers.get("totalChunks", 0))
-        except TypeError:
+        except TypeError as why:
             return self.finish_json(
-                400, {"status": "error", "error": "TYPE ERROR", "data": {}}
+                400, {"status": "error", "error": "TYPE ERROR", "error_data": {why}}
             )
         self.chunk_index = self.request.headers.get("chunkId")
         if u_type == "server_upload":
@@ -281,6 +296,21 @@ class ApiFilesUploadHandler(BaseApiHandler):
                     with open(chunk_file, "rb") as infile:
                         outfile.write(infile.read())
                     os.remove(chunk_file)
+            if upload_type == "background":
+                # Strip EXIF data
+                image_path = os.path.join(file_path)
+                logger.debug("Stripping exif data from image")
+                image = Image.open(image_path)
+
+                # Get current raw pixel data from image
+                image_data = list(image.getdata())
+                # Create new image
+                image_no_exif = Image.new(image.mode, image.size)
+                # Restore pixel data
+                image_no_exif.putdata(image_data)
+
+                image_no_exif.save(image_path)
+
             logger.info(
                 f"File upload completed. Filename: {self.filename}"
                 f" Path: {file_path} Type: {u_type}"

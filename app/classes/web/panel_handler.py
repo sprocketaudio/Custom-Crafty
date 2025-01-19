@@ -43,6 +43,8 @@ SUBPAGE_PERMS = {
 
 SCHEDULE_AUTH_ERROR_URL = "/panel/error?error=Unauthorized access To Schedules"
 
+HUMANIZED_INDEX_FILE = "humanized_index.json"
+
 
 class PanelHandler(BaseHandler):
     def get_user_roles(self) -> t.Dict[str, list]:
@@ -359,6 +361,7 @@ class PanelHandler(BaseHandler):
                 else None
             ),
             "superuser": superuser,
+            "themes": self.helper.get_themes(),
         }
         try:
             page_data["hosts_data"]["disk_json"] = json.loads(
@@ -879,7 +882,7 @@ class PanelHandler(BaseHandler):
                         os.path.join(self.helper.root_dir, "app", "translations")
                     )
                 ):
-                    if file == "humanized_index.json":
+                    if file == HUMANIZED_INDEX_FILE:
                         continue
                     if file.endswith(".json"):
                         if file.split(".")[0] not in self.helper.get_setting(
@@ -977,6 +980,8 @@ class PanelHandler(BaseHandler):
             for file in sorted(
                 os.listdir(os.path.join(self.helper.root_dir, "app", "translations"))
             ):
+                if file == HUMANIZED_INDEX_FILE:
+                    continue
                 if file.endswith(".json"):
                     if file.split(".")[0] not in self.helper.get_setting(
                         "disabled_language_files"
@@ -1434,7 +1439,7 @@ class PanelHandler(BaseHandler):
             for file in sorted(
                 os.listdir(os.path.join(self.helper.root_dir, "app", "translations"))
             ):
-                if file == "humanized_index.json":
+                if file == HUMANIZED_INDEX_FILE:
                     continue
                 if file.endswith(".json"):
                     if file.split(".")[0] not in self.helper.get_setting(
