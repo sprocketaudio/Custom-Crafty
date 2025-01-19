@@ -41,7 +41,7 @@
           </span>
 
           <div class="row">
-            <div class="col-md-12 col-sm-12" style="overflow-x:auto;">
+            <div class="col-md-12 col-sm-12 overflow-x-auto">
               <div class="card">
                 <div class="card-header header-sm d-flex justify-content-between align-items-center">
                   <h4 class="card-title"><i class="fas fa-calendar"></i> {{ translate('serverSchedules',
@@ -53,13 +53,13 @@
                 </div>
                 <div class="card-body">
                   {% if len(data['schedules']) == 0 %}
-                  <div style="text-align: center; color: grey;">
+                  <div class="text-align-center text-secondary">
                     <h7>{{ translate('serverSchedules', 'no-schedule', data['lang']) }} <strong>{{ translate('serverSchedules', 'newSchedule',data['lang']) }}</strong>.</h7>
                   </div>
                   {% end %}
                   {% if len(data['schedules']) > 0 %}
                   <div class="d-none d-lg-block">
-                    <table class="table table-hover table-responsive" id="schedule_table" style="table-layout:fixed;" aria-describedby="Schedule List">
+                    <table class="table table-hover table-responsive no-scroll" id="schedule_table" style="table-layout:fixed;" aria-describedby="Schedule List">
                       <thead>
                         <tr class="rounded">
                           <th style="width: 5%; min-width: 64px;">{{ translate('serverSchedules', 'enabled',
@@ -92,8 +92,8 @@
                           <td id="{{schedule.action}}">
                             <p>{{schedule.action}}</p>
                           </td>
-                          <td id="{{schedule.command}}" style="overflow: scroll; max-width: 30px;">
-                            <p style="overflow: scroll;" class="no-scroll">{{schedule.command}}</p>
+                          <td id="{{schedule.command}}" class="overflow-scroll" style="max-width: 30px;">
+                            <p class="no-scroll">{{schedule.command}}</p>
                           </td>
                           <td id="{{schedule.interval}}">
                             {% if schedule.interval_type != '' and schedule.interval_type != 'reaction' %}
@@ -142,8 +142,8 @@
                           <td id="{{schedule.action}}" class="action">
                             <p>{{schedule.action}}</p>
                           </td>
-                          <td id="{{schedule.command}}" class="action" style="overflow: scroll; max-width: 30px;">
-                            <p style="overflow: scroll;">{{schedule.command}}</p>
+                          <td id="{{schedule.command}}" class="action overflow-scroll" style="max-width: 30px;">
+                            <p class="overflow-scroll;">{{schedule.command}}</p>
                           </td>
                           <td id="{{schedule.enabled}}" class="enabled">
                             <button type="button" class="btn btn-sm btn-info btn-toggle schedule-custom-toggle" id="schedule{{schedule.id}}" name="schedule{{schedule.id}}" data-schedule-id="{{schedule.schedule_id}}" data-schedule-enabled="{{ 'true' if schedule.enabled else 'false' }}" data-toggle="button" aria-pressed="true" autocomplete="off">
@@ -163,43 +163,42 @@
                                 </button>
                               </div>
                               <div class="modal-body">
-                                <ul style="list-style: none;">
-                                  <li id="{{schedule.schedule_id}}" class="id" style="border-top: .1em solid gray;">
+                                <ul class="list-group">
+                                  <li id="{{schedule.schedule_id}}" class="id list-group-item">
                                     <h4>{{ translate('serverSchedules', 'name', data['lang']) }}</h4>
-                                    <p>{{schedule.schedule_id}}</p>
+                                    <p class="mb-0">{{schedule.schedule_id}}</p>
                                   </li>
-                                  <li id="{{schedule.action}}" class="action" style="border-top: .1em solid gray;">
+                                  <li id="{{schedule.action}}" class="action list-group-item">
                                     <h4>{{ translate('serverSchedules', 'action', data['lang']) }}</h4>
-                                    <p>{{schedule.action}}</p>
+                                    <p class="mb-0">{{schedule.action}}</p>
                                   </li>
-                                  <li id="{{schedule.command}}" class="action" style="border-top: .1em solid gray;">
+                                  <li id="{{schedule.command}}" class="action list-group-item">
                                     <h4>{{ translate('serverSchedules', 'command', data['lang']) }}</h4>
-                                    <p>{{schedule.command}}</p>
+                                    <p class="mb-0">{{schedule.command}}</p>
                                   </li>
-                                  <li id="{{schedule.interval}}" class="action" style="border-top: .1em solid gray;">
+                                  <li id="{{schedule.interval}}" class="action list-group-item">
                                     {% if schedule.interval != '' %}
                                     <h4>{{ translate('serverSchedules', 'interval', data['lang']) }}</h4>
-                                    <p>{{ translate('serverSchedules', 'every', data['lang']) }} {{schedule.interval}}
+                                    <p class="mb-0">{{ translate('serverSchedules', 'every', data['lang']) }} {{schedule.interval}}
                                       {{schedule.interval_type}}</p>
                                     {% elif schedule.interval_type == 'reaction' %}
                                     <h4>{{ translate('serverSchedules', 'interval', data['lang']) }}</h4>
-                                    <p>{{schedule.interval_type}}<br><br>{{ translate('serverSchedules', 'child',
+                                    <p class="mb-0">{{schedule.interval_type}}<br><br>{{ translate('serverSchedules', 'child',
                                       data['lang']) }}: {{ schedule.parent }}</p>
                                     {% else %}
                                     <h4>{{ translate('serverSchedules', 'interval', data['lang']) }}</h4>
-                                    <p>{{ translate('serverSchedules', 'cron', data['lang']) }}: {{schedule.cron_string}}
-                                    </p>
+                                    <p class="mb-0">{{ translate('serverSchedules', 'cron', data['lang']) }}: {{schedule.cron_string}}</p>
                                     {% end %}
                                   </li>
-                                  <li id="{{schedule.start_time}}" class="action" style="border-top: .1em solid gray;">
+                                  <li id="{{schedule.start_time}}" class="action list-group-item">
                                     <h4>{{ translate('serverSchedules', 'nextRun', data['lang']) }}</h4>
                                     {% if schedule.next_run %}
-                                    <p>{{schedule.next_run}}</p>
+                                    <p class="mb-0">{{schedule.next_run}}</p>
                                     {% else %}
-                                    <p>zzzzzzz</p>
+                                    <p class="mb-0">zzzzzzz</p>
                                     {% end %}
                                   </li>
-                                  <li id="{{schedule.enabled}}" class="action" style="border-top: .1em solid gray; border-bottom: .1em solid gray">
+                                  <li id="{{schedule.enabled}}" class="action list-group-item">
                                     <h4>{{ translate('serverSchedules', 'enabled', data['lang']) }}</h4>
                                     <input type="checkbox" class="schedule-enabled-toggle" data-schedule-id="{{schedule.schedule_id}}" data-schedule-enabled="{{ 'true' if schedule.enabled else 'false' }}">
                                   </li>
@@ -235,11 +234,6 @@
     </div>
   </div>
   <style>
-    .popover-body {
-      color: white !important;
-      ;
-    }
-
     .toggle-handle {
       background-color: white !important;
     }

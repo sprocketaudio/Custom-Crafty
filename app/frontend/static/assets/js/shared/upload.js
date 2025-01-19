@@ -137,7 +137,7 @@ async function uploadFile(type, file = null, path = null, file_num = 0, _onProgr
         // All promises resolved successfully
         $("#upload_input").html(`<div class="card-header header-sm d-flex justify-content-between align-items-center" style="width: 100%;"><input value="${file.name}" type="text" id="file-uploaded" disabled></input> 🔒</div>`);
         if (type === "import") {
-            document.getElementById("lower_half").style.visibility = "visible";
+            document.getElementById("lower_half").classList.remove("d-none");
             document.getElementById("lower_half").hidden = false;
         } else if (type === "background") {
             setTimeout(function () {

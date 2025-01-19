@@ -508,7 +508,8 @@
     },
     "serverSchedules": {
         "action": "Action",
-        "actionId": "Select Action Child",
+        "actionId": "Action Child",
+        "backupPol": "Backup Policy",
         "areYouSure": "Delete Scheduled Task?",
         "cancel": "Cancel",
         "cannotSee": "Not seeing everything?",
