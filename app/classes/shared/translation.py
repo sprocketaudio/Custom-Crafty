@@ -23,9 +23,9 @@ class Translation:
     def translate(self, page, word, language, error=True):
         fallback_language = "en_EN"
 
-        translated_word = self.translate_inner(page, word, language)
+        translated_word = self.translate_inner(page, word, language, error)
         if translated_word is None:
-            translated_word = self.translate_inner(page, word, fallback_language)
+            translated_word = self.translate_inner(page, word, fallback_language, error)
 
         if translated_word:
             if isinstance(translated_word, dict):
@@ -41,7 +41,7 @@ class Translation:
             return "Error while getting translation"
         return word
 
-    def translate_inner(self, page, word, language) -> t.Union[t.Any, None]:
+    def translate_inner(self, page, word, language, error) -> t.Union[t.Any, None]:
         language_file = self.get_language_file(language)
         try:
             if not self.cached_translation:
@@ -59,35 +59,38 @@ class Translation:
             try:
                 translated_page = data[page]
             except KeyError:
-                logger.error(
-                    f"Translation File Error: page {page} "
-                    f"does not exist for lang {language}"
-                )
-                Console.error(
-                    f"Translation File Error: page {page} "
-                    f"does not exist for lang {language}"
-                )
+                if error:
+                    logger.error(
+                        f"Translation File Error: page {page} "
+                        f"does not exist for lang {language}"
+                    )
+                    Console.error(
+                        f"Translation File Error: page {page} "
+                        f"does not exist for lang {language}"
+                    )
                 return None
 
             try:
                 translated_word = translated_page[word]
                 return translated_word
             except KeyError:
-                logger.error(
-                    f"Translation File Error: word {word} does not exist on page "
-                    f"{page} for lang {language}"
-                )
-                Console.error(
-                    f"Translation File Error: word {word} does not exist on page "
-                    f"{page} for lang {language}"
-                )
+                if error:
+                    logger.error(
+                        f"Translation File Error: word {word} does not exist on page "
+                        f"{page} for lang {language}"
+                    )
+                    Console.error(
+                        f"Translation File Error: word {word} does not exist on page "
+                        f"{page} for lang {language}"
+                    )
                 return None
 
         except Exception as e:
-            logger.critical(
-                f"Translation File Error: Unable to read {language_file} due to {e}"
-            )
-            Console.critical(
-                f"Translation File Error: Unable to read {language_file} due to {e}"
-            )
+            if error:
+                logger.critical(
+                    f"Translation File Error: Unable to read {language_file} due to {e}"
+                )
+                Console.critical(
+                    f"Translation File Error: Unable to read {language_file} due to {e}"
+                )
             return None
