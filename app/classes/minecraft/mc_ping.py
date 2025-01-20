@@ -94,7 +94,7 @@ class Players(list):
 class Player:
     def __init__(self, data):
         self.id = data.get("id", "")
-        self.name = data("name", "Anonymous")
+        self.name = data.get("name", "Anonymous")
 
     def __str__(self):
         return self.name

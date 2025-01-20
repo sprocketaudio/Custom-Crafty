@@ -1,4 +1,9 @@
 # Changelog
+## --- [4.4.6] - 2024/01/20
+### Bug fixes
+- Fix traceback on stats page for data missing data.get ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/824))
+<br><br>
+
 ## --- [4.4.5] - 2024/01/19
 ### Refactor
 - Refactor and standardize all JSON validator errors returning human readable translations ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/786))
