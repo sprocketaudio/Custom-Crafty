@@ -18,7 +18,7 @@
         "downloading": "서버를 다운로드 중입니다...",
         "explainRoot": "아카이브 내에서 서버의 루트 디렉터리를 선택하려면 아래 버튼을 클릭하세요",
         "importServer": "기존 서버 가져오기",
-        "importServerButton": "서버 가져오기",
+        "importServerButton": "서버 가져오기!",
         "importZip": "ZIP 파일에서 가져오기",
         "importing": "서버 가져오는 중...",
         "labelZipFile": "ZIP 파일을 선택하세요",
@@ -266,7 +266,7 @@
         "stop": "정지",
         "storage": "저장공간",
         "version": "버전",
-        "welcome": "Crafty Controller에 오신걸 환영합니다!"
+        "welcome": "Crafty Controller에 오신걸 환영합니다"
     },
     "datatables": {
         "i18n": {
@@ -382,8 +382,8 @@
     },
     "notify": {
         "activityLog": "활동 로그",
-        "backupComplete": "서버 {} 에 대한 백업이 성공적으로 완료되었습니다!",
-        "backupStarted": "서버 {} 에 대한 백업이 시작되었습니다!",
+        "backupComplete": "서버 {}에 대한 백업이 성공적으로 완료되었습니다.",
+        "backupStarted": "서버 {}에 대한 백업이 시작되었습니다.",
         "backup_desc": "백업 마이그레이션이 부분적으로 또는 완전히 실패했을 수 있음을 감지했습니다. 백업 탭에서 백업 기록을 확인하십시오.",
         "backup_title": "백업 마이그레이션 경고",
         "downloadLogs": "지원 로그 다운로드?",
@@ -435,7 +435,7 @@
         "configUpdate": "마지막 업데이트: ",
         "created": "생성됨: ",
         "delRole": "역할 제거",
-        "doesNotExist": "아직 존재하지 않는 것을 삭제할 수 없습니다.",
+        "doesNotExist": "아직 존재하지 않는 것을 삭제할 수 없습니다",
         "pageTitle": "역할 수정",
         "pageTitleNew": "새 역할",
         "permAccess": "액세스 가능?",
@@ -555,7 +555,7 @@
         "timeoutExplain1": "Cratfy가 명령 실행 후 서버가 종료될 때까지 기다리는 시간입니다",
         "timeoutExplain2": "이 시간이 지나면 프로세스를 강제로 종료합니다.",
         "update": "실행 파일 업데이트",
-        "yesDelete": "삭제합니다",
+        "yesDelete": "네, 삭제합니다",
         "yesDeleteFiles": "모든 파일을 삭제합니다"
     },
     "serverConfigHelp": {
@@ -661,7 +661,7 @@
     },
     "serverSchedules": {
         "action": "작업",
-        "actionId": "하위 작업 선택",
+        "actionId": "하위 작업",
         "areYouSure": "스케줄 작업을 삭제할까요?",
         "cancel": "취소",
         "cannotSee": "모든 항목이 보이지 않나요?",
@@ -685,7 +685,8 @@
         "no": "아니요",
         "no-schedule": "현재 서버에 대한 예약이 없습니다. 시작하려면 다음을 클릭합니다",
         "scheduledTasks": "스케줄 작업",
-        "yes": "예"
+        "yes": "예",
+        "backupPol": "백업 정책"
     },
     "serverStats": {
         "cpuUsage": "CPU 사용량",
