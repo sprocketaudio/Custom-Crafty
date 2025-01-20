@@ -1,21 +1,19 @@
 # Changelog
-## --- [4.4.7] - 2024/TBD
-### New features
-TBD
+## --- [4.4.7] - 2024/01/20
 ### Bug fixes
-TBD
-### Tweaks
-TBD
-### Lang
-TBD
+- Docker Repair | Remove ubuntu user to replace with crafty user ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/826)) Resolves #521
 <br><br>
 
 ## --- [4.4.6] - 2024/01/20
+## NOTE Version effected by non-root docker issue if you installed from this version see [RCA document](https://gitlab.com/crafty-controller/crafty-4/-/issues/521#:~:text=Users%20deploying%20after%204.4.4)
+
 ### Bug fixes
 - Fix traceback on stats page for data missing data.get ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/824))
 <br><br>
 
 ## --- [4.4.5] - 2024/01/19
+## NOTE Version effected by non-root docker issue if you installed from this version see [RCA document](https://gitlab.com/crafty-controller/crafty-4/-/issues/521#:~:text=Users%20deploying%20after%204.4.4)
+
 ### Refactor
 - Refactor and standardize all JSON validator errors returning human readable translations ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/786))
 - Improve docker-build CI/CD, supporting nightly builds ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/813))
