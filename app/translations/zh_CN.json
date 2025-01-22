@@ -508,7 +508,7 @@
     },
     "serverSchedules": {
         "action": "操作",
-        "actionId": "选择子操作",
+        "actionId": "子操作",
         "areYouSure": "删除计划任务？",
         "cancel": "取消",
         "cannotSee": "什么都看不到？",
@@ -532,7 +532,8 @@
         "no": "否",
         "no-schedule": "此服务器当前没有计划。要开始使用计划，点击",
         "scheduledTasks": "计划任务",
-        "yes": "是"
+        "yes": "是",
+        "backupPol": "备份策略"
     },
     "serverStats": {
         "cpuUsage": "CPU 使用率",
