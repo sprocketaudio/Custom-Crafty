@@ -189,6 +189,7 @@
         "contact": "Contact Crafty Control Support via Discord",
         "craftyStatus": "Crafty's status page",
         "cronFormat": "Invalid Cron format detected",
+        "duplicateId": "Request tokens must only specify session_id or token_id, not both.",
         "embarassing": "Oh my, well, this is embarrassing.",
         "error": "Error!",
         "eulaAgree": "Do you agree?",

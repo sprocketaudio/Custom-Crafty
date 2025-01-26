@@ -201,6 +201,19 @@ class BaseHandler(tornado.web.RequestHandler):
             api_key, token_data, user = self.controller.authentication.check_err(
                 self._auth_get_api_token()
             )
+            if token_data.get("token_id") and token_data.get(
+                "session_id"
+            ):  # Check to see if token defines session_id and token_id
+                return self.finish_json(
+                    403,
+                    {
+                        "status": "error",
+                        "error": "ACCESS_DENIED",
+                        "error_data": self.helper.translation.translate(
+                            "error", "duplicateId", user["lang"]
+                        ),
+                    },
+                )
             if (
                 (user["superuser"] and not token_data.get("mfa"))
                 and not self.is_totp_method()
