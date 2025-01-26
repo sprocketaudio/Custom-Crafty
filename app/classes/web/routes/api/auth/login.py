@@ -1,6 +1,8 @@
+import os
 import logging
 import json
 from jsonschema import validate
+from datetime import datetime, timedelta
 from jsonschema.exceptions import ValidationError
 from app.classes.models.users import Users
 from app.classes.shared.helpers import Helpers
@@ -35,6 +37,32 @@ login_schema = {
 
 
 class ApiAuthLoginHandler(BaseApiHandler):
+    def is_time_locked(self):
+        timestamps = (
+            self.controller.auth_tracker.get(self.request.remote_ip, {})
+            .get("login", {})
+            .get("times", [])
+        )
+        print(timestamps)
+        # Parse the timestamps and check if they're within the last 3 minutes
+        now = datetime.now()
+        three_minutes_ago = now - timedelta(minutes=3)
+
+        # Filter the timestamps
+        recent_timestamps = [
+            ts
+            for ts in timestamps
+            if datetime.strptime(ts, "%d/%m/%Y %H:%M:%S") >= three_minutes_ago
+        ]
+        if len(recent_timestamps) > 3:
+            if three_minutes_ago <= parsed_time <= now:
+                # Calculate the remaining time until it's no longer within 3 minutes
+                time_remaining = parsed_time - three_minutes_ago
+                minutes, seconds = divmod(time_remaining.total_seconds(), 60)
+            self.controller.auth_tracker[self.request.remote_ip][
+                "next_allowed_login"
+            ] = [datetime.now().strftime("%d/%m/%Y %H:%M:%S")]
+
     def post(self):
         try:
             data = json.loads(self.request.body)
@@ -69,6 +97,8 @@ class ApiAuthLoginHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
+
+        # self.is_time_locked()
 
         username = data["username"]
         password = data["password"]
