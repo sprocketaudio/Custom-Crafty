@@ -40,5 +40,24 @@
     margin-bottom: 2rem;
 }
 
+.flex-container {
+    display: flex;
+    gap: 10px;
+    /* Space between totp_container and the select element */
+    align-items: center;
+    /* Vertically align items */
+}
+
+#totp_container {
+    flex: 1;
+    /* Allows the TOTP input to take up more space */
+}
+
+#server_type {
+    flex: 0;
+    /* Keeps the select element compact */
+    width: auto;
+    /* Ensures the width doesn't stretch unnecessarily */
+}
 
 /**************************************************************/
