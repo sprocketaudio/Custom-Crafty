@@ -47,7 +47,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
                 source_ip=self.get_remote_ip(),
             )
             data_key = self.controller.authentication.generate(
-                key.user_id_id, {"token_id": key.token_id, "api_key": True}
+                key.user_id_id, {"token_id": key.token_id}
             )
 
             return self.finish_json(
