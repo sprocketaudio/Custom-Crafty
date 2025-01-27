@@ -228,7 +228,7 @@ class BaseHandler(tornado.web.RequestHandler):
                 goto = self.helper.translation.translate(
                     "otp", "goToPage", user["lang"]
                 )
-                url = f"/panel/edit_user_otp?id={user["user_id"]}"
+                url = f"/panel/edit_user_otp?id={user['user_id']}"
                 return self.finish_json(
                     403,
                     {

@@ -428,9 +428,9 @@ data['lang']) }}{% end %}
         superuser = userData.data["superuser"];
         edit_id = userData.data["user_id"];
       } else {
-        bootbox.alert({
+        return bootbox.alert({
           title: userData.error,
-          message: userData.error
+          message: userData.error_data
         });
       }
 
