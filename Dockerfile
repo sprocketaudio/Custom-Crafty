@@ -5,8 +5,12 @@ ENV DEBIAN_FRONTEND="noninteractive"
 # Security Patch for CVE-2021-44228
 ENV LOG4J_FORMAT_MSG_NO_LOOKUPS=true
 
+# Remove shipped sudoer user (Required for Ubuntu 24.04 base) MR !826
 # Create non-root user & required dirs
-RUN useradd -g root -M crafty \
+RUN touch /var/mail/ubuntu \
+    && chown ubuntu /var/mail/ubuntu \
+    && userdel -r ubuntu \
+    && useradd -g root -M crafty \
     && mkdir /crafty \
     && chown -R crafty:root /crafty
 

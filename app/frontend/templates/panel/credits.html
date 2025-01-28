@@ -23,77 +23,62 @@
   <!-- Page Title Header Ends-->
 
   <div class="card">
-    <div class="card-header header-sm d-flex justify-content-between align-items-center">
-      <h4 class="card-title"><i class="fa-solid fa-code-merge"></i> &nbsp;{{ translate('credits', 'developmentTeam',
-        data['lang'])
-        }}</h4>
+    <div class="card-header header-sm">
+      <h4><i class="fa-solid fa-code-merge"></i> &nbsp;{{ translate('credits', 'developmentTeam', data['lang'])}}</h4>
     </div>
     <div class="card-body">
       <div class="row">
         {% for person in data['staff']['development'] %}
-        <div class="col-lg-6 mb-5">
-          <div class="card rounded shadow-none">
-
-            <div class="row">
-              <div class="col-md-4" style="max-width: fit-content;">
-
-                <div class="user-avatar mb-auto">
-                  {% if person['pic'] %}
-                  <img src="{{ person['pic'] }}" alt="profile image" class="profile-img img-lg rounded-circle">
-                  {% else %}
-                  <div alt="profil image" class="profile-img img-lg rounded-circle">
-                    <img src="/static/assets/images/credits/user-circle-solid.svg" alt="profile image"
-                      class="profile-img img-lg rounded-circle">
-                  </div>
-                  {% end %}
+        <div class="col-12 col-lg-6">
+          <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+            <div class="col-12 col-sm-auto col-lg-12 col-xl-auto px-4 pb-2 pt-4 px-lg-4 pb-lg-2 pt-lg-4 py-sm-4 pr-sm-2 pl-sm-4 py-xl-4 pr-xl-2 pl-xl-4">
+              <div class="user-avatar pl-2 pb-2">
+                {% if person['pic'] %}
+                <img src="{{ person['pic'] }}" alt="profile image" class="profile-img img-lg rounded-circle">
+                {% else %}
+                <div alt="profil image" class="profile-img img-lg rounded-circle">
+                  <img src="/static/assets/images/credits/user-circle-solid.svg" alt="profile image" class="profile-img img-lg rounded-circle">
                 </div>
-
-                <div class="wrapper">
-                  <div class="wrapper d-flex align-items-center">
-                    <h4 class="mb-0 font-weight-medium">{{ person['name'] }}</h4>
-                  </div>
-
-                  <div class="wrapper d-flex align-items-center font-weight-medium text-muted">
-                    {% if person['loc'] %}
-                    <i class="mdi mdi-map-marker-outline mr-2"></i>
-                    <p class="mb-0 text-muted">{{ person['loc'] }}</p>
-                    {% end %}
-                  </div>
-                </div>
+                {% end %}
               </div>
-
-              <div class="col-md-8">
-                <div class="wrapper d-flex align-items-start">
-                  {% if person['tags'][0] %}
-                  <span class="btn btn-sm btn-info mr-2">{{ person['tags'][0] }}</span>
-                  {% end %}
-                  {% if person['tags'][1] %}
-                  {% if type(person['tags'][1]) is list %}
-                  <a href="{{ person['tags'][1][1] }}" class="btn btn-sm btn-primary mr-2">{{ person['tags'][1][0]
-                    }}</a>
-                  {% else %}
-                  <span class="btn btn-sm btn-primary mr-2">{{ person['tags'][1] }}</span>
-                  {% end %}
-                  {% end %}
-                  {% if person['tags'][2] %}
-                  {% if type(person['tags'][2]) is list %}
-                  <a href="{{ person['tags'][2][1] }}" class="btn btn-sm btn-inverse-success mr-2">{{
-                    person['tags'][2][0] }}</a>
-                  {% else %}
-                  <span class="btn btn-sm btn-inverse-success mr-2">{{ person['tags'][2] }}</span>
-                  {% end %}
-                  {% end %}
-                </div>
-
-                <div class="wrapper align-items-start pt-3">
-                  {% if person['title'] %}
-                  <h5><strong>Crafty's {{ person['title'] }}</strong></h5>
-                  {% end %}
-                  <p>{{ person['blurb'] }}</p>
-                </div>
+              <div class="align-items-center">
+                <h4 class="font-weight-medium">{{ person['name'] }}</h4>
+              </div>
+              <div class="align-items-center font-weight-medium text-muted">
+                {% if person['loc'] %}
+                <p class="text-muted mb-2"><i class="mdi mdi-map-marker-outline"></i> {{ person['loc'] }}</p>
+                {% end %}
               </div>
             </div>
-
+            <div class="col px-4 pt-2 pb-4 px-lg-4 pt-lg-2 pb-lg-4 py-sm-4 pl-sm-2 pr-sm-4 py-xl-4 pl-xl-2 pr-xl-4  d-flex flex-column position-static">
+              <div name="tags" class="my-2 align-items-start">
+                {% if person['tags'][0] %}
+                <span class="btn btn-sm btn-info m-1">{{ person['tags'][0] }}</span>
+                {% end %}
+                {% if person['tags'][1] %}
+                {% if type(person['tags'][1]) is list %}
+                <a href="{{ person['tags'][1][1] }}" class="btn btn-sm btn-primary m-1">{{ person['tags'][1][0]
+                  }}</a>
+                {% else %}
+                <span class="btn btn-sm btn-primary m-1">{{ person['tags'][1] }}</span>
+                {% end %}
+                {% end %}
+                {% if person['tags'][2] %}
+                {% if type(person['tags'][2]) is list %}
+                <a href="{{ person['tags'][2][1] }}" class="btn btn-sm btn-inverse-success m-1">{{
+                  person['tags'][2][0] }}</a>
+                {% else %}
+                <span class="btn btn-sm btn-inverse-success m-1">{{ person['tags'][2] }}</span>
+                {% end %}
+                {% end %}
+              </div>
+              <div name="blurb" class="m-2 align-items-start">
+                {% if person['title'] %}
+                <h5><strong>Crafty's {{ person['title'] }}</strong></h5>
+                {% end %}
+                <p>{{ person['blurb'] }}</p>
+              </div>
+            </div>
           </div>
         </div>
         {% end %}
@@ -104,160 +89,133 @@
   <br />
 
   <div class="card">
-    <div class="card-header header-sm d-flex justify-content-between align-items-center">
-      <h4 class="card-title"><i class="fa fa-book"></i> &nbsp;{{ translate('credits', 'supportTeam', data['lang'])
-        }}</h4>
+    <div class="card-header header-sm">
+      <h4><i class="fa fa-book"></i> &nbsp;{{ translate('credits', 'supportTeam', data['lang']) }}</h4>
     </div>
     <div class="card-body">
       <div class="row">
         {% for person in data['staff']['support'] %}
-        <div class="col-lg-6 mb-5">
-          <div class="card rounded shadow-none">
-
-            <div class="row">
-              <div class="col-md-4" style="max-width: fit-content;">
-
-                <div class="user-avatar mb-auto">
-                  {% if person['pic'] %}
-                  <img src="{{ person['pic'] }}" alt="profile image" class="profile-img img-lg rounded-circle">
-                  {% else %}
-                  <div alt="profil image" class="profile-img img-lg rounded-circle">
-                    <img src="/static/assets/images/credits/user-circle-solid.svg" alt="profile image"
-                      class="profile-img img-lg rounded-circle">
-                  </div>
-                  {% end %}
+        <div class="col-12 col-lg-6">
+          <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+            <div class="col-12 col-sm-auto col-lg-12 col-xl-auto px-4 pb-2 pt-4 px-lg-4 pb-lg-2 pt-lg-4 py-sm-4 pr-sm-2 pl-sm-4 py-xl-4 pr-xl-2 pl-xl-4">
+              <div class="user-avatar pl-2 pb-2">
+                {% if person['pic'] %}
+                <img src="{{ person['pic'] }}" alt="profile image" class="profile-img img-lg rounded-circle">
+                {% else %}
+                <div alt="profil image" class="profile-img img-lg rounded-circle">
+                  <img src="/static/assets/images/credits/user-circle-solid.svg" alt="profile image" class="profile-img img-lg rounded-circle">
                 </div>
-
-                <div class="wrapper">
-                  <div class="wrapper d-flex align-items-center">
-                    <h4 class="mb-0 font-weight-medium">{{ person['name'] }}</h4>
-                  </div>
-
-                  <div class="wrapper d-flex align-items-center font-weight-medium text-muted">
-                    {% if person['loc'] %}
-                    <i class="mdi mdi-map-marker-outline mr-2"></i>
-                    <p class="mb-0 text-muted">{{ person['loc'] }}</p>
-                    {% end %}
-                  </div>
-                </div>
+                {% end %}
               </div>
-
-              <div class="col-md-8">
-                <div class="wrapper d-flex align-items-start">
-                  {% if person['tags'][0] %}
-                  <span class="btn btn-sm btn-info mr-2">{{ person['tags'][0] }}</span>
-                  {% end %}
-                  {% if person['tags'][1] %}
-                  {% if type(person['tags'][1]) is list %}
-                  <a href="{{ person['tags'][1][1] }}" class="btn btn-sm btn-primary mr-2">{{ person['tags'][1][0]
-                    }}</a>
-                  {% else %}
-                  <span class="btn btn-sm btn-primary mr-2">{{ person['tags'][1] }}</span>
-                  {% end %}
-                  {% end %}
-                  {% if person['tags'][2] %}
-                  {% if type(person['tags'][2]) is list %}
-                  <a href="{{ person['tags'][2][1] }}" class="btn btn-sm btn-inverse-success mr-2">{{
-                    person['tags'][2][0] }}</a>
-                  {% else %}
-                  <span class="btn btn-sm btn-inverse-success mr-2">{{ person['tags'][2] }}</span>
-                  {% end %}
-                  {% end %}
-                </div>
-
-                <div class="wrapper align-items-start pt-3">
-                  {% if person['title'] %}
-                  <h5><strong>{{ person['title'] }}</strong></h5>
-                  {% end %}
-                  <p>{{ person['blurb'] }}</p>
-                </div>
+              <div class="align-items-center">
+                <h4 class="font-weight-medium">{{ person['name'] }}</h4>
+              </div>
+              <div class="align-items-center font-weight-medium text-muted">
+                {% if person['loc'] %}
+                <p class="text-muted mb-2"><i class="mdi mdi-map-marker-outline"></i> {{ person['loc'] }}</p>
+                {% end %}
               </div>
             </div>
-
+            <div class="col px-4 pt-2 pb-4 px-lg-4 pt-lg-2 pb-lg-4 py-sm-4 pl-sm-2 pr-sm-4 py-xl-4 pl-xl-2 pr-xl-4  d-flex flex-column position-static">
+              <div name="tags" class="my-2 align-items-start">
+                {% if person['tags'][0] %}
+                <span class="btn btn-sm btn-info m-1">{{ person['tags'][0] }}</span>
+                {% end %}
+                {% if person['tags'][1] %}
+                {% if type(person['tags'][1]) is list %}
+                <a href="{{ person['tags'][1][1] }}" class="btn btn-sm btn-primary m-1">{{ person['tags'][1][0]
+                  }}</a>
+                {% else %}
+                <span class="btn btn-sm btn-primary m-1">{{ person['tags'][1] }}</span>
+                {% end %}
+                {% end %}
+                {% if person['tags'][2] %}
+                {% if type(person['tags'][2]) is list %}
+                <a href="{{ person['tags'][2][1] }}" class="btn btn-sm btn-inverse-success m-1">{{
+                  person['tags'][2][0] }}</a>
+                {% else %}
+                <span class="btn btn-sm btn-inverse-success m-1">{{ person['tags'][2] }}</span>
+                {% end %}
+                {% end %}
+              </div>
+              <div name="blurb" class="m-2 align-items-start">
+                {% if person['title'] %}
+                <h5><strong>Crafty's {{ person['title'] }}</strong></h5>
+                {% end %}
+                <p>{{ person['blurb'] }}</p>
+              </div>
+            </div>
           </div>
         </div>
         {% end %}
       </div>
-    </div> <!-- end user row-->
+    </div> <!-- end of user row -->
   </div>
 
   <br />
 
   <div class="card">
-    <div class="card-header header-sm d-flex justify-content-between align-items-center">
-      <h4 class="card-title"><i class="fa-solid fa-thumbtack"></i> &nbsp;{{ translate('credits', 'retiredStaff',
-        data['lang'])
-        }}</h4>
+    <div class="card-header header-sm">
+      <h4><i class="fa-solid fa-thumbtack"></i> &nbsp;{{ translate('credits', 'retiredStaff', data['lang']) }}</h4>
     </div>
-
     <div class="card-body">
       <div class="row">
         {% for person in data['staff']['retired'] %}
-        <div class="col-lg-6 mb-5">
-          <div class="card rounded shadow-none">
-            <div class="row">
-              <div class="col-md-4" style="max-width: fit-content;">
-                <div class="card-img-top user-avatar mb-auto">
-                  {% if person['pic'] %}
-                  <img src="{{ person['pic'] }}" alt="profile image" class="profile-img img-lg rounded-circle">
-                  {% else %}
-                  <div alt="profil image" class="profile-img img-lg rounded-circle">
-                    <img src="/static/assets/images/credits/user-circle-solid.svg" alt="profile image">
-                  </div>
-                  {% end %}
+        <div class="col-12 col-lg-6">
+          <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+            <div class="col-12 col-sm-auto col-lg-12 col-xl-auto px-4 pb-2 pt-4 px-lg-4 pb-lg-2 pt-lg-4 py-sm-4 pr-sm-2 pl-sm-4 py-xl-4 pr-xl-2 pl-xl-4">
+              <div class="user-avatar pl-2 pb-2">
+                {% if person['pic'] %}
+                <img src="{{ person['pic'] }}" alt="profile image" class="profile-img img-lg rounded-circle">
+                {% else %}
+                <div alt="profil image" class="profile-img img-lg rounded-circle">
+                  <img src="/static/assets/images/credits/user-circle-solid.svg" alt="profile image" class="profile-img img-lg rounded-circle">
                 </div>
-
-                <div class="wrapper">
-                  <div class="wrapper d-flex align-items-center">
-                    <h4 class="mb-0 font-weight-medium">{{ person['name'] }}</h4>
-                  </div>
-
-                  <div class="wrapper d-flex align-items-center font-weight-medium text-muted">
-                    {% if person['loc'] %}
-                    <i class="mdi mdi-map-marker-outline mr-2"></i>
-                    <p class="mb-0 text-muted">{{ person['loc'] }}</p>
-                    {% end %}
-                  </div>
-                </div>
+                {% end %}
               </div>
-
-              <div class="col-md-8">
-                <div class="wrapper d-flex align-items-start">
-                  {% if person['tags'][0] %}
-                  <span class="btn btn-sm btn-info mr-2">{{ person['tags'][0] }}</span>
-                  {% end %}
-                  {% if person['tags'][1] %}
-                  {% if type(person['tags'][1]) is list %}
-                  <a href="{{ person['tags'][1][1] }}" class="btn btn-sm btn-primary mr-2">{{ person['tags'][1][0]
-                    }}</a>
-                  {% else %}
-                  <span class="btn btn-sm btn-primary mr-2">{{ person['tags'][1] }}</span>
-                  {% end %}
-                  {% end %}
-                  {% if person['tags'][2] %}
-                  {% if type(person['tags'][2]) is list %}
-                  <a href="{{ person['tags'][2][1] }}" class="btn btn-sm btn-inverse-success mr-2">{{
-                    person['tags'][2][0] }}</a>
-                  {% else %}
-                  <span class="btn btn-sm btn-inverse-success mr-2">{{ person['tags'][2] }}</span>
-                  {% end %}
-                  {% end %}
-                </div>
-
-                <div class="wrapper align-items-start pt-3">
-                  {% if person['title'] %}
-                  <h5><strong>{{ person['title'] }}</strong></h5>
-                  {% end %}
-                  <p>{{ person['blurb'] }}</p>
-                </div>
+              <div class="align-items-center">
+                <h4 class="font-weight-medium">{{ person['name'] }}</h4>
+              </div>
+              <div class="align-items-center font-weight-medium text-muted">
+                {% if person['loc'] %}
+                <p class="text-muted mb-2"><i class="mdi mdi-map-marker-outline"></i> {{ person['loc'] }}</p>
+                {% end %}
               </div>
             </div>
-
+            <div class="col px-4 pt-2 pb-4 px-lg-4 pt-lg-2 pb-lg-4 py-sm-4 pl-sm-2 pr-sm-4 py-xl-4 pl-xl-2 pr-xl-4  d-flex flex-column position-static">
+              <div name="tags" class="my-2 align-items-start">
+                {% if person['tags'][0] %}
+                <span class="btn btn-sm btn-info m-1">{{ person['tags'][0] }}</span>
+                {% end %}
+                {% if person['tags'][1] %}
+                {% if type(person['tags'][1]) is list %}
+                <a href="{{ person['tags'][1][1] }}" class="btn btn-sm btn-primary m-1">{{ person['tags'][1][0]
+                  }}</a>
+                {% else %}
+                <span class="btn btn-sm btn-primary m-1">{{ person['tags'][1] }}</span>
+                {% end %}
+                {% end %}
+                {% if person['tags'][2] %}
+                {% if type(person['tags'][2]) is list %}
+                <a href="{{ person['tags'][2][1] }}" class="btn btn-sm btn-inverse-success m-1">{{
+                  person['tags'][2][0] }}</a>
+                {% else %}
+                <span class="btn btn-sm btn-inverse-success m-1">{{ person['tags'][2] }}</span>
+                {% end %}
+                {% end %}
+              </div>
+              <div name="blurb" class="m-2 align-items-start">
+                {% if person['title'] %}
+                <h5><strong>Crafty's {{ person['title'] }}</strong></h5>
+                {% end %}
+                <p>{{ person['blurb'] }}</p>
+              </div>
+            </div>
           </div>
         </div>
         {% end %}
-      </div> <!-- end user row-->
-    </div>
+      </div>
+    </div> <!-- end of user row -->
   </div>
 
   <br />
@@ -274,7 +232,7 @@
         <div class="card-body">
           <p class="card-description"> {{ translate('credits', 'hugeDesc', data['lang']) }}
             <code>{{ translate('credits', 'thankYou', data['lang']) }}</code>&nbsp; {{ translate('credits',
-            'patreonDesc', data['lang']) }} | <span style="color: #9365B8">{{ translate('credits', 'patreonUpdate',
+            'patreonDesc', data['lang']) }} | <span class="text-info">{{ translate('credits', 'patreonUpdate',
               data['lang']) }} {{ data["lastUpdate"] }}</span>
           </p>
           <table class="table table-hover">
@@ -341,14 +299,14 @@
               {% for person in data['translations'] %}
               <tr>
                 <td>{{ person }}</td>
-                <td class="pb-0">
+                <td class="">
                   <div class="row">
                     {% for language in data['translations'][person] %}
                     {% if language['status'] %}
-                    <span class="btn btn-sm btn-inverse-success mr-2" style="margin-bottom: 12px;">{{ language['name']
+                    <span class="btn btn-sm btn-inverse-success m-1">{{ language['name']
                       }}</span>
                     {% else %}
-                    <span class="btn btn-sm btn-inverse-secondary mr-2" style="margin-bottom: 12px;">{{ language['name']
+                    <span class="btn btn-sm btn-inverse-secondary m-1">{{ language['name']
                       }}</span>
                     {% end %}
                     {% end %}

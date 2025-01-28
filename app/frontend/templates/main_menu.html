@@ -1,14 +1,6 @@
 <!-- partial -->
 <!-- partial:partials/_sidebar.html -->
-<style>
-  @media screen and (max-width: 991px) {
-    .sidebar-offcanvas {
-      -webkit-transition: all 0.25s cubic-bezier(.22, .61, .36, 1);
-      transition: all 0.25s cubic-bezier(.22, .61, .36, 1);
-      box-shadow: 0px 8px 17px 2px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12), 0px 5px 5px -3px rgba(0, 0, 0, 0.2);
-    }
-  }
-</style>
+
 <script>
   function debounce(func, wait, immediate) {
     var timeout;
@@ -71,8 +63,7 @@
     </li>
 
     <li class="nav-item">
-      <a class="nav-link" data-toggle="collapse" href="#page-layouts" aria-expanded="false"
-        aria-controls="page-layouts">
+      <a class="nav-link" data-toggle="collapse" href="#page-layouts" aria-expanded="false" aria-controls="page-layouts">
         <i class="fas fa-server"></i> &nbsp;
         <span class="menu-title">{{ translate('sidebar', 'servers', data['lang']) }}</span>
         <i class="menu-arrow"></i>

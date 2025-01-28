@@ -1,6 +1,7 @@
 import os
 import logging
 import shutil
+from PIL import Image
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.shared.helpers import Helpers
 from app.classes.web.base_api_handler import BaseApiHandler
@@ -295,6 +296,21 @@ class ApiFilesUploadHandler(BaseApiHandler):
                     with open(chunk_file, "rb") as infile:
                         outfile.write(infile.read())
                     os.remove(chunk_file)
+            if upload_type == "background":
+                # Strip EXIF data
+                image_path = os.path.join(file_path)
+                logger.debug("Stripping exif data from image")
+                image = Image.open(image_path)
+
+                # Get current raw pixel data from image
+                image_data = list(image.getdata())
+                # Create new image
+                image_no_exif = Image.new(image.mode, image.size)
+                # Restore pixel data
+                image_no_exif.putdata(image_data)
+
+                image_no_exif.save(image_path)
+
             logger.info(
                 f"File upload completed. Filename: {self.filename}"
                 f" Path: {file_path} Type: {u_type}"

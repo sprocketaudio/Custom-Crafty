@@ -9,8 +9,8 @@
     height: 1.5rem;
     width: 3rem;
     border-radius: 1.5rem;
-    color: #6b7381;
-    background: #bdc1c8;
+    color: var(--gray);
+    background: var(--select-bg);
 }
 
 .btn-toggle:focus,
@@ -52,7 +52,7 @@
     width: 1.125rem;
     height: 1.125rem;
     border-radius: 1.125rem;
-    background: #fff;
+    background: var(--white);
     transition: left 0.25s;
 }
 
@@ -76,7 +76,7 @@
 .btn-toggle.btn-sm:before,
 .btn-toggle.btn-sm:after {
     line-height: -0.5rem;
-    color: #fff;
+    color: var(--white);
     letter-spacing: 0.75px;
     left: 0.4125rem;
     width: 2.325rem;
@@ -106,11 +106,11 @@
 
 .btn-toggle:before,
 .btn-toggle:after {
-    color: #6b7381;
+    color: var(--gray);
 }
 
 .btn-toggle.active {
-    background-color: #29b5a8;
+    background-color: var(--success);
 }
 
 .btn-toggle.btn-lg {
@@ -162,7 +162,7 @@
     width: 1.875rem;
     height: 1.875rem;
     border-radius: 1.875rem;
-    background: #fff;
+    background: var(--white);
     transition: left 0.25s;
 }
 
@@ -186,7 +186,7 @@
 .btn-toggle.btn-lg.btn-sm:before,
 .btn-toggle.btn-lg.btn-sm:after {
     line-height: 0.5rem;
-    color: #fff;
+    color: var(--white);
     letter-spacing: 0.75px;
     left: 0.6875rem;
     width: 3.875rem;
@@ -423,7 +423,7 @@
 
 .btn-toggle.btn-info:before,
 .btn-toggle.btn-info:after {
-    color: #6b7381;
+    color: var(--gray);
 }
 
 .btn-toggle.btn-info.active {
@@ -431,17 +431,17 @@
 }
 
 .btn-toggle.btn-secondary {
-    color: #6b7381;
-    background: #bdc1c8;
+    color: var(--gray);
+    background: var(--select-bg);
 }
 
 .btn-toggle.btn-secondary:before,
 .btn-toggle.btn-secondary:after {
-    color: #6b7381;
+    color: var(--gray);
 }
 
 .btn-toggle.btn-secondary.active {
-    background-color: #ff8300;
+    background-color: var(--warning);
 }
 
 /**************************************************************/
