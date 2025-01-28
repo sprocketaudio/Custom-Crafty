@@ -119,6 +119,7 @@ config_json_schema = {
             "error": "typeBool",
             "fill": True,
         },
+        "max_login_attempts": {"type": "integer", "error": "typeInt", "fill": True},
     },
     "additionalProperties": False,
     "minProperties": 1,

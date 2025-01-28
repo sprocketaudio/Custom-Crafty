@@ -1,8 +1,7 @@
-import os
 import logging
 import json
-from jsonschema import validate
 from datetime import datetime, timedelta
+from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from app.classes.models.users import Users
 from app.classes.shared.helpers import Helpers
@@ -17,9 +16,12 @@ login_schema = {
             "type": "string",
             "maxLength": 20,
             "minLength": 4,
-            "pattern": "^[a-z0-9_]+$",
+            "pattern": "^[a-zA-Z0-9_]+$",
         },
-        "password": {"type": "string", "minLength": 4},
+        "password": {
+            "type": "string",
+            "minLength": 8,
+        },
         "totp": {
             "type": "string",
             "pattern": r"^(\d{6})$",
@@ -37,20 +39,28 @@ login_schema = {
 
 
 class ApiAuthLoginHandler(BaseApiHandler):
-    def is_cooldown(self):
+    def is_cooldown(
+        self,
+    ):  # ToDo create type hint on return when we force py3.10 or higher
         # Check for active cooldown
-        current_time = datetime.now()
+        current_time = datetime.now()  # Get current time
         cooldown_until = self.controller.auth_tracker.get(
             self.request.remote_ip, {}
-        ).get("cooldown_until", None)
-        if cooldown_until and cooldown_until > current_time:
+        ).get(
+            "cooldown_until", None
+        )  # Check auth_tracker for active cooldown
+        if cooldown_until and cooldown_until > current_time:  # Check if there is a
+            # cooldown and if it is currently active
             cooldown_remaining = (cooldown_until - current_time).seconds
             minutes, seconds = divmod(cooldown_remaining, 60)
-            return f"{int(minutes):02}:{int(seconds):02}"
-        return False
+            return f"{int(minutes):02}:{int(seconds):02}"  # Calc and return
+        # remaining time for login message
+        return False  # If there is no cooldown we just return false
 
     def is_max_failures(self) -> bool:
-        if len(self.get_recent_attempts()) > 3:  # Check if recent attempts is more than
+        if len(self.get_recent_attempts()) >= self.helper.get_setting(
+            "max_login_attempts", 3
+        ):  # Check if recent attempts is more than
             # user defined max
             if not self.is_cooldown():  # If we're not on cooldown we're going to
                 # activate it
@@ -80,7 +90,7 @@ class ApiAuthLoginHandler(BaseApiHandler):
 
     def post(self):
         try:
-            data = json.loads(self.request.body)
+            data = json.loads(self.request.body)  # Get request payload
         except json.decoder.JSONDecodeError as e:
             logger.error(
                 "Invalid JSON schema for API"
@@ -108,10 +118,15 @@ class ApiAuthLoginHandler(BaseApiHandler):
                 400,
                 {
                     "status": "error",
-                    "error": "INVALID_JSON_SCHEMA",
-                    "error_data": f"{str(err)}",
+                    "error": "INCORRECT_CREDENTIALS",
+                    "error_data": self.helper.translation.translate(
+                        "login", "incorrect", self.helper.get_setting("language")
+                    ),
                 },
-            )
+            )  # Generic incorrerct message even on invalid json schema. Trying to
+        # prevent an attacker from having easy access to password/user requirements
+        # Sure, they could just check our open source code ¬_¬
+
         self.is_max_failures()  # check if user has reached max failures in 3 minutes
         cooldown = self.is_cooldown()  # Check if we have a cooldown active
         global_lang = self.helper.get_setting("language")
@@ -126,9 +141,10 @@ class ApiAuthLoginHandler(BaseApiHandler):
                 },
             )
 
-        username = data["username"]
+        username = str(data["username"]).lower()  # We're going to lower the username
+        # because they can only be lowercase
         password = data["password"]
-        totp = data.get("totp")
+        totp = data.get("totp")  # We may not have totp or backupcode everytime
         backup_code = data.get("backup_code")
         # pylint: disable=no-member
         user_data = Users.get_or_none(Users.username == username)
