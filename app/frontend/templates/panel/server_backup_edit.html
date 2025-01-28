@@ -329,7 +329,6 @@
   async function restore_backup(filename, id, in_place) {
     const token = getCookie("_xsrf")
     let contents = JSON.stringify({ "filename": filename, "inPlace": Boolean(parseInt(in_place)) })
-    console.log(contents)
     var dialog = bootbox.dialog({
       message: "<i class='fa fa-spin fa-spinner'></i> {{ translate('serverBackups', 'restoring', data['lang']) }}",
       closeButton: false
@@ -466,7 +465,6 @@
 
     try {
       if ($('#backup_location').val() == '') {
-        console.log('true')
         try {
           document.getElementById('backup_now_button').disabled = true;
         } catch {
@@ -522,7 +520,6 @@
           }
         },
         callback: function (result) {
-          console.log(result);
           if (result == true) {
             var full_path = backup_location + '/' + file_to_del;
             del_backup(file_to_del, serverId);
@@ -567,7 +564,6 @@
               } else {
                 restore_backup(file_to_restore, serverId, selectedOption)
               }
-              console.log(selectedOption);
             }
           }
         }
