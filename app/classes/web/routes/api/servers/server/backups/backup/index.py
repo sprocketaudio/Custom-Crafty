@@ -251,7 +251,6 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                 },
             )
         in_place = data.get("inPlace")
-        print(in_place)
         svr_obj = self.controller.servers.get_server_instance_by_id(server_id)
         server_data = self.controller.servers.get_server_data_by_id(server_id)
         zip_name = data["filename"]
