@@ -16,7 +16,7 @@ login_schema = {
             "type": "string",
             "maxLength": 20,
             "minLength": 4,
-            "pattern": "^[a-zA-Z0-9_]+$",
+            "pattern": "^[a-zA-Z0-9_-]+$",
         },
         "password": {
             "type": "string",

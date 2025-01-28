@@ -218,6 +218,7 @@ class BaseHandler(tornado.web.RequestHandler):
                 (user["superuser"] and not token_data.get("mfa"))
                 and not self.is_totp_method()
                 and not token_data.get("token_id")
+                and user["username"] != "anti-lockout-user"
             ):  # check to see if user is superuser
                 # and MFA is not in token.
                 # Also check to see if user is trying to add MFA or access backup codes.
