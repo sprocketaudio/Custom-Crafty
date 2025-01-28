@@ -137,7 +137,8 @@ class ApiAuthLoginHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "TOO_MANY_ATTEMPTS",
-                    "error_data": f"{err} {cooldown}",
+                    "error_data": err,
+                    "cooldown_time": cooldown,
                 },
             )
 

@@ -215,9 +215,28 @@
           location.href = responseData.data.page;
         }
       } else {
-        $("#error-field").html(responseData.error_data);
+        $("#error-field").html(`${responseData.error_data}&nbsp;<span id="cooldown">${responseData.cooldown_time || ""}</span>`);
+        let time_array = String(responseData.cooldown_time).split(":")
+        startCountdown(time_array[0], time_array[1]);
       }
     });
+    function startCountdown(minutes, seconds) {
+      let totalSeconds = parseInt(minutes) * 60 + parseInt(seconds);
+      const interval = setInterval(() => {
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        const formattedTime = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        $("#cooldown").html(formattedTime);
+
+        // Stop timer at 0
+        if (totalSeconds === 0) {
+          clearInterval(interval);
+          $("#error-field").html("")
+        }
+
+        totalSeconds--;
+      }, 1000);
+    }
   </script>
   <style>
     .modal-content {
