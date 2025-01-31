@@ -240,6 +240,7 @@
     },
     "notify": {
         "activityLog": "Activity Logs",
+        "accountSettings": "Account Settings",
         "backupComplete": "Backup completed successfully for server {}",
         "backupStarted": "Backup started for server {}",
         "backup_desc": "We detected the backup migration may have partially or fully failed. Please confirm your backups records on the backups tab.",

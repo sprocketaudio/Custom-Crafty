@@ -74,6 +74,12 @@ data['lang']) }}{% end %}
                     <div class="card-header header-sm d-flex justify-content-between align-items-center">
                       <h4 class="card-title"><i class="fas fa-user"></i> {{ translate('userConfig', 'userSettings',
                         data['lang']) }}</h4>
+
+                      <span data-translate1="{{translate('userConfig', 'password', data['lang'])}}"
+                        data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}"
+                        data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}"
+                        class="edit_password clickable" data-id="{{data['user']['user_id']}}"><i
+                          class="fa-solid fa-lock"></i></span>
                     </div>
                     <div class="card-body">
                       {% if data['new_user'] %}
@@ -330,6 +336,14 @@ data['lang']) }}{% end %}
                 </div>
               </div>
               <div class="text-center">
+                <button data-translate="{{translate('userConfig', 'userName', data['lang'])}}"
+                data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}"
+                id="username_{{data['user']['user_id']}}" data-name="{{data['user']['username']}}"
+                data-id="{{data['user']['user_id']}}"class="btn btn-outline-info edit_user"><i class="fa-solid fa-user-gear"></i>Change Username</button>
+                <button data-translate1="{{translate('userConfig', 'password', data['lang'])}}"
+                data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}"
+                data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}"
+                data-id="{{data['user']['user_id']}}"class="btn btn-outline-warning edit_password"><i class="fa-solid fa-user-lock"></i>Change Password</button><br><br>
                 {% if data['new_user'] %}
                 <a class="btn btn-sm btn-danger disabled"><i class="fas fa-trash"></i>{{ translate('userConfig',
                   'deleteUserB', data['lang']) }}</a><br />
@@ -601,5 +615,6 @@ data['lang']) }}{% end %}
 
 
 </script>
+<script src="../../static/assets/js/shared/userSettings.js"></script>
 
 {% end %}
