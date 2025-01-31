@@ -9,9 +9,13 @@ $("#renewCodes").click(async function () {
         },
     });
     let responseData = await res.json();
-    let backupcodes = createBackupCodesDiv(responseData.data)
-    bootbox.alert(backupcodes);
-    registerCopyFunction();
+    if (responseData.status === "ok") {
+        let backupcodes = createBackupCodesDiv(responseData.data)
+        bootbox.alert(backupcodes);
+        registerCopyFunction();
+    } else {
+        bootbox.alert(responseData.error_data);
+    }
 });
 
 function createBackupCodesDiv(data) {

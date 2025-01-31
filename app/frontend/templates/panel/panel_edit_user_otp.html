@@ -210,7 +210,7 @@
                     });
                     $("#verify").click(async function () {
                         let totp_id = $("#verify-input").data("otp-id");
-                        let res = await fetch(`/api/v2/totp/${totp_id}/verify/`, {
+                        let res = await fetch(`/api/v2/users/${userId}/totp/${totp_id}/verify/`, {
                             method: 'POST',
                             headers: {
                                 'X-XSRFToken': token

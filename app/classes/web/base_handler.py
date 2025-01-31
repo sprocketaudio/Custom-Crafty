@@ -176,7 +176,10 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def is_totp_method(self):
         if (
-            re.match(r"^/api/v2/(users/.+/totp/|totp/.+/verify/)$", self.request.path)
+            re.match(
+                r"^/api/v2/(users/.+/totp/|users/[^/]+/totp/.+/verify/)$",
+                self.request.path,
+            )
             and self.request.method == "POST"
         ) or (
             re.match(r"^/api/v2/users/[^/]+/totp/recovery/renew/$", self.request.path)

@@ -215,9 +215,13 @@
           location.href = responseData.data.page;
         }
       } else {
-        $("#error-field").html(`${responseData.error_data}&nbsp;<span id="cooldown">${responseData.cooldown_time || ""}</span>`);
-        let time_array = String(responseData.cooldown_time).split(":")
-        startCountdown(time_array[0], time_array[1]);
+        if (responseData.cooldown_time) {
+          $("#error-field").html(`${responseData.error_data}&nbsp;<span id="cooldown">${responseData.cooldown_time || ""}</span>`);
+          let time_array = String(responseData.cooldown_time).split(":")
+          startCountdown(time_array[0], time_array[1]);
+        } else {
+          $("#error-field").html(`${responseData.error_data}`);
+        }
       }
     });
     function startCountdown(minutes, seconds) {

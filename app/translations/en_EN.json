@@ -269,6 +269,7 @@
         "2faCreate": "Add New MFA Method",
         "backupCodes": "Please copy your backup codes.",
         "backupCodesMax": "A maximum of 6 back codes has already been reached.",
+        "backupOtp": "A MFA method is required to request backup codes",
         "saveWarn": "Make sure to save these backup codes or you could lose access",
         "confirm2FA": "Please Confirm Authenticator Code",
         "newName": "Enter a friendly name for this MFA method",

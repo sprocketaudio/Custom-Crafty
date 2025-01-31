@@ -4,7 +4,6 @@ import typing as t
 
 from playhouse.shortcuts import model_to_dict
 from jsonschema import ValidationError, validate
-from app.classes.controllers.users_controller import UsersController
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.web.base_api_handler import BaseApiHandler
 
@@ -65,7 +64,10 @@ class APIUsersTOTPIndexHandler(BaseApiHandler):
         if user_id in ["@me", user["user_id"]]:
             user_id = user["user_id"]
             res_user = user
-        elif EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
+        elif (
+            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
+            and not auth_data[4]["superuser"]
+        ):
             return self.finish_json(
                 400,
                 {
@@ -114,9 +116,12 @@ class APIUsersTOTPIndexHandler(BaseApiHandler):
         if user_id in ["@me", user["user_id"]]:
             user_id = user["user_id"]
             res_user = self.controller.users.get_user_object(user_id)
-        elif EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
+        elif (
+            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
+            and not auth_data[4]["superuser"]
+        ):
             return self.finish_json(
-                400,
+                403,
                 {
                     "status": "error",
                     "error": "NOT_AUTHORIZED",
@@ -146,13 +151,13 @@ class APIUsersTOTPIndexHandler(BaseApiHandler):
 
 
 class APIUsersTOTPVerifyIndexHandler(BaseApiHandler):
-    def post(self, totp_id):
+    def post(self, user_id, totp_id):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
         (
             _,
-            _,
+            exec_user_crafty_permissions,
             _,
             _,
             _,
@@ -177,8 +182,33 @@ class APIUsersTOTPVerifyIndexHandler(BaseApiHandler):
                 },
             )
 
+        if user_id in ["@me", auth_data[4]["user_id"]]:
+            user_id = auth_data[4]["user_id"]
+            res_user = self.controller.users.get_user_object(user_id)
+        elif (
+            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
+            and not auth_data[4]["superuser"]
+        ):
+            return self.finish_json(
+                403,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                },
+            )
+        else:
+            # has User_Config permission and isn't viewing self
+            res_user = self.controller.users.get_user_object(user_id)
+            if not res_user:
+                return self.finish_json(
+                    404,
+                    {
+                        "status": "error",
+                        "error": "USER_NOT_FOUND",
+                    },
+                )
         verified = self.controller.totp.verify_user_totp(
-            auth_data[4]["user_id"], totp_id, data.get("totp")
+            res_user.user_id, totp_id, data.get("totp")
         )  # In this step we only iterate through the request user's TOTP so this will
         # validate the user identity itself.
 
@@ -220,7 +250,10 @@ class APIUsersTOTPHandler(BaseApiHandler):
         if user_id in ["@me", user["user_id"]]:
             user_id = user["user_id"]
             res_user = self.controller.users.get_user_object(user_id)
-        elif EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
+        elif (
+            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
+            and not auth_data[4]["superuser"]
+        ):
             return self.finish_json(
                 400,
                 {
@@ -281,7 +314,10 @@ class APIUsersTOTPHandler(BaseApiHandler):
         if user_id in ["@me", user["user_id"]]:
             user = self.controller.users.get_user_object(user_id)
             self.controller.users.remove_user(user_id)
-        elif EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
+        elif (
+            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
+            and not auth_data[4]["superuser"]
+        ):
             return self.finish_json(
                 400,
                 {
@@ -336,7 +372,10 @@ class APIUsersTOTPRecovery(BaseApiHandler):
         if user_id in ["@me", user["user_id"]]:
             user_id = user["user_id"]
             res_user = self.controller.users.get_user_object(user_id)
-        elif EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
+        elif (
+            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
+            and not auth_data[4]["superuser"]
+        ):
             return self.finish_json(
                 400,
                 {
@@ -355,6 +394,17 @@ class APIUsersTOTPRecovery(BaseApiHandler):
                         "error": "USER_NOT_FOUND",
                     },
                 )
+        if len(list(res_user.totp_user)) == 0:
+            return self.finish_json(
+                403,
+                {
+                    "status": "error",
+                    "error": "NOT AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "otp", "backupOtp", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         self.controller.totp.remove_all_recovery_codes(res_user.user_id)
 

@@ -107,10 +107,13 @@
                               {% end %}
                             </ul>
                           </td>
-                          <td><span data-translate="{{translate('otp', 'backupCodes', data['lang'])}}"
+                          <td>
+                            {% if len(list(user.totp_user)) != 0 %}
+                            <span data-translate="{{translate('otp', 'backupCodes', data['lang'])}}"
                               data-toggle="tooltip" title="{{ translate('otp', 'renewRecovery', data['lang'])}}"
                               class="clickable" data-name="{{user.username}}" data-id="{{user.user_id}}"
                               id="renewCodes"><i class="fa-solid fa-shield-halved"></i></span>
+                              {% end %}
                             &nbsp;&nbsp;<span data-translate="{{translate('userConfig', 'userName', data['lang'])}}"
                               data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}"
                               id="username_{{user.user_id}}" class="edit_user clickable" data-name="{{user.username}}"
