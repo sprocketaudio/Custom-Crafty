@@ -142,10 +142,62 @@
             "decimal": ".",
             "info": "Prikazivanje od _START_ do _END_ of _TOTAL_ unosa",
             "emptyTable": "Nema podataka u tabeli",
-            "infoEmpty": "Prikazivanje od 0 do 0 od ukupno 0 unosa"
-        }
+            "infoEmpty": "Prikazivanje od 0 do 0 od ukupno 0 unosa",
+            "infoPostFix": "|",
+            "lengthMenu": "Prikazivanje _MENU_ unosa",
+            "loadingRecords": "Učitavanje...",
+            "paginate": {
+                "first": "Prvi",
+                "last": "Poslednji",
+                "next": "Sledeći",
+                "previous": "Prethodni"
+            },
+            "processing": "Obrada...",
+            "search": "Pretraga:",
+            "select": {
+                "cells": {
+                    "0": "Kliknite na ćeliju da je selektujete",
+                    "_": "%d ćelije izabrane",
+                    "1": "%d ćelija izabrana"
+                },
+                "rows": {
+                    "_": "Izabrano je %d redova",
+                    "0": "Kliknite na red da ga selektujete",
+                    "1": "Izabran je %d red"
+                },
+                "columns": {
+                    "0": "Kliknite na kolonu da je selektujete",
+                    "1": "Izabrana je %d kolona",
+                    "_": "Izabrano je %d kolona"
+                }
+            },
+            "thousands": ",",
+            "zeroRecords": "Nema odgovarajućih zapisa",
+            "infoFiltered": "(filtrirano iz ukupno _MAX_ unosa)"
+        },
+        "loadingRecords": "Učitavanje..."
     },
     "base": {
         "doesNotWorkWithoutJavascript": "<strong>Upozorenje:</strong> Crafty ne funkcioniše ispravno kada JavaScript nije omogućen!"
+    },
+    "error": {
+        "agree": "Slažem se",
+        "bedrockError": "Bedrock preuzimanja nisu dostupna. Molimo proverite",
+        "bigBucket2": "za najnovije informacije.",
+        "cancel": "Otkaži",
+        "craftyStatus": "Crafty statusna stranica",
+        "cronFormat": "Detektovan je pogrešan Cron format",
+        "embarassing": "Oh, pa, ovo je neprijatno.",
+        "error": "Greška!",
+        "eulaAgree": "Da li se slažete?",
+        "eulaMsg": "Morate da prihvatite ",
+        "eulaTitle": "Slažem se sa EULA",
+        "hereIsTheError": "Ovde je greška",
+        "internet": "Detektovali smo da mašina na kojoj se pokreće Crafty nema internet konekciju. Povezivanje klijenata na server može biti ograničeno.",
+        "bigBucket1": "Veliki Bucket Health Check nije prošao. Molimo proverite",
+        "installerJava": "Nije uspelo instaliranje {}: Forge Server instalacije zahtevaju Java. Detektovali smo da Java nije instalirana. Molimo instalirajte Java, a zatim pokušajte ponovo da instalirate server.",
+        "contact": "Kontaktirajte Crafty Control podršku preko Discord-a",
+        "fileTooLarge": "Otprema nije uspela. Fajl je prevelik. Kontaktirajte sistemskog administratora za pomoć.",
+        "fileError": "Tip fajla mora biti slika."
     }
 }
