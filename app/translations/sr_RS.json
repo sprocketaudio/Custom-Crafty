@@ -1,1 +1,151 @@
-{}
+{
+    "404": {
+        "notFound": "Stranica nije pronađena",
+        "contact": "Kontaktirajte Crafty Control podršku preko Discord-a",
+        "unableToFind": "Nismo uspeli da pronađemo stranicu koju tražite. Molimo pokušajte ponovo, ili se vratite i osvežite stranicu."
+    },
+    "accessDenied": {
+        "accessDenied": "Pristup odbijen",
+        "contact": "Kontaktirajte Crafty Control podršku preko Discord-a",
+        "noAccess": "Nemate pristup ovom resursu",
+        "contactAdmin": "Kontaktirajte administratiora servera za pristup ovom resursu, ili ako mislite da treba da imate pristup, obratite se podršci."
+    },
+    "apiKeys": {
+        "apiKeys": "API ključ",
+        "auth": "Ovlašćen? ",
+        "buttons": "Dugmadi",
+        "config": "Konfiguracija",
+        "crafty": "Crafty: ",
+        "createNew": "Kreirajte novi API token",
+        "created": "Kreirano",
+        "deleteKeyConfirmation": "Da li želite da obrišete ovaj API ključ? Ova radnja se ne može poništiti.",
+        "deleteKeyConfirmationTitle": "Da li želite da uklonite API ključ ${keyId}?",
+        "fullAccess": "Puni pristup",
+        "getToken": "Nabavite token",
+        "name": "Ime",
+        "no": "Ne",
+        "pageTitle": "Izmeni korisničke API ključeve",
+        "permName": "Ime dozvole",
+        "perms": "Dozvole",
+        "server": "Server: ",
+        "yes": "Da",
+        "nameDesc": "Kako želite da nazovete ovaj API token?? "
+    },
+    "credits": {
+        "developmentTeam": "Razvojni tim",
+        "hugeDesc": "Ogroman",
+        "pageTitle": "Zasluge",
+        "patreonDesc": "Našim Patreon / Ko-fi podržavaocima!",
+        "patreonOther": "Ostalo",
+        "patreonSupporter": "Patreon / Ko-fi podržavaoci",
+        "patreonUpdate": "Poslednje ažuriranje:",
+        "retiredStaff": "Penzionisani zaposleni",
+        "subscriberName": "Ime",
+        "subscriptionLevel": "Nivo",
+        "thankYou": "HVALA VAM",
+        "translationDesc": "Našoj zajednici koja prevodi! [ Aktivni = 🟢 Neaktivni/Penzionisani = ⚪ ]",
+        "translationName": "Ime",
+        "translator": "Prevodioci",
+        "pageDescription": "Bez ovih ljudi, ne biste imali Crafty",
+        "supportTeam": "Tim za podršku i dokumentaciju",
+        "translationTitle": "Prevod jezika"
+    },
+    "customLogin": {
+        "apply": "Primeni",
+        "backgroundUpload": "Pozadinsko učitavanje",
+        "customLoginPage": "Uredi stranicu za prijavljivanje",
+        "delete": "Obriši",
+        "loginBackground": "Slika pozadine za prijavljivanje",
+        "loginImage": "Postavite sliku pozadine za ekran prijavljivanja.",
+        "loginOpacity": "Izaberite providnost prozora za prijavljivanje",
+        "pageTitle": "Prilagođena stranica za prijavljivanje",
+        "preview": "Pregled",
+        "selectImage": "Izaberi sliku",
+        "select": "Izaberi",
+        "labelLoginImage": "Izaberite pozadinu za stranicu prijavljivanja"
+    },
+    "dashboard": {
+        "avg": "Prosečno",
+        "bePatientStart": "Molimo vas da budete strpljivi dok pokrećemo server.<br /> Ovaj ekran će se osvežiti za trenutak",
+        "bePatientStop": "Molimo vas da budete strpljivi dok zaustavljamo server.<br /> Ovaj ekran će se osvežiti za trenutak",
+        "cannotSee": "Ne vidite sve?",
+        "cannotSeeOnMobile2": "Pokušajte da pomerite tabelu ustranu.",
+        "clone": "Klonirati",
+        "cpuCores": "CPU jezgra",
+        "cpuCurFreq": "Trenutna brzina CPU-a",
+        "cpuMaxFreq": "Maksimalna brzina CPU-a",
+        "cpuUsage": "Iskorišćenost CPU-a",
+        "crashed": "Pao",
+        "dashboard": "Nadzorna ploča",
+        "host": "Host",
+        "kill": "Prekini proces",
+        "killing": "Prekidanje procesa...",
+        "lastBackup": "Poslednje:",
+        "max": "Maksimalno",
+        "motd": "Poruka dana",
+        "newServer": "Kreiraj novi server",
+        "nextBackup": "Sledeći:",
+        "offline": "Van mreže",
+        "online": "Na mreži",
+        "players": "Igrači",
+        "restart": "Restartuj",
+        "sendingCommand": "Šaljem vašu komandu",
+        "server": "Server",
+        "servers": "Serveri",
+        "start": "Pokreni",
+        "starting": "Kašnjenje pri pokretanju",
+        "status": "Status",
+        "stop": "Zaustavi",
+        "storage": "Prostor",
+        "version": "Verzija",
+        "backups": "Rezervne kopije",
+        "bePatientClone": "Molimo vas da budete strpljivi dok kloniramo server.<br /> Ovaj ekran će se osvežiti za trenutak",
+        "welcome": "Dobrodošli u Crafty Controller",
+        "actions": "Akcija",
+        "allServers": "Svi serveri",
+        "installing": "Instaliranje...",
+        "size": "Veličina direktorijuma servera",
+        "bePatientRestart": "Molimo vas da budete strpljivi dok restartujemo server.<br /> Ovaj ekran će se osvežiti za trenutak",
+        "cannotSeeOnMobile": "Ne vidite sve na mobilnom?",
+        "cloneConfirm": "Da li ste sigurni da želite da klonirate ovaj server? Ovaj proces može potrajati.",
+        "delay-explained": "Usluga/agenta je nedavno pokrenut i uzrokuje kašnjenje u pokretanju Minecraft server instance",
+        "memUsage": "Iskorišćenog memorije",
+        "no-servers": "Trenutno nema servera. Da biste započeli, kliknite"
+    },
+    "datatables": {
+        "i18n": {
+            "aria": {
+                "sortAscending": ": aktivirajte za sortiranje kolone u rastućem redosledu",
+                "sortDescending": ": aktivirajte za sortiranje kolone u opadajućem redosledu"
+            },
+            "buttons": {
+                "colvis": "Vidljivost kolone",
+                "colvisRestore": "Vrati vidljivost",
+                "copy": "Kopiraj",
+                "copySuccess": {
+                    "1": "Kopirana 1 red u clipboard",
+                    "_": "Kopirano %d redova u clipboard"
+                },
+                "copyTitle": "Kopiraj u clipboard",
+                "csv": "CSV",
+                "excel": "Excel",
+                "pageLength": {
+                    "1": "Pokaži 1 red",
+                    "_": "Pokaži %d redova",
+                    "-1": "Prikaži sve redove"
+                },
+                "pdf": "PDF",
+                "print": "Štampa",
+                "copyKeys": "Pritisnite ctrl ili u2318 + C da kopirate podatke iz tabele u vaš sistemski clipboard.<br><br>Da biste otkazali, kliknite na ovu poruku ili pritisnite escape.",
+                "collection": "Kolekcije <span class='ui-button-icon-primary ui-icon ui-icon-triangle-1-s'/>"
+            },
+            "decimal": ".",
+            "info": "Prikazivanje od _START_ do _END_ of _TOTAL_ unosa",
+            "emptyTable": "Nema podataka u tabeli",
+            "infoEmpty": "Prikazivanje od 0 do 0 od ukupno 0 unosa"
+        }
+    },
+    "base": {
+        "doesNotWorkWithoutJavascript": "<strong>Upozorenje:</strong> Crafty ne funkcioniše ispravno kada JavaScript nije omogućen!"
+    }
+}
