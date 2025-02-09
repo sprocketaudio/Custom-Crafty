@@ -683,6 +683,7 @@
         "documentation": "Documentation",
         "inApp": "In App Docs",
         "newServer": "Create New Server",
+        "panelSettings": "Panel Settings",
         "servers": "Servers"
     },
     "startup": {
