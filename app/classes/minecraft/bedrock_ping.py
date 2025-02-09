@@ -44,7 +44,9 @@ class BedrockPing:
         None,  # The Bedrock ping string response ends with a terminator, eat it
     ]
 
-    def __init__(self, bedrock_addr, bedrock_port, client_guid=0, timeout=5):
+    def __init__(
+        self, bedrock_addr, bedrock_port: int, client_guid: int = 0, timeout: int = 5
+    ):
         self.addr = bedrock_addr
         self.port = bedrock_port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -54,12 +56,12 @@ class BedrockPing:
         self.guid_bytes = self.guid.to_bytes(8, BedrockPing.byte_order)
 
     @staticmethod
-    def __byter(in_val, to_type):
+    def __byter(in_val: str, to_type: str) -> bytes:
         f = BedrockPing.field_sizes[to_type]
         return in_val.to_bytes(f[0], BedrockPing.byte_order, signed=f[1])
 
     @staticmethod
-    def __slice(in_bytes, pattern):
+    def __slice(in_bytes: bytes, pattern: list) -> list:
         ret = []
         bytes_index = 0
         pattern_index = 0
@@ -110,10 +112,10 @@ class BedrockPing:
         return ret
 
     @staticmethod
-    def __get_time():
+    def __get_time() -> int:
         return time.perf_counter_ns() // 1000000
 
-    def __sendping(self):
+    def __sendping(self) -> None:
         pack_id = BedrockPing.__byter(0x01, "byte")
         now = BedrockPing.__byter(BedrockPing.__get_time(), "ulong")
         guid = self.guid_bytes
@@ -121,8 +123,14 @@ class BedrockPing:
         # print("S:", d2s)
         self.sock.sendto(d2s, (self.addr, self.port))
 
-    def __recvpong(self):
-        data = self.sock.recv(4096)
+    def __recvpong(self) -> dict:
+        try:
+            data = self.sock.recv(4096)
+        except TimeoutError:
+            logger.warning(
+                "Got timeout while issuing bedrock ping to %s:%i", self.addr, self.port
+            )
+            return {}
         if data[0] == 0x1C:
             ret = {}
             sliced = BedrockPing.__slice(
@@ -132,43 +140,49 @@ class BedrockPing:
                 raise ValueError(f"Incorrect magic received ({sliced[3]})")
             ret["server_guid"] = sliced[2]
             ret["server_string_raw"] = sliced[4]
-            server_info = sliced[4].split(";")
-            logger.debug("Parsing server info: %s", server_info)
-            last_enumeration = 0
-            for i in enumerate(server_info):
-                # Enumerate the server fields, look up the field name by index,
-                #  store it in the return dictionary
-                try:
-                    field_name = self.pingpong_string_fields[i[0]]
-                    if field_name:
-                        ret[field_name] = i[1]
-                        last_enumeration = i[0]
-                    elif i[1] != "":
-                        # The last field should be empty, if it is not, log the error
-                        logger.debug(
-                            "Found non-empty field at the end of Bedrock ping: '%s'",
-                            i[1],
-                        )
-                    else:
-                        last_enumeration = i[0]
-                except IndexError:
-                    logger.debug(
-                        "Bedrock ping had too many fields while parsing, found '%s'",
-                        i,
-                    )
-            if last_enumeration < len(self.pingpong_string_fields) - 1:
-                missing_keys = self.pingpong_string_fields[last_enumeration + 1 :]
-                logger.warning(
-                    "Bedrock ping returned a string with too few fields"
-                    " - missing values %s",
-                    missing_keys,
-                )
-                for m in missing_keys:
-                    ret[m] = None
+            ret.update(self.__unpack_bedrock_pong_str(sliced[4]))
             return ret
         raise ValueError(f"Incorrect packet type ({data[0]} detected")
 
-    def ping(self, retries=3):
+    @staticmethod
+    def __unpack_bedrock_pong_str(server_info_str: str) -> dict:
+        server_info = server_info_str.split(";")
+        logger.debug("Parsing server info: %s", server_info)
+        last_enumeration = 0
+        unpacked_values = {}
+        for i in enumerate(server_info):
+            # Enumerate the server fields, look up the field name by index,
+            #  store it in the return dictionary
+            try:
+                field_name = BedrockPing.pingpong_string_fields[i[0]]
+                if field_name:
+                    unpacked_values[field_name] = i[1]
+                    last_enumeration = i[0]
+                elif i[1] != "":
+                    # The last field should be empty, if it is not, log the error
+                    logger.debug(
+                        "Found non-empty field at the end of Bedrock ping: '%s'",
+                        i[1],
+                    )
+                else:
+                    last_enumeration = i[0]
+            except IndexError:
+                logger.debug(
+                    "Bedrock ping had too many fields while parsing, found '%s'",
+                    i,
+                )
+        if last_enumeration < len(BedrockPing.pingpong_string_fields) - 1:
+            missing_keys = BedrockPing.pingpong_string_fields[last_enumeration + 1 :]
+            logger.warning(
+                "Bedrock ping returned a string with too few fields"
+                " - missing values %s",
+                missing_keys,
+            )
+            for m in missing_keys:
+                unpacked_values[m] = None
+        return unpacked_values
+
+    def ping(self, retries: int = 3):
         rtr = retries
         while rtr > 0:
             try:
