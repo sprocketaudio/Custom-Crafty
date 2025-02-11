@@ -6,7 +6,7 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Bump cryptography for CVE-2024-12797 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/833))
 ### Tweaks
 TBD
 ### Lang
