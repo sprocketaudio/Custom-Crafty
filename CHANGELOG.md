@@ -1,5 +1,8 @@
 # Changelog
 ## --- [4.4.8] - 2025/TBD
+
+### Refactor
+- Refactor backups for efficiency and in-place backup restores ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/815))
 ### New features
 TBD
 ### Bug fixes
