@@ -37,3 +37,7 @@
 .tree-nested {
     display: none;
 }
+
+#restore-box {
+    text-align: left;
+}
