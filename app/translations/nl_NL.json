@@ -28,7 +28,8 @@
         "permName": "Toestemming naam",
         "perms": "Toestemmingen",
         "server": "Server: ",
-        "yes": "Ja"
+        "yes": "Ja",
+        "fullAccess": "Volledige Toegang"
     },
     "base": {
         "doesNotWorkWithoutJavascript": "<strong>Warning: </strong>Crafty werkt niet naar behoren als JavaScript niet ingeschakeld is!"
@@ -95,7 +96,10 @@
         "status": "Status",
         "stop": "Stoppen",
         "version": "Versie",
-        "welcome": "Welkom bij Crafty Controller"
+        "welcome": "Welkom bij Crafty Controller",
+        "cloneConfirm": "Weet je zeker dat je deze server wilt dupliceren? Dit proces kan even duren.",
+        "storage": "Opslag",
+        "installing": "Installeren..."
     },
     "datatables": {
         "loadingRecords": "Laden...",
@@ -176,7 +180,23 @@
         "not-downloaded": "We kunnen je executable-bestand niet vinden. Is het klaar met downloaden? Zijn de toestemmingen gezet op 'uitvoerbaar'?",
         "portReminder": "We zien dat dit de eerste keer is dat {} uitgevoerd wordt. Zorg dat poort {} door je router/firewall gestuurd wordt om er via het openbare internet bij te kunnen komen.",
         "start-error": "Server {} kon niet starten, error code: {}",
-        "terribleFailure": "Een verschrikkelijke fout!"
+        "terribleFailure": "Een verschrikkelijke fout!",
+        "fileTooLarge": "Upload mislukt. Bestandsupload is te groot. Neem contact op met de systeembeheerder voor assistentie.",
+        "bedrockError": "Bedrock-downloads zijn niet beschikbaar. Graag controleren",
+        "agree": "Instemmen",
+        "installerJava": "Installatie mislukt {}: Forge Server Installatie vereist Java. We hebben gedetecteerd dat Java niet geïnstalleerd is. Installeer eerst Java en vervolgens de server.",
+        "privMsg": "en de ",
+        "selfHost": "Als je deze repo zelf host, controleer dan je adres of raadpleeg onze handleiding voor probleemoplossingen.",
+        "bigBucket1": "Big Bucket Gezondheidscontrole Mislukt. Graag controleren",
+        "bigBucket2": "voor de meest actuele informatie.",
+        "cancel": "Annuleren",
+        "craftyStatus": "Crafty's statuspagina",
+        "cronFormat": "Invalide Cron-formaat gedecteerd",
+        "fileError": "Bestandstype moet een afbeelding zijn.",
+        "migration": "Crafty's primaire server opslag wordt gemigreerd naar een nieuwe locatie. Gedurende deze tijd zijn alle serverstarts opgeschort. Even geduld terwijl wij deze migratie afronden",
+        "noInternet": "Crafty heeft moeite om het internet te bereiken. Server Creatie is uitgeschakeld. Controleer je internetverbinding en ververs deze pagina.",
+        "return": "Terugkeren naar Dashboard",
+        "superError": "Je moet supergebruiker zijn om deze actie te voltooien."
     },
     "footer": {
         "allRightsReserved": "Alle rechten voorbehouden.",
@@ -187,7 +207,11 @@
         "forgotPassword": "Wachtwoord vergeten",
         "login": "Inloggen",
         "password": "Wachtwoord",
-        "username": "Gebruikersnaam"
+        "username": "Gebruikersnaam",
+        "disabled": "Gebruikersaccount uitgeschakeld. Neem contact op met jouw systeembeheerder voor meer informatie.",
+        "defaultPath": "Het wachtwoord dat je hebt ingevoerd is het standaardpad voor referenties, niet het wachtwoord. Zoek het standaardwachtwoord op die locatie.",
+        "incorrect": "Incorrecte gebruikersnaam of wachtwoord",
+        "viewStatus": "Bekijk Publieke Statuspagina"
     },
     "notify": {
         "activityLog": "Activiteit-logboeken",
@@ -197,7 +221,11 @@
         "finishedPreparing": "We hebben je ondersteuningslogboeken klaargemaakt. Klik om deze te downloaden",
         "logout": "Uitloggen",
         "preparingLogs": "Wacht terwijl we je logboeken klaarmaken... Je krijgt een melding als ze klaar zijn. Dit kan lang duren voor grote inzetten.",
-        "supportLogs": "Ondersteuningslogboeken"
+        "supportLogs": "Ondersteuningslogboeken",
+        "backup_desc": "Wij hebben gedetecteerd dat de back-upmigratie mogelijk gedeeltelijk of volledig mislukt is. Controleer jouw back-upgegevens in het tabblad Backups.",
+        "backup_title": "Back-upmigratie Waarschuwing",
+        "schedule_desc": "We hebben gedetecteerd dat sommige of alle geplande taken niet succesvol overgezet zijn tijdens de upgrade. Bevestig uw roosters in het tabblad 'Roosters'.",
+        "schedule_title": "Roosters Migratiewaarschuwing"
     },
     "panelConfig": {
         "adminControls": "Admin Bediening",
@@ -218,7 +246,17 @@
         "superConfirm": "Ga alleen verder als je wil dat deze gebruiker bij ALLES kan (alle gebruikersaccounts, servers, panel-instellingen, etc.). Ze kunnen ook jouw super-gebruikerrechten intrekken.",
         "superConfirmTitle": "super-gebruiker inschakelen? Weet je het zeker?",
         "user": "Gebruiker",
-        "users": "Gebruikers"
+        "users": "Gebruikers",
+        "enableLang": "Alle Talen Inschakelen",
+        "globalExplain": "Waar Crafty al jouw serverbestanden opslaat. (Wij vullen het pad aan met /servers/[uuid van server])",
+        "custom": "Crafty Aanpassen",
+        "apply": "Toepassen",
+        "globalServer": "Globale Serverlijst",
+        "json": "Config.json",
+        "match": "Wachtwoorden moeten overeenkomen",
+        "noMounts": "Geen mounts weergeven op dashboard",
+        "select": "Selecteer",
+        "title": "Crafty-configuratie"
     },
     "rolesConfig": {
         "config": "Rol-configuratie",
@@ -242,7 +280,8 @@
         "roleUsers": "Rol-gebruikers: ",
         "serverAccess": "Toegang?",
         "serverName": "Servernaam",
-        "serversDesc": "Servers waar deze rol toegang tot heeft"
+        "serversDesc": "Servers waar deze rol toegang tot heeft",
+        "selectManager": "Selecteer een manager voor deze rol"
     },
     "serverBackups": {
         "backupAtMidnight": "Automatische back-up bij middernacht?",
@@ -270,7 +309,25 @@
         "save": "Opslaan",
         "size": "Grootte",
         "storageLocation": "Opslaglocatie",
-        "storageLocationDesc": "Waar wil je back-ups opslaan?"
+        "storageLocationDesc": "Waar wil je back-ups opslaan?",
+        "actions": "Acties",
+        "after": "Voer commando uit na back-up",
+        "defaultExplain": "De backup die Crafty zal gebruiken vóór updates. Deze kan niet veranderd of verwijderd worden.",
+        "backups": "Serverbackups",
+        "before": "Voer commando uit vóór back-up",
+        "default": "Standaardback-up",
+        "edit": "Bewerken",
+        "enabled": "Ingeschakeld",
+        "failed": "Mislukt",
+        "myBackup": "Mijn Nieuwe Back-up",
+        "name": "Naam",
+        "newBackup": "Maak nieuwe back-up",
+        "no-backup": "Geen Back-ups. Om een nieuwe back-up te maken, dus op 'Nieuwe Back-up'",
+        "run": "Back-up uitvoeren",
+        "shutdown": "Server uitzetten gedurende back-up",
+        "standby": "Gereed",
+        "status": "Status",
+        "storage": "Opslaglocatie"
     },
     "serverConfig": {
         "bePatientDelete": "Wees geduldig terwijl we de server uit het dashboard verwijderen. Dit scherm sluit in een ogenblik.",
@@ -314,9 +371,21 @@
         "serverStopCommand": "Server stopcommando",
         "serverStopCommandDesc": "Commando om de server te stoppen",
         "stopBeforeDeleting": "Stop de server voordat je deze verwijderd",
-        "update": "Executable updaten",
+        "update": "Uitvoerbestand Bijwerken",
         "yesDelete": "Ja, verwijder",
-        "yesDeleteFiles": "Ja, verwijder bestanden"
+        "yesDeleteFiles": "Ja, verwijder bestanden",
+        "countPlayers": "Server opnemen in totale spelersaantal",
+        "ignoredExitsExplain": "Exitcodes die Crafty's Crashdetectie moet negeren als een normale 'stop' (gescheiden door komma's)",
+        "showStatus": "Toon op Publieke Statuspagina",
+        "statsHint1": "De poort waar je server op draait, moet hier ingevuld worden. Dit is hoe Crafty een connectie opent met jouw server voor statistieken.",
+        "timeoutExplain1": "Hoe lang Crafty wacht tot jouw server is afgesloten na uitvoeren van de",
+        "javaVersionDesc": "Als je Java gaat overschrijven, zorg er dan voor dat je huidige Java pad 'execution command' tussen aanhalingstekens staat (standaard 'java' variabele uitgesloten)",
+        "ignoredExits": "Genegeerde Crash-exitcodes",
+        "javaNoChange": "Niet Overschrijven",
+        "javaVersion": "Overschrijf Huidige Java Versie",
+        "shutdownTimeout": "Afsluittimeout",
+        "statsHint2": "Dit veranderd niet de poort van jouw server. Je moet nog steeds de poort van je server aanpassen in het configuratiebestand.",
+        "timeoutExplain2": "opdracht voordat het proces geforceerd wordt beëindigd."
     },
     "serverConfigHelp": {
         "desc": "Hier kan je de configuratie van de server veranderen",
@@ -343,7 +412,10 @@
         "playerControls": "Spelerbeheer",
         "schedule": "Rooster",
         "serverDetails": "Server details",
-        "terminal": "Terminal"
+        "terminal": "Terminal",
+        "filter": "Logs Filteren",
+        "filterList": "Gefilterde Woorden",
+        "metrics": "Metrieken"
     },
     "serverFiles": {
         "clickUpload": "Klik hier om je bestanden te selecteren",
@@ -526,5 +598,23 @@
         "userRolesDesc": "Rollen waarvan deze gebruiker lid is",
         "userSettings": "Gebruikersinstellingen",
         "uses": "Aantal keer toegestaan (-1==Geen limiet)"
+    },
+    "customLogin": {
+        "apply": "Toepassen",
+        "loginImage": "Upload een achtergrondafbeelding voor het loginscherm.",
+        "backgroundUpload": "Achtergrond Upload",
+        "customLoginPage": "De Login Pagina Aanpassen",
+        "delete": "Verwijderen",
+        "labelLoginImage": "Kies jouw Login Achtergrond",
+        "loginBackground": "Login Achtergrondafbeelding",
+        "loginOpacity": "Selecteer de opaciteit van het Inlogvenster",
+        "pageTitle": "Aangepaste Inlogpagina",
+        "preview": "Voorvertoning",
+        "select": "Selecteer",
+        "selectImage": "Selecteer een afbeelding"
+    },
+    "offline": {
+        "offline": "Offline",
+        "pleaseConnect": "Verbind met het internet om Crafty te gebruiken."
     }
 }
