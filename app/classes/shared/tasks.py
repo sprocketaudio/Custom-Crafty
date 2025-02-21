@@ -217,6 +217,13 @@ class TasksManager:
             id="auth_tracker_write",
             start_date=datetime.datetime.now(),
         )
+        self.scheduler.add_job(
+            self.controller.totp.purge_pending,
+            "interval",
+            hours=24,
+            id="mfa_purge",
+            start_date=datetime.datetime.now(),
+        )
         # self.scheduler.add_job(
         #    self.scheduler.print_jobs, "interval", seconds=10, id="-1"
         # )
