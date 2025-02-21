@@ -6,7 +6,6 @@
 {% block title %}Crafty Controller - {{ translate('serverDetails', 'serverDetails', data['lang']) }}{% end %}
 
 {% block content %}
-
 <div class="content-wrapper">
 
     <!-- Page Title Header Starts-->
@@ -31,17 +30,32 @@
         <div class="col-sm-12 grid-margin">
             <div class="card">
                 <div class="card-body  pt-0">
-
                     <span class="d-none d-sm-block">
                         {% include "parts/server_controls_list.html %}
                     </span>
                     <span class="d-block d-sm-none">
                         {% include "parts/m_server_controls_list.html %}
                     </span>
-                    {% include "../panel/parts/big_bucket_wiz.html" %}
+                    <div id="selectHead">
+                        <select class="form-control">
+                            <option value="0">Basic</option>
+                            <option value="1">Advanced</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div id="basic">
+                        {% include "../panel/parts/big_bucket_wiz.html" %}
+                    </div>
+                    <div id="advanced">
+                        Test
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<link rel="stylesheet" href="../../static/assets/css/partial/crafty-update-center.css">
 {% end %}
+<script>
+
+</script>
