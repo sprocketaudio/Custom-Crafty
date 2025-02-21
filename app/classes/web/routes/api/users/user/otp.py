@@ -10,18 +10,10 @@ from app.classes.web.base_api_handler import BaseApiHandler
 
 logger = logging.getLogger(__name__)
 
-totp_schema = {
-    "type": "object",
-    "properties": {
-        "name": {"type": "string", "minLength": 3},
-    },
-    "additionalProperties": False,
-    "minProperties": 1,
-}
-
 totp_verify_schema = {
     "type": "object",
     "properties": {
+        "name": {"type": "string", "minLength": 3},
         "totp": {"type": "integer", "minLength": 6, "maxLength": 6},
     },
     "additionalProperties": False,
@@ -42,24 +34,6 @@ class APIUsersTOTPIndexHandler(BaseApiHandler):
             user,
             _,
         ) = auth_data
-        try:
-            data = json.loads(self.request.body)
-        except json.decoder.JSONDecodeError as e:
-            return self.finish_json(
-                400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
-            )
-
-        try:
-            validate(data, totp_schema)
-        except ValidationError as e:
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
-                },
-            )
 
         if user_id in ["@me", user["user_id"]]:
             user_id = user["user_id"]
@@ -86,15 +60,12 @@ class APIUsersTOTPIndexHandler(BaseApiHandler):
                         "error": "USER_NOT_FOUND",
                     },
                 )
-        otp_name = data["name"]
-        otp = self.controller.totp.create_user_totp(otp_name, user_id)
-        otp_dict = model_to_dict(otp)
-        otp_dict["user"].pop("password", None)
+        otp = self.controller.totp.create_user_totp(user_id)
         return self.finish_json(
             200,
             {
                 "status": "ok",
-                "data": {"otp": otp_dict},
+                "data": {"otp": otp},
             },
         )
 
@@ -208,7 +179,7 @@ class APIUsersTOTPVerifyIndexHandler(BaseApiHandler):
                     },
                 )
         verified = self.controller.totp.verify_user_totp(
-            res_user.user_id, totp_id, data.get("totp")
+            res_user.user_id, totp_id, data.get("name"), data.get("totp")
         )  # In this step we only iterate through the request user's TOTP so this will
         # validate the user identity itself.
 

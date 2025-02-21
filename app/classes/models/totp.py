@@ -24,7 +24,6 @@ class TOTPData(BaseModel):
     id = CharField(primary_key=True, default=Helpers.create_uuid)
     name = CharField(default="TOTP")
     user = ForeignKeyField(Users, backref="totp_user")
-    verified = BooleanField(default=False)
     totp_secret = CharField()
 
     class Meta:
@@ -61,28 +60,15 @@ class HelperTOTP:
     ####################################################################################
 
     @staticmethod
-    def create_user_totp(name: str, user: Users, user_secret: str) -> str:
-        totp_id = TOTPData.create(name=name, user=user, totp_secret=user_secret)
+    def create_user_totp(totp_id: str, name: str, user: Users, user_secret: str) -> str:
+        totp_id = TOTPData.create(
+            id=totp_id, name=name, user=user, totp_secret=user_secret
+        )
         return totp_id
 
     def delete_totp_entry(self, totp_id: str) -> bool:
         with self.database.atomic():
             return TOTPData.delete().where(TOTPData.id == totp_id).execute()
-
-    @staticmethod
-    def verify_totp(totp_id: str):
-        TOTPData.update({"verified": True}).where(TOTPData.id == totp_id).execute()
-
-    @staticmethod
-    def verified(user_id):
-        return (
-            TOTPData.select()
-            .where(
-                (TOTPData.user == user_id)
-                & (TOTPData.verified == True)  # pylint: disable=singleton-comparison
-            )  # disabled pylint because ORMs do not like "is True"
-            .exists()
-        )
 
     ####################################################################################
     # TOTP REOVERY METHODS

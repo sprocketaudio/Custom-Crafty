@@ -143,18 +143,23 @@
 
         const contentHTML = `
             <div class="bootbox-custom-layout row">
-                <div class="left-panel col-md-6 col-12 d-flex flex-column align-items-center justify-content-center">
+                <div id="left-panel" class="left-panel col-md-12 col-12 d-flex flex-column align-items-center justify-content-center">
+                    <div class="d-flex align-items-center mt-3">
+                        <label for="name-input" class="d-block">${$("#createButton").data("new-name")}<input type="text" id="name-input" class="form-control me-2 d-block" placeholder="${$("#createButton").data("new-name")}"></label>
+                        
+                    </div>
+                    </br>
                     <div id="qrcode" class="mb-3"></div>
-                    <ul class="list-group">
-                    <li class="list-group-item" id="secret">${data["otp"]["totp_secret"]}</li>
-                    <ul>
+                        <ul class="list-group">
+                            <li class="list-group-item" id="secret">${data["otp"]["totp_secret"]}</li>
+                        </ul>
                     
                     <div class="d-flex align-items-center mt-3">
                         <input type="text" id="verify-input" data-otp-id="${data["otp"]["id"]}" class="form-control me-2" placeholder="Enter code">
                         <button id="verify" class="btn btn-primary">Verify</button><span id="verify-status"></span>
                     </div>
                 </div>
-                <div id="backup-codes" class="right-panel col-md-6 col-12">
+                <div id="backup-codes" class="right-panel col-md-6 col-12 d-none">
                 </div>
             </div>
         `;
@@ -168,80 +173,70 @@
     const userId = new URLSearchParams(document.location.search).get('id');
     const token = getCookie("_xsrf");
     // Create TOTP on button click
-    $("#createButton").click(function () {
-        bootbox.prompt({
-            title: $("#createButton").data("new-name"),
-            centerVertical: true,
-            callback: async function (result) {
-                if (!result) {
-                    return;
+    $("#createButton").click(async function () {
+        let res = await fetch(`/api/v2/users/${userId}/totp/`, {
+            method: 'POST',
+            headers: {
+                'X-XSRFToken': token
+            },
+        });
+        let responseData = await res.json();
+        if (responseData.status === "ok") {
+            let resdiv = createResponseDiv(responseData.data);
+            bootbox.dialog({
+                title: $("#createButton").data("verify-title"),
+                size: "large",
+                closeButton: false,
+                message: resdiv, // Display the generated QR code
+                buttons: {
+                    close: {
+                        label: 'Close',
+                        className: 'bb-close-button',
+                        callback: function () {
+                        }
+                    }
                 }
-                let res = await fetch(`/api/v2/users/${userId}/totp/`, {
+            });
+
+            // Generate the QR Code with the TOTP secret, user name, and issuer
+            generateTotpQrCode(responseData.data["otp"]["totp_secret"], responseData.data["otp"]["username"], "CraftyController");
+            $(".bb-close-button").click(function () {
+                location.reload()
+            });
+            $("#verify").click(async function () {
+                let totp_id = $("#verify-input").data("otp-id");
+                let res = await fetch(`/api/v2/users/${userId}/totp/${totp_id}/verify/`, {
                     method: 'POST',
                     headers: {
                         'X-XSRFToken': token
                     },
-                    body: JSON.stringify({ "name": result }),
+                    body: JSON.stringify({ "name": $("#name-input").val(), "totp": Number($("#verify-input").val()) }),
                 });
                 let responseData = await res.json();
+                let data = responseData.data
                 if (responseData.status === "ok") {
-                    let resdiv = createResponseDiv(responseData.data);
-                    bootbox.dialog({
-                        title: $("#createButton").data("verify-title"),
-                        size: "large",
-                        closeButton: false,
-                        message: resdiv, // Display the generated QR code
-                        buttons: {
-                            close: {
-                                label: 'Close',
-                                className: 'bb-close-button',
-                                callback: function () {
-                                    // Optional: Any cleanup logic
-                                }
-                            }
-                        }
-                    });
-                    $(`.bb-close-button`).prop("disabled", true);
-
-                    // Generate the QR Code with the TOTP secret, user name, and issuer
-                    generateTotpQrCode(responseData.data["otp"]["totp_secret"], responseData.data["otp"]["user"]["username"], "CraftyController");
-                    $(".bb-close-button").click(function () {
-                        location.reload()
-                    });
-                    $("#verify").click(async function () {
-                        let totp_id = $("#verify-input").data("otp-id");
-                        let res = await fetch(`/api/v2/users/${userId}/totp/${totp_id}/verify/`, {
-                            method: 'POST',
-                            headers: {
-                                'X-XSRFToken': token
-                            },
-                            body: JSON.stringify({ "totp": Number($("#verify-input").val()) }),
-                        });
-                        let responseData = await res.json();
-                        let data = responseData.data
-                        if (responseData.status === "ok") {
-                            let backupcodes = createBackupCodesDiv(data)
-                            $("#backup-codes").html(backupcodes);
-                            $("#verify-status").html(`<i class="fa-solid fa-check"></i>`);
-                            $(".bb-close-button").removeAttr("disabled");
-                            $("#verify-input").removeClass("wrong");
-                            $("#verify-input").addClass("verified");
-                            $("#verify-input").attr("disabled")
-                            $("#verify").remove();
-                            registerCopyFunction();
-                        } else {
-                            $("#verify-status").html(`<i class="fas fa-exclamation-triangle"></i>`);
-                            $("#verify-input").addClass("wrong");
-                        }
-                    });
+                    let backupcodes = createBackupCodesDiv(data)
+                    $("#left-panel").removeClass("col-md-12").addClass("col-md-6");
+                    $("#backup-codes").removeClass("d-none");
+                    $("#backup-codes").html(backupcodes);
+                    $("#verify-status").html(`<i class="fa-solid fa-check"></i>`);
+                    $(".bb-close-button").removeAttr("disabled");
+                    $("#verify-input").removeClass("wrong");
+                    $("#verify-input").addClass("verified");
+                    $("#verify-input").attr("disabled")
+                    $("#verify").remove();
+                    registerCopyFunction();
                 } else {
-                    bootbox.alert({
-                        title: responseData.error,
-                        message: responseData.error_data
-                    });
+                    $("#verify-status").html(`<i class="fas fa-exclamation-triangle"></i>`);
+                    $("#verify-input").addClass("wrong");
                 }
-            }
-        });
+            });
+        } else {
+            bootbox.alert({
+                title: responseData.error,
+                message: responseData.error_data
+            });
+        }
     });
 
     $('.delete-totp').click(function () {

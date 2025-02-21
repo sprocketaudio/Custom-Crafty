@@ -189,11 +189,8 @@ class ApiAuthLoginHandler(BaseApiHandler):
         # Verify user password
         pass_login_result = self.helper.verify_pass(password, user_data.password)
 
-        # Check to see if the user has any verified totp code
         # Get the length of user TOTP actions
-        totp_enabled = len(
-            list(user_data.totp_user)
-        ) > 0 and self.controller.totp.verified(user_data.user_id)
+        totp_enabled = len(list(user_data.totp_user)) > 0
 
         totp_login_result = False
         # Check if user has TOTP and if we got any type of TOTP data in the login
@@ -247,11 +244,6 @@ class ApiAuthLoginHandler(BaseApiHandler):
                 f" into panel from remote IP {self.get_remote_ip()}"
             )
             logger.info(f"User: {user_data} Logged in from IP: {self.get_remote_ip()}")
-
-            for item in user_data.totp_user:
-                if item.verified is False:
-                    self.controller.totp.delete_user_totp(item.id)
-                    logger.info("TOTP code with id %s not verified. Removing.", item.id)
 
             # record this login
             query = Users.select().where(Users.username == username.lower()).get()

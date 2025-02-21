@@ -200,7 +200,6 @@ def migrate(migrator, database, **kwargs):
         id = peewee.CharField(primary_key=True, default="", index=True)
         name = peewee.CharField(default="TOTP")
         user = peewee.ForeignKeyField(Users, backref="totp_user")
-        verified = peewee.BooleanField(default=False)
         totp_secret = peewee.CharField()
 
         class Meta:

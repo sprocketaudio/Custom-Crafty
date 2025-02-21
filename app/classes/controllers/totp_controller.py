@@ -1,5 +1,6 @@
 import re
 import pyotp
+from app.classes.shared.helpers import Helpers
 from app.classes.models.users import HelperUsers
 from app.classes.models.totp import HelperTOTP
 
@@ -8,20 +9,34 @@ class TOTPController:
     def __init__(self, totp_helper, helper):
         self.totp_helper = totp_helper
         self.helper = helper
+        self.pending_totp = {}
 
-    @staticmethod
-    def create_user_totp(name: str, user_id: int) -> str:
-        user = HelperUsers.get_by_id(user_id)
+    def create_user_totp(self, user_id: int) -> dict:
+        user = HelperUsers.get_user(user_id)
         user_secret = pyotp.random_base32()
-        return HelperTOTP.create_user_totp(name, user, user_secret)
+        totp_id = Helpers.create_uuid()
+        self.pending_totp[totp_id] = {
+            "id": totp_id,
+            "totp_secret": user_secret,
+            "user_id": user_id,
+            "username": user["username"],
+        }
+        return self.pending_totp[totp_id]
 
     def delete_user_totp(self, totp_id: str) -> bool:
         return self.totp_helper.delete_totp_entry(totp_id)
 
-    def verified(self, user_id) -> bool:
-        return HelperTOTP.verified(user_id)
+    def validate_user_totp(self, user_id: int, totp_code: str) -> bool:
+        """Check current code and user_id against all user totp codes until we find one
+        that matches.
 
-    def validate_user_totp(self, user_id, totp_code):
+        Args:
+            user_id (_type_): _description_
+            totp_code (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         user = HelperUsers.get_by_id(user_id)
         authenticated = False
         # Iterate through just in case a user has multiple 2FA methods
@@ -35,14 +50,32 @@ class TOTPController:
                 authenticated = True
         return authenticated
 
-    def verify_user_totp(self, user_id, totp_id, totp_code):
-        user = HelperUsers.get_by_id(user_id)
-        for totp in user.totp_user:
-            if totp.id == totp_id:
-                totp_factory = pyotp.TOTP(totp.totp_secret)
-                if totp_factory.verify(totp_code):
-                    HelperTOTP.verify_totp(totp.id)
-                    return True
+    def verify_user_totp(
+        self, user_id: int, totp_id: str, totp_name: str, totp_code: str
+    ) -> dict:
+        """Takes the desired totp_id and compares it against the pending totp requests.
+        If we find a totp_id and matching user ID we verify the code we're recieving. If
+        this is successful we add the entry to the database.
+
+        Args:
+            user_id (_type_): _description_
+            totp_id (_type_): _description_
+            totp_code (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        if totp_id and int(self.pending_totp.get(totp_id)["user_id"]) == user_id:
+            user = HelperUsers.get_by_id(user_id)
+            totp_code = str(totp_code)  # Set totp to desired string
+            totp_factory = pyotp.TOTP(self.pending_totp[totp_id]["totp_secret"])
+            if totp_factory.verify(totp_code):
+                return HelperTOTP.create_user_totp(
+                    totp_id,
+                    totp_name,
+                    user,
+                    self.pending_totp[totp_id]["totp_secret"],
+                )
         return False
 
     def create_missing_backup_codes(self, user_id):
