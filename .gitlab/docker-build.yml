@@ -19,7 +19,7 @@ docker-build:
       variables:
         ENVIRONMENT_NAME: "production"
         # We'll set the version in the script and append stable tags
-        DOCKER_TAGS: "" # We'll determine in script
+        DOCKER_TAGS: ""
     # Scheduled nightly builds on main
     - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       variables:
