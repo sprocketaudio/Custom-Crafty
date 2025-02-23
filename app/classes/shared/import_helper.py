@@ -217,15 +217,16 @@ class ImportHelpers:
         FileHelpers.del_dirs(temp_dir)
 
     def download_bedrock_server(self, path, new_id):
+        bedrock_url = Helpers.get_latest_bedrock_url()
         download_thread = threading.Thread(
             target=self.download_threaded_bedrock_server,
             daemon=True,
-            args=(path, new_id),
+            args=(path, new_id, bedrock_url),
             name=f"{new_id}_download",
         )
         download_thread.start()
 
-    def download_threaded_bedrock_server(self, path, new_id):
+    def download_threaded_bedrock_server(self, path, new_id, bedrock_url):
         """
         Downloads the latest Bedrock server, unzips it, sets necessary permissions.
 
@@ -236,10 +237,8 @@ class ImportHelpers:
         This method handles exceptions and logs errors for each step of the process.
         """
         try:
-            bedrock_url = Helpers.get_latest_bedrock_url()
             if bedrock_url:
                 file_path = os.path.join(path, "bedrock_server.zip")
-
                 success = FileHelpers.ssl_get_file(
                     bedrock_url, path, "bedrock_server.zip"
                 )
@@ -263,6 +262,7 @@ class ImportHelpers:
             logger.critical(
                 f"Failed to download bedrock executable during server creation! \n{e}"
             )
+            raise e
 
         ServersController.finish_import(new_id)
         server_users = PermissionsServers.get_server_user_list(new_id)

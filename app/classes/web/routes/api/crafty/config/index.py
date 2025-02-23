@@ -9,28 +9,111 @@ from app.classes.web.base_api_handler import BaseApiHandler
 config_json_schema = {
     "type": "object",
     "properties": {
-        "https_port": {"type": "integer"},
+        "https_port": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
         "language": {
             "type": "string",
+            "error": "typeString",
+            "fill": True,
         },
-        "cookie_expire": {"type": "integer"},
-        "show_errors": {"type": "boolean"},
-        "history_max_age": {"type": "integer"},
-        "stats_update_frequency_seconds": {"type": "integer"},
-        "delete_default_json": {"type": "boolean"},
-        "show_contribute_link": {"type": "boolean"},
-        "virtual_terminal_lines": {"type": "integer"},
-        "max_log_lines": {"type": "integer"},
-        "max_audit_entries": {"type": "integer"},
-        "disabled_language_files": {"type": "array"},
-        "stream_size_GB": {"type": "integer"},
-        "keywords": {"type": "array"},
-        "allow_nsfw_profile_pictures": {"type": "boolean"},
-        "enable_user_self_delete": {"type": "boolean"},
-        "reset_secrets_on_next_boot": {"type": "boolean"},
-        "monitored_mounts": {"type": "array"},
-        "dir_size_poll_freq_minutes": {"type": "integer"},
-        "crafty_logs_delete_after_days": {"type": "integer"},
+        "cookie_expire": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
+        "show_errors": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "history_max_age": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
+        "stats_update_frequency_seconds": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
+        "delete_default_json": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "show_contribute_link": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "virtual_terminal_lines": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
+        "max_log_lines": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
+        "max_audit_entries": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
+        "disabled_language_files": {
+            "type": "array",
+            "error": "typeList",
+            "fill": True,
+        },
+        "stream_size_GB": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
+        "keywords": {
+            "type": "array",
+            "error": "typeList",
+            "fill": True,
+        },
+        "allow_nsfw_profile_pictures": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "enable_user_self_delete": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "reset_secrets_on_next_boot": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "monitored_mounts": {
+            "type": "array",
+            "error": "typeList",
+            "fill": True,
+        },
+        "dir_size_poll_freq_minutes": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
+        "crafty_logs_delete_after_days": {
+            "type": "integer",
+            "error": "typeInteger",
+            "fill": True,
+        },
+        "big_bucket_repo": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -38,8 +121,16 @@ config_json_schema = {
 customize_json_schema = {
     "type": "object",
     "properties": {
-        "photo": {"type": "string"},
-        "opacity": {"type": "string"},
+        "photo": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "opacity": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -48,7 +139,11 @@ customize_json_schema = {
 photo_delete_schema = {
     "type": "object",
     "properties": {
-        "photo": {"type": "string"},
+        "photo": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -67,13 +162,23 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         # GET /api/v2/roles?ids=true
         get_only_ids = self.get_query_argument("ids", None) == "true"
 
         if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         self.finish_json(
             200,
@@ -93,33 +198,45 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
-        (
-            _,
-            _,
-            _,
-            superuser,
-            user,
-        ) = auth_data
+        (_, _, _, superuser, user, _) = auth_data
 
         if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = orjson.loads(self.request.body)
-        except orjson.JSONDecodeError as e:
+        except orjson.JSONDecodeError as why:
             return self.finish_json(
-                400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
+                400,
+                {"status": "error", "error": "INVALID_JSON", "error_data": str(why)},
             )
 
         try:
             validate(data, config_json_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = ""
+            if why.schema.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{offending_key} {self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {why.schema.get("enum", "")}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
 
@@ -149,13 +266,23 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         # GET /api/v2/roles?ids=true
         get_only_ids = self.get_query_argument("ids", None) == "true"
 
         if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         self.finish_json(
             200,
@@ -181,9 +308,19 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
         if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = orjson.loads(self.request.body)
@@ -249,7 +386,16 @@ class ApiCraftyCustomizeIndexHandler(BaseApiHandler):
             return
 
         if not auth_data[4]["superuser"]:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = json.loads(self.request.body)

@@ -33,7 +33,7 @@
         <div class="card-body">
 
           <div class="table-responsive">
-            <table class="table table-hover" id="audit_table" style="overflow: scroll;" width="100%">
+            <table class="table table-hover w-100" id="audit_table">
               <thead>
                 <tr class="rounded">
                   <th>Time</th>
@@ -59,16 +59,6 @@
       </div>
     </div>
   </div>
-  <style>
-    .popover-body {
-      color: white !important;
-      ;
-    }
-  </style>
-
-
-
-
 </div>
 <!-- content-wrapper ends -->
 
@@ -142,7 +132,7 @@
       updateActivity(responseData.data);
       console.log("activity update")
     } else {
-      bootbox.alert(responseData.error)
+      bootbox.alert(responseData.error_data)
     }
   }
 

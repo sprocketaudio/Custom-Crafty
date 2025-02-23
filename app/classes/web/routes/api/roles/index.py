@@ -2,6 +2,7 @@ import typing as t
 from jsonschema import ValidationError, validate
 import orjson
 from playhouse.shortcuts import model_to_dict
+from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.web.base_api_handler import BaseApiHandler
 
 create_role_schema = {
@@ -10,25 +11,31 @@ create_role_schema = {
         "name": {
             "type": "string",
             "minLength": 1,
+            "pattern": r"^[^,\[\]]*$",
+            "error": "roleName",
         },
         "servers": {
             "type": "array",
+            "error": "typeList",
+            "fill": True,
             "items": {
                 "type": "object",
                 "properties": {
                     "server_id": {
                         "type": "string",
                         "minimum": 1,
+                        "error": "roleServerId",
                     },
                     "permissions": {
                         "type": "string",
-                        "pattern": "^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "pattern": r"^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "error": "roleServerPerms",
                     },
                 },
                 "required": ["server_id", "permissions"],
             },
         },
-        "manager": {"type": ["integer", "null"]},
+        "manager": {"type": ["integer", "null"], "error": "roleManager"},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -40,19 +47,24 @@ basic_create_role_schema = {
         "name": {
             "type": "string",
             "minLength": 1,
+            "error": "roleName",
         },
         "servers": {
             "type": "array",
+            "error": "typeList",
+            "fill": True,
             "items": {
                 "type": "object",
                 "properties": {
                     "server_id": {
                         "type": "string",
                         "minimum": 1,
+                        "error": "roleServerId",
                     },
                     "permissions": {
                         "type": "string",
-                        "pattern": "^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "pattern": r"^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "error": "roleServerPerms",
                     },
                 },
                 "required": ["server_id", "permissions"],
@@ -71,17 +83,30 @@ class ApiRolesIndexHandler(BaseApiHandler):
             return
         (
             _,
-            _,
+            exec_user_permissions_crafty,
             _,
             superuser,
+            _,
             _,
         ) = auth_data
 
         # GET /api/v2/roles?ids=true
         get_only_ids = self.get_query_argument("ids", None) == "true"
 
-        if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+        if (
+            not superuser
+            and EnumPermissionsCrafty.ROLES_CONFIG not in exec_user_permissions_crafty
+        ):
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         self.finish_json(
             200,
@@ -103,14 +128,27 @@ class ApiRolesIndexHandler(BaseApiHandler):
             return
         (
             _,
-            _,
+            exec_user_permissions_crafty,
             _,
             superuser,
             user,
+            _,
         ) = auth_data
 
-        if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+        if (
+            not superuser
+            and EnumPermissionsCrafty.ROLES_CONFIG not in exec_user_permissions_crafty
+        ):
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = orjson.loads(self.request.body)
@@ -124,18 +162,28 @@ class ApiRolesIndexHandler(BaseApiHandler):
                 validate(data, create_role_schema)
             else:
                 validate(data, basic_create_role_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = ""
+            if why.schema.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{offending_key} {self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {why.schema.get("enum", "")}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
 
         role_name = data["name"]
         manager = data.get("manager", None)
+        if not superuser and not manager:
+            manager = auth_data[4]["user_id"]
         if manager == self.controller.users.get_id_by_name("SYSTEM") or manager == 0:
             manager = None
 
@@ -153,7 +201,12 @@ class ApiRolesIndexHandler(BaseApiHandler):
 
         if self.controller.roles.get_roleid_by_name(role_name) is not None:
             return self.finish_json(
-                400, {"status": "error", "error": "ROLE_NAME_ALREADY_EXISTS"}
+                400,
+                {
+                    "status": "error",
+                    "error": "ROLE_NAME_ALREADY_EXISTS",
+                    "error_data": "UNIQUE VALUE ERROR",
+                },
             )
 
         role_id = self.controller.roles.add_role_advanced(role_name, servers, manager)

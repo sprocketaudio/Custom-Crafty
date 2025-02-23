@@ -1,9 +1,125 @@
 # Changelog
-## --- [4.3.3] - 2024/TBD
+## --- [4.4.8] - 2025/TBD
+
 ### Refactor
-- Refactor API keys "super user" to "full access" ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/731))
+- Refactor backups for efficiency and in-place backup restores ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/815))
 ### New features
 TBD
+### Bug fixes
+TBD
+### Tweaks
+TBD
+### Lang
+TBD
+<br><br>
+
+
+## --- [4.4.7] - 2025/01/20
+### Bug fixes
+- Docker Repair | Remove ubuntu user to replace with crafty user ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/826)) Resolves #521
+<br><br>
+
+## --- [4.4.6] - 2025/01/20
+## NOTE Version effected by non-root docker issue if you installed from this version see [RCA document](https://gitlab.com/crafty-controller/crafty-4/-/issues/521#:~:text=Users%20deploying%20after%204.4.4)
+
+### Bug fixes
+- Fix traceback on stats page for data missing data.get ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/824))
+<br><br>
+
+## --- [4.4.5] - 2025/01/19
+## NOTE Version effected by non-root docker issue if you installed from this version see [RCA document](https://gitlab.com/crafty-controller/crafty-4/-/issues/521#:~:text=Users%20deploying%20after%204.4.4)
+
+### Refactor
+- Refactor and standardize all JSON validator errors returning human readable translations ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/786))
+- Improve docker-build CI/CD, supporting nightly builds ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/813))
+- Standardize and centralize CSS throughout front end, Allows for easier management of themes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/726))
+### Bug fixes
+- Bump requests to resolve yank for CVE-2024-35195 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/808))
+- Better handle malformed mcping data ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/799))
+- Resolve type issue when posting no keywords in the "keyword" field in config.json tab ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/819))
+- Resolve issue where sometimes backup migration `20240308_multi-backup` would run twice ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/820))
+### Tweaks
+- Dyamically change child action translation for backups ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/806))
+- Remove EXIF image data on app Background Photos ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/805))
+- Bump Docker base image `22.04` -> `24.04` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/812))
+- Bump python pip `2.0.3` -> `24.3.1` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/812))
+- Bump python setuptools `50.3.2` -> `75.6.0` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/812))
+- Bump tornado for CVE-2024-52804 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/814))
+### Lang
+- Weblate Translation Platform Integration
+- Remove incomplete labels from translation files to better support new translation workflow ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/810))
+- New langs added `ja_JP`, `ko_KR` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/811))
+<br><br>
+
+## --- [4.4.4] - 2024/10/03
+### Bug fixes
+- Migrations | Fix orphan schedule configurations crashing migration operation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/796))
+- Fix logic issue causing bedrock wizard's root files buttons to not respond to user click events ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/797))
+- Reset crash detection counter after crash detection process detects successful start ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/798))
+- Update new bedrock DL url and correctly bubble up exception on DL fail - Thanks @sarcastron ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/802))
+- Bump cryptography for GHSA-h4gh-qq45-vh27 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/803))
+<br><br>
+
+## --- [4.4.3] - 2024/08/08
+### Bug fixes
+- Fix schedules creation fail due to missing action ID ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/791))
+<br><br>
+
+## --- [4.4.2] - 2024/08/07
+### Bug fixes
+- Migrations | Fix exception message on file not found for backups migration ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/789))
+- UploadAPI | Upload chunks in batches to avoid overloading browser cache ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/788))
+<br><br>
+
+## --- [4.4.1] - 2024/08/06
+### Patch Fixes
+- Migrations | Fix orphan backup configurations crashing migration operation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/785))
+- Migrations | Fix missing default configuration if no server backup config exists during the migration ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/785))
+- Migrations | Fix extended runtime on move procedure during migration ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/785))
+
+**-----------------------------------------------------------------------------**
+
+**Initial release was reverted for patching (See Merge Request: [!784](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/784))** *2024/07/28*
+
+**-----------------------------------------------------------------------------**
+### Refactor
+- Backups | Allow multiple backup configurations ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/711))
+- UploadAPI | Use Crafty's JWT authentication for file uploads ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/762))
+- UploadAPI | Splice files on the frontend to allow chunked uploads as well as bulk uploads ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/762))
+- UploadAPI | Enhance upload progress feedback on all upload pages ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/762))
+- UploadAPI | Consolidate and improve speed on uploads, supporting 100mb+ uploads through Cloudflare(Free) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/762))
+### Bug fixes
+- Fix zip imports so the root dir selection is functional ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/764))
+- Fix bug where full access gives minimal access ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/768))
+- Bump tornado & requests for sec advisories ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/774))
+- Ensure audit.log exists or create it on Crafty startup ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/771))
+- Fix typing issue on ID comparison causing general users to not be able to delete their own API keys ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/775))
+- Fix user creation bug where it would fail when a role was selected ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/763))
+- Security improvements for general user creations on roles page ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/763))
+- Security improvements for general user creations on user page ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/763))
+- Use UTC for tokens_valid_from in user config, to resolve token invalidation on instance TZ change ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/765))
+- Remove unused and problematic "dropdown-menu" ident from [!722](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/772) CSS ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/782))
+### Tweaks
+- Add info note to default creds file ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/760))
+- Remove navigation label from sidebar ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/766))
+- Do not allow slashes in server names ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/767))
+- Add a thread dump to support logs ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/769))
+- Remove text from status page and use symbols ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/770))
+- Add better feedback on when errors appear on user creation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/763))
+- Workaround cpu_freq call catching on obscure cpu architectures ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/776))
+- Change Role selector in server wizard to be a filter list ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/772))
+### Lang
+- Show natural language name instead of country code in User Config Lang select list ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/773))
+- Add remaining `he_IL`, `th_TH` translations from **4.4.0** Release ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/761) | [Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/763))
+- Fix `fr_FR` syntax issues ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/780) | [Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/778))
+- Add ru_RU Translation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/779))
+- Add `th_TH` translations for [!772](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/772) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/781))
+<br><br>
+
+## --- [4.4.0] - 2024/05/11
+### Refactor
+- Refactor API keys "super user" to "full access" ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/731) | [Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/759))
+- Refactor SBuilder to use Big Bucket Svc ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/755))
 ### Bug fixes
 - Reset query arguments on login if `?next` is not available ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/750))
 - Fix child schedule failing to load after del parent ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/753))

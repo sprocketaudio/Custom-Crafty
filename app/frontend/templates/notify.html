@@ -6,8 +6,9 @@
             text-danger
         {% end %}
         "></i><span id="notif-count" class="badge badge-notify"></span> </a>
-    <div class="dropdown-menu dropdown-menu-right navbar-dropdown notif-div" style="width: 40vw; max-height: 80vh;" aria-labelledby="notifDropdown">
-      <ul style="padding-top: 10px;" id="announcements">
+    <div class="p-0 dropdown-menu dropdown-menu-right navbar-dropdown notif-div vw-40 max-vh-80"
+      aria-labelledby="notifDropdown">
+      <ul class="p-3" id="announcements">
       </ul>
     </div>
   </li>
@@ -20,10 +21,12 @@
 
   <li class="nav-item dropdown user-dropdown">
     <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
-      <img class="img-xs rounded-circle profile-picture" onerror="pfpError(this)" src="{{ data['user_data']['pfp'] }}" alt="Profile image"> </a>
+      <img class="img-xs rounded-circle profile-picture" onerror="pfpError(this)" src="{{ data['user_data']['pfp'] }}"
+        alt="Profile"> </a>
     <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
       <div class="dropdown-header text-center">
-        <img class="img-md rounded-circle profile-picture" onerror="pfpError(this)" src="{{ data['user_data']['pfp'] }}" alt="Profile image">
+        <img class="img-md rounded-circle profile-picture" onerror="pfpError(this)" src="{{ data['user_data']['pfp'] }}"
+          alt="Profile">
         <p class="mb-1 mt-3 font-weight-semibold">{{ data['user_data']['username'] }}</p>
         <p class="font-weight-light text-muted mb-0">Roles: </p>
         {% for r in data['user_role'] %}
@@ -35,19 +38,23 @@
         <p class="font-weight-light text-muted mb-0">Email: {{ data['user_data']['email'] }}</p>
       </div>
       {% if data['user_data']['preparing'] %}
-      <span class="dropdown-item" id="support_progress"><i class="dropdown-item-icon mdi mdi-download-outline text-primary"></i>{{ translate('notify', 'supportLogs',
+      <span class="dropdown-item" id="support_progress"><i
+          class="dropdown-item-icon mdi mdi-download-outline text-primary"></i>{{ translate('notify', 'supportLogs',
         data['lang']) }}<br><br></span>
       <span class="dropdown-item" id="support_progress">
-        <div class="support_progress" style="height: 15px; width: 100%;">
-          <div class="progress-bar progress-bar-striped progress-bar-animated" id="logs_progress_bar" role="progressbar" style="width:0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+        <div class="support_progress">
+          <progress class="progress-bar progress-bar-striped progress-bar-animated" id="logs_progress_bar"
+            style="width:0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</progress>
         </div>
       </span>
       {% else %}
-      <a class="dropdown-item" id="support_logs"><i class="dropdown-item-icon mdi mdi-download-outline text-primary"></i>{{ translate('notify', 'supportLogs',
+      <a class="dropdown-item" id="support_logs"><i
+          class="dropdown-item-icon mdi mdi-download-outline text-primary"></i>{{ translate('notify', 'supportLogs',
         data['lang']) }}</i></a>
       {% end %}
       {% if data['superuser'] %}
-      <a class="dropdown-item" href="/panel/activity_logs"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i>{{ translate('notify',
+      <a class="dropdown-item" href="/panel/activity_logs"><i
+          class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i>{{ translate('notify',
         'activityLog', data['lang']) }}</a>
       {% end %}
       <a class="dropdown-item" href="/logout"><i class="dropdown-item-icon mdi mdi-power text-primary"></i>{{
@@ -96,7 +103,7 @@
     console.log(data);
     let text = "";
     for (let value of data) {
-      text += `<li class="card-header header-sm justify-content-between align-items-center" id="${value.id}"><p style="float: right;"><i data-id="${value.id}"class="clear-button fa-regular fa-x"></i></p><a style="color: var(--purple);" href=${value.link} target="_blank"><h6>${value.title}</h6><small><p>${value.date}</p></small><p>${value.desc}</p></li></a>`
+      text += `<li class="card-header header-sm justify-content-between align-items-center annoucement-item" id="${value.id}"><p><i data-id="${value.id}" class="clear-button fa-regular fa-x"></i></p><a href=${value.link} target="_blank"><h6 class="annoucement-title">${value.title}</h6><small><p>${value.date}</p></small><p>${value.desc}</p></li></a>`
     }
     if (data.length > 0) {
       localStorage.setItem("notif-count", data.length);
@@ -104,8 +111,7 @@
       $("#notif-count").html(data.length);
       $("#announcements").html(text);
     } else {
-      $("#announcements").html(`<p style='margin-top: 15px;' class='text-center'><i class="fa fa-bell-slash" aria-hidden="true"></i>
-</p>`);
+      $("#announcements").html(`<li><p class='my-3 text-center'><i class="fa fa-bell-slash" aria-hidden="true"></i></p></li>`);
       $("#notif-count").hide()
     }
     $(".clear-button").on("click", function (event) {
@@ -119,8 +125,7 @@
         localStorage.setItem("notif-count", notif_count);
         $("#notif-count").html(notif_count);
       } else {
-        $("#announcements").html(`<p style='margin-top: 15px;' class='text-center'><i class="fa fa-bell-slash" aria-hidden="true"></i>
-</p>`)
+        $("#announcements").html(`<li><p class='my-3 text-center'><i class="fa fa-bell-slash" aria-hidden="true"></i></p></li>`)
         $("#notif-count").html("");
       }
 
@@ -136,7 +141,7 @@
     });
     let responseData = await res.json();
     console.log(responseData);
-    setTimeout(function() {
+    setTimeout(function () {
       getAnnouncements();
     }, 1800000); //Wait 30 minutes in miliseconds
     console.log("Registered annoucement fetch event in 30 minutes.")
@@ -162,7 +167,7 @@
     if (responseData.status === "ok") {
       return
     } else {
-      bootbox.alert(responseData.error)
+      bootbox.alert(responseData.error_data)
     }
   }
 

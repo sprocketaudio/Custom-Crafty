@@ -29,7 +29,6 @@
         "permName": "Nome Permesso",
         "perms": "Permessi",
         "server": "Server: ",
-        "superUser": "Super User",
         "yes": "Sì"
     },
     "base": {
@@ -117,7 +116,6 @@
         "welcome": "Benvenuto su Crafty Controller"
     },
     "datatables": {
-        "loadingRecords": "Carico...",
         "i18n": {
             "aria": {
                 "sortAscending": ": attiva per ordinare le colonne in modo ascendente",
@@ -144,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "Stampa"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Nessun dato disponibile nella tabella",
             "info": "Mostro da _START_ a _END_ di _TOTAL_ record",
             "infoEmpty": "Mostro da 0 a 0 di 0 record",
             "infoFiltered": "(filtrato da _MAX_ record totali)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Mostra _MENU_ record",
             "loadingRecords": "Carico...",
             "paginate": {
@@ -179,11 +177,14 @@
             },
             "thousands": ",",
             "zeroRecords": "Nessun record corrispondente trovato"
-        }
+        },
+        "loadingRecords": "Carico..."
     },
     "error": {
         "agree": "Conferma",
         "bedrockError": "I download di Bedrock non sono disponibili. Si prega di controllare",
+        "bigBucket1": "Controllo integrità di Big Bucket fallito. Controlla nuovamente",
+        "bigBucket2": "per informazioni più aggiornate.",
         "cancel": "Annulla",
         "contact": "Contact Crafty Control Support via Discord",
         "craftyStatus": "Stato di Crafty",
@@ -206,8 +207,7 @@
         "portReminder": "We have detected this is the first time {} has been run. Make sure to forward port {} through your router/firewall to make this remotely accessible from the internet.",
         "privMsg": "e il ",
         "return": "Torna alla pagina iniziale",
-        "serverJars1": "API JAR del server non raggiungibile. Si prega di controllare",
-        "serverJars2": "per informazioni più aggiornate.",
+        "selfHost": "se stai ospitando te questo repo, controlla il tuo indirizzo o consulta la nostra guida di risoluzione dei problemi.",
         "start-error": "Server {} failed to start with error code: {}",
         "superError": "Devi essere un super utente per eseguire questa azione.",
         "terribleFailure": "What a Terrible Failure!"
@@ -235,7 +235,9 @@
         "finishedPreparing": "Abbiamo finito di preparare i tuoi registri di supporto.Per favore clicca Scarica per scaricarli",
         "logout": "Disconnessione",
         "preparingLogs": "Per favore aspetta mentre prepariamo i tuoi registri... Ti invieremo una notifica quando saranno pronti. Potrebbe volerci un po' per installazioni grosse.",
-        "supportLogs": "Registri di supporto"
+        "supportLogs": "Registri di supporto",
+        "backup_desc": "Abbiamo rilevato che la migrazione del backup potrebbe essere parzialmente o completamente fallita. Controlla i backup effettuati nella scheda Backup.",
+        "backup_title": "Avviso migrazione di backup"
     },
     "offline": {
         "offline": "Disconnesso",
@@ -298,10 +300,12 @@
         "serversDesc": "Server a cui questo ruolo è consentito l'accesso"
     },
     "serverBackups": {
+        "actions": "Azioni",
         "after": "Esegui il comando prima del backup",
         "backupAtMidnight": "Auto-backup a mezzanotte?",
         "backupNow": "Effettua il Backup Ora!",
         "backupTask": "Un'azione di backup è cominciata.",
+        "backups": "Backup del server",
         "before": "Esegui il comando dopo il backup",
         "cancel": "Cancella",
         "clickExclude": "Clicca per selezionare le esclusioni",
@@ -310,21 +314,34 @@
         "confirmDelete": "Vuoi eliminare questo backup? Non puoi tornare indietro.",
         "confirmRestore": "Sei sicuro di voler ripristinare qeusto backup? Tutti i file correnti verranno sovrascritti allo stato di backup e saranno irrecuperabili.",
         "currentBackups": "Backup attuali",
+        "default": "Backup predefinito",
+        "defaultExplain": "Il backup che Crafty utilizzerà prima degli aggiornamenti. Non può essere cambiato o eliminato.",
         "delete": "Elimina",
         "destroyBackup": "Distruggere il backup \" + file_to_del + \"?",
         "download": "Scarica",
+        "edit": "Modifica",
+        "enabled": "Abilitato",
         "excludedBackups": "Percorsi esclusi: ",
         "excludedChoose": "Scegli i percorsi che desideri escludere dai tuoi backups",
         "exclusionsTitle": "Fai un backup delle esclusioni",
+        "failed": "Fallito",
         "maxBackups": "Backup massimi",
         "maxBackupsDesc": "Crafty non memorizzerà più di N backup, cancellando quelli più vecchi (inserisci 0 per mantenerli tutti)",
+        "myBackup": "Il mio nuovo backup",
+        "name": "Nome",
+        "newBackup": "Crea nuovo backup",
+        "no-backup": "Nessun backup. Per configurare un nuovo backup clicca Nuovo backup",
         "options": "Opzioni",
         "path": "Percorso",
         "restore": "Ripristina",
         "restoring": "Ripristinando il backup. Potrebber volerci un momento. Per favore sii paziente.",
+        "run": "Esegui backup",
         "save": "Salva",
         "shutdown": "Arresto del server per la durata del backup",
         "size": "Dimensioni",
+        "standby": "Sospeso",
+        "status": "Stato",
+        "storage": "Percorso archiviazione",
         "storageLocation": "Percorso di memorizzazione",
         "storageLocationDesc": "Dove vuoi memorizzare i backup?"
     },
@@ -489,6 +506,7 @@
     },
     "serverSchedules": {
         "action": "Azione",
+        "actionId": "Seleziona azione da eseguire",
         "areYouSure": "Eliminare l'azione programmata?",
         "cancel": "Cancella",
         "cannotSee": "Non vedi tutto?",
@@ -535,7 +553,6 @@
     "serverTerm": {
         "commandInput": "Inserisci il comando",
         "delay-explained": "Il servizio/agente è stato avviato di recente e sta ritardando l'avvio del server di Minecraft",
-        "downloading": "Scaricando...",
         "importing": "Importazione...",
         "installing": "Installazione...",
         "restart": "Riavvia",
@@ -567,6 +584,8 @@
         "minMem": "Memoria minima",
         "myNewServer": "Il mio nuovo Server",
         "newServer": "Crea un Nuovo Server",
+        "noRole": "Nessun ruolo trovato con questo parametro di ricerca",
+        "noneRoles": "Nessun ruolo selezionato",
         "quickSettings": "Impostazioni Rapide",
         "quickSettingsDescription": "Non ti preoccupare, puoi cambiarle più tardi",
         "resetForm": "Reset Form",
@@ -597,12 +616,12 @@
         "dashboard": "Pannello di controllo",
         "documentation": "Documentazione",
         "inApp": "Documenti in app",
-        "navigation": "Navigazione",
         "newServer": "Crea un Nuovo Server",
         "servers": "Servers"
     },
     "startup": {
         "almost": "Finalizzazione. Tieniti forte...",
+        "cache": "Aggiornamento cache di Big Bucket",
         "internals": "Configurazione e avvio dei componenti interni di Crafty",
         "internet": "Controllo connessione a internet",
         "server": "Inizializzazione ",
@@ -649,6 +668,12 @@
         "userSettings": "Impostazioni Utente",
         "userTheme": "Tema IU",
         "uses": "Numero di usi permessi (-1==Nessun limite)"
+    },
+    "validators": {
+        "passLength": "La password è troppo corta. Lunghezza minima: 8",
+        "enumErr": "Validazione fallita. Valori accettabili includono: ",
+        "serverExeCommand": "Il comando di esecuzione del server dev’essere una stringa con lunghezza minima di 1.",
+        "serverLogPath": "Il percorso del registro del server dev’essere una stringa con lunghezza minima di 1"
     },
     "webhooks": {
         "areYouSureDel": "Sei sicuro di voler eliminare questo webhook?",

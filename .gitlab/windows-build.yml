@@ -1,20 +1,26 @@
 # yamllint disable rule:line-length
 ---
 win-dev-build:
-  stage: dev-deployment
+  stage: build-and-deploy
   tags:
-    - win64
+    - saas-windows-medium-amd64
   cache:
     paths:
       - .venv/
   rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
     - if: "$CI_COMMIT_BRANCH == 'dev'"
   environment:
     name: development
+  before_script:
+    - |
+      echo "Prepare python"
+      choco install python --version=3.10.6 -y -f
   script:
     - |
       $ErrorActionPreference = "Stop"
-      py -m venv .venv
+      C:\\Python310\\python.exe -m venv .venv
       .venv\Scripts\activate.ps1
       pip install pyinstaller
       pip install -r requirements.txt
@@ -48,21 +54,27 @@ win-dev-build:
       - app\classes\**\*
 
 win-prod-build:
-  stage: prod-deployment
+  stage: build-and-deploy
   tags:
-    - win64
+    - saas-windows-medium-amd64
   cache:
     paths:
       - .venv/
   rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
     - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
     - if: $CI_COMMIT_TAG
   environment:
     name: production
+  before_script:
+    - |
+      echo "Prepare python"
+      choco install python --version=3.10.6 -y -f
   script:
     - |
       $ErrorActionPreference = "Stop"
-      py -m venv .venv
+      C:\\Python310\\python.exe -m venv .venv
       .venv\Scripts\activate.ps1
       pip install pyinstaller
       pip install -r requirements.txt

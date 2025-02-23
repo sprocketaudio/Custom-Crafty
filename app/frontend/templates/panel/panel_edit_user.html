@@ -122,7 +122,7 @@ data['lang']) }}{% end %}
                           name="lang" form="user_form">
                           {% for lang in data['languages'] %}
                           {% if not 'incomplete' in lang %}
-                          <option value="{{lang}}">{{lang}}</option>
+                          <option value="{{lang}}" >{{translate('language', lang, 'humanized_index', False)}}</option>
                           {% else %}
                           <option value="{{lang}}" disabled>{{lang}}</option>
                           {% end %}
@@ -393,6 +393,7 @@ data['lang']) }}{% end %}
   }
   function replacer(key, value) {
       if (typeof value == "boolean" || key === "email" || key === "permissions" || key === "roles") {
+        console.log(key)
         return value
       } else {
         console.log(key, value)
@@ -433,6 +434,7 @@ data['lang']) }}{% end %}
       let disabled_flag = false;
       let roles = null;
       if (superuser || userId != edit_id){
+        console.log("ROLES")
         roles = $('.role_check').map(function() {
         if ($(this).attr("disabled")){
           disabled_flag = true;
@@ -457,9 +459,7 @@ data['lang']) }}{% end %}
         delete formDataObject.username
       }
       if (superuser || userId != edit_id){
-      if (!disabled_flag){
         formDataObject.roles = roles;
-      }
       if ($("#permissions").length){
         formDataObject.permissions = permissions;
       }
@@ -547,7 +547,7 @@ data['lang']) }}{% end %}
 
               bootbox.alert({
                 title: responseData.error,
-                message: responseData.error
+                message: responseData.error_data
               });
             }
         }

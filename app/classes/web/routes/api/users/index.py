@@ -2,6 +2,7 @@ import logging
 import json
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+from app.classes.shared.translation import Translation
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.models.roles import Roles, HelperRoles
 from app.classes.models.users import PUBLIC_USER_ATTRS
@@ -21,6 +22,7 @@ class ApiUsersIndexHandler(BaseApiHandler):
             _,
             _,
             user,
+            _,
         ) = auth_data
 
         # GET /api/v2/users?ids=true
@@ -53,6 +55,7 @@ class ApiUsersIndexHandler(BaseApiHandler):
         )
 
     def post(self):
+        self.translator = Translation(self.helper)
         new_user_schema = {
             "type": "object",
             "properties": {
@@ -70,10 +73,20 @@ class ApiUsersIndexHandler(BaseApiHandler):
             _,
             superuser,
             user,
+            _,
         ) = auth_data
 
         if EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         try:
             data = json.loads(self.request.body)
@@ -84,13 +97,21 @@ class ApiUsersIndexHandler(BaseApiHandler):
 
         try:
             validate(data, new_user_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = ""
+            if why.schema.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{offending_key} {self.translator.translate(
+                "validators",
+                why.schema.get("error"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {why.schema.get("enum", "")}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
         username = data["username"]
@@ -116,11 +137,23 @@ class ApiUsersIndexHandler(BaseApiHandler):
 
         if username.lower() in ["system", ""]:
             return self.finish_json(
-                400, {"status": "error", "error": "INVALID_USERNAME"}
+                400,
+                {
+                    "status": "error",
+                    "error": "INVALID_USERNAME",
+                    "error_data": "INVALID USERNAME",
+                },
             )
 
         if self.controller.users.get_id_by_name(username) is not None:
-            return self.finish_json(400, {"status": "error", "error": "USER_EXISTS"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "USER_EXISTS",
+                    "error_data": "UNIQUE VALUE ERROR",
+                },
+            )
 
         if roles is None:
             roles = set()
@@ -146,14 +179,33 @@ class ApiUsersIndexHandler(BaseApiHandler):
 
         if new_superuser and not superuser:
             return self.finish_json(
-                400, {"status": "error", "error": "INVALID_SUPERUSER_CREATE"}
+                400,
+                {
+                    "status": "error",
+                    "error": "INVALID_SUPERUSER_CREATE",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
             )
 
-        if len(roles) != 0 and not superuser:
-            # HACK: This should check if the user has the roles or something
-            return self.finish_json(
-                400, {"status": "error", "error": "INVALID_ROLES_CREATE"}
-            )
+        for role in roles:
+            role = self.controller.roles.get_role(role)
+            if (
+                str(role.get("manager", "no manager found"))
+                != str(auth_data[4]["user_id"])
+                and not superuser
+            ):
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_ROLES_CREATE",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
+                )
 
         # TODO: do this in the most efficient way
         user_id = self.controller.users.add_user(

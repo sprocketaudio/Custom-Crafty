@@ -28,7 +28,6 @@
         "permName": "Toestemming naam",
         "perms": "Toestemmingen",
         "server": "Server: ",
-        "superUser": "Super Gebruiker",
         "yes": "Ja"
     },
     "base": {
@@ -131,7 +130,7 @@
             "info": "_START_ tot _END_ van _TOTAL_ entries",
             "infoEmpty": "0 tot 0 van 0 entries",
             "infoFiltered": "(Gefilterd van _MAX_ totale entries)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "_MENU_ entries laten zien",
             "loadingRecords": "Laden...",
             "paginate": {
@@ -437,7 +436,6 @@
     "serverTerm": {
         "commandInput": "Commando invoeren",
         "delay-explained": "De service/agent is recentelijk gestart en stelt de start uit van de Minecraft-serverinstantie",
-        "downloading": "Aan het downloaden...",
         "restart": "Restarten",
         "sendCommand": "Commando versturen",
         "start": "Starten",
@@ -489,7 +487,6 @@
         "credits": "Credits",
         "dashboard": "Dashboard",
         "documentation": "Documentatie",
-        "navigation": "Navigatie",
         "newServer": "Nieuwe server maken",
         "servers": "Servers"
     },

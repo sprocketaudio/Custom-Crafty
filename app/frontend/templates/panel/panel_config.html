@@ -24,7 +24,7 @@
   <div class="row">
     <div class="col-md-12 grid-margin">
       <div class="card">
-        <div class="card-body">
+        <div class="card-body pt-0">
 
 
           {% if data['superuser'] %}
@@ -79,7 +79,8 @@
                       <tbody>
                         {% for user in data['users'] %}
                         <tr>
-                          <td><i class="fas fa-user"></i><span id="user_{{user.user_id}}">{{ user.username }}</span></td>
+                          <td><i class="fas fa-user"></i><span id="user_{{user.user_id}}">{{ user.username }}</span>
+                          </td>
                           <td>
                             {% if user.enabled %}
                             <span class="text-success">
@@ -106,9 +107,18 @@
                               {% end %}
                             </ul>
                           </td>
-                          <td><span data-translate="{{translate('userConfig', 'userName', data['lang'])}}" data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}" id="username_{{user.user_id}}" class="edit_user clickable" data-name="{{user.username}}" data-id="{{user.user_id}}"><i class="fa-solid fa-user"></i></span>
-                            &nbsp;&nbsp;<span data-translate1="{{translate('userConfig', 'password', data['lang'])}}" data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}" data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}" class="edit_password clickable" data-id="{{user.user_id}}"><i class="fa-solid fa-lock"></i></span>
-                            &nbsp;&nbsp;<a data-toggle="tooltip" title="{{ translate('userConfig', 'pageTitle', data['lang'])}}" href="/panel/edit_user?id={{user.user_id}}"><i class="fas fa-pencil-alt"></i></a>
+                          <td><span data-translate="{{translate('userConfig', 'userName', data['lang'])}}"
+                              data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}"
+                              id="username_{{user.user_id}}" class="edit_user clickable" data-name="{{user.username}}"
+                              data-id="{{user.user_id}}"><i class="fa-solid fa-user"></i></span>
+                            &nbsp;&nbsp;<span data-translate1="{{translate('userConfig', 'password', data['lang'])}}"
+                              data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}"
+                              data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}"
+                              class="edit_password clickable" data-id="{{user.user_id}}"><i
+                                class="fa-solid fa-lock"></i></span>
+                            &nbsp;&nbsp;<a data-toggle="tooltip"
+                              title="{{ translate('userConfig', 'pageTitle', data['lang'])}}"
+                              href="/panel/edit_user?id={{user.user_id}}"><i class="fas fa-pencil-alt"></i></a>
                           </td>
                         </tr>
                         {% end %}
@@ -141,9 +151,18 @@
                               {% end %}
                             </ul>
                           </td>
-                          <td><span data-translate="{{translate('userConfig', 'userName', data['lang'])}}" data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}" id="username_{{user.user_id}}" class="edit_user clickable" data-name="{{user.username}}" data-id="{{user.user_id}}"><i class="fa-solid fa-user"></i></span>
-                            &nbsp;&nbsp;<span data-translate1="{{translate('userConfig', 'password', data['lang'])}}" data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}" data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}" class="edit_password clickable" data-id="{{user.user_id}}"><i class="fa-solid fa-lock"></i></span>
-                            &nbsp;&nbsp;<a data-toggle="tooltip" title="{{ translate('userConfig', 'pageTitle', data['lang'])}}" href="/panel/edit_user?id={{user.user_id}}"><i class="fas fa-pencil-alt"></i></a>
+                          <td><span data-translate="{{translate('userConfig', 'userName', data['lang'])}}"
+                              data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}"
+                              id="username_{{user.user_id}}" class="edit_user clickable" data-name="{{user.username}}"
+                              data-id="{{user.user_id}}"><i class="fa-solid fa-user"></i></span>
+                            &nbsp;&nbsp;<span data-translate1="{{translate('userConfig', 'password', data['lang'])}}"
+                              data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}"
+                              data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}"
+                              class="edit_password clickable" data-id="{{user.user_id}}"><i
+                                class="fa-solid fa-lock"></i></span>
+                            &nbsp;&nbsp;<a data-toggle="tooltip"
+                              title="{{ translate('userConfig', 'pageTitle', data['lang'])}}"
+                              href="/panel/edit_user?id={{user.user_id}}"><i class="fas fa-pencil-alt"></i></a>
                           </td>
                         </tr>
                         {% end %}
@@ -283,16 +302,13 @@
   .clickable {
     color: var(--primary);
   }
+
   .clickable:hover {
     cursor: pointer;
   }
+
   .custom-picker {
     border: 1px solid var(--outline);
-  }
-
-  .popover-body {
-    color: white !important;
-    ;
   }
 
   .loading:after {
@@ -327,7 +343,7 @@
   function validateForm() {
     let password0 = document.getElementById("password0").value;
     let password1 = document.getElementById("password1").value;
-     if (password0 != password1) {
+    if (password0 != password1) {
       $('.passwords-match').popover('show');
       $('.popover-body').click(function () {
         $('.passwords-match').popover("hide");
@@ -341,7 +357,7 @@
       return password1;
     }
   }
-  $(".edit_password").on("click", async function(){
+  $(".edit_password").on("click", async function () {
     const token = getCookie("_xsrf");
     let user_id = $(this).data('id');
     bootbox.confirm(`<form class="form" id='infos' action=''>\
@@ -353,38 +369,38 @@
       <label for="confirm_password">${$(this).data("translate2")}</label>
       <input class="form-control" type='password' id="password1" name='confirm_password' />\
       </div>
-      </form>`, async function(result) {
-          if(result){
-          password = validateForm();
-          if (!password){
-            return;
-          }
-          let res = await fetch(`/api/v2/users/${user_id}`, {
-            method: 'PATCH',
-            headers: {
-            'X-XSRFToken': token
-            },
-            body: JSON.stringify({"password": password}),
-          });
-          let responseData = await res.json();
-          if (responseData.status === "ok") {
-            console.log(responseData.data)
-          } else {
-
-            bootbox.alert({
-              title: responseData.status,
-              message: responseData.error
-            });
-          }
+      </form>`, async function (result) {
+      if (result) {
+        password = validateForm();
+        if (!password) {
+          return;
         }
+        let res = await fetch(`/api/v2/users/${user_id}`, {
+          method: 'PATCH',
+          headers: {
+            'X-XSRFToken': token
+          },
+          body: JSON.stringify({ "password": password }),
+        });
+        let responseData = await res.json();
+        if (responseData.status === "ok") {
+          console.log(responseData.data)
+        } else {
+
+          bootbox.alert({
+            title: responseData.status,
+            message: responseData.error_data
+          });
+        }
+      }
     });
   });
-  $(document).on("submit", ".bootbox form", function(e) {
+  $(document).on("submit", ".bootbox form", function (e) {
     e.preventDefault();
     $(".bootbox .btn-primary").click();
-});
+  });
 
-  $(".edit_user").on("click", function(){
+  $(".edit_user").on("click", function () {
     const token = getCookie("_xsrf");
     let username = $(this).data('name');
     let user_id = $(this).data('id');
@@ -393,29 +409,30 @@
       <label for="username">${$(this).data("translate")}</label>
       <input class="form-control" type='text' name='username' id="username_field" value=${username} /><br/>\
       </div>
-      </form>`, async function(result) {
-        if(result){
-          let new_username = $("#username_field").val();
-          let res = await fetch(`/api/v2/users/${user_id}`, {
-            method: 'PATCH',
-            headers: {
+      </form>`, async function (result) {
+      if (result) {
+        let new_username = $("#username_field").val();
+        let res = await fetch(`/api/v2/users/${user_id}`, {
+          method: 'PATCH',
+          headers: {
             'X-XSRFToken': token
-            },
-            body: JSON.stringify({"username": new_username}),
-          });
-          let responseData = await res.json();
-          if (responseData.status === "ok") {
-            $(`#user_${user_id}`).html(` ${new_username}`)
-            $(`#username_${user_id}`).data('name', new_username);
-          } else {
+          },
+          body: JSON.stringify({ "username": new_username }),
+        });
+        let responseData = await res.json();
+        if (responseData.status === "ok") {
+          $(`#user_${user_id}`).html(` ${new_username}`)
+          $(`#username_${user_id}`).data('name', new_username);
+        } else {
 
-            bootbox.alert({
-              title: responseData.status,
-              message: responseData.error
-            });
-          }
+          bootbox.alert({
+            title: responseData.error,
+            message: responseData.error_data
+          });
         }
-    });
+      }
+    }
+    )
   });
   if (webSocket) {
     webSocket.on('move_status', function (message) {
@@ -451,8 +468,8 @@
     } else {
 
       bootbox.alert({
-        title: responseData.status,
-        message: responseData.error
+        title: responseData.error,
+        message: responseData.error_data
       });
     }
   });

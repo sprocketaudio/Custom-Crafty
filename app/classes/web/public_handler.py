@@ -45,6 +45,7 @@ class PublicHandler(BaseHandler):
             "query": "",
             "background": self.controller.cached_login,
             "login_opacity": self.controller.management.get_login_opacity(),
+            "themes": self.helper.get_themes(),
         }
 
         if self.request.query:
@@ -261,7 +262,11 @@ class PublicHandler(BaseHandler):
             )
             return self.finish_json(
                 403,
-                {"status": "error", "error": error_msg},
+                {
+                    "status": "error",
+                    "error": "INVALID CREDENTIALS",
+                    "error_data": error_msg,
+                },
             )
         else:
             self.redirect("/login?")

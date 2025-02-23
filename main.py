@@ -115,10 +115,27 @@ def controller_setup():
     controller.clear_support_status()
 
 
+def get_migration_notifications():
+    migration_notifications = []
+    for file in os.listdir(
+        os.path.join(APPLICATION_PATH, "app", "migrations", "status")
+    ):
+        if os.path.isfile(file):
+            with open(
+                os.path.join(APPLICATION_PATH, "app", "migrations", "status", file),
+                encoding="utf-8",
+            ) as status_file:
+                status_json = json.load(status_file)
+            for item in status_json:
+                if not status_json[item].get("status"):
+                    migration_notifications.append(item)
+    return migration_notifications
+
+
 def tasks_starter():
     """
     Method starts stats recording, app scheduler, and
-    serverjars/steamCMD cache refreshers
+    big bucket/steamCMD cache refreshers
     """
     # start stats logging
     tasks_manager.start_stats_recording()
@@ -128,8 +145,8 @@ def tasks_starter():
     tasks_manager.start_scheduler()
 
     # refresh our cache and schedule for every 12 hoursour cache refresh
-    # for serverjars.com
-    tasks_manager.serverjar_cache_refresher()
+    # for big bucket.com
+    tasks_manager.big_bucket_cache_refresher()
 
 
 def signal_handler(signum, _frame):
@@ -213,6 +230,8 @@ def setup_starter():
     time.sleep(2)
     controller_setup_thread.start()
 
+    web_sock.broadcast("update", {"section": "cache"})
+    controller.big_bucket.manual_refresh_cache()
     # Wait for the setup threads to finish
     web_sock.broadcast(
         "update",
@@ -272,6 +291,15 @@ def setup_logging(debug=True):
     ):
         open(
             os.path.join(APPLICATION_PATH, "logs", "auth_tracker.log"),
+            "a",
+            encoding="utf-8",
+        ).close()
+
+    if not helper.check_file_exists(
+        os.path.join(APPLICATION_PATH, "logs", "audit.log")
+    ):
+        open(
+            os.path.join(APPLICATION_PATH, "logs", "audit.log"),
             "a",
             encoding="utf-8",
         ).close()
@@ -339,6 +367,9 @@ if __name__ == "__main__":
         helper.db_path, pragmas={"journal_mode": "wal", "cache_size": -1024 * 10}
     )
     database_proxy.initialize(database)
+    Helpers.ensure_dir_exists(
+        os.path.join(APPLICATION_PATH, "app", "migrations", "status")
+    )
     migration_manager = MigrationManager(database, helper)
     migration_manager.up()  # Automatically runs migrations
 
@@ -365,7 +396,15 @@ if __name__ == "__main__":
             encoding="utf-8",
         ) as cred_file:
             cred_file.write(
-                json.dumps({"username": "admin", "password": PASSWORD}, indent=4)
+                json.dumps(
+                    {
+                        "username": "admin",
+                        "password": PASSWORD,
+                        "info": "This is NOT where you change your password."
+                        " This file is only a means to give you a default password.",
+                    },
+                    indent=4,
+                )
             )
         os.chmod(
             os.path.join(APPLICATION_PATH, "app", "config", "default-creds.txt"), 0o600
@@ -389,7 +428,7 @@ if __name__ == "__main__":
     controller.set_project_root(APPLICATION_PATH)
     tasks_manager = TasksManager(helper, controller, file_helper)
     import3 = Import3(helper, controller)
-
+    helper.migration_notifications = get_migration_notifications()
     # Check to see if client config.json version is different than the
     # Master config.json in helpers.py
     Console.info("Checking for remote changes to config.json")

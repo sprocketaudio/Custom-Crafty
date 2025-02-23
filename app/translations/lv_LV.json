@@ -29,7 +29,6 @@
         "permName": "Atļaujas Nosaukums",
         "perms": "Atļaujas",
         "server": "Serveris: ",
-        "superUser": "Super Lietotājs",
         "yes": "Jā"
     },
     "base": {
@@ -59,7 +58,6 @@
         "backgroundUpload": "Fona attēla augšupielāde",
         "customLoginPage": "Pielāgo Pieteikšanās Lapa",
         "delete": "Dzēst",
-        "installing": "Uztāda...",
         "labelLoginImage": "Izvēlies savu Pieteikšanās Lapas Fonu",
         "loginBackground": "Pieteikšanās Fona Attēls",
         "loginImage": "Augšupielādē fona attēlu priekš pieteikšanās ekrāna.",
@@ -118,7 +116,6 @@
         "welcome": "Esiet sveicināts Crafty Controller"
     },
     "datatables": {
-        "loadingRecords": "Ielādē...",
         "i18n": {
             "aria": {
                 "sortAscending": ": aktivizēt lai kārotu kolonnu augoši",
@@ -145,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "Drukāt"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Tabulā nav pieejami dati",
             "info": "Attēlo _START_ līdz _END_ no _TOTAL_ ierakstiem",
             "infoEmpty": "Attēlo 0 līdz 0 no 0 ierakstiem",
             "infoFiltered": "(filtrēts no _MAX_ kopējiem ierkstiem)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Attēlo _MENU_ ierakstus",
             "loadingRecords": "Ielādē...",
             "paginate": {
@@ -180,11 +177,14 @@
             },
             "thousands": ",",
             "zeroRecords": "Nav atrasti atbilstoši ieraksti"
-        }
+        },
+        "loadingRecords": "Ielādē..."
     },
     "error": {
         "agree": "Piekrītu",
         "bedrockError": "Bedrock lejupielādes nav pieejamas. Lūdzu pārbaudi",
+        "bigBucket1": "Big Bucket stāvokļa pārbaude neizdevās. Lūdzu izpētiet",
+        "bigBucket2": "priekš jaunākās informācijas.",
         "cancel": "Atcelt",
         "contact": "Sazinies ar Crafty Control Atbalstu izmantojot Discord",
         "craftyStatus": "Crafty statusa lapa",
@@ -207,8 +207,7 @@
         "portReminder": "Mēs noteicām ka šī ir pirmā reize, kad {} ir ticis palaists. Pārliecinies izlaist portu {} cauri savam rūterim/ugunsmūrim lai padarītu šo attāli pieejamu no interneta.",
         "privMsg": "un ",
         "return": "Atgriezties uz pārskatu",
-        "serverJars1": "Serveru JAR API nav sasniedzams. Lūdzu pārbaudiet",
-        "serverJars2": "priekš jaunākās informācijas.",
+        "selfHost": "Ja jūs paši uzturat šo repozitoriju, pārbaudiet savu adresi vai apskatiet mūsu kļūdu novēršanas dokumentāciju.",
         "start-error": "Serveris {} neveiskmīgi startējās ar kļūdas kodu: {}",
         "superError": "Jums ir jābūt super lietotājam lai veiktu šo darbību.",
         "terribleFailure": "Kas par neveiksmi!"
@@ -232,10 +231,14 @@
         "activityLog": "Aktivitātes Logi",
         "backupComplete": "Dublējums veiksmīgi pabeigts priekš servera ",
         "backupStarted": "Dublējums startēts priekš servera ",
+        "backup_desc": "Mēs noteicām ka dublējuma migrācija daļēji vai pilnīgi neizdevās. Lūdzu pārskatiet savus dublējumus dublējumu cilnē.",
+        "backup_title": "Dublējuma Migrācijas Brīdinājums",
         "downloadLogs": "Lejupielādēt Atbalsta Log Failus?",
         "finishedPreparing": "Mēs esam pabeiguši sagatavot jūsu atbalsta log datnes. Lūdzu nospiediet lejupielādet lai lejupielādētu",
         "logout": "Iziet",
         "preparingLogs": " Lūdzu uzgaidiet kamēr mēs sagatavojam jūsu log datnes... Mēs jums nosūtīsim paziņojumu kad tās būs gatavas. Tas var aizņemt kādu laiku priekš lielām instalācijām.",
+        "schedule_desc": "Mēs noteicām ka daži vai visi no jūsu darbību grafikiem nebija veiksmīgi pārnesti atjauninājuma laikā. Lūdzu pārskatiet savus grafikus grafiku cilnē.",
+        "schedule_title": "Grafiku Migrācijas Brīdinājums",
         "supportLogs": "Atbalsta Logi"
     },
     "offline": {
@@ -299,10 +302,12 @@
         "serversDesc": "serveri, kuriem šai lomai ir atļauta piekļuve"
     },
     "serverBackups": {
+        "actions": "Darbības",
         "after": "Palaist komandu pēc dublējuma",
         "backupAtMidnight": "Automātiski dublēt pusnaktī?",
         "backupNow": "Dublēt Tagad!",
         "backupTask": "Dublējuma uzdevums ticis startēts.",
+        "backups": "Servera Dublējumi",
         "before": "Palaist komandu pirms dublējuma",
         "cancel": "Atcelt",
         "clickExclude": "Nospied lai izvēlētos Izņēmumus",
@@ -311,21 +316,34 @@
         "confirmDelete": "Vai vēlaties izdzēst šo dublējumu? Šo nevar atdarīt.",
         "confirmRestore": "Vai tiešām vēlieties atjaunot no šī dublējuma. Visas esošās datnes tiks atgrieztas uz dublējuma stāvokli un būs neatgriežamas.",
         "currentBackups": "Pašreizējie Dublējumi",
+        "default": "Noklusētais Dublējums",
+        "defaultExplain": "Dublējums ko Crafty izmanto pirms atjaunināšanas. To nevar mainīt vai izdzēst.",
         "delete": "Dzēst",
         "destroyBackup": "Iznīcināt dublējumu \" + file_to_del + \"?",
         "download": "Lejupielādēt",
+        "edit": "Rediģēt",
+        "enabled": "Iespējots",
         "excludedBackups": "Izņēmuma Ceļi: ",
         "excludedChoose": "Izvēlies ceļus, kurus tu vēlies izņemt no saviem dublējumiem",
         "exclusionsTitle": "Dublējuma Izņēmumi",
+        "failed": "Neizdevās",
         "maxBackups": "Maks. Dublējumi",
         "maxBackupsDesc": "Crafty nesaglabās vairāk nekā N dublējumus, dzēšot vecākaos (ievadi 0 lai saglabātu visus)",
+        "myBackup": "Mans Jaunais Dublējums",
+        "name": "Nosaukums",
+        "newBackup": "Izveidot Jaunu Dublējumu",
+        "no-backup": "Nav Dublējumu. Lai izveidotu dublējuma konfigurāciju, nospied Izveidot Jaunu Dublējumu",
         "options": "Opcijas",
         "path": "Ceļš",
         "restore": "Atjaunot",
         "restoring": "Atjauno dublējumu. Tas var aizņemt kādi laiku. Esiet pacietīgs.",
+        "run": "Veikt Dublējumu",
         "save": "Saglabāt",
         "shutdown": "Apturēt serveri dublējumkopijas laikā",
         "size": "Lielums",
+        "standby": "Gaidstāve",
+        "status": "Statuss",
+        "storage": "Glabātavas Vieta",
         "storageLocation": "Krātuves Vieta",
         "storageLocationDesc": "Kur jūs vēlaties saglabāt dublējumus?"
     },
@@ -490,6 +508,7 @@
     },
     "serverSchedules": {
         "action": "Darbība",
+        "actionId": "Izvēlēties apakšdarbību",
         "areYouSure": "Dzēst Ieplānoto Uzdevumu?",
         "cancel": "Atcelt",
         "cannotSee": "Neredziet visu?",
@@ -536,7 +555,6 @@
     "serverTerm": {
         "commandInput": "Ievadi savu komandu",
         "delay-explained": "Serviss/aģents tika nesen startēts, un aizkavē Minecraft servera instances startu",
-        "downloading": "Lejupielādē...",
         "importing": "Importē...",
         "installing": "Uzstāda...",
         "restart": "Restartēt",
@@ -568,6 +586,8 @@
         "minMem": "Minimālā Atmiņa",
         "myNewServer": "Mans Jaunais Serveris",
         "newServer": "Izveidot Jaunu Serveri",
+        "noRole": "Nav lomas ar izvēlētiem meklēšanas parametriem",
+        "noneRoles": "Nav Izvēlētas Lomas",
         "quickSettings": "Ātrie Iestatījumi",
         "quickSettingsDescription": "Neuztraucies, tos var izmainīt vēlāk",
         "resetForm": "Notīrīt Formu",
@@ -598,12 +618,12 @@
         "dashboard": "Panelis",
         "documentation": "Dokumentācija",
         "inApp": "Iebūvētā dokumentācija",
-        "navigation": "Navigācija",
         "newServer": "Izveidot Jaunu Serveri",
         "servers": "Serveri"
     },
     "startup": {
         "almost": "Pabeidz. Vēl tik nedaudz...",
+        "cache": "Atjauno Big Bucket keša failu",
         "internals": "Konfigurē un Startē Crafty iekšējās komponenetes",
         "internet": "Pārbauda interneta savienojumu",
         "server": "Inicializē ",
@@ -650,6 +670,28 @@
         "userSettings": "Lietotāju Iestatījumi",
         "userTheme": "UI Tēma",
         "uses": "Dauzums, cik reizes lietot (-1==Bez Limita)"
+    },
+    "validators": {
+        "passLength": "Parole pārāk īsa. Minimālais Garums: 8",
+        "backupName": "Dublējuma nosaukumam jābūt tekstam (string) ar minimālo garumu 3.",
+        "enumErr": "pārbaude neizdevās. Pieņemamie dati ietver: ",
+        "filesPageLen": "garumam jābūt lielākam par 1 priekš vienības",
+        "insufficientPerms": "Piekļuves Kļūda: Nepietiekama atļauja priekš šī resursa",
+        "roleManager": "Lomas pārvaldniekam jābūt skaitlim (pārvaldnieka ID) vai Nekam (None)",
+        "roleName": "Lomas nosaukumam jābūt tekstam (string) kas ir garāks par 1 rakstzīmi. Tas nevar iekļaut sekojošos simbolus: [ ] , ",
+        "roleServerId": "Servera ID vienībai jābūt tekstam (string) ar minimālo garumu 1",
+        "roleServerPerms": "Servera atļaujām jābūt 8-bitu tekstam (string)",
+        "serverCreateName": "Servera nosaukumam jābūt tekstam (string) ar minimumālo garumu 2 un tas nevar saturēt: \\ / vai # ",
+        "serverExeCommand": "Servera izpildes komandai jābūt tekstam (string) ar minimālo garumu 1.",
+        "serverLogPath": "Servera log datņu ceļam ir jābūt tekstam (string) ar minimālo garumu 1",
+        "taskIntervalType": "Notikumu Intervala Tipam jābūt vienam no sekojošiem: ",
+        "typeBool": "jābūt patiesam vai nepatiesam (true vai false, boolean tips)",
+        "typeEmail": "jābūt tipam e-pasts.",
+        "typeInteger": "jābūt skaitlim.",
+        "typeIntMinVal0": "jābūt skaitlim (integer) ar minimālo vērtību 0.",
+        "typeList": "jābūt tipam saraksts/masīvs (list/array) ",
+        "typeString": "jābūt tipam teksts (string).",
+        "userName": " jābūt tipam teksts (string), tikai ar MAZAJIEM BURTIEM, ar 4 rakstzīmju minimālo un 20 rakstzīmju maksimālo garumu"
     },
     "webhooks": {
         "areYouSureDel": "Vai tiešām vēlies noņemt šo webhook?",

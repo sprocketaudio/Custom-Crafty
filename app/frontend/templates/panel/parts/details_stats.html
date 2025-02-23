@@ -3,7 +3,7 @@
     <div class="card">
       <div class="card-body pt-3 pb-3">
         <div class="row">
-          <div class="col-sm-4 mr-2">
+          <div class="col-sm-4">
             {% if data['server_stats']['running'] %}
             <b>{{ translate('serverStats', 'serverStatus', data['lang']) }}:</b> <span id="status" class="text-success">{{ translate('serverStats', 'online', data['lang']) }}</span><br />
             <b>{{ translate('serverStats', 'serverStarted', data['lang']) }}:</b> <span id="started">{{ data['server_stats']['started'] }}</span><br />
@@ -21,7 +21,7 @@
             <b>{{ translate('serverStats', 'serverTimeZone', data['lang']) }}:</b> <span class="text-info">{{ data['serverTZ'] }}</span>
           </div>
 
-          <div class="col-sm-3 mr-2">
+          <div class="col-sm-3">
             <b>{{ translate('serverStats', 'cpuUsage', data['lang']) }}:</b> <span id="cpu">{{ data['server_stats']['cpu'] }}%</span> <br />
             <b>{{ translate('serverStats', 'memUsage', data['lang']) }}:</b> <span id="mem">{{ data['server_stats']['mem'] }}</span> <br />
             {% if data['server_stats']['int_ping_results'] %}
@@ -31,14 +31,14 @@
             {% end %}
           </div>
 
-          <div class="col-sm-3 mr-2">
+          <div class="col-sm-5">
             {% if data['server_stats']['version'] != 'False' %}
             <b>{{ translate('serverStats', 'version', data['lang']) }}:</b> <span id="version">{{ data['server_stats']['version'] }}</span><br />
-            <b>{{ translate('serverStats', 'description', data['lang']) }}:</b> <span id="input_motd" style="max-width: 10px; max-height: 10px" class="input_motd">{{ translate('serverStats', 'loadingMotd', data['lang']) }}</span>
+            <b>{{ translate('serverStats', 'description', data['lang']) }}:</b> <span id="input_motd" class="input_motd">{{ translate('serverStats', 'loadingMotd', data['lang']) }}</span>
             <br />
             {% else %}
             <b>{{ translate('serverStats', 'version', data['lang']) }}:</b> <span id="version">{{ translate('serverStats', 'unableToConnect', data['lang']) }}</span> <br />
-            <b>{{ translate('serverStats', 'description', data['lang']) }}:</b> <span style="max-width: 10px; max-height: 10px" id="input_motd" class="input_motd">{{ translate('serverStats', 'unableToConnect', data['lang']) }}</span> <br />
+            <b>{{ translate('serverStats', 'description', data['lang']) }}:</b> <span id="input_motd" class="input_motd">{{ translate('serverStats', 'unableToConnect', data['lang']) }}</span> <br />
             {% end %}
             <b>Server Type: <span class="text-info">{{data['server_stats']['server_type']}}</span></b>
 
@@ -211,17 +211,24 @@
     let text = ""
     let players = server.players_cache;
     for (let i = 0; i < players.length; i++) {
-      text += `<tr id="playerItem-${players[i]["name"]}" class="playerItem--" style="text-align: center;">`;
-      text += `<td class="no-scroll" style="overflow: scroll;"><strong>${players[i]["name"]}</strong></td>`;
+      text += `<tr id="playerItem-${players[i]["name"]}" class="playerItem-- text-center">`;
+      text += `<td class="no-scroll col-5"><strong>${players[i]["name"]}</strong></td>`;
       if (players[i]["status"] === "Online") {
-        text += `<td><span class="text-success"><i class="fas fa-signal"></i> ${players[i]['status']}</span></td>`
+        text += `<td class="col-4"><span class="text-success"><i class="fas fa-signal"></i> ${players[i]['status']}</span></td>`
       } else {
-        text += `<td><span class="text-warning"><i class="fa-regular fa-circle-xmark"></i><span class="offline-status">&nbsp;${players[i]['status']}</span><span class="conn-break"> Last connection :<br> ${players[i]['last_seen']}</span></td>`
+        text += `<td class="col-4"><span class="text-warning"><i class="fa-regular fa-circle-xmark"></i><span class="offline-status">&nbsp;${players[i]['status']}</span><span class="conn-break"> Last connection :<br> ${players[i]['last_seen']}</span></td>`
       }
       if (server["running"]) {
-        text += `<td><button onclick="send_command_to_server('ban ${players[i]['name']}')" type="button" class="btn btn-danger controls">Ban</button><br class="mobile-break"><button onclick="send_command_to_server('kick ${players[i]['name']}')" type="button" class="btn btn-outline-danger controls">Kick</button><br><button onclick="send_command_to_server('op ${players[i]['name']}')" type="button" class="btn btn-warning controls">OP</button><br class="mobile-break"><button onclick="send_command_to_server('deop ${players[i]['name']}')" type="button" class="btn btn-outline-warning controls">De-OP</button></td>`
+        text += `<td class="col-3">
+                    <div class="row">
+                      <div class="col"><button onclick="send_command_to_server('ban ${players[i]['name']}')" type="button" class="btn btn-danger">Ban</button></div>
+                      <div class="col"><button onclick="send_command_to_server('kick ${players[i]['name']}')" type="button" class="btn btn-outline-danger">Kick</button></div>
+                      <div class="col"><button onclick="send_command_to_server('op ${players[i]['name']}')" type="button" class="btn btn-warning">OP</button></div>
+                      <div class="col"><button onclick="send_command_to_server('deop ${players[i]['name']}')" type="button" class="btn btn-outline-warning">De-OP</button></div>
+                    </div>
+                  </td>`
       } else {
-        text += `<td><span> Unavailable<br> (Server Offline)</span></td>`
+        text += `<td><div><span> Unavailable<br> (Server Offline)</span></div></td>`
       }
 
     }

@@ -73,7 +73,7 @@ class RolesController:
 
     @staticmethod
     def get_server_ids_and_perms_from_role(
-        role_id: t.Union[str, int]
+        role_id: t.Union[str, int],
     ) -> t.List[RoleServerJsonType]:
         # FIXME: somehow retrieve only the server ids, not the whole servers
         return [

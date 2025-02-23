@@ -37,9 +37,16 @@ class UsersController:
                     permission.name
                     for permission in PermissionsCrafty.get_permissions_list()
                 ],
+                "error": "enumErr",
+                "fill": True,
             },
-            "quantity": {"type": "number", "minimum": -1},
-            "enabled": {"type": "boolean"},
+            "quantity": {
+                "type": "number",
+                "minimum": -1,
+                "error": "typeInteger",
+                "fill": True,
+            },
+            "enabled": {"type": "boolean", "error": "typeBool", "fill": True},
         }
         self.user_jsonschema_props: t.Final = {
             "username": {
@@ -49,23 +56,30 @@ class UsersController:
                 "pattern": "^[a-z0-9_]+$",
                 "examples": ["admin"],
                 "title": "Username",
+                "error": "userName",
+                "fill": True,
             },
             "password": {
                 "type": "string",
                 "minLength": self.helper.minimum_password_length,
                 "examples": ["crafty"],
                 "title": "Password",
+                "error": "passLength",
             },
             "email": {
                 "type": "string",
                 "format": "email",
                 "examples": ["default@example.com"],
                 "title": "E-Mail",
+                "error": "typeEmail",
+                "fill": True,
             },
             "enabled": {
                 "type": "boolean",
                 "examples": [True],
                 "title": "Enabled",
+                "error": "typeBool",
+                "fill": True,
             },
             "lang": {
                 "type": "string",
@@ -73,16 +87,30 @@ class UsersController:
                 "minLength": 2,
                 "examples": ["en"],
                 "title": "Language",
+                "error": "typeString",
+                "fill": True,
             },
             "superuser": {
                 "type": "boolean",
                 "examples": [False],
                 "title": "Superuser",
+                "error": "typeBool",
+                "fill": True,
             },
-            "manager": {"type": ["integer", "null"]},
-            "theme": {"type": "string"},
+            "manager": {
+                "type": ["integer", "null"],
+                "error": "typeInteger",
+                "fill": True,
+            },
+            "theme": {
+                "type": "string",
+                "error": "typeString",
+                "fill": True,
+            },
             "permissions": {
                 "type": "array",
+                "error": "typeList",
+                "fill": True,
                 "items": {
                     "type": "object",
                     "properties": _permissions_props,
@@ -91,13 +119,25 @@ class UsersController:
             },
             "roles": {
                 "type": "array",
+                "error": "typeList",
+                "fill": True,
                 "items": {
                     "type": "integer",
                     "minLength": 1,
+                    "error": "typeInteger",
+                    "fill": True,
                 },
             },
-            "hints": {"type": "boolean"},
-            "server_order": {"type": "string"},
+            "hints": {
+                "type": "boolean",
+                "error": "typeBool",
+                "fill": True,
+            },
+            "server_order": {
+                "type": "string",
+                "error": "typeString",
+                "fill": True,
+            },
         }
 
     # **********************************************************************************

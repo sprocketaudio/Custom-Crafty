@@ -28,7 +28,6 @@
         "permName": "Käyttoikeuden nimi",
         "perms": "Käyttoikeudet",
         "server": "Palvelin: ",
-        "superUser": "Järjestelmänvalvoja",
         "yes": "Kyllä"
     },
     "base": {
@@ -127,12 +126,12 @@
                 "pdf": "PDF",
                 "print": "Tulosta"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Tietoja ei löytynyt",
             "info": "Näytetään rivit _START_ - _END_ (yhteensä _TOTAL_ )",
             "infoEmpty": "Näytetään 0 - 0 (yhteensä 0)",
             "infoFiltered": "(suodatettu _MAX_ tuloksen joukosta)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Näytä kerralla _MENU_ riviä",
             "loadingRecords": "Ladataan...",
             "paginate": {
@@ -147,40 +146,16 @@
                 "cells": {
                     "0": "Klikkaa solua valitaksesi sen",
                     "1": "Yksi solu valittuna",
-                    "2": "Kaksi solua valittuna",
-                    "3": "Kolme solua valittuna",
-                    "4": "Neljä solua valittuna",
-                    "5": "Viisi solua valittuna",
-                    "6": "Kuusi solua valittuna",
-                    "7": "Seitsemän solua valittuna",
-                    "8": "Kahdeksan solua valittuna",
-                    "9": "Yhdeksän solua valittuna",
                     "_": "%d solua valittuna"
                 },
                 "columns": {
                     "0": "Klikkaa saraketta valitaksesi sen",
                     "1": "Yksi sarake valittuna",
-                    "2": "Kaksi saraketta valittuna",
-                    "3": "Kolme saraketta valittuna",
-                    "4": "Neljä saraketta valittuna",
-                    "5": "Viisi saraketta valittuna",
-                    "6": "Kuusi saraketta valittuna",
-                    "7": "Seitsemän saraketta valittuna",
-                    "8": "Kahdeksan saraketta valittuna",
-                    "9": "Yhdeksän saraketta valittuna",
                     "_": "%d saraketta valittuna"
                 },
                 "rows": {
                     "0": "Klikkaa riviä valitaksesi sen",
                     "1": "Yksi rivi valittuna",
-                    "2": "Kaksi riviä valittuna",
-                    "3": "Kolme riviä valittuna",
-                    "4": "Neljä riviä valittuna",
-                    "5": "Viisi riviä valittuna",
-                    "6": "Kuusi riviä valittuna",
-                    "7": "Seitsemän riviä valittuna",
-                    "8": "Kahdeksan riviä valittuna",
-                    "9": "Yhdeksän riviä valittuna",
                     "_": "%d riviä valittuna"
                 }
             },
@@ -468,7 +443,6 @@
     "serverTerm": {
         "commandInput": "Kirjoita komento",
         "delay-explained": "Palvelu/agentti on äskettäin aloittanut ja viivästyttää minecraft -palvelimen ilmentymän alkua",
-        "downloading": "Ladataan...",
         "restart": "Uudelleen&shy;käynnistä",
         "sendCommand": "Lähetä komento",
         "start": "Käynnistä",
@@ -520,7 +494,6 @@
         "credits": "Hyvitykset",
         "dashboard": "Kojelauta",
         "documentation": "Dokumentaatio",
-        "navigation": "Navigaatio",
         "newServer": "Luo uusi palvelin",
         "servers": "Palvelimet"
     },

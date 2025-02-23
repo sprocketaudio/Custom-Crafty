@@ -7,7 +7,7 @@
     "accessDenied": {
         "accessDenied": "ACCES DENID",
         "contact": "CONTACK CWAFTY CONTROLLR SUPORT ON DA DWISCORDZ",
-        "contactAdmin": "PLZ TALKZ TO UR SERVR HOOMAN FOR DIS, OR IF U FINKZ U SHUD GET IN, ASK SUPORT",
+        "contactAdmin": "PLZ TALKZ TO UR SERVR HOOMAN FOR DIS, OR IF U FINKZ U SHUD GET IN, ASK SUPORT.",
         "noAccess": "U DO NOT HAZ ACCES 2 DIS LITTERBOX"
     },
     "apiKeys": {
@@ -29,7 +29,6 @@
         "permName": "PERMISSION NAME",
         "perms": "PERMISSIONS",
         "server": "SERVER: ",
-        "superUser": "SUPA DOOPA USR",
         "yes": "YESH!"
     },
     "base": {
@@ -117,7 +116,6 @@
         "welcome": "WELCOM 2 CWAFTY CONTROLLR"
     },
     "datatables": {
-        "loadingRecords": "Loading...",
         "i18n": {
             "aria": {
                 "sortAscending": ": activate to sort column ascending",
@@ -144,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "Print"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "No data available in table",
             "info": "Showing _START_ to _END_ of _TOTAL_ entries",
             "infoEmpty": "Showing 0 to 0 of 0 entries",
             "infoFiltered": "(filtered from _MAX_ total entries)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Show _MENU_ entries",
             "loadingRecords": "Loading...",
             "paginate": {
@@ -179,11 +177,14 @@
             },
             "thousands": ",",
             "zeroRecords": "No matching records found"
-        }
+        },
+        "loadingRecords": "Loading..."
     },
     "error": {
         "agree": "YESH PLS",
         "bedrockError": "BEDROCKZ DOWNLOADZ NO WORKY. CHECK PLZ.",
+        "bigBucket1": "Big Bucket No Worky. Plz check",
+        "bigBucket2": "for da freshest nooz.",
         "cancel": "NOPEZ",
         "contact": "CONTACK CWAFTY CONTROLLR SUPORT ON DA DIZORD",
         "craftyStatus": "CWAFTY'S STATUSZ",
@@ -206,8 +207,7 @@
         "portReminder": "WE HAS DETECTD DIS AR TEH FURST TIEM {} IZ BEAN RUN. IF U WANTS IT ACESIBLE TO NEIGHBORHOOD CATS PLZ UNLOCK CAT_FLAP, {}, THRU UR ROUTR IF U HAS NOT DUN SO.",
         "privMsg": "AND THEEZ ",
         "return": "Go Bak to Dashbored",
-        "serverJars1": "CAN'T TALK TO SERVER JARS API. CHECKZ",
-        "serverJars2": "TO SEE NEWZ STUFFZ.",
+        "selfHost": "If u iz self-hostin' dis repo, check ur addy or peep our fix-it guide.",
         "start-error": "CHAIR {} FAILD 2 START WIF OOF CODE: {}",
         "superError": "U MUST BE A BIG CAT TO DO DIS.",
         "terribleFailure": "SUMTIN DUN BWOKE"
@@ -235,7 +235,11 @@
         "finishedPreparing": "I HAS FINISHD PREPARIN UR FISH. PLZ CLICK DOWNLOAD 2 DOWNLOAD",
         "logout": "GO BYE BYE",
         "preparingLogs": " PLZ WAIT WHILE I GATHR UR FISHZ... ILL MAK NOIZE WHEN THEY`RE READY. DIS CUD TAEK WHILE  IF UR HOUZ IZ HOOJ.",
-        "supportLogs": "SUPPORT FISHIEZ"
+        "supportLogs": "SUPPORT FISHIEZ",
+        "schedule_desc": "WE NOTICED SOME OR ALL UR SCHEDULED FISH DIDN’T MOVE RIGHT DURING DA UPGRADE. PLS CONFIRM ALL UR FISH IN DA SCHEDULES TAB.",
+        "backup_desc": "WE NOTICED DA BACKUP MIGRASHUN MIGHTA GONE BOOM. PLS CHECK UR BACKUP RECORDZ ON DA BACKUP TAB.",
+        "backup_title": "BACKUP MIGRASHUN OOPSIE",
+        "schedule_title": "SCHEDULES MIGRASHUN OOPSIE"
     },
     "offline": {
         "offline": "NOT HEREZ",
@@ -298,10 +302,12 @@
         "serversDesc": "SERVRS DIS ROLE IZ ALLOWD 2 ACCES"
     },
     "serverBackups": {
+        "actions": "DO-STUFFZ",
         "after": "RUNZ COMMANDZ AFTUR BAKUP",
         "backupAtMidnight": "AUTO-BAKUP AT MIDDLENIGHTZ?",
         "backupNow": "BAKUP NOWZ!",
         "backupTask": "OKAI I GETZ FISH, BAK SOONZ",
+        "backups": "SERVER BACKUPS",
         "before": "RUNZ COMMANDZ BEFOUR BAKUP",
         "cancel": "STAHP",
         "clickExclude": "CLICK 2 MARK EXCLUSHUNS",
@@ -310,21 +316,34 @@
         "confirmDelete": "R U SURE U WANTZ ME TO EATZ DIS BAKUP? WIAL BEH LOZT FOREVR (LONGIR THAN KITTEHZ NAPZ)",
         "confirmRestore": "R U SURE U WANTZ 2 RESTORE FRUM DIS BAKUP. ALL CURRENT SERVR FISHZ WILL BE EATZ AN WILL BE UNRECOVERABLE.",
         "currentBackups": "CURRENT STASH OV BAKUPS",
+        "default": "USUAL BACKUP",
+        "defaultExplain": "DA BACKUP THAT CRAFTY USE BEFORE UPDATES. DIS NO CAN CHANGE OR GO AWAY.",
         "delete": "MAK GONE",
         "destroyBackup": "EAT BAKUP \" + file_to_del + \"?",
         "download": "DOWNLOADZ",
+        "edit": "MAKE BETTERS",
+        "enabled": "TURNED ON",
         "excludedBackups": "EXCLUSHUNS: ",
         "excludedChoose": "CHOOSE TEH PATHS U WANTS 2 EXCLUDE FRUM UR BAKUPS",
         "exclusionsTitle": "BAKUP EXCLUSHUNS",
+        "failed": "NOPE'D",
         "maxBackups": "MAX BAKUPS",
         "maxBackupsDesc": "CWAFTY WILL NOT KEEPZ MOAR THAN N BCKUPS, DELETIN TEH MOST OLDZ FURST (ENTR 0 TO BE BIG GREEDY)",
+        "myBackup": "MAH NEW BACKUP",
+        "name": "NAMZ",
+        "newBackup": "MAKEZ NEW BACKUP",
+        "no-backup": "NO BACKUPS. TO MAKE A NEW BACKUP THINGY PLEASE BOOP. NEW BACKUP",
         "options": "OPSHUNS",
         "path": "PETH",
         "restore": "RESTOR",
         "restoring": "RESTORIN BAKUP. DIS CUD TAEK WHILE. PLZ BE PATIENT.",
+        "run": "DO BACKUP NOWZ",
         "save": "DUN",
         "shutdown": "SLEEPY SERVR WEN MAK BAKAUPZ?",
         "size": "HOW BIGZ",
+        "standby": "WAITIN'",
+        "status": "WHAT'S UP",
+        "storage": "HIDING SPOT",
         "storageLocation": "SHINY STASH OV HINGZ",
         "storageLocationDesc": "WER DO U WANTS 2 STASH BAKUPS?"
     },
@@ -489,6 +508,7 @@
     },
     "serverSchedules": {
         "action": "ACTSHUN",
+        "actionId": "PICK ACTION KITTY",
         "areYouSure": "FORGET 2 DO DIS ????",
         "cancel": "STAHP",
         "cannotSee": "CANNY SEE?",
@@ -535,7 +555,6 @@
     "serverTerm": {
         "commandInput": "ENTR YOUR COMARNED",
         "delay-explained": "TEH SERVICE/AGENT HUS RESENTLY STARTD AN IZ DELAYIN TEH STARTD OV TEH SERVR",
-        "downloading": "WAIT PLZ!?!?!",
         "importing": "BRINGINGZ IN...",
         "installing": "PUTTINGZ TOGETHER...",
         "restart": "COPYZ",
@@ -567,6 +586,8 @@
         "minMem": "SMOL MEMZ LIMIT",
         "myNewServer": "MY NEW SOFT CHAIR",
         "newServer": "MAK A NU SERVR",
+        "noRole": "ME NO FINDY ANY ROLEZ WIF DIS SEARCHY",
+        "noneRoles": "NO ROLEZ PICKED",
         "quickSettings": "FAST SETTINGZ!",
         "quickSettingsDescription": "NO FEAR, IT NOT PERMZ",
         "resetForm": "REZET",
@@ -597,12 +618,12 @@
         "dashboard": "DASHBORD",
         "documentation": "DOCUMENTASHUN",
         "inApp": "IN APPZ DOCS",
-        "navigation": "NAVIGASHUN",
         "newServer": "CONSTWUCT A SERVR",
         "servers": "SERVRS"
     },
     "startup": {
         "almost": "ALMOST DUN. HOLD ON TO YER WHISKERS...",
+        "cache": "Fightin' for a Big Bucket o Fish",
         "internals": "SETTIN' UP AN' STARTIN' CWAFTY'S INSIDE BITZ",
         "internet": "LOOKIN' FOR OUTER SPACE TALKY",
         "server": "WAKIN' UPZ ",
@@ -649,6 +670,28 @@
         "userSettings": "HOOMAN THINGZ",
         "userTheme": "THEMEZ",
         "uses": "NUMBER OV USES ALLOWED (-1==NO LIMIT)"
+    },
+    "validators": {
+        "passLength": "PASSWRD TOO SMOL. NEEDZ 8 CATZ PLZ",
+        "backupName": "BACKUP NAME GOTTA BE WURDZ, AT LEAST 3 FISH.",
+        "enumErr": "OOFS IN VALIDATING. GOOD STUFF INCLUDES: ",
+        "serverExeCommand": "SERVER EXECUTION COMMAND GOTTA BE WURDZ, AT LEAST 1 FISH LONG.",
+        "filesPageLen": "LENGTH GOTTA BE MORE THAN 1 FOR DIS PROPERTY",
+        "insufficientPerms": "PERMISSION ERROR: U NEED MORE PERMISSIONZ FOR DIS RESOURCE",
+        "roleManager": "ROLE MANAGER GOTTA BE NUMBERS (MANAGER ID) OR NUFFIN",
+        "roleServerId": "SERVER ID GOTTA BE WURDZ, AT LEAST 1 FISH LONG",
+        "roleServerPerms": "SERVER PERMISSIONS GOTTA BE AN 8-BIT WURDZ",
+        "serverCreateName": "SERVER NAME GOTTA BE WURDZ, AT LEAST 2 FISH LONG AND CAN’T HAVE: \\\\ / or # ",
+        "taskIntervalType": "TASK INTERVAL TYPE GOTTA BE ONE OF: ",
+        "typeBool": "GOTTA BE MEOW OR NEOW (TYPE BOOLEAN)",
+        "typeEmail": "GOTTA BE EMAIL TYPE.",
+        "typeIntMinVal0": "GOTTA BE A WHOLE FISH AT LEAST... 0.",
+        "typeInteger": "GOTTA BE A NUMBR.",
+        "typeList": "GOTTA BE A ARAY ",
+        "typeString": "GOTTA BE STRINGY THINGY.",
+        "roleName": "ROLE NAME GOTTA BE WURDZ, MORE THAN 1 FISH. CAN’T HAVE THESE: [ ] , ",
+        "serverLogPath": "SERVER LOG PATH GOTTA BE WURDZ, AT LEAST 1 FISH LONG",
+        "userName": " GOTTA BE STRINGY THINGY, ALL LOW, AT LEAST 4 FISH, MAX 20 FISHIES"
     },
     "webhooks": {
         "areYouSureDel": "U SURE U WANTZ TO EATZ DIS WEBHOOK?",

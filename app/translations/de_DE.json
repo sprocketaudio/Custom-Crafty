@@ -29,7 +29,6 @@
         "permName": "Berechtigungs Name",
         "perms": "Berechtigungen",
         "server": "Server: ",
-        "superUser": "Super Benutzer",
         "yes": "Ja"
     },
     "base": {
@@ -117,7 +116,6 @@
         "welcome": "Willkommen bei Crafty Controller"
     },
     "datatables": {
-        "loadingRecords": "Laden...",
         "i18n": {
             "aria": {
                 "sortAscending": ": Aktivieren, um die Spalte aufsteigend zu sortieren",
@@ -144,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "Drucken"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Keine Daten in der Tabelle verfügbar",
             "info": "Zeige _START_ bis _END_ von insges. _TOTAL_ Einträge(n)",
             "infoEmpty": "Zeige 0 bis 0 von insges. 0 Einträgen",
             "infoFiltered": "(gefiltert von _MAX_ maximalen Einträgen)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Zeige _MENU_ Einträge",
             "loadingRecords": "Laden...",
             "paginate": {
@@ -179,11 +177,14 @@
             },
             "thousands": ".",
             "zeroRecords": "Keine passenden Einträge gefunden"
-        }
+        },
+        "loadingRecords": "Laden..."
     },
     "error": {
         "agree": "Zustimmen",
         "bedrockError": "Bedrock-Downloads sind nicht verfügbar. Bitte überprüfen Sie",
+        "bigBucket1": "Big Bucket Zustandsprüfung fehlgeschlagen. Bitte Überprüfen",
+        "bigBucket2": "für die aktuellsten Informationen.",
         "cancel": "Abbrechen",
         "contact": "Kontaktieren Sie den Crafty Control Support über Discord",
         "craftyStatus": "Crafty-Statusseite",
@@ -206,8 +207,7 @@
         "portReminder": "Wir haben festgestellt, dass dies das erste Mal ist, dass {} ausgeführt wurde. Stellen Sie sicher, dass Sie Port {} durch Ihren Router/Firewall weiterleiten, um den Fernzugriff aus dem Internet zu ermöglichen.",
         "privMsg": "und der/die/das ",
         "return": "Zurück zum Dashboard",
-        "serverJars1": "Server-JAR-API nicht erreichbar. Bitte überprüfen Sie ",
-        "serverJars2": "um die aktuellsten Informationen zu erhalten.",
+        "selfHost": "Wenn Sie dieses Repo selbst hosten, überprüfen Sie bitte Ihre Adresse oder konsultieren Sie unsere Anleitung zur Fehlerbehebung.",
         "start-error": "Der Server {} konnte wegen dem Fehlercode: {} nicht gestartet werden",
         "superError": "Sie müssen ein Administrator sein, um diese Aktion abzuschließen.",
         "terribleFailure": "Was für ein furchtbarer Fehler!"
@@ -219,7 +219,7 @@
     },
     "login": {
         "defaultPath": "Der eingegebene Text ist der Pfad zum Passwort, nicht das Passwort selbst. Das Standartpasswort kann unter diesen Pfad eingesehen werden.",
-        "disabled": "Account gesperrt. Für weitere Informationen den Serveradministrator kontaktieren",
+        "disabled": "Account gesperrt. Für weitere Informationen den Serveradministrator kontaktieren.",
         "forgotPassword": "Passwort vergessen",
         "incorrect": "Benutzername oder Passwort falsch",
         "login": "Einloggen",
@@ -235,11 +235,15 @@
         "finishedPreparing": "Wir haben die Bereitstellung der Supportprotokolle abgeschlossen. Bitte klicke 'Herunterladen' um diese herunterzuladen",
         "logout": "Abmelden",
         "preparingLogs": " Bitte warten, während wir die Protokolle vorbereiten... Wir schicken eine Benachrichtigung, wenn sie fertig sind. Dies kann bei großen Projekten eine Weile dauern.",
-        "supportLogs": "Supportprotokolle"
+        "supportLogs": "Supportprotokolle",
+        "backup_desc": "Wir haben fesgestellt, dass die Migration des Backups teilweise oder vollständig fehlgeschlagen ist. Bitte Backups im Backup Menü überprüfen.",
+        "schedule_desc": "Wir haben festgestellt, dass geplante Aufgaben während des Upgrades nicht erfolgreich übertragen wurden. Bitte die geplanten Aufgaben im Zeitplan überprüfen.",
+        "backup_title": "Backup Migrations Warnung",
+        "schedule_title": "Zeitplan Migrations Warnung"
     },
     "offline": {
         "offline": "Offline",
-        "pleaseConnect": "Bitte stellen sie eine Internetverbindung her, um Crafty nutzen zu können"
+        "pleaseConnect": "Bitte stellen sie eine Internetverbindung her, um Crafty nutzen zu können."
     },
     "panelConfig": {
         "adminControls": "Administrations-Werkzeuge",
@@ -298,10 +302,12 @@
         "serversDesc": "Server, auf die Nutzer mit dieser Rolle zugreifen darf"
     },
     "serverBackups": {
+        "actions": "Aktionen",
         "after": "Befehl nach dem Backup ausführen",
         "backupAtMidnight": "Automatisches Backup um 24:00 Uhr?",
         "backupNow": "Jetzt sichern!",
         "backupTask": "Ein Backup-Auftrag wurde gestartet.",
+        "backups": "Server-Backups",
         "before": "Befehl vor dem Backup ausführen",
         "cancel": "Abbrechen",
         "clickExclude": "Auswählen, um Ausnahmen zu markieren",
@@ -310,21 +316,34 @@
         "confirmDelete": "Möchten Sie diese Backup-Datei löschen? Dies kann nicht rückgängig gemacht werden.",
         "confirmRestore": "Sicher, dass dieses Backup wiederherstellgestellt werden soll? Alle aktuellen Serverdateien werden in den Zustand von diesem Backup versetzt und können nicht wiederhergestellt werden.",
         "currentBackups": "Aktuelle Backups",
+        "default": "Standard-Backup",
+        "defaultExplain": "Das Backup, welches Crafty vor Updates verwendet. Dies kann nicht geändert oder gelöscht werden.",
         "delete": "Löschen",
         "destroyBackup": "Backup löschen \" + file_to_del + \"?",
         "download": "Herunterladen",
+        "edit": "Bearbeiten",
+        "enabled": "Aktiviert",
         "excludedBackups": "Ausgeschlossene Verzeichnisse: ",
         "excludedChoose": "Verzeichnisse auswählen, die nicht gesichert werden sollen",
         "exclusionsTitle": "Backup Ausnahmen",
+        "failed": "Fehlgeschlagen",
         "maxBackups": "Maximale Backups",
         "maxBackupsDesc": "Crafty speichert nicht mehr als N Backups, wodurch das älteste gelöscht wird (geben Sie 0 ein, um alle zu behalten)",
+        "myBackup": "Mein Neues Backup",
+        "name": "Name",
+        "newBackup": "Neues Backup erstellen",
+        "no-backup": "Keine Backups. Um eine neue Backup-Konfiguration zu erstellen, bitte auf 'Neues Backup erstellen' klicken.",
         "options": "Optionen",
         "path": "Pfad",
         "restore": "Wiederherstellen",
         "restoring": "Backup wiederherstellen. Dies kann eine Weile dauern.",
+        "run": "Backup erstellen",
         "save": "Speichern",
         "shutdown": "Server für die Dauer des Backups stoppen",
         "size": "Größe",
+        "standby": "Bereitschaft",
+        "status": "Status",
+        "storage": "Speicherort",
         "storageLocation": "Speicherort",
         "storageLocationDesc": "Wo wollen Sie die Backups speichern?"
     },
@@ -489,6 +508,7 @@
     },
     "serverSchedules": {
         "action": "Aktion",
+        "actionId": "Aktion auswählen",
         "areYouSure": "Geplante Aufgabe löschen?",
         "cancel": "Abbrechen",
         "cannotSee": "Nicht alles sichtbar?",
@@ -535,7 +555,6 @@
     "serverTerm": {
         "commandInput": "Geben Sie Ihren Befehl ein",
         "delay-explained": "Der Dienst wurde kürzlich gestartet und verzögert den Start der Minecraft-Serverinstanz",
-        "downloading": "Lädt herunter...",
         "importing": "Importieren...",
         "installing": "Installation läuft...",
         "restart": "Neustart",
@@ -567,6 +586,8 @@
         "minMem": "Minimaler RAM",
         "myNewServer": "Mein neuer Server",
         "newServer": "Neuen Server erstellen",
+        "noRole": "Keine Rolle mit aktuellem Suchparameter gefunden",
+        "noneRoles": "Keine Rollen ausgewählt",
         "quickSettings": "Schnelleinstellungen",
         "quickSettingsDescription": "Keine Sorge, Änderungen können später immer noch vorgenommen werden.",
         "resetForm": "Konfiguration zurücksetzen",
@@ -597,12 +618,12 @@
         "dashboard": "Dashboard",
         "documentation": "Dokumentation",
         "inApp": "In-App-Dokumentation",
-        "navigation": "Navigation",
         "newServer": "Neuen Server erstellen",
         "servers": "Server"
     },
     "startup": {
         "almost": "Nur noch einen Moment, fast geschafft",
+        "cache": "Aktualisieren der Big Bucket-Cache-Datei",
         "internals": "Crafty's interne Komponneten initialisieren und starten",
         "internet": "Verbindung zum Internet überprüfen",
         "server": "initialisieren ",
@@ -649,6 +670,28 @@
         "userSettings": "Benutzereinstellungen",
         "userTheme": "Design für die Benutzeroberfläche",
         "uses": "Anzahl der erlaubten Verwendungen (-1==Keine Begrenzung)"
+    },
+    "validators": {
+        "passLength": "Passwort zu kurz. Mindestlänge: 8",
+        "typeInteger": "muss eine Zahl sein.",
+        "typeList": "muss eine Liste (array) sein ",
+        "roleManager": "Rollenmanager muss vom Typ Ganzzahl (Manager ID) oder ohne Wert sein",
+        "typeIntMinVal0": "muss eine ganze Zahl und mindestens 0 sein.",
+        "backupName": "Der Name des Backups muss eine Zeichenkette mit mindestens drei Zeichen sein.",
+        "serverCreateName": "Server Name muss eine Zeichenkette mit der Mindestlänge 1 sein und darf die folgenden Zeichen nicht beinhalten: \\ / # ",
+        "userName": " muss vom Typ Zeichenkette, in kleinbuchstaben und zwischen 4 und 20 Zeichen lang sein",
+        "enumErr": "Validierung fehlgeschlagen. Erfolgreiche Prüfung der folgenden Daten: ",
+        "filesPageLen": "Länge der Eigenschaft muss größer als 1 sein",
+        "roleName": "Rollenmanager muss eine Zeichenkette Länger als 1 sein und darf folgende Symbole nicht enthalten: [], ",
+        "roleServerId": "Server ID muss eine Zeichenkette mit der Mindestlänge 1 sein",
+        "roleServerPerms": "Serverberechtigung muss eine 8 Bit Zeichenkette sein",
+        "serverLogPath": "Server log Pfad muss eine Zeichenkette mit einer Mindestlänge von 1 sein",
+        "taskIntervalType": "Aufgaben Intervall muss einer der folgenden sein: ",
+        "typeBool": "muss wahr oder falsch sein (typ boolean)",
+        "typeEmail": "muss eine Email sein.",
+        "insufficientPerms": "Berechtigungsfehler: Fehlende Berechtigungen für diese Ressource",
+        "serverExeCommand": "Server Ausführungbefehl muss eine Zeichenkette mit der Mindestlänge 1 sein.",
+        "typeString": "muss vom Typ Zeichenkette sein."
     },
     "webhooks": {
         "areYouSureDel": "Sind Sie sicher, dass Sie diesen Webhook löschen möchten?",

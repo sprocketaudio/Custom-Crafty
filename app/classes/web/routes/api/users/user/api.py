@@ -113,6 +113,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
             _,
             _superuser,
             user,
+            _,
         ) = auth_data
 
         try:
@@ -188,6 +189,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
             _,
             _,
             _user,
+            _,
         ) = auth_data
         if key_id:
             key = self.controller.users.get_user_api_key(key_id)
@@ -215,7 +217,7 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
                 )
 
             if (
-                target_key.user_id != auth_data[4]["user_id"]
+                str(target_key.user_id) != str(auth_data[4]["user_id"])
                 and not auth_data[4]["superuser"]
             ):
                 return self.finish_json(

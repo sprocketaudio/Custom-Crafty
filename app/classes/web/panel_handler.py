@@ -41,6 +41,10 @@ SUBPAGE_PERMS = {
     "webhooks": EnumPermissionsServer.CONFIG,
 }
 
+SCHEDULE_AUTH_ERROR_URL = "/panel/error?error=Unauthorized access To Schedules"
+
+HUMANIZED_INDEX_FILE = "humanized_index.json"
+
 
 class PanelHandler(BaseHandler):
     def get_user_roles(self) -> t.Dict[str, list]:
@@ -357,6 +361,7 @@ class PanelHandler(BaseHandler):
                 else None
             ),
             "superuser": superuser,
+            "themes": self.helper.get_themes(),
         }
         try:
             page_data["hosts_data"]["disk_json"] = json.loads(
@@ -677,36 +682,18 @@ class PanelHandler(BaseHandler):
                 page_data["java_versions"] = page_java
             if subpage == "backup":
                 server_info = self.controller.servers.get_server_data_by_id(server_id)
-                page_data["backup_config"] = (
-                    self.controller.management.get_backup_config(server_id)
-                )
-                exclusions = []
-                page_data["exclusions"] = (
-                    self.controller.management.get_excluded_backup_dirs(server_id)
+
+                page_data["backups"] = self.controller.management.get_backups_by_server(
+                    server_id, model=True
                 )
                 page_data["backing_up"] = (
                     self.controller.servers.get_server_instance_by_id(
                         server_id
                     ).is_backingup
                 )
-                page_data["backup_stats"] = (
-                    self.controller.servers.get_server_instance_by_id(
-                        server_id
-                    ).send_backup_status()
-                )
                 # makes it so relative path is the only thing shown
-                for file in page_data["exclusions"]:
-                    if Helpers.is_os_windows():
-                        exclusions.append(file.replace(server_info["path"] + "\\", ""))
-                    else:
-                        exclusions.append(file.replace(server_info["path"] + "/", ""))
-                page_data["exclusions"] = exclusions
+
                 self.controller.servers.refresh_server_settings(server_id)
-                try:
-                    page_data["backup_list"] = server.list_backups()
-                except:
-                    page_data["backup_list"] = []
-                page_data["backup_path"] = Helpers.wtol_path(server_info["backup_path"])
 
             if subpage == "metrics":
                 try:
@@ -782,20 +769,23 @@ class PanelHandler(BaseHandler):
 
         elif page == "download_backup":
             file = self.get_argument("file", "")
+            backup_id = self.get_argument("backup_id", "")
 
             server_id = self.check_server_id()
             if server_id is None:
                 return
-
+            backup_config = self.controller.management.get_backup_config(backup_id)
             server_info = self.controller.servers.get_server_data_by_id(server_id)
+            backup_location = os.path.join(backup_config["backup_location"], backup_id)
             backup_file = os.path.abspath(
                 os.path.join(
-                    Helpers.get_os_understandable_path(server_info["backup_path"]), file
+                    Helpers.get_os_understandable_path(backup_location),
+                    file,
                 )
             )
             if not self.helper.is_subdir(
                 backup_file,
-                Helpers.get_os_understandable_path(server_info["backup_path"]),
+                Helpers.get_os_understandable_path(backup_location),
             ) or not os.path.isfile(backup_file):
                 self.redirect("/panel/error?error=Invalid path detected")
                 return
@@ -894,6 +884,8 @@ class PanelHandler(BaseHandler):
                         os.path.join(self.helper.root_dir, "app", "translations")
                     )
                 ):
+                    if file == HUMANIZED_INDEX_FILE:
+                        continue
                     if file.endswith(".json"):
                         if file.split(".")[0] not in self.helper.get_setting(
                             "disabled_language_files"
@@ -990,6 +982,8 @@ class PanelHandler(BaseHandler):
             for file in sorted(
                 os.listdir(os.path.join(self.helper.root_dir, "app", "translations"))
             ):
+                if file == HUMANIZED_INDEX_FILE:
+                    continue
                 if file.endswith(".json"):
                     if file.split(".")[0] not in self.helper.get_setting(
                         "disabled_language_files"
@@ -1132,6 +1126,9 @@ class PanelHandler(BaseHandler):
             page_data["server_data"] = self.controller.servers.get_server_data_by_id(
                 server_id
             )
+            page_data["backups"] = self.controller.management.get_backups_by_server(
+                server_id, True
+            )
             page_data["server_stats"] = self.controller.servers.get_server_stats_by_id(
                 server_id
             )
@@ -1152,6 +1149,7 @@ class PanelHandler(BaseHandler):
             page_data["schedule"]["delay"] = 0
             page_data["schedule"]["time"] = ""
             page_data["schedule"]["interval"] = 1
+            page_data["schedule"]["action_id"] = ""
             # we don't need to check difficulty here.
             # We'll just default to basic for new schedules
             page_data["schedule"]["difficulty"] = "basic"
@@ -1160,7 +1158,7 @@ class PanelHandler(BaseHandler):
 
             if not EnumPermissionsServer.SCHEDULE in page_data["user_permissions"]:
                 if not superuser:
-                    self.redirect("/panel/error?error=Unauthorized access To Schedules")
+                    self.redirect(SCHEDULE_AUTH_ERROR_URL)
                     return
 
             template = "panel/server_schedule_edit.html"
@@ -1197,6 +1195,9 @@ class PanelHandler(BaseHandler):
                     exec_user["user_id"], server_id
                 )
             )
+            page_data["backups"] = self.controller.management.get_backups_by_server(
+                server_id, True
+            )
             page_data["server_data"] = self.controller.servers.get_server_data_by_id(
                 server_id
             )
@@ -1211,6 +1212,7 @@ class PanelHandler(BaseHandler):
             page_data["schedule"]["server_id"] = server_id
             page_data["schedule"]["schedule_id"] = schedule.schedule_id
             page_data["schedule"]["action"] = schedule.action
+            page_data["schedule"]["action_id"] = schedule.action_id
             if schedule.name:
                 page_data["schedule"]["name"] = schedule.name
             else:
@@ -1254,10 +1256,140 @@ class PanelHandler(BaseHandler):
 
             if not EnumPermissionsServer.SCHEDULE in page_data["user_permissions"]:
                 if not superuser:
-                    self.redirect("/panel/error?error=Unauthorized access To Schedules")
+                    self.redirect(SCHEDULE_AUTH_ERROR_URL)
                     return
 
             template = "panel/server_schedule_edit.html"
+
+        elif page == "edit_backup":
+            server_id = self.get_argument("id", None)
+            backup_id = self.get_argument("backup_id", None)
+            page_data["active_link"] = "backups"
+            page_data["permissions"] = {
+                "Commands": EnumPermissionsServer.COMMANDS,
+                "Terminal": EnumPermissionsServer.TERMINAL,
+                "Logs": EnumPermissionsServer.LOGS,
+                "Schedule": EnumPermissionsServer.SCHEDULE,
+                "Backup": EnumPermissionsServer.BACKUP,
+                "Files": EnumPermissionsServer.FILES,
+                "Config": EnumPermissionsServer.CONFIG,
+                "Players": EnumPermissionsServer.PLAYERS,
+            }
+            if not self.failed_server:
+                server_obj = self.controller.servers.get_server_instance_by_id(
+                    server_id
+                )
+                page_data["backup_failed"] = server_obj.last_backup_status()
+            page_data["user_permissions"] = (
+                self.controller.server_perms.get_user_id_permissions_list(
+                    exec_user["user_id"], server_id
+                )
+            )
+            server_info = self.controller.servers.get_server_data_by_id(server_id)
+            page_data["backup_config"] = self.controller.management.get_backup_config(
+                backup_id
+            )
+            page_data["backups"] = self.controller.management.get_backups_by_server(
+                server_id, model=True
+            )
+            exclusions = []
+            page_data["backing_up"] = self.controller.servers.get_server_instance_by_id(
+                server_id
+            ).is_backingup
+            self.controller.servers.refresh_server_settings(server_id)
+            try:
+                page_data["backup_list"] = server.list_backups(
+                    page_data["backup_config"]
+                )
+            except:
+                page_data["backup_list"] = []
+            page_data["backup_path"] = Helpers.wtol_path(
+                page_data["backup_config"]["backup_location"]
+            )
+            page_data["server_data"] = self.controller.servers.get_server_data_by_id(
+                server_id
+            )
+            page_data["server_stats"] = self.controller.servers.get_server_stats_by_id(
+                server_id
+            )
+            page_data["server_stats"]["server_type"] = (
+                self.controller.servers.get_server_type_by_id(server_id)
+            )
+            page_data["exclusions"] = (
+                self.controller.management.get_excluded_backup_dirs(backup_id)
+            )
+            # Make exclusion paths relative for page
+            for file in page_data["exclusions"]:
+                if Helpers.is_os_windows():
+                    exclusions.append(file.replace(server_info["path"] + "\\", ""))
+                else:
+                    exclusions.append(file.replace(server_info["path"] + "/", ""))
+            page_data["exclusions"] = exclusions
+
+            if EnumPermissionsServer.BACKUP not in page_data["user_permissions"]:
+                if not superuser:
+                    self.redirect(SCHEDULE_AUTH_ERROR_URL)
+                    return
+            template = "panel/server_backup_edit.html"
+
+        elif page == "add_backup":
+            server_id = self.get_argument("id", None)
+            backup_id = self.get_argument("backup_id", None)
+            page_data["active_link"] = "backups"
+            page_data["permissions"] = {
+                "Commands": EnumPermissionsServer.COMMANDS,
+                "Terminal": EnumPermissionsServer.TERMINAL,
+                "Logs": EnumPermissionsServer.LOGS,
+                "Schedule": EnumPermissionsServer.SCHEDULE,
+                "Backup": EnumPermissionsServer.BACKUP,
+                "Files": EnumPermissionsServer.FILES,
+                "Config": EnumPermissionsServer.CONFIG,
+                "Players": EnumPermissionsServer.PLAYERS,
+            }
+            if not self.failed_server:
+                server_obj = self.controller.servers.get_server_instance_by_id(
+                    server_id
+                )
+                page_data["backup_failed"] = server_obj.last_backup_status()
+            page_data["user_permissions"] = (
+                self.controller.server_perms.get_user_id_permissions_list(
+                    exec_user["user_id"], server_id
+                )
+            )
+            server_info = self.controller.servers.get_server_data_by_id(server_id)
+            page_data["backup_config"] = {
+                "excluded_dirs": [],
+                "max_backups": 0,
+                "server_id": server_id,
+                "backup_location": os.path.join(self.helper.backup_path, server_id),
+                "compress": False,
+                "shutdown": False,
+                "before": "",
+                "after": "",
+            }
+            page_data["backing_up"] = False
+            self.controller.servers.refresh_server_settings(server_id)
+
+            page_data["backup_list"] = []
+            page_data["backup_path"] = Helpers.wtol_path(
+                page_data["backup_config"]["backup_location"]
+            )
+            page_data["server_data"] = self.controller.servers.get_server_data_by_id(
+                server_id
+            )
+            page_data["server_stats"] = self.controller.servers.get_server_stats_by_id(
+                server_id
+            )
+            page_data["server_stats"]["server_type"] = (
+                self.controller.servers.get_server_type_by_id(server_id)
+            )
+            page_data["exclusions"] = []
+
+            if EnumPermissionsServer.BACKUP not in page_data["user_permissions"]:
+                if not superuser:
+                    self.redirect(SCHEDULE_AUTH_ERROR_URL)
+                    return
+            template = "panel/server_backup_edit.html"
 
         elif page == "edit_user":
             user_id = self.get_argument("id", None)
@@ -1309,6 +1441,8 @@ class PanelHandler(BaseHandler):
             for file in sorted(
                 os.listdir(os.path.join(self.helper.root_dir, "app", "translations"))
             ):
+                if file == HUMANIZED_INDEX_FILE:
+                    continue
                 if file.endswith(".json"):
                     if file.split(".")[0] not in self.helper.get_setting(
                         "disabled_language_files"

@@ -29,7 +29,6 @@
         "permName": "Název oprávnění",
         "perms": "Oprávnění",
         "server": "Server: ",
-        "superUser": "Super uživatel",
         "yes": "Ano"
     },
     "base": {
@@ -117,7 +116,6 @@
         "welcome": "Vítejte v Crafty Controlleru"
     },
     "datatables": {
-        "loadingRecords": "Načítání...",
         "i18n": {
             "aria": {
                 "sortAscending": ": aktivace řazení sloupce vzestupně",
@@ -131,9 +129,6 @@
                 "copyKeys": "Stisknutím kláves Ctrl nebo u2318 + C zkopírujete data tabulky do systémové schránky.<br><br>Chcete-li tuto zprávu zrušit, klikněte na ni nebo stiskněte klávesu ESC.",
                 "copySuccess": {
                     "1": "Zkopírován 1 řádek do schránky",
-                    "2": "Zkopírovány 2 řádky do schránky",
-                    "3": "Zkopírovány 3 řádky do schránky",
-                    "4": "Zkopírovány 4 řádky do schránky",
                     "_": "Zkopírováno %d řádků do schránky"
                 },
                 "copyTitle": "Zkopírovat do schránky",
@@ -142,20 +137,17 @@
                 "pageLength": {
                     "-1": "Zobrazit všechny řádky",
                     "1": "Zobrazit 1 řádek",
-                    "2": "Zobrazit 2 řádky",
-                    "3": "Zobrazit 3 řádky",
-                    "4": "Zobrazit 4 řádky",
                     "_": "Zobrazit %d řádků"
                 },
                 "pdf": "PDF",
                 "print": "Tisk"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "V tabulce nejsou k dispozici žádné údaje",
             "info": "Zobrazeno _START_ až _END_ z _TOTAL_ záznamů",
             "infoEmpty": "Zobrazeno 0 až 0 z 0 záznamů",
             "infoFiltered": "(filtrováno z _MAX_ celkových záznamů)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Zobrazit položky _MENU_",
             "loadingRecords": "Načítání...",
             "paginate": {
@@ -170,35 +162,29 @@
                 "cells": {
                     "0": "Kliknutím na buňku ji vyberete",
                     "1": "Vybraná %d buňka",
-                    "2": "Vybrané %d buňky",
-                    "3": "Vybrané %d buňky",
-                    "4": "Vybrané %d buňky",
                     "_": "Vybráno %d buněk"
                 },
                 "columns": {
                     "0": "Kliknutím na sloupec jej vyberete",
                     "1": "Vybraný %d sloupec",
-                    "2": "Vybrané %d sloupce",
-                    "3": "Vybrané %d sloupce",
-                    "4": "Vybrané %d sloupce",
                     "_": "Vybráno %d sloupců"
                 },
                 "rows": {
                     "0": "Kliknutím na řádek jej vyberete",
                     "1": "Vybraný %d řádek",
-                    "2": "Vybrané %d řádky",
-                    "3": "Vybrané %d řádky",
-                    "4": "Vybrané %d řádky",
                     "_": "Vybráno %d řádků"
                 }
             },
             "thousands": " ",
             "zeroRecords": "Nebyly nalezeny žádné odpovídající záznamy"
-        }
+        },
+        "loadingRecords": "Načítání..."
     },
     "error": {
         "agree": "Souhlasím",
         "bedrockError": "Stažení Bedrocku není dostupné. Prosím zkontrolujte",
+        "bigBucket1": "Big Bucket Kontrola stavu selhala. Prosím zkontrolujte jej",
+        "bigBucket2": "pro nejnovější informace.",
         "cancel": "Zrušit",
         "contact": "Kontaktujte podporu Crafty přes Discord",
         "craftyStatus": "Crafty stav systémů",
@@ -221,8 +207,7 @@
         "portReminder": "Zjistili jsme, že server {} byl spuštěn poprvé. Ujistěte se, že jste přesměrovali port {} přes váš směrovač/firewall, aby byl tento port vzdáleně přístupný z internetu.",
         "privMsg": "a ",
         "return": "vrátit se na hlavní stránku",
-        "serverJars1": "Server JAR api je nepřístupná. Prosím zkontrolujte",
-        "serverJars2": "pro aktualní informace.",
+        "selfHost": "Pokud Hostujete sami toto uložiště prosím zkontrolujte adresu nebo si přečtěte náš průvodce odstraňováním problémů.",
         "start-error": "Server {} se nepodařilo spustit s kódem chyby: {}",
         "superError": "Pro dokončení této akce musíte být super uživatel.",
         "terribleFailure": "Jaké strašné selhání!"
@@ -250,7 +235,8 @@
         "finishedPreparing": "Dokončili jsme přípravu protokolů podpory. Klikněte na tlačítko Stáhnout pro stažení",
         "logout": "Odhlásit se",
         "preparingLogs": " Počkejte prosím, než připravíme vaše protokoly... Až budou připraveny, pošleme vám oznámení. U rozsáhlých zavádění to může chvíli trvat.",
-        "supportLogs": "Protokoly podpory"
+        "supportLogs": "Protokoly podpory",
+        "backup_desc": ""
     },
     "offline": {
         "offline": "Offline",
@@ -261,7 +247,6 @@
         "allowedServers": "Povolené servery",
         "apply": "Použít",
         "assignedRoles": "Přidělené role",
-        "backgroundUpload": "Nahrání pozadí",
         "cancel": "Zrušit",
         "clearComms": "Vymazat nevykonané příkazy",
         "custom": "Upravit Crafty",
@@ -272,20 +257,16 @@
         "globalExplain": "Kde má Crafty ukládat všechny soubory serverů. (Cestu doplníme o /server/[uuid serveru])",
         "globalServer": "Globalní cesta k serverům",
         "json": "Config.json",
-        "loginBackground": "Přihlašovací obrázek na pozadí",
-        "loginImage": "Nahrajte obrázek na pozadí přihlašovací obrazovky.",
         "match": "Hesla musí být stejná",
         "newRole": "Přidat novou roli",
         "newUser": "Přidat nového uživatele",
         "noMounts": "Ukazatel zaplněnosti disků na hlavní stránce",
         "pageTitle": "Nastavení panelu",
-        "preview": "Náhled",
         "role": "Role",
         "roleUsers": "Uživatelé s rolí",
         "roles": "Role",
         "save": "Uložit",
         "select": "Vyberte",
-        "selectImage": "Vyberte obrázek",
         "superConfirm": "Postupujte pouze v případě, že chcete, aby měl tento uživatel přístup ke VŠEM (ke všem uživatelským účtům, serverům, nastavení panelu atd.). Může vám dokonce odebrat práva superuživatele.",
         "superConfirmTitle": "Povolit superuživatele? Jste si jisti?",
         "title": "Crafty Konfigurace",
@@ -318,10 +299,12 @@
         "serversDesc": "servery, ke kterým má tato role přístup"
     },
     "serverBackups": {
+        "actions": "Akce",
         "after": "Spustit příkaz po záloze",
         "backupAtMidnight": "Automatické zálohování o půlnoci?",
         "backupNow": "Zálohovat nyní!",
         "backupTask": "Bylo spuštěno zálohování.",
+        "backups": "Zálohy serverů",
         "before": "Spustit příkaz před zálohou",
         "cancel": "Zrušit",
         "clickExclude": "Kliknutím vyberete výjimku",
@@ -330,21 +313,34 @@
         "confirmDelete": "Chcete tuto zálohu odstranit? Tuto akci nelze vrátit zpět.",
         "confirmRestore": "Jste si jisti, že chcete provést obnovu z této zálohy. Všechny aktuální soubory serveru se změní na stav zálohy a nebude možné je obnovit.",
         "currentBackups": "Aktuální zálohy",
+        "default": "Defaultní záloha",
+        "defaultExplain": "Tuto zálohu Crafty používalo před aktualizací. Nemůžete ji změnit nebo smazat",
         "delete": "Smazat",
         "destroyBackup": "Zničit zálohu \" + file_to_del + \"?",
         "download": "Stáhnout",
+        "edit": "upravit",
+        "enabled": "Povoleno",
         "excludedBackups": "Vyloučené cesty: ",
         "excludedChoose": "Vyberte cesty, které chcete ze zálohování vyloučit.",
         "exclusionsTitle": "Vyloučení ze zálohování",
+        "failed": "Selhalo",
         "maxBackups": "Maximální počet záloh",
         "maxBackupsDesc": "Crafty neuloží více než N záloh a odstraní nejstarší (zadejte 0 pro zachování všech).",
+        "myBackup": "Moje nová záloha",
+        "name": "Jméno",
+        "newBackup": "Vytvořit novou zálohu",
+        "no-backup": "Žádné zálohy. Pro vytvoření nové zálohy zmáčkněte prosím. Vytvořit novou zálohu",
         "options": "Nastavení",
         "path": "Cesta",
         "restore": "Obnovit",
         "restoring": "Obnovení zálohy. To může chvíli trvat. Buďte prosím trpěliví.",
+        "run": "Nastartovat zálohu",
         "save": "Uložit",
         "shutdown": "Vypnout server po dobu zálohování",
         "size": "Velikost",
+        "standby": "V pohotovosti",
+        "status": "Stav",
+        "storage": "Lokace uložiště",
         "storageLocation": "Umístění úložiště",
         "storageLocationDesc": "Kam chcete ukládat zálohy?"
     },
@@ -509,6 +505,7 @@
     },
     "serverSchedules": {
         "action": "Akce",
+        "actionId": "Vyberte zálohu na které se to má potvrdit!",
         "areYouSure": "Odstranění naplánované úlohy?",
         "cancel": "Zrušit",
         "cannotSee": "Nevidíte všechno?",
@@ -586,6 +583,8 @@
         "minMem": "Minimální paměť",
         "myNewServer": "Nový server",
         "newServer": "Vytvořit nový server",
+        "noRole": "Žádna role nebyla nalezena z tím to vstupem",
+        "noneRoles": "Žádne role vybrány",
         "quickSettings": "Rychlé nastavení",
         "quickSettingsDescription": "Nebojte se, můžete je změnit později.",
         "resetForm": "Obnovit nastavení formuláře",
@@ -616,12 +615,12 @@
         "dashboard": "Ovládací panel",
         "documentation": "Dokumentace",
         "inApp": "V lokalní dokumentaci",
-        "navigation": "Navigace",
         "newServer": "Vytvořit nový server",
         "servers": "Servery"
     },
     "startup": {
         "almost": "Dokončuji. Držte se...",
+        "cache": "Znovu načítam mezipaměť Big Bucket",
         "internals": "Nastavuji a startuji Crafty interní komponenty",
         "internet": "Kontroluju připojení k internetu",
         "server": "Konfigurace ",
@@ -668,6 +667,9 @@
         "userSettings": "Nastavení uživatele",
         "userTheme": "Motiv UI",
         "uses": "Počet povolených použití (-1==bez omezení)"
+    },
+    "validators": {
+        "passLength": "Heslo je příliš krátké. Minimální délka je 8 znaků"
     },
     "webhooks": {
         "areYouSureDel": "Seš si jistý že chceš smazat tento webhook?",

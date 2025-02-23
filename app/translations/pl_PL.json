@@ -29,7 +29,6 @@
         "permName": "Nazwa permisji",
         "perms": "Permisje",
         "server": "Serwer: ",
-        "superUser": "Super użytkownik",
         "yes": "Tak"
     },
     "base": {
@@ -117,7 +116,6 @@
         "welcome": "Witamy w Crafty Controller"
     },
     "datatables": {
-        "loadingRecords": "Wczytywanie...",
         "i18n": {
             "aria": {
                 "sortAscending": ": aktywuj, aby sortować kolumny w góre",
@@ -144,12 +142,12 @@
                 "pdf": "PDF",
                 "print": "Wydrukuj"
             },
-            "decimal": "",
+            "decimal": ".",
             "emptyTable": "Brak danych w tej tabeli danych",
             "info": "Pokazywanie od _START_ do _END_ z _TOTAL_ wszystkich wejść",
             "infoEmpty": "Pokazywanie 0 do 0 z 0 wejść",
             "infoFiltered": "(Pokazuje z _MAX_ wejść)",
-            "infoPostFix": "",
+            "infoPostFix": "|",
             "lengthMenu": "Pokazuj _MENU_ wejść",
             "loadingRecords": "Wczytywanie...",
             "paginate": {
@@ -179,11 +177,14 @@
             },
             "thousands": ",",
             "zeroRecords": "Nie znaleziono pasujacego wyniku"
-        }
+        },
+        "loadingRecords": "Wczytywanie..."
     },
     "error": {
         "agree": "Zgadzam się",
         "bedrockError": "Pobieranie serwera bedrock jest teraz niedostępne. Proszę sprawdź",
+        "bigBucket1": "Odświeżanie Big Bucket nie powiodło się. Sprawdź",
+        "bigBucket2": "dla najnowszych informacji.",
         "cancel": "Anuluj",
         "contact": "Podrzebujesz pomocy? Zapraszamy na serwer discord Crafty Controler",
         "craftyStatus": "Status strony Craftyiego",
@@ -206,8 +207,7 @@
         "portReminder": "Zauważyliśmy że to jest pierwszy raz {} kiedy był włączony. Upewnij się że otworzyłeś port {} na swoim routerze/firewallu aby korzystać z tego poza domem.",
         "privMsg": "i także ",
         "return": "Powrót do panelu",
-        "serverJars1": "API Server Jars jest niedostępne. Proszę sprawdź",
-        "serverJars2": "dla najnowzsych informacji.",
+        "selfHost": "Jeśli zarządasz tą repozytorią upewnij się że adres hest poprawny, w innym przypadku odwiedź strone rozwiązywania problemów.",
         "start-error": "Serwer {} nie mógł się odpalić z powodu: {}",
         "superError": "Potrzebujesz uprawnienie Adminitsratora aby zakończyć tę akcję.",
         "terribleFailure": "Okropny błąd!"
@@ -298,10 +298,12 @@
         "serversDesc": "Serwery które mają tą role mają dostęp"
     },
     "serverBackups": {
+        "actions": "Akcje",
         "after": "Wykonaj tę komendę po backupie",
         "backupAtMidnight": "Auto-backup o północy?",
         "backupNow": "Backup Teraz!",
         "backupTask": "Backup został rozpoczęty.",
+        "backups": "Kopie zapasowe serwera",
         "before": "Wykonaj tę komendę przed backupem",
         "cancel": "Anuluj",
         "clickExclude": "Kliknij aby zaznaczyć wyjątki",
@@ -310,21 +312,34 @@
         "confirmDelete": "Czy chcesz usunąć ten backup? Nie można tego cofnąć.",
         "confirmRestore": "Czy jesteś pewien że chcesz przywrócić z tego backupu. Wszystkie pliki powrócą do stanu z backupu.",
         "currentBackups": "Backupy Teraz",
+        "default": "Podstawowa kopia zapasowa",
+        "defaultExplain": "Kopia zapasowa przed jakimikolwiek zmianami. Nie można jej usunąć ani edytować.",
         "delete": "Usuń",
         "destroyBackup": "Zniszcz Backup \" + file_to_del + \"?",
         "download": "Pobierz",
+        "edit": "Edytuj",
+        "enabled": "Włączony",
         "excludedBackups": "Wykluczone ścieżki: ",
         "excludedChoose": "Wybierz ścieżki do wykluczenia z backupu",
         "exclusionsTitle": "Wykluczenia backupu",
+        "failed": "Nieudany!",
         "maxBackups": "Maks. Backupów",
         "maxBackupsDesc": "Crafty nie będzie zbierał więcej niż X backupów, zacznie usuwać od nadstarszych (wpisz 0, aby zatrzymać nieskończoną ilość)",
+        "myBackup": "Nowa kopia zapasowa",
+        "name": "Nazwa",
+        "newBackup": "Nowa kopia zapasowa",
+        "no-backup": "Brak kopii zapasowych. Aby skonfigurować kopię zapasową kliknij na",
         "options": "Opcje",
         "path": "Nazwa pliku",
         "restore": "Przywróć",
         "restoring": "Przywracanie backupu. To trochę zajmie. Bądź cierpliwy.",
+        "run": "Wykonaj kopię zapasową",
         "save": "Zapisz",
         "shutdown": "Wyłącz serwer na czas backupu",
         "size": "Rozmiar",
+        "standby": "Gotowy",
+        "status": "Status",
+        "storage": "Lokalizacja kopii zapasowych",
         "storageLocation": "Ścieżka zapisywania",
         "storageLocationDesc": "Gdzie chcesz trzymać backupy?"
     },
@@ -489,6 +504,7 @@
     },
     "serverSchedules": {
         "action": "Akcja",
+        "actionId": "Zaznacz zadanie podwładne",
         "areYouSure": "Usuń zaplanowane (zadanie)?",
         "cancel": "Anuluj",
         "cannotSee": "Nie widzisz wszystkiego?",
@@ -566,6 +582,8 @@
         "minMem": "Min. RAMu",
         "myNewServer": "Mój nowy serwer",
         "newServer": "Stwórz nowy serwer",
+        "noRole": "Nie znaleziono roli z tym wyszukiwaniem",
+        "noneRoles": "Nie zaznaczono żadnej roli",
         "quickSettings": "Szybkie ustawienia",
         "quickSettingsDescription": "Nie martw się, możesz te ustawienia zmienić później",
         "resetForm": "Resetuj formę",
@@ -596,12 +614,12 @@
         "dashboard": "Panel",
         "documentation": "Dokumentacja",
         "inApp": "Dokumentacja w Aplikacji",
-        "navigation": "Nawigacja",
         "newServer": "Stwórz nowy serwer",
         "servers": "Serwery"
     },
     "startup": {
         "almost": "Prawie gotowe! Jeszcze tylko chwilka...",
+        "cache": "Odświeżanie pamięci podręcznej Big Bucket",
         "internals": "Konfigurowanie i włączanie backendu...",
         "internet": "Sprawdzam połączenie z internetem",
         "server": "Włączanie ",
@@ -648,6 +666,9 @@
         "userSettings": "Ustawienia użytkownika",
         "userTheme": "Wygląd interfejsu",
         "uses": "Ilość użyć (-1==Bez limitu)"
+    },
+    "validators": {
+        "passLength": "Hasło jest zbyt krótkie. Hasło musi posiadać minimum 8 znaków."
     },
     "webhooks": {
         "areYouSureDel": "Usunąć ten webhook?",

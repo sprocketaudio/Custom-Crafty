@@ -56,8 +56,8 @@ get_keys "${DIR}/en_EN.json" | sort > "${ref_keys}"
 
 # Iterate over each .json file in the directory
 for file in "${DIR}"/*.json; do
-    # Check if file is a regular file and not en_EN.json, and does not contain "_incomplete" in its name
-    if [[ -f "${file}" && "${file}" != "${DIR}/en_EN.json" && ! "${file}" =~ _incomplete ]]; then
+    # Check if file is a regular file and not en_EN.json, humanized index and does not contain "_incomplete" in its name
+    if [[ -f "${file}" && "${file}" != "${DIR}/en_EN.json" && "${file}" != "${DIR}/humanized_index.json" && ! "${file}" =~ _incomplete ]]; then
 
         # Get keys and subkeys from the current file
         current_keys=$(mktemp)

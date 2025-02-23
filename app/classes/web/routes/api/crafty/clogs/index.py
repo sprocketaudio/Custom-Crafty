@@ -14,10 +14,20 @@ class ApiCraftyLogIndexHandler(BaseApiHandler):
             _,
             superuser,
             _,
+            _,
         ) = auth_data
 
         if not superuser:
-            return self.finish_json(400, {"status": "error", "error": "NOT_AUTHORIZED"})
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
 
         log_types = ["audit", "session", "schedule"]
         if log_type not in log_types:
