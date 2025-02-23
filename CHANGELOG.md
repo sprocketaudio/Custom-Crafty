@@ -1,5 +1,8 @@
 # Changelog
-## --- [4.4.8] - 2024/TBD
+## --- [4.4.8] - 2025/TBD
+
+### Refactor
+- Refactor backups for efficiency and in-place backup restores ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/815))
 ### New features
 TBD
 ### Bug fixes
@@ -11,19 +14,19 @@ TBD
 <br><br>
 
 
-## --- [4.4.7] - 2024/01/20
+## --- [4.4.7] - 2025/01/20
 ### Bug fixes
 - Docker Repair | Remove ubuntu user to replace with crafty user ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/826)) Resolves #521
 <br><br>
 
-## --- [4.4.6] - 2024/01/20
+## --- [4.4.6] - 2025/01/20
 ## NOTE Version effected by non-root docker issue if you installed from this version see [RCA document](https://gitlab.com/crafty-controller/crafty-4/-/issues/521#:~:text=Users%20deploying%20after%204.4.4)
 
 ### Bug fixes
 - Fix traceback on stats page for data missing data.get ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/824))
 <br><br>
 
-## --- [4.4.5] - 2024/01/19
+## --- [4.4.5] - 2025/01/19
 ## NOTE Version effected by non-root docker issue if you installed from this version see [RCA document](https://gitlab.com/crafty-controller/crafty-4/-/issues/521#:~:text=Users%20deploying%20after%204.4.4)
 
 ### Refactor

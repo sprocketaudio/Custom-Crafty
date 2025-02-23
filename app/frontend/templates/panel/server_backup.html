@@ -46,9 +46,13 @@
                   <h4 class="card-title"><i class="fa-regular fa-bell"></i> {{ translate('serverBackups', 'backups',
                     data['lang']) }} </h4>
                   {% if data['user_data']['hints'] %}
-                  <span class="too_small" title="{{ translate('serverSchedules', 'cannotSee', data['lang']) }}" , data-content="{{ translate('serverSchedules', 'cannotSeeOnMobile', data['lang']) }}" , data-placement="bottom"></span>
+                  <span class="too_small" title="{{ translate('serverSchedules', 'cannotSee', data['lang']) }}" ,
+                    data-content="{{ translate('serverSchedules', 'cannotSeeOnMobile', data['lang']) }}" ,
+                    data-placement="bottom"></span>
                   {% end %}
-                  <div><a class="btn btn-info" href="/panel/add_backup?id={{ data['server_stats']['server_id']['server_id'] }}"><i class="fas fa-plus-circle"></i> {{ translate('serverBackups', 'newBackup', data['lang']) }}</a>
+                  <div><a class="btn btn-info"
+                      href="/panel/add_backup?id={{ data['server_stats']['server_id']['server_id'] }}"><i
+                        class="fas fa-plus-circle"></i> {{ translate('serverBackups', 'newBackup', data['lang']) }}</a>
                   </div>
                 </div>
                 <div class="card-body">
@@ -59,7 +63,8 @@
                   {% end %}
                   {% if len(data['backups']) > 0 %}
                   <div class="d-none d-lg-block">
-                    <table class="table table-hover responsive-table" aria-label="backups list" id="backup_table" style="table-layout:fixed;">
+                    <table class="table table-hover responsive-table" aria-label="backups list" id="backup_table"
+                      style="table-layout:fixed;">
                       <thead>
                         <tr class="rounded">
                           <th scope="col" style="width: 15%; min-width: 10px;">{{ translate('serverBackups', 'name',
@@ -82,12 +87,16 @@
                             <br>
                             {% if backup.default %}
                             <span class="badge-pill badge-outline-warning">{{ translate('serverBackups', 'default',
-                              data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain" data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i class="fa-solid fa-question"></i></button></small>
+                              data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain"
+                                data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i
+                                  class="fa-solid fa-question"></i></button></small>
                             {% end %}
                           </td>
                           <td>
                             <div id="{{backup.backup_id}}_status">
-                              <button class="btn btn-outline-success backup-status" data-status="{{ backup.status }}" data-Standby="{{ translate('serverBackups', 'standby', data['lang'])}}" data-Failed="{{ translate('serverBackups', 'failed', data['lang'])}}"></button>
+                              <button class="btn btn-outline-success backup-status" data-status="{{ backup.status }}"
+                                data-Standby="{{ translate('serverBackups', 'standby', data['lang'])}}"
+                                data-Failed="{{ translate('serverBackups', 'failed', data['lang'])}}"></button>
                             </div>
                           </td>
                           <td id="{{backup.backup_location}}" class="type">
@@ -97,15 +106,20 @@
                             <p>{{backup.max_backups}}</p>
                           </td>
                           <td id="backup_edit" class="action">
-                            <button onclick="window.location.href=`/panel/edit_backup?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.backup_id}}`" class="btn btn-info">
+                            <button
+                              onclick="window.location.href=`/panel/edit_backup?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.backup_id}}`"
+                              class="btn btn-info">
                               <i class="fas fa-pencil-alt"></i>
                             </button>
                             {% if not backup.default %}
-                            <button data-backup={{ backup.backup_id }} class="btn btn-danger del_button">
+                            <button data-backup={{ backup.backup_id }} data-backupname={{ backup.backup_name }}
+                              class="btn btn-danger del_button">
                               <i class="fas fa-trash" aria-hidden="true"></i>
                             </button>
                             {% end %}
-                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip" title="{{ translate('serverBackups', 'run', data['lang']) }}" class="btn btn-outline-warning run-backup backup_now_button">
+                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip"
+                              title="{{ translate('serverBackups', 'run', data['lang']) }}"
+                              class="btn btn-outline-warning run-backup backup_now_button">
                               <i class="fa-solid fa-forward"></i>
                             </button>
                           </td>
@@ -115,7 +129,8 @@
                     </table>
                   </div>
                   <div class="d-block d-lg-none">
-                    <table aria-label="backups list" class="table table-hover responsive-table" id="backup_table_mini" style="table-layout:fixed;">
+                    <table aria-label="backups list" class="table table-hover responsive-table" id="backup_table_mini"
+                      style="table-layout:fixed;">
                       <thead>
                         <tr class="rounded">
                           <th style="width: 40%; min-width: 10px;">Name
@@ -131,24 +146,33 @@
                             <p>{{backup.backup_name}}</p>
                             <br>
                             <div id="{{backup.backup_id}}_status">
-                              <button class="btn btn-outline-success backup-status" data-status="{{ backup.status }}" data-Standby="{{ translate('serverBackups', 'standby', data['lang'])}}" data-Failed="{{ translate('serverBackups', 'failed', data['lang'])}}"></button>
+                              <button class="btn btn-outline-success backup-status" data-status="{{ backup.status }}"
+                                data-Standby="{{ translate('serverBackups', 'standby', data['lang'])}}"
+                                data-Failed="{{ translate('serverBackups', 'failed', data['lang'])}}"></button>
                             </div>
                             <br>
                             {% if backup.default %}
                             <span class="badge-pill badge-outline-warning">{{ translate('serverBackups', 'default',
-                              data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain" data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i class="fa-solid fa-question"></i></button></small>
+                              data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain"
+                                data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i
+                                  class="fa-solid fa-question"></i></button></small>
                             {% end %}
                           </td>
                           <td id="backup_edit" class="action">
-                            <button onclick="window.location.href=`/panel/edit_backup?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.backup_id}}`" class="btn btn-info">
+                            <button
+                              onclick="window.location.href=`/panel/edit_backup?id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{backup.backup_id}}`"
+                              class="btn btn-info">
                               <i class="fas fa-pencil-alt"></i>
                             </button>
                             {% if not backup.default %}
-                            <button data-backup={{ backup.backup_id }} class="btn btn-danger del_button">
+                            <button data-backup={{ backup.backup_id }} data-backupname={{ backup.backup_name }}
+                              class="btn btn-danger del_button">
                               <i class="fas fa-trash" aria-hidden="true"></i>
                             </button>
                             {% end %}
-                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip" title="{{ translate('serverBackups', 'run', data['lang']) }}" class="btn btn-outline-warning test-socket backup_now_button">
+                            <button data-backup={{ backup.backup_id }} data-toggle="tooltip"
+                              title="{{ translate('serverBackups', 'run', data['lang']) }}"
+                              class="btn btn-outline-warning test-socket backup_now_button">
                               <i class="fa-solid fa-forward"></i>
                             </button>
                           </td>
@@ -299,10 +323,9 @@
     });
 
     $(".del_button").click(function () {
+      var file_to_del = $(this).data("backupname");
+      console.log(file_to_del)
       let backup = $(this).data('backup');
-      var file_to_del = $(this).data("file");
-      var backup_path = $(this).data('backup_path');
-
       console.log("file to delete is" + file_to_del);
 
       bootbox.confirm({
@@ -326,31 +349,8 @@
       });
     });
 
-    $(".restore_button").click(function () {
-      var file_to_restore = $(this).data("file");
-
-
-      bootbox.confirm({
-        title: "{{ translate('serverBackups', 'restore', data['lang']) }} " + file_to_restore,
-        message: "{{ translate('serverBackups', 'confirmRestore', data['lang']) }}",
-        buttons: {
-          cancel: {
-            label: '<i class="fas fa-times"></i> {{ translate("serverBackups", "cancel", data['lang']) }}'
-          },
-          confirm: {
-            label: '<i class="fas fa-check"></i> {{ translate("serverBackups", "restore", data['lang']) }}',
-            className: 'btn-outline-danger'
-          }
-        },
-        callback: function (result) {
-          console.log(result);
-          if (result == true) {
-            restore_backup(file_to_restore, serverId);
-          }
-        }
-      });
-    });
     $(".backup_now_button").click(function () {
+      console.log("Backup started")
       backup_started($(this).data('backup'));
     });
 
