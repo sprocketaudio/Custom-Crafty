@@ -1154,6 +1154,8 @@ class ServerInstance:
         time.sleep(3)
 
         # Get the backup config
+        if not backup_id:
+            return logger.error("No backup ID provided. Exiting backup")
         conf = HelpersManagement.get_backup_config(backup_id)
         # Adjust the location to include the backup ID for destination.
         backup_location = os.path.join(conf["backup_location"], conf["backup_id"])
