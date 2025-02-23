@@ -101,7 +101,7 @@ class TOTPController:
 
     def verify_user_totp(
         self, user_id: int, totp_id: str, totp_name: str, totp_code: str
-    ) -> dict:
+    ):
         """Takes the desired totp_id and compares it against the pending totp requests.
         If we find a totp_id and matching user ID we verify the code we're recieving. If
         this is successful we add the entry to the database.
@@ -147,11 +147,10 @@ class TOTPController:
         logger.info("Found user needs %s backup codes. Creating them", num_codes)
         hashed_codes = []
         plain_text_codes = []
-        for i in range(num_codes):
+        for _ in range(num_codes):
             code = str(self.helper.random_string_generator(16))
             hashed_codes.append(self.helper.encode_pass(code.lower()))
             plain_text_codes.append(re.sub(r"(\w{4})(?=\w)", r"\1-", code).upper())
-            i += 1
         self.totp_helper.add_recovery_codes(user, hashed_codes)
         return plain_text_codes
 

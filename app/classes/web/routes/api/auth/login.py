@@ -330,5 +330,3 @@ class ApiAuthLoginHandler(BaseApiHandler):
             )
         else:
             self.clear_cookie("token")
-            # self.clear_cookie("user")
-            # self.clear_cookie("user_data")

@@ -238,7 +238,7 @@ class BaseHandler(tornado.web.RequestHandler):
                     {
                         "status": "error",
                         "error": "ACCESS_DENIED",
-                        "error_data": (f"{warning}" f"<br><a href='{url}'>{goto}</a>"),
+                        "error_data": (f"{warning} <br><a href='{url}'>{goto}</a>"),
                     },
                 )
 
