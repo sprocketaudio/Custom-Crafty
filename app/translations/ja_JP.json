@@ -609,7 +609,7 @@
         "maxMem": "最大メモリ使用量",
         "minMem": "最小メモリ使用量",
         "myNewServer": "新しいサーバー",
-        "newServer": "新規でサーバーを作成",
+        "newServer": "一からサーバーを作成",
         "noRole": "検索パラメータにあてはまるロールはありません",
         "noneRoles": "ロールが選択されていません",
         "quickSettings": "クイック設定",
