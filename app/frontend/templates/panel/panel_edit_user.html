@@ -422,7 +422,7 @@ data['lang']) }}{% end %}
       e.preventDefault();
       let password = null;
       if(!userId){
-        let password = validateForm();
+        password = validateForm();
         if (!password){
           return;
         }
