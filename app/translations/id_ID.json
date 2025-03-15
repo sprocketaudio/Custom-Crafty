@@ -255,7 +255,6 @@
         "compress": "Kompres Cadangan",
         "confirm": "Konfirmasi",
         "confirmDelete": "Apakah Anda ingin menghapus cadangan ini? Ini tidak dapat dibatalkan.",
-        "confirmRestore": "Apakah Anda yakin ingin memulihkan dari cadangan ini?Semua file server saat ini akan diubah menjadi status cadangan dan tidak dapat dipulihkan.",
         "currentBackups": "Cadangan Saat Ini",
         "delete": "Hapus",
         "destroyBackup": "Hancurkan Cadangan \" + file_to_del + \"?",

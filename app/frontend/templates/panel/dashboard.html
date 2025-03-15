@@ -299,10 +299,12 @@
                   <td draggable="false" id="server_world_{{server['server_data']['server_id']}}">
                     {{ server['stats']['world_size'] }}
                   </td>
-                  <td draggable="false" id="server_desc_{{server['server_data']['server_id']}}">
+                  <td draggable="false">
                     {% if server['stats']['int_ping_results'] %}
-                    {{ server['stats']['online'] }} / {{ server['stats']['max'] }} {{ translate('dashboard', 'max',
-                    data['lang']) }}
+                    <span id="server_desc_{{server['server_data']['server_id']}}">
+                      {{ server['stats']['online'] }} / {{ server['stats']['max'] }} {{ translate('dashboard', 'max',
+                      data['lang']) }}
+                    </span>
                     {% end %}
                     <span class="server-player-totals" id="server_players_{{server['server_data']['server_id']}}"
                       data-serverId="{{server['server_data']['server_id']}}"
@@ -738,7 +740,6 @@
 
         servers.forEach(server => {
           try {
-            console.log(`#server_desc_${server.getAttribute("data-serverId")}`)
             $(`#server_desc_${server.getAttribute("data-serverId")}`).toggleClass("gray", server.getAttribute('data-count') === 'false')
             if (server.getAttribute('data-count') === 'true') {
               all_total_players += parseInt(server.getAttribute('data-players'));

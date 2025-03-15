@@ -310,7 +310,6 @@
         "compress": "Compresser la Sauvegarde",
         "confirm": "Confirmer",
         "confirmDelete": "Es-tu sûr de vouloir supprimer cette sauvegarde ? Tu ne pourras pas revenir en arrière.",
-        "confirmRestore": "Êtes-vous sûr de vouloir restaurer à partir de cette sauvegarde. Tous les fichiers du serveur actuel passeront à l'état de sauvegarde et seront irrécupérables.",
         "currentBackups": "Sauvegardes Actuelles",
         "default": "Sauvegarde par Défaut",
         "defaultExplain": "La sauvegarde que Crafty utilisera avant la mise à jour. Cela ne peut être changé ou modifié.",

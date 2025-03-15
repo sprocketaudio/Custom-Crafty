@@ -314,7 +314,6 @@
         "compress": "Back-up comprimeren",
         "confirm": "Bevestigen",
         "confirmDelete": "Wil je deze back-up verwijderen? Dit kan niet ongedaan gemaakt worden.",
-        "confirmRestore": "Bent u zeker dat u wilt herstellen vanaf deze backup. Alle huidige server bestanden zullen worden veranderd naar de backup status en zullen niet meer hersteld kunnen worden.",
         "currentBackups": "Huidige back-ups",
         "default": "Standaardbackup",
         "defaultExplain": "De backup die Crafty gebruikt vóór updates. Deze kan niet worden gewijzigd of verwijderd.",

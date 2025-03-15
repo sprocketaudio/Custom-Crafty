@@ -256,7 +256,6 @@
         "compress": "Comprimir Backup",
         "confirm": "Confirmar",
         "confirmDelete": "Deseja deletar este backup? Esta ação não pode ser desfeita.",
-        "confirmRestore": "Tem certeza de que deseja restaurar a partir deste backup. Todos os arquivos atuais do servidor serão mudados para o estado de backup e serão irrecuperáveis.",
         "currentBackups": "Backups atuais",
         "delete": "Deletar",
         "destroyBackup": "Destruir backup \" + file_to_del + \"?",

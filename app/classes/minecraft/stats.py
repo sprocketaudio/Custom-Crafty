@@ -299,16 +299,14 @@ class Stats:
     def parse_server_raknet_ping(ping_obj: object):
         try:
             server_icon = base64.encodebytes(ping_obj["icon"])
-        except Exception as e:
+        except KeyError:
             server_icon = False
-            logger.debug(
-                "Unable to read the server icon due to the following error:", exc_info=e
-            )
+            logger.debug("Could not find icon in RakNet ping response")
         ping_data = {
             "online": ping_obj["server_player_count"],
             "max": ping_obj["server_player_max"],
             "players": [],
-            "server_description": ping_obj["server_edition"],
+            "server_description": ping_obj["server_motd"],
             "server_version": ping_obj["server_version_name"],
             "server_icon": server_icon,
         }

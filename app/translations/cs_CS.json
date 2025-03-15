@@ -311,7 +311,6 @@
         "compress": "Komprimovat zálohu",
         "confirm": "Potvrdit",
         "confirmDelete": "Chcete tuto zálohu odstranit? Tuto akci nelze vrátit zpět.",
-        "confirmRestore": "Jste si jisti, že chcete provést obnovu z této zálohy. Všechny aktuální soubory serveru se změní na stav zálohy a nebude možné je obnovit.",
         "currentBackups": "Aktuální zálohy",
         "default": "Defaultní záloha",
         "defaultExplain": "Tuto zálohu Crafty používalo před aktualizací. Nemůžete ji změnit nebo smazat",

@@ -255,7 +255,6 @@
         "compress": "Pakkaa varmuuskopio",
         "confirm": "Vahvista",
         "confirmDelete": "Haluatko poistaa tämän varmuuskopion? Tätä ei voi peruuttaa.",
-        "confirmRestore": "Haluatko varmasti palauttaa tämän varmuuskopion. Kaikki nykyiset palvelintiedostot muutetaan varmuuskopiotilaan, eikä niitä voida palauttaa.",
         "currentBackups": "Nykyiset varmuuskopiot",
         "delete": "Poista",
         "destroyBackup": "Tuhotaanko varmuuskopio \" + file_to_del + \"?",
