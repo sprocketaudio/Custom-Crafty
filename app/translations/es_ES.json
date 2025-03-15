@@ -310,7 +310,6 @@
         "compress": "Comprimir la copia",
         "confirm": "Confirmar",
         "confirmDelete": "¿Quieres eliminar esta copia de seguridad? Esto no se puede deshacer.",
-        "confirmRestore": "¿Seguro que quiere restaurar desde este respaldo?. Todos los archivos del servidor actuales serán cambiados al estado del respaldo y serán irrecuperables.",
         "currentBackups": "Copias de seguridad actuales",
         "default": "Copia de seguridad predeterminada",
         "defaultExplain": "La copia de seguridad que Crafty usará antes de actualizar. No se puede cambiar ni eliminar.",

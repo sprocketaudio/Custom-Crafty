@@ -314,7 +314,6 @@
         "compress": "MAK BAKUP SMOL",
         "confirm": "YIS",
         "confirmDelete": "R U SURE U WANTZ ME TO EATZ DIS BAKUP? WIAL BEH LOZT FOREVR (LONGIR THAN KITTEHZ NAPZ)",
-        "confirmRestore": "R U SURE U WANTZ 2 RESTORE FRUM DIS BAKUP. ALL CURRENT SERVR FISHZ WILL BE EATZ AN WILL BE UNRECOVERABLE.",
         "currentBackups": "CURRENT STASH OV BAKUPS",
         "default": "USUAL BACKUP",
         "defaultExplain": "DA BACKUP THAT CRAFTY USE BEFORE UPDATES. DIS NO CAN CHANGE OR GO AWAY.",
@@ -508,7 +507,7 @@
     },
     "serverSchedules": {
         "action": "ACTSHUN",
-        "actionId": "PICK ACTION KITTY",
+        "actionId": "ACTION KITTY",
         "areYouSure": "FORGET 2 DO DIS ????",
         "cancel": "STAHP",
         "cannotSee": "CANNY SEE?",
@@ -532,7 +531,8 @@
         "no": "NOPE",
         "no-schedule": "THER BE NO SCHEDULEZ FOR DIS SERVER RIGHT MEOW. 2 GET STARTD, BOOP",
         "scheduledTasks": "SCHEDULED TASKZ",
-        "yes": "YESH"
+        "yes": "YESH",
+        "backupPol": "BAKUPS RULEZ"
     },
     "serverStats": {
         "cpuUsage": "CPU USAGE",

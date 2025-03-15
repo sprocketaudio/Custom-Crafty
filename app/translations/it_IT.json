@@ -312,7 +312,6 @@
         "compress": "Comprimi backup",
         "confirm": "Conferma",
         "confirmDelete": "Vuoi eliminare questo backup? Non puoi tornare indietro.",
-        "confirmRestore": "Sei sicuro di voler ripristinare qeusto backup? Tutti i file correnti verranno sovrascritti allo stato di backup e saranno irrecuperabili.",
         "currentBackups": "Backup attuali",
         "default": "Backup predefinito",
         "defaultExplain": "Il backup che Crafty utilizzerà prima degli aggiornamenti. Non può essere cambiato o eliminato.",

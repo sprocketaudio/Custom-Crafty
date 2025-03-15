@@ -314,7 +314,6 @@
         "compress": "Yedeklemeyi Sıkıştır",
         "confirm": "Onayla",
         "confirmDelete": "Bu yedeği silmek istediğine emin misin? Bu geri alınamaz.",
-        "confirmRestore": "Bu yedeği geri yüklemek istediğinizden emin misiniz? Tüm mevcut sunucu dosyaları yedeklemedeki durumuna dönecek ve kurtarılamayacaktır.",
         "currentBackups": "Mevcut Yedekmeler",
         "default": "Varsayılan Yedek",
         "defaultExplain": "Crafty'nin güncellemelerden önce kullanacağı yedek. Bu değiştirilemez ya da silinemez.",

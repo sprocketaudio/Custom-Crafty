@@ -2,7 +2,7 @@
     "404": {
         "contact": "Podrzebujesz pomocy? Zapraszamy na serwer discord Crafty Controler",
         "notFound": "Strony nie znaleziono",
-        "unableToFind": "Nie znaleźliśmy strony której szukasz. Spróbój ponownie, albo wróć się o stronę i ją odśwież"
+        "unableToFind": "Nie znaleźliśmy strony której szukasz. Spróbuj ponownie, albo wróć się o stronę i ją odśwież."
     },
     "accessDenied": {
         "accessDenied": "Nie posiadasz do tego dostępu",
@@ -192,7 +192,7 @@
         "embarassing": "Oh, więc, to jest żenujące.",
         "error": "Błąd!",
         "eulaAgree": "Czy się zgadzasz?",
-        "eulaMsg": "Musisz się zgodzić na EULA. Kopia EULA Minecraft jest zalinkowana pod tą wiadomością.",
+        "eulaMsg": "Musisz się zgodzić na EULA. Kopia EULA Minecraft jest zalinkowana pod tą wiadomością. ",
         "eulaTitle": "Zgódź się na EULA",
         "fileError": "Plik musi być zdjęciem.",
         "fileTooLarge": "Upload nie udany. Plik jest za duży. Skontaktuj się z administratorem dla pomocy.",
@@ -235,7 +235,8 @@
         "finishedPreparing": "Skończyliśmy przygotowywać logi supportu. Kliknij tutaj, aby je pobrać",
         "logout": "Wyloguj się",
         "preparingLogs": " Poczekaj kiedy my przygotowujemy twoje logi ... Wyślemy ci powiadomienie kiedy będą gotowe. To trochę zajmie na dużych serwerach.",
-        "supportLogs": "Logi Pomocnicze"
+        "supportLogs": "Logi Pomocnicze",
+        "backup_desc": "Wykryliśmy, że migracja kopii zapasowych nie powiodła się, lub mogła zostać uszkodzona. Sprawdź status kopii sekcji backupów."
     },
     "offline": {
         "offline": "Offline",
@@ -310,7 +311,6 @@
         "compress": "Skompresuj backup",
         "confirm": "Akceptuj",
         "confirmDelete": "Czy chcesz usunąć ten backup? Nie można tego cofnąć.",
-        "confirmRestore": "Czy jesteś pewien że chcesz przywrócić z tego backupu. Wszystkie pliki powrócą do stanu z backupu.",
         "currentBackups": "Backupy Teraz",
         "default": "Podstawowa kopia zapasowa",
         "defaultExplain": "Kopia zapasowa przed jakimikolwiek zmianami. Nie można jej usunąć ani edytować.",
@@ -565,7 +565,7 @@
         "absoluteServerPath": "Pełna ścieżka serwera",
         "absoluteZipPath": "Pełna ścieżka serwera",
         "addRole": "Dodaj serwer do ról/roli",
-        "autoCreate": " Jeśli żadnej nie zaznaczysz, crafty stworzy nową!",
+        "autoCreate": "Jeśli żadnej nie zaznaczysz, crafty stworzy nową!",
         "bePatient": "Proszę, poczekaj kiedy ' + (importing ? 'importujemy' :  'pobieramy') + ' serwer",
         "buildServer": "Zbuduj serwer!",
         "clickRoot": "Kilknij tutaj aby zaznaczyć główną ścieżkę",
@@ -573,7 +573,7 @@
         "defaultPort": "Domyślnie 25565",
         "downloading": "Pobieranie serwera...",
         "explainRoot": "Proszę, kliknij przycisk poniżej aby zaznaczyć główną ścieżkę w tym archiwum",
-        "importServer": "Importuj egzystujący serwer",
+        "importServer": "Importuj Istniejący serwer",
         "importServerButton": "Importuj serwer!",
         "importZip": "Importuj z ZIPa",
         "importing": "Importowanie serwera...",
@@ -605,7 +605,7 @@
         "sizeInGB": "Wielkość w GB",
         "unsupported": "Wersje Minecrafta poniżej 1.8 nie są wspierane przez Crafty. Mimo to możesz je zainstalować - jednakże nie jesteśmy w stanie zagwarantować ich działanie.",
         "uploadButton": "Wgraj",
-        "uploadZip": "Wgraj plik Zip dla imprtowania serwera",
+        "uploadZip": "Wgraj plik Zip pod importowanie serwera",
         "zipPath": "Server Path"
     },
     "sidebar": {
@@ -623,7 +623,7 @@
         "internals": "Konfigurowanie i włączanie backendu...",
         "internet": "Sprawdzam połączenie z internetem",
         "server": "Włączanie ",
-        "serverInit": "Ładuje serwery...",
+        "serverInit": "Wczytywanie serwerów...",
         "starting": "Włączam Craftiego...",
         "tasks": "Włączanie harmonogramu..."
     },
@@ -641,7 +641,7 @@
         "deleteUser": "Usuń użytkownika: ",
         "deleteUserB": "Usuń użytkownika",
         "enabled": "Enabled",
-        "gravDesc": "To jest email tylko używany do  Gravatar™. Crafty nie użyje pod żadnymi okolicznościami twojego adresu email, niż sprawdzenie ikony Gravatar™ ",
+        "gravDesc": "To jest email tylko używany do Gravatar™. Crafty nie użyje pod żadnymi okolicznościami twojego adresu email, niż sprawdzenie ikony Gravatar™",
         "gravEmail": "Gravatar™ Email",
         "lastIP": "Ostatnie IP: ",
         "lastLogin": "Ostatni login: ",
@@ -668,7 +668,7 @@
         "uses": "Ilość użyć (-1==Bez limitu)"
     },
     "validators": {
-        "passLength": "Hasło jest zbyt krótkie. Hasło musi posiadać minimum 8 znaków."
+        "passLength": "Hasło jest zbyt krótkie. Hasło musi mieć minimum 8 znaków."
     },
     "webhooks": {
         "areYouSureDel": "Usunąć ten webhook?",
@@ -676,7 +676,7 @@
         "backup_server": "Kopia zapasowa serwera została wykonana",
         "bot_name": "Nazwa bota",
         "color": "Akcent kolorystyczny",
-        "crash_detected": "Serwer scrashował!",
+        "crash_detected": "Serwer uległ awarii!",
         "edit": "Edytuj",
         "enabled": "Włączony",
         "jar_update": "Plik startowy zaktualizowany",
@@ -686,7 +686,7 @@
         "newWebhook": "Nowy Webhook",
         "no-webhook": "Nie posiadasz aktualnie żadnych Webhooków dla tego serwera. Aby dodać webhook kliknij na",
         "run": "Przetestuj Webhook",
-        "send_command": "Komenda serwera otrzymana!",
+        "send_command": "Komenda serwera wysłana!",
         "start_server": "Serwer włączony",
         "stop_server": "Serwer wyłączony",
         "trigger": "Aktywuje się na:",

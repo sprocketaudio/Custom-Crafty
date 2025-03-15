@@ -314,7 +314,6 @@
         "compress": "Saspiest Dublējumu",
         "confirm": "Piekrist",
         "confirmDelete": "Vai vēlaties izdzēst šo dublējumu? Šo nevar atdarīt.",
-        "confirmRestore": "Vai tiešām vēlieties atjaunot no šī dublējuma. Visas esošās datnes tiks atgrieztas uz dublējuma stāvokli un būs neatgriežamas.",
         "currentBackups": "Pašreizējie Dublējumi",
         "default": "Noklusētais Dublējums",
         "defaultExplain": "Dublējums ko Crafty izmanto pirms atjaunināšanas. To nevar mainīt vai izdzēst.",

@@ -18,7 +18,7 @@
         "downloading": "서버를 다운로드 중입니다...",
         "explainRoot": "아카이브 내에서 서버의 루트 디렉터리를 선택하려면 아래 버튼을 클릭하세요",
         "importServer": "기존 서버 가져오기",
-        "importServerButton": "서버 가져오기",
+        "importServerButton": "서버 가져오기!",
         "importZip": "ZIP 파일에서 가져오기",
         "importing": "서버 가져오는 중...",
         "labelZipFile": "ZIP 파일을 선택하세요",
@@ -158,14 +158,14 @@
         "unableToFind": "찾고 계시는 페이지를 찾을 수 없습니다. 다시 시도하거나 뒤로가서 새로고침을 해주세요."
     },
     "accessDenied": {
-        "accessDenied": "접근 불가능",
-        "contact": "디스코드를 통해 Crafty Controll 지원팀애 문의하세요",
+        "accessDenied": "접근을 할 수 없습니다",
+        "contact": "디스코드를 통해 Crafty Controll 지원팀에 문의하세요",
         "contactAdmin": "해당 리소스에 접근하기 위해서는 서버 관리자에게 문의하시거나, 접근 권한이 있다고 생각되시면 지원팀에 문의해 주세요.",
         "noAccess": "당신은 해당 리소스에 대한 권한이 없습니다"
     },
     "apiKeys": {
         "apiKeys": "API 키",
-        "auth": "인증이 필요한가요? ",
+        "auth": "인증여부 ? ",
         "buttons": "버튼",
         "config": "설정",
         "crafty": "Crafty: ",
@@ -266,7 +266,7 @@
         "stop": "정지",
         "storage": "저장공간",
         "version": "버전",
-        "welcome": "Crafty Controller에 오신걸 환영합니다!"
+        "welcome": "Crafty Controller에 오신걸 환영합니다"
     },
     "datatables": {
         "i18n": {
@@ -382,8 +382,8 @@
     },
     "notify": {
         "activityLog": "활동 로그",
-        "backupComplete": "서버 {} 에 대한 백업이 성공적으로 완료되었습니다!",
-        "backupStarted": "서버 {} 에 대한 백업이 시작되었습니다!",
+        "backupComplete": "서버 {}에 대한 백업이 성공적으로 완료되었습니다.",
+        "backupStarted": "서버 {}에 대한 백업이 시작되었습니다.",
         "backup_desc": "백업 마이그레이션이 부분적으로 또는 완전히 실패했을 수 있음을 감지했습니다. 백업 탭에서 백업 기록을 확인하십시오.",
         "backup_title": "백업 마이그레이션 경고",
         "downloadLogs": "지원 로그 다운로드?",
@@ -435,7 +435,7 @@
         "configUpdate": "마지막 업데이트: ",
         "created": "생성됨: ",
         "delRole": "역할 제거",
-        "doesNotExist": "아직 존재하지 않는 것을 삭제할 수 없습니다.",
+        "doesNotExist": "아직 존재하지 않는 것을 삭제할 수 없습니다",
         "pageTitle": "역할 수정",
         "pageTitleNew": "새 역할",
         "permAccess": "액세스 가능?",
@@ -467,7 +467,6 @@
         "compress": "백업 파일을 압축하기",
         "confirm": "확인",
         "confirmDelete": "이 백업을 삭제하시겠습니까? 이 백업은 되돌릴 수 없습니다.",
-        "confirmRestore": "이 백업에서 복원하시겠습니까? 현재 서버 파일이 모두 백업 상태로 변경되어 복구할 수 없습니다.",
         "currentBackups": "현재 백업",
         "default": "기본 백업",
         "defaultExplain": "Crafty가 업데이트하기 전에 사용할 백업입니다. 이 백업은 변경하거나 삭제할 수 없습니다.",
@@ -498,7 +497,10 @@
         "status": "상태",
         "storage": "저장 위치",
         "storageLocation": "저장 위치",
-        "storageLocationDesc": "백업을 어디에 저장하시겠습니까?"
+        "storageLocationDesc": "백업을 어디에 저장하시겠습니까?",
+        "inplace": "백업 파일을 원복합니다 – 백업 ZIP에 포함되지 않은 파일은 서버 디렉토리에 그대로 남습니다",
+        "replace": " • 백업 파일을 복원하고, 서버 디렉토리를 백업과 동일한 구조로 재설정합니다",
+        "radioRequired": "백업을 복원할 옵션을 선택해야 합니다."
     },
     "serverConfig": {
         "bePatientDelete": "Crafty 패널에서 서버를 제거하는 동안 잠시만 기다려 주세요. 이 화면은 잠시 후 닫힙니다.",
@@ -555,7 +557,7 @@
         "timeoutExplain1": "Cratfy가 명령 실행 후 서버가 종료될 때까지 기다리는 시간입니다",
         "timeoutExplain2": "이 시간이 지나면 프로세스를 강제로 종료합니다.",
         "update": "실행 파일 업데이트",
-        "yesDelete": "삭제합니다",
+        "yesDelete": "네, 삭제합니다",
         "yesDeleteFiles": "모든 파일을 삭제합니다"
     },
     "serverConfigHelp": {
@@ -661,7 +663,7 @@
     },
     "serverSchedules": {
         "action": "작업",
-        "actionId": "하위 작업 선택",
+        "actionId": "하위 작업",
         "areYouSure": "스케줄 작업을 삭제할까요?",
         "cancel": "취소",
         "cannotSee": "모든 항목이 보이지 않나요?",
@@ -685,7 +687,8 @@
         "no": "아니요",
         "no-schedule": "현재 서버에 대한 예약이 없습니다. 시작하려면 다음을 클릭합니다",
         "scheduledTasks": "스케줄 작업",
-        "yes": "예"
+        "yes": "예",
+        "backupPol": "백업 정책"
     },
     "serverStats": {
         "cpuUsage": "CPU 사용량",

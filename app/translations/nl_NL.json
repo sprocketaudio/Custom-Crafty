@@ -1,11 +1,11 @@
 {
     "404": {
         "contact": "Neem contact op met Crafty Control Support via Discord",
-        "notFound": "Pagina niet gevonden",
+        "notFound": "Pagina Niet Gevonden",
         "unableToFind": "We konden de pagina niet vinden. Probeer het opnieuw, of ververs de pagina."
     },
     "accessDenied": {
-        "accessDenied": "Toegang geweigerd",
+        "accessDenied": "Toegang Geweigerd",
         "contact": "Neem contact op met Crafty Control Support via Discord",
         "contactAdmin": "Neem contact op met je serveradministrator voor toegang tot deze hulpbron, of als je denkt toegang te moeten hebben, neem contact op met support.",
         "noAccess": "Je hebt geen toegang tot deze hulpbron"
@@ -22,13 +22,14 @@
         "deleteKeyConfirmationTitle": "Verwijder API-sleutel ${keyId}?",
         "getToken": "Verkrijg een token",
         "name": "Naam",
-        "nameDesc": "Hoe wil je deze API-token noemen?",
+        "nameDesc": "Hoe wil je deze API-token noemen? ",
         "no": "Nee",
         "pageTitle": "Bewerk gebruiker API-sleutels",
         "permName": "Toestemming naam",
         "perms": "Toestemmingen",
         "server": "Server: ",
-        "yes": "Ja"
+        "yes": "Ja",
+        "fullAccess": "Volledige Toegang"
     },
     "base": {
         "doesNotWorkWithoutJavascript": "<strong>Warning: </strong>Crafty werkt niet naar behoren als JavaScript niet ingeschakeld is!"
@@ -40,14 +41,14 @@
         "pageTitle": "Credits",
         "patreonDesc": "aan onze Patreon / Ko-fi supporters!",
         "patreonOther": "Overig",
-        "patreonSupporter": "Patreon / Ko-fi Supporters",
+        "patreonSupporter": "Patreon / Ko-fi supporters",
         "patreonUpdate": "Laatste update:",
         "retiredStaff": "Gepensioneerde staff",
         "subscriberName": "Naam",
         "subscriptionLevel": "Niveau",
         "supportTeam": "Support- en documentatieteam",
         "thankYou": "DANKJEWEL",
-        "translationDesc": "aan onze community die vertaalt!",
+        "translationDesc": "aan onze community die vertaalt! [ Actief = 🟢 Inactief/Met Pensioen = ⚪ ]",
         "translationName": "Naam",
         "translationTitle": "Vertaling",
         "translator": "Vertalers"
@@ -89,13 +90,16 @@
         "sendingCommand": "Commando aan het versturen",
         "server": "Server",
         "servers": "Servers",
-        "size": "Server  map-grootte",
+        "size": "Server Map-grootte",
         "start": "Starten",
         "starting": "Uitgestelde start",
         "status": "Status",
         "stop": "Stoppen",
         "version": "Versie",
-        "welcome": "Welkom bij Crafty Controller"
+        "welcome": "Welkom bij Crafty Controller",
+        "cloneConfirm": "Weet je zeker dat je deze server wilt dupliceren? Dit proces kan even duren.",
+        "storage": "Opslag",
+        "installing": "Installeren..."
     },
     "datatables": {
         "loadingRecords": "Laden...",
@@ -167,7 +171,7 @@
         "embarassing": "Oh, oeps, dit is gÃªnant.",
         "error": "Error!",
         "eulaAgree": "Stem je in met de EULA?",
-        "eulaMsg": "Je moet instemmen met de EULA. Een kopie van de Minecraft EULA is onder dit bericht gelinkt.",
+        "eulaMsg": "Je moet instemmen met de ",
         "eulaTitle": "Instemmen met de EULA",
         "hereIsTheError": "Hier is de error",
         "internet": "We hebben gedetecteerd dat de serverhost geen internetverbinding heeft. Client connecties zijn mogelijk gelimiteerd.",
@@ -176,10 +180,26 @@
         "not-downloaded": "We kunnen je executable-bestand niet vinden. Is het klaar met downloaden? Zijn de toestemmingen gezet op 'uitvoerbaar'?",
         "portReminder": "We zien dat dit de eerste keer is dat {} uitgevoerd wordt. Zorg dat poort {} door je router/firewall gestuurd wordt om er via het openbare internet bij te kunnen komen.",
         "start-error": "Server {} kon niet starten, error code: {}",
-        "terribleFailure": "Een verschrikkelijke fout!"
+        "terribleFailure": "Een verschrikkelijke fout!",
+        "fileTooLarge": "Upload mislukt. Bestandsupload is te groot. Neem contact op met de systeembeheerder voor assistentie.",
+        "bedrockError": "Bedrock-downloads zijn niet beschikbaar. Graag controleren",
+        "agree": "Instemmen",
+        "installerJava": "Installatie mislukt {}: Forge Server Installatie vereist Java. We hebben gedetecteerd dat Java niet geïnstalleerd is. Installeer eerst Java en vervolgens de server.",
+        "privMsg": "en de ",
+        "selfHost": "Als je deze repo zelf host, controleer dan je adres of raadpleeg onze handleiding voor probleemoplossingen.",
+        "bigBucket1": "Big Bucket Gezondheidscontrole Mislukt. Graag controleren",
+        "bigBucket2": "voor de meest actuele informatie.",
+        "cancel": "Annuleren",
+        "craftyStatus": "Crafty's statuspagina",
+        "cronFormat": "Invalide Cron-formaat gedecteerd",
+        "fileError": "Bestandstype moet een afbeelding zijn.",
+        "migration": "Crafty's primaire server opslag wordt gemigreerd naar een nieuwe locatie. Gedurende deze tijd zijn alle serverstarts opgeschort. Even geduld terwijl wij deze migratie afronden",
+        "noInternet": "Crafty heeft moeite om het internet te bereiken. Server Creatie is uitgeschakeld. Controleer je internetverbinding en ververs deze pagina.",
+        "return": "Terugkeren naar Dashboard",
+        "superError": "Je moet supergebruiker zijn om deze actie te voltooien."
     },
     "footer": {
-        "allRightsReserved": "Alle rechten voorbehouden.",
+        "allRightsReserved": "Alle rechten voorbehouden",
         "copyright": "Copyright",
         "version": "Versie"
     },
@@ -187,7 +207,11 @@
         "forgotPassword": "Wachtwoord vergeten",
         "login": "Inloggen",
         "password": "Wachtwoord",
-        "username": "Gebruikersnaam"
+        "username": "Gebruikersnaam",
+        "disabled": "Gebruikersaccount uitgeschakeld. Neem contact op met jouw systeembeheerder voor meer informatie.",
+        "defaultPath": "Het wachtwoord dat je hebt ingevoerd is het standaardpad voor referenties, niet het wachtwoord. Zoek het standaardwachtwoord op die locatie.",
+        "incorrect": "Incorrecte gebruikersnaam of wachtwoord",
+        "viewStatus": "Bekijk Publieke Statuspagina"
     },
     "notify": {
         "activityLog": "Activiteit-logboeken",
@@ -196,8 +220,12 @@
         "downloadLogs": "Ondersteuningslogboeken downloaden?",
         "finishedPreparing": "We hebben je ondersteuningslogboeken klaargemaakt. Klik om deze te downloaden",
         "logout": "Uitloggen",
-        "preparingLogs": "Wacht terwijl we je logboeken klaarmaken... Je krijgt een melding als ze klaar zijn. Dit kan lang duren voor grote inzetten.",
-        "supportLogs": "Ondersteuningslogboeken"
+        "preparingLogs": " Wacht terwijl we je logboeken klaarmaken... Je krijgt een melding als ze klaar zijn. Dit kan lang duren voor grote inzetten.",
+        "supportLogs": "Ondersteuningslogboeken",
+        "backup_desc": "Wij hebben gedetecteerd dat de back-upmigratie mogelijk gedeeltelijk of volledig mislukt is. Controleer jouw back-upgegevens in het tabblad Backups.",
+        "backup_title": "Back-upmigratie Waarschuwing",
+        "schedule_desc": "We hebben gedetecteerd dat sommige of alle geplande taken niet succesvol overgezet zijn tijdens de upgrade. Bevestig uw roosters in het tabblad 'Roosters'.",
+        "schedule_title": "Roosters Migratiewaarschuwing"
     },
     "panelConfig": {
         "adminControls": "Admin Bediening",
@@ -218,7 +246,17 @@
         "superConfirm": "Ga alleen verder als je wil dat deze gebruiker bij ALLES kan (alle gebruikersaccounts, servers, panel-instellingen, etc.). Ze kunnen ook jouw super-gebruikerrechten intrekken.",
         "superConfirmTitle": "super-gebruiker inschakelen? Weet je het zeker?",
         "user": "Gebruiker",
-        "users": "Gebruikers"
+        "users": "Gebruikers",
+        "enableLang": "Alle Talen Inschakelen",
+        "globalExplain": "Waar Crafty al jouw serverbestanden opslaat. (Wij vullen het pad aan met /servers/[uuid van server])",
+        "custom": "Crafty Aanpassen",
+        "apply": "Toepassen",
+        "globalServer": "Globale Serverlijst",
+        "json": "Config.json",
+        "match": "Wachtwoorden moeten overeenkomen",
+        "noMounts": "Geen mounts weergeven op dashboard",
+        "select": "Selecteer",
+        "title": "Crafty-configuratie"
     },
     "rolesConfig": {
         "config": "Rol-configuratie",
@@ -242,18 +280,18 @@
         "roleUsers": "Rol-gebruikers: ",
         "serverAccess": "Toegang?",
         "serverName": "Servernaam",
-        "serversDesc": "Servers waar deze rol toegang tot heeft"
+        "serversDesc": "Servers waar deze rol toegang tot heeft",
+        "selectManager": "Selecteer een manager voor deze rol"
     },
     "serverBackups": {
         "backupAtMidnight": "Automatische back-up bij middernacht?",
-        "backupNow": "Nu back-up maken",
+        "backupNow": "Nu Back-up Maken!",
         "backupTask": "Een back-uptaak is gestart.",
         "cancel": "Annuleren",
         "clickExclude": "Klik om uitsluitingen te kiezen",
         "compress": "Back-up comprimeren",
         "confirm": "Bevestigen",
         "confirmDelete": "Wil je deze back-up verwijderen? Dit kan niet ongedaan gemaakt worden.",
-        "confirmRestore": "Weet je zeker dat je deze back-up wil terugzetten? Alle huidige bestanden zullen worden overschreven.",
         "currentBackups": "Huidige back-ups",
         "delete": "Verwijderen",
         "destroyBackup": "Back-up \" + file_to_del + \" verwijderen?",
@@ -270,22 +308,43 @@
         "save": "Opslaan",
         "size": "Grootte",
         "storageLocation": "Opslaglocatie",
-        "storageLocationDesc": "Waar wil je back-ups opslaan?"
+        "storageLocationDesc": "Waar wil je back-ups opslaan?",
+        "actions": "Acties",
+        "after": "Voer commando uit na back-up",
+        "defaultExplain": "De backup die Crafty zal gebruiken vóór updates. Deze kan niet veranderd of verwijderd worden.",
+        "backups": "Serverbackups",
+        "before": "Voer commando uit vóór back-up",
+        "default": "Standaardback-up",
+        "edit": "Bewerken",
+        "enabled": "Ingeschakeld",
+        "failed": "Mislukt",
+        "myBackup": "Mijn Nieuwe Back-up",
+        "name": "Naam",
+        "newBackup": "Maak nieuwe back-up",
+        "no-backup": "Geen Back-ups. Om een nieuwe back-up te maken, dus op 'Nieuwe Back-up'",
+        "run": "Back-up uitvoeren",
+        "shutdown": "Server uitzetten gedurende back-up",
+        "standby": "Gereed",
+        "status": "Status",
+        "storage": "Opslaglocatie",
+        "inplace": "Back-upbestanden op hun plaats herstellen - bestanden die niet in de back-up zip zitten, blijven in de servermap",
+        "replace": " Herstel back-upbestanden en stel de servermap opnieuw in, zodat deze exact overeenkomt met de structuur van de back-up",
+        "radioRequired": "Je moet een optie kiezen om je back-up te herstellen"
     },
     "serverConfig": {
         "bePatientDelete": "Wees geduldig terwijl we de server uit het dashboard verwijderen. Dit scherm sluit in een ogenblik.",
         "bePatientDeleteFiles": "Wees geduldig terwijl we de server uit het dashboard verwijderen en de bestanden verwijderen. Dit scherm sluit in een ogenblik.",
         "bePatientUpdate": "Wees geduldig terwijl we de server updaten. Downloadtijden kunnen variÃ«ren op basis van internetsnelheid.<br /> Dit scherm ververst in een ogenblik",
         "cancel": "Annuleren",
-        "crashTime": "Crash Timeout",
+        "crashTime": "Crash Time-out",
         "crashTimeDesc": "Hoe lang moeten we wachten totdat de server als gecrasht wordt gezien?",
         "deleteFilesQuestion": "Serverbestanden verwijderen?",
         "deleteFilesQuestionMessage": "Wil je dat Crafty de serverbestanden verwijderd? <br><br><strong>Back-ups worden ook verwijderd.</strong>",
         "deleteServer": "Server verwijderen",
         "deleteServerQuestion": "Server verwijderen?",
-        "deleteServerQuestionMessage": "Weet je zeker dat je de server wil verwijderen? Dit is onomkeerbaar!",
+        "deleteServerQuestionMessage": "Weet je zeker dat je de server wil verwijderen? Dit is onomkeerbaar...",
         "exeUpdateURL": "Serverupdate URL",
-        "exeUpdateURLDesc": "Directe URL voor downloaden van updates",
+        "exeUpdateURLDesc": "Directe Download URL voor  updates.",
         "noDelete": "Nee, ga terug",
         "noDeleteFiles": "Nee, verwijder alleen van dashboard",
         "removeOldLogsAfter": "Verwijder oude logboeken achteraf",
@@ -297,7 +356,7 @@
         "serverAutostartDelay": "Automatische start-vertraging",
         "serverAutostartDelayDesc": "Vertraging voor automatisch starten (Als dit hieronder aanstaat)",
         "serverCrashDetection": "Server crashdetectie",
-        "serverExecutable": "Server Executable",
+        "serverExecutable": "Executable van de Server",
         "serverExecutableDesc": "Het uitvoerbare bestand van de server",
         "serverExecutionCommand": "Servercommando",
         "serverExecutionCommandDesc": "Wat uitgevoerd wordt in een verborgen terminal om de server te starten",
@@ -314,9 +373,21 @@
         "serverStopCommand": "Server stopcommando",
         "serverStopCommandDesc": "Commando om de server te stoppen",
         "stopBeforeDeleting": "Stop de server voordat je deze verwijderd",
-        "update": "Executable updaten",
+        "update": "Uitvoerbestand Bijwerken",
         "yesDelete": "Ja, verwijder",
-        "yesDeleteFiles": "Ja, verwijder bestanden"
+        "yesDeleteFiles": "Ja, verwijder bestanden",
+        "countPlayers": "Server opnemen in totale spelersaantal",
+        "ignoredExitsExplain": "Exitcodes die Crafty's Crashdetectie moet negeren als een normale 'stop' (gescheiden door komma's)",
+        "showStatus": "Toon op Publieke Statuspagina",
+        "statsHint1": "De poort waar je server op draait, moet hier ingevuld worden. Dit is hoe Crafty een connectie opent met jouw server voor statistieken.",
+        "timeoutExplain1": "Hoe lang Crafty wacht tot jouw server is afgesloten na uitvoeren van de",
+        "javaVersionDesc": "Als je Java gaat overschrijven, zorg er dan voor dat je huidige Java pad 'execution command' tussen aanhalingstekens staat (standaard 'java' variabele uitgesloten)",
+        "ignoredExits": "Genegeerde Crash-exitcodes",
+        "javaNoChange": "Niet Overschrijven",
+        "javaVersion": "Overschrijf Huidige Java Versie",
+        "shutdownTimeout": "Afsluittimeout",
+        "statsHint2": "Dit veranderd niet de poort van jouw server. Je moet nog steeds de poort van je server aanpassen in het configuratiebestand.",
+        "timeoutExplain2": "opdracht voordat het proces geforceerd wordt beëindigd."
     },
     "serverConfigHelp": {
         "desc": "Hier kan je de configuratie van de server veranderen",
@@ -343,7 +414,11 @@
         "playerControls": "Spelerbeheer",
         "schedule": "Rooster",
         "serverDetails": "Server details",
-        "terminal": "Terminal"
+        "terminal": "Terminal",
+        "filter": "Logs Filteren",
+        "filterList": "Gefilterde Woorden",
+        "metrics": "Metrieken",
+        "reset": "Scroll Resetten"
     },
     "serverFiles": {
         "clickUpload": "Klik hier om je bestanden te selecteren",
@@ -374,7 +449,8 @@
         "upload": "Uploaden",
         "uploadTitle": "Bestanden uploaden naar: ",
         "waitUpload": "Wees geduldig terwijl wij de bestanden uploaden... Dit kan even duren.",
-        "yesDelete": "Ja, ik begrijp de gevolgen"
+        "yesDelete": "Ja, ik begrijp de gevolgen",
+        "size": "Verander Editor Grootte"
     },
     "serverPlayerManagement": {
         "bannedPlayers": "Verbannen spelers",
@@ -383,12 +459,12 @@
     },
     "serverScheduleConfig": {
         "backup": "Maak server back-up",
-        "basic": "Basic",
+        "basic": "Basis",
         "children": "Gelinkte child-planningen: ",
         "command": "Commando",
         "command-explain": "Welk commando wil je uitvoeren? Voer de '/' niet in",
         "cron": "Cron",
-        "cron-explain": "Voer je cron-string in",
+        "cron-explain": "Voer je cron-string in -- NOTITIE: 0 = Maandag op laatste optie.",
         "custom": "Aangepast commando",
         "days": "Dagen",
         "enabled": "Ingeschakeld",
@@ -406,7 +482,8 @@
         "start": "Start server",
         "stop": "Stop server",
         "time": "Tijd",
-        "time-explain": "Hoe laat wil je deze planning uitvoeren?"
+        "time-explain": "Hoe laat wil je deze planning uitvoeren?",
+        "select": "Selecteer Basis / Cron / Kettingreactie"
     },
     "serverSchedules": {
         "areYouSure": "Geplande taak verwijderen?",
@@ -414,7 +491,28 @@
         "cannotSee": "Kan je niet alles zien?",
         "cannotSeeOnMobile": "Probeer op een geplande taak te klikken voor details.",
         "confirm": "Bevestigen",
-        "confirmDelete": "Weet je zeker dat je deze geplande taak wil verwijderen? Dit kan je niet terugdraaien."
+        "confirmDelete": "Weet je zeker dat je deze geplande taak wil verwijderen? Dit kan je niet terugdraaien.",
+        "no-schedule": "Er zijn momenteel geen schema's voor deze server. Om te beginnen, klik",
+        "action": "Actie",
+        "actionId": "Onderliggende Actie",
+        "backupPol": "Back-upbeleid",
+        "child": "Onderliggend proces van schema met ID ",
+        "close": "Sluiten",
+        "command": "Commando",
+        "create": "Maak Nieuw Schema",
+        "cron": "Cron-String",
+        "delete": "Verwijderen",
+        "details": "Schemadetails",
+        "edit": "Bewerken",
+        "enabled": "Ingeschakeld",
+        "every": "Elke",
+        "interval": "Interval",
+        "name": "Naam",
+        "newSchedule": "Nieuw Schema",
+        "nextRun": "Volgende Uitvoering",
+        "no": "Nee",
+        "scheduledTasks": "Geplande Taken",
+        "yes": "Ja"
     },
     "serverStats": {
         "cpuUsage": "Gebruik van CPU",
@@ -431,7 +529,8 @@
         "serverUptime": "Server uptime",
         "starting": "Uitgestelde start",
         "unableToConnect": "Kan niet verbinden",
-        "version": "Versie"
+        "version": "Versie",
+        "loadingMotd": "MOTD Laden"
     },
     "serverTerm": {
         "commandInput": "Commando invoeren",
@@ -442,13 +541,15 @@
         "starting": "Uitgestelde start",
         "stop": "Stoppen",
         "stopScroll": "Stop automatisch scrollen",
-        "updating": "Aan het updaten..."
+        "updating": "Aan het updaten...",
+        "importing": "Importeren...",
+        "installing": "Installeren..."
     },
     "serverWizard": {
         "absoluteServerPath": "Absoluut pad naar de server",
         "absoluteZipPath": "Absoluut pad naar de server",
         "addRole": "Server toevoegen aan bestaande rol(len)",
-        "autoCreate": "Als er niks is geselecteerd maakt Crafty er Ã©Ã©n.",
+        "autoCreate": "Als er niks is geselecteerd, maakt Crafty er zelf een!",
         "bePatient": "Wees geduldig, we ' + (importing ? 'importeren' :  'downloaden') + ' de server",
         "buildServer": "Maak server!",
         "clickRoot": "Klik hier om je root-map te selecteren",
@@ -480,7 +581,16 @@
         "serverType": "Servertype",
         "serverVersion": "Serverversie",
         "sizeInGB": "Grootte in GB",
-        "zipPath": "Serverpad"
+        "zipPath": "Serverpad",
+        "labelZipFile": "Kies je Zip-Bestand",
+        "selectServer": "Selecteer een Server",
+        "unsupported": "Minecraft-versies lager dan 1.8 worden niet ondersteund door Crafty. Je kunt het nog steeds installeren. Resultaten kunnen variëren.",
+        "noRole": "Geen rol gevonden met huidige zoekparameters",
+        "noneRoles": "Geen Rollen Geselecteerd",
+        "serverSelect": "Server Selecteren",
+        "serverUpload": "Gezipte Server Uploaden",
+        "uploadButton": "Uploaden",
+        "uploadZip": "Upload Zip-bestand voor Serverimport"
     },
     "sidebar": {
         "contribute": "Meehelpen",
@@ -488,7 +598,8 @@
         "dashboard": "Dashboard",
         "documentation": "Documentatie",
         "newServer": "Nieuwe server maken",
-        "servers": "Servers"
+        "servers": "Servers",
+        "inApp": "In-App Documentatie"
     },
     "userConfig": {
         "apiKey": "API-sleutels",
@@ -514,7 +625,7 @@
         "notExist": "Je kan niet iets verwijderen wat er niet is!",
         "pageTitle": "Gebruiker bewerken",
         "pageTitleNew": "Gebruiker aanmaken",
-        "password": "Wachtwoord",
+        "password": "Nieuw Wachtwoord",
         "permName": "Toestemmingsnaam",
         "repeat": "Wachtwoord herhalen",
         "roleName": "Rolnaam",
@@ -523,8 +634,91 @@
         "userName": "Gebruikersnaam",
         "userNameDesc": "Hoe wil je deze gebruiker noemen?",
         "userRoles": "Gebruiker-rollen",
-        "userRolesDesc": "Rollen waarvan deze gebruiker lid is",
+        "userRolesDesc": "Rollen waarvan deze gebruiker lid is.",
         "userSettings": "Gebruikersinstellingen",
-        "uses": "Aantal keer toegestaan (-1==Geen limiet)"
+        "uses": "Aantal keer toegestaan (-1==Geen limiet)",
+        "manager": "Manager",
+        "selectManager": "Selecteer Manager voor Gebruiker",
+        "userTheme": "UI-thema"
+    },
+    "customLogin": {
+        "apply": "Toepassen",
+        "loginImage": "Upload een achtergrondafbeelding voor het loginscherm.",
+        "backgroundUpload": "Achtergrond Upload",
+        "customLoginPage": "De Login Pagina Aanpassen",
+        "delete": "Verwijderen",
+        "labelLoginImage": "Kies jouw Login Achtergrond",
+        "loginBackground": "Login Achtergrondafbeelding",
+        "loginOpacity": "Selecteer de opaciteit van het Inlogvenster",
+        "pageTitle": "Aangepaste Inlogpagina",
+        "preview": "Voorvertoning",
+        "select": "Selecteer",
+        "selectImage": "Selecteer een afbeelding"
+    },
+    "offline": {
+        "offline": "Offline",
+        "pleaseConnect": "Verbind met het internet om Crafty te gebruiken."
+    },
+    "validators": {
+        "roleManager": "Rollenmanager moet van type integer (manager-ID) of None zijn",
+        "enumErr": "validatie mislukt. Accepteerbare gegevens zijn ",
+        "typeList": "moet zijn van het type lijst/array ",
+        "serverCreateName": "De servernaam moet een string zijn met een minimumlengte van 2 en mag niet bevatten: \\/ if # ",
+        "typeEmail": "moet van het type e-mail zijn.",
+        "userName": " moet van het type string zijn, volledig KLEINE LETTERS, minimaal 4 tekens en maximaal 20 tekens",
+        "backupName": "Back-upnaam moet een string zijn en een minimumlengte van 3 hebben.",
+        "filesPageLen": "lengte moet groter zijn dan 1 voor eigenschap",
+        "insufficientPerms": "Toestemmingsfout: Ontbrekende rechten voor deze bron",
+        "passLength": "Wachtwoord Te Kort. Minimumlengte: 8",
+        "roleName": "De rolnaam moet een string zijn die groter is dan 1 teken. Deze mag geen van de volgende symbolen bevatten: [], ",
+        "roleServerId": "De eigenschap van Server-ID moet een string zijn met een minimumlengte van 1",
+        "roleServerPerms": "Servertoestemmingen moeten een 8-bits string zijn",
+        "serverExeCommand": "Het server-uitvoeringscommando moet een string zijn met een minimumlengte van 1.",
+        "serverLogPath": "Het pad naar de serverlog moet een string zijn met een minimumlengte van 1",
+        "taskIntervalType": "Het Type Taakinterval moet een van de volgende zijn: ",
+        "typeBool": "moet true of false zijn (type boolean)",
+        "typeIntMinVal0": "moet een geheel getal zijn met een minimumwaarde van 0.",
+        "typeInteger": "moet een getal zijn.",
+        "typeString": "moet van het type string zijn."
+    },
+    "serverMetrics": {
+        "zoomHint1": "Om in te zoomen op de grafiek, houdt je de shift-toets ingedrukt en gebruik je vervolgens je scrollwiel.",
+        "resetZoom": "Zoom Resetten",
+        "zoomHint2": "Het is ook mogelijk om de shift-toets ingedrukt houden en klikken en slepen in het gebied waar je wilt inzoomen."
+    },
+    "startup": {
+        "tasks": "Takenplanner Starten",
+        "almost": "Afronden. Houd je vast...",
+        "cache": "Big Bucket-cachebestand Verversen",
+        "internals": "Crafty's interne componenten configureren en starten",
+        "internet": "Internetverbinding controleren",
+        "server": "Initialiseren ",
+        "serverInit": "Servers Initialiseren",
+        "starting": "Crafty wordt gestart..."
+    },
+    "webhooks": {
+        "no-webhook": "Er zijn momenteel geen webhooks voor deze server. Om te beginnen, klik",
+        "areYouSureRun": "Weet je zeker dat je webhook wilt testen?",
+        "areYouSureDel": "Weet je zeker dat je deze webhook wilt verwijderen?",
+        "backup_server": "Serverback-up voltooid",
+        "bot_name": "Botnaam",
+        "color": "Selecteer Kleuraccent",
+        "crash_detected": "Server Gecrasht",
+        "edit": "Bewerken",
+        "enabled": "Ingeschakeld",
+        "jar_update": "Server-uitvoerbaar Bestand Bijgewerkt",
+        "kill": "Server Gedood",
+        "name": "Naam",
+        "new": "Nieuwe Webhook",
+        "newWebhook": "Nieuwe Webhook",
+        "run": "Webhook Test Uitvoeren",
+        "send_command": "Servercommando Ontvangen",
+        "start_server": "Server Gestart",
+        "stop_server": "Server Gestopt",
+        "trigger": "Trigger",
+        "type": "Webhook-type",
+        "url": "Webhook-URL",
+        "webhook_body": "Webhook-body",
+        "webhooks": "Webhooks"
     }
 }

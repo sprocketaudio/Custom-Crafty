@@ -314,7 +314,6 @@
         "compress": "Backup komprimieren",
         "confirm": "Bestätigen",
         "confirmDelete": "Möchten Sie diese Backup-Datei löschen? Dies kann nicht rückgängig gemacht werden.",
-        "confirmRestore": "Sicher, dass dieses Backup wiederherstellgestellt werden soll? Alle aktuellen Serverdateien werden in den Zustand von diesem Backup versetzt und können nicht wiederhergestellt werden.",
         "currentBackups": "Aktuelle Backups",
         "default": "Standard-Backup",
         "defaultExplain": "Das Backup, welches Crafty vor Updates verwendet. Dies kann nicht geändert oder gelöscht werden.",

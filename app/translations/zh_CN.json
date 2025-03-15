@@ -314,7 +314,6 @@
         "compress": "压缩备份",
         "confirm": "确认",
         "confirmDelete": "您想要删除这个备份吗？此操作不能撤销。",
-        "confirmRestore": "你确定要从此备份恢复吗？所有现存的服务器文件将更改到备份时的状态，并且无法撤销。",
         "currentBackups": "现有备份",
         "default": "默认备份",
         "defaultExplain": "Crafty 在更新前会使用的备份。此项目不能被更改或删除。",
@@ -345,7 +344,10 @@
         "status": "状态",
         "storage": "存储位置",
         "storageLocation": "存储位置",
-        "storageLocationDesc": "您想要在哪里存储备份？"
+        "storageLocationDesc": "您想要在哪里存储备份？",
+        "inplace": "在原位置恢复备份 - 备份 zip 中不存在的文件将保留在服务器目录中",
+        "radioRequired": "您必须选择一个选项来恢复您的备份",
+        "replace": " 恢复备份文件并将服务器目录重置为备份中的结构"
     },
     "serverConfig": {
         "bePatientDelete": "请耐心等待，我们正在从 Crafty 面板中移除服务器。稍后此页面会关闭。",
@@ -508,7 +510,7 @@
     },
     "serverSchedules": {
         "action": "操作",
-        "actionId": "选择子操作",
+        "actionId": "子操作",
         "areYouSure": "删除计划任务？",
         "cancel": "取消",
         "cannotSee": "什么都看不到？",
@@ -532,7 +534,8 @@
         "no": "否",
         "no-schedule": "此服务器当前没有计划。要开始使用计划，点击",
         "scheduledTasks": "计划任务",
-        "yes": "是"
+        "yes": "是",
+        "backupPol": "备份策略"
     },
     "serverStats": {
         "cpuUsage": "CPU 使用率",

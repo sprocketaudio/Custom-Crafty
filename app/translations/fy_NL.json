@@ -253,7 +253,6 @@
         "compress": "Backup komprimearje",
         "confirm": "Befêstigje",
         "confirmDelete": "Wolle jo dizze backup wiskje? Dit kin net ûngedien makke wurde.",
-        "confirmRestore": "Binne jo wis dat jo fan dizze backup weromsette wolle? Alle aktuele serverbestannen wurde feroare yn backupstatus en sille net werom te heljen wêze.",
         "currentBackups": "Aktuele backups",
         "delete": "Wiskje",
         "destroyBackup": "Backup \" + file_to_del + \" wiskje?",
