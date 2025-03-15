@@ -193,4 +193,4 @@ def ping_bedrock(ip, port):
         brp = BedrockPing(ip, port, client_guid)
         return brp.ping()
     except:
-        logger.debug("Unable to get RakNet stats")
+        logger.exception("Unable to get RakNet stats")
