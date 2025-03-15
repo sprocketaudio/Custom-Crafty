@@ -4,7 +4,7 @@
 ### Refactor
 - Refactor backups for efficiency and in-place backup restores ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/815))
 ### New features
-TBD
+- Add TOTP to allow for added authentication security ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/818))
 ### Bug fixes
 - Fix problematic MOTDs on bedrock servers breaking stats collection ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/831))
 - Fix caching issue on upload imports ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/836))
