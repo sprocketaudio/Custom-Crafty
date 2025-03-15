@@ -1090,7 +1090,7 @@ class Helpers:
                 If not provided, a default path under the config_dir is used.
 
         Returns:
-            - bool: True if the certificate and key are created (or already exist),
+            - bool: True if the certificate and key are created,
               False otherwise.
 
         Raises:
@@ -1119,7 +1119,7 @@ class Helpers:
         # Don't create new files if we already have them.
         if Helpers.check_file_exists(cert_file) and Helpers.check_file_exists(key_file):
             logger.info("Cert and Key files already exists, not creating them.")
-            return True
+            return False
 
         Console.info("Generating a self signed SSL")
         logger.info("Generating a self signed SSL")
@@ -1166,8 +1166,8 @@ class Helpers:
             .issuer_name(issuer)
             .public_key(private_key.public_key())
             .serial_number(secrets.randbelow(254) + 1)  # rand serial
-            .not_valid_before(datetime.utcnow())
-            .not_valid_after(datetime.utcnow() + timedelta(days=365))  # 1 yr
+            .not_valid_before(datetime.now(timezone.utc))
+            .not_valid_after(datetime.now(timezone.utc) + timedelta(days=365))  # 1 yr
             .add_extension(san, critical=False)
             .add_extension(
                 x509.BasicConstraints(ca=False, path_length=None), critical=True
