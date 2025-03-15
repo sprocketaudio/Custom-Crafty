@@ -6,7 +6,7 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Fix problematic MOTDs on bedrock servers breaking stats collection ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/831))
 ### Tweaks
 TBD
 ### Lang
