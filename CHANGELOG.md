@@ -3,9 +3,11 @@
 
 ### Refactor
 - Refactor backups for efficiency and in-place backup restores ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/815))
+- Refactor self-signed cert creation from `OpenSSL.crypto.X509` to `pyca/cryptography`'s X.509 APIs ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/833))
 ### New features
 - Add TOTP to allow for added authentication security ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/818))
 ### Bug fixes
+- Bump cryptography for CVE-2024-12797 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/833))
 - Fix problematic MOTDs on bedrock servers breaking stats collection ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/831))
 - Fix caching issue on upload imports ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/836))
 - Fix server-name not showing after CSS refactor ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/832))

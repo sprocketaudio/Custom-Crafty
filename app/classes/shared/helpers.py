@@ -17,11 +17,17 @@ import shutil
 import shlex
 import subprocess
 import itertools
-from datetime import datetime, timezone
 from socket import gethostname
 from contextlib import redirect_stderr, suppress
+from datetime import datetime, timezone, timedelta
+
 import libgravatar
 from packaging import version as pkg_version
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import rsa
+
 
 from app.classes.shared.null_writer import NullWriter
 from app.classes.shared.console import Console
@@ -42,7 +48,6 @@ logger = logging.getLogger(__name__)
 try:
     import requests
     from requests import get
-    from OpenSSL import crypto
     from argon2 import PasswordHasher
 
 except ModuleNotFoundError as err:
@@ -1078,10 +1083,33 @@ class Helpers:
             return False
 
     def create_self_signed_cert(self, cert_dir=None):
+        """
+        Creates a self-signed SSL certificate and private key, writing them to disk.
+
+        Parameters:
+            - cert_dir (str, optional): The directory where the certificate and key
+            files will be created.
+                If not provided, a default path under the config_dir is used.
+
+        Returns:
+            - bool: True if the certificate and key are created,
+              False otherwise.
+
+        Raises:
+            - OSError: If there are issues creating files or directories.
+
+        Exception:
+            Any unexpected error that occurs during certificate or key generation.
+
+        Note:
+        This function generates an RSA key pair and an X.509 certificate using
+        the cryptography library.
+        The resulting files are saved in PEM format.
+        """
         if cert_dir is None:
             cert_dir = os.path.join(self.config_dir, "web", "certs")
 
-        # create a directory if needed
+        # Ensure directory exists
         Helpers.ensure_dir_exists(cert_dir)
 
         cert_file = os.path.join(cert_dir, "commander.cert.pem")
@@ -1090,61 +1118,84 @@ class Helpers:
         logger.info(f"SSL Cert File is set to: {cert_file}")
         logger.info(f"SSL Key File is set to: {key_file}")
 
-        # don't create new files if we already have them.
+        # Don't create new files if we already have them.
         if Helpers.check_file_exists(cert_file) and Helpers.check_file_exists(key_file):
             logger.info("Cert and Key files already exists, not creating them.")
-            return True
+            return False
 
         Console.info("Generating a self signed SSL")
         logger.info("Generating a self signed SSL")
 
-        # create a key pair
+        # Generate private key
         logger.info("Generating a key pair. This might take a moment.")
         Console.info("Generating a key pair. This might take a moment.")
-        k = crypto.PKey()
-        k.generate_key(crypto.TYPE_RSA, 4096)
+        private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=4096,
+        )
 
-        # create a self-signed cert
-        cert = crypto.X509()
-        cert.get_subject().C = "US"
-        cert.get_subject().ST = "Michigan"
-        cert.get_subject().L = "Kent County"
-        cert.get_subject().O = "Crafty Controller"
-        cert.get_subject().OU = "Server Ops"
-        cert.get_subject().CN = gethostname()
-        alt_names = ",".join(
+        # Build certificate subject/issuer meta
+        subject = issuer = x509.Name(
             [
-                f"DNS:{socket.gethostname()}",
-                f"DNS:*.{socket.gethostname()}",
-                "DNS:localhost",
-                "DNS:*.localhost",
-                "DNS:127.0.0.1",
+                x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
+                x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Indiana"),
+                x509.NameAttribute(
+                    NameOID.ORGANIZATION_NAME, "Arcadia Technology, LLC"
+                ),
+                x509.NameAttribute(
+                    NameOID.ORGANIZATIONAL_UNIT_NAME, "Crafty Controller"
+                ),
+                x509.NameAttribute(NameOID.COMMON_NAME, gethostname()),
+                x509.NameAttribute(NameOID.EMAIL_ADDRESS, "info@arcadiatech.org"),
             ]
-        ).encode()
-        subject_alt_names_ext = crypto.X509Extension(
-            b"subjectAltName", False, alt_names
         )
-        basic_constraints_ext = crypto.X509Extension(
-            b"basicConstraints", True, b"CA:false"
-        )
-        cert.add_extensions([subject_alt_names_ext, basic_constraints_ext])
-        cert.set_serial_number(secrets.randbelow(254) + 1)
-        cert.gmtime_adj_notBefore(0)
-        cert.gmtime_adj_notAfter(365 * 24 * 60 * 60)
-        cert.set_issuer(cert.get_subject())
-        cert.set_pubkey(k)
-        cert.set_version(2)
-        cert.sign(k, "sha256")
 
-        with open(cert_file, "w", encoding="utf-8") as cert_file_handle:
-            cert_file_handle.write(
-                crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode()
+        # Build subject Alternative Names
+        alt_names = [
+            socket.gethostname(),
+            f"*.{socket.gethostname()}",
+            "localhost",
+            "*.localhost",
+            "*.local",
+            "127.0.0.1",
+        ]
+        san = x509.SubjectAlternativeName([x509.DNSName(name) for name in alt_names])
+
+        # Construct certificate
+        cert_builder = (
+            x509.CertificateBuilder()
+            .subject_name(subject)
+            .issuer_name(issuer)
+            .public_key(private_key.public_key())
+            .serial_number(secrets.randbelow(254) + 1)  # rand serial
+            .not_valid_before(datetime.now(timezone.utc))
+            .not_valid_after(datetime.now(timezone.utc) + timedelta(days=365))  # 1 yr
+            .add_extension(san, critical=False)
+            .add_extension(
+                x509.BasicConstraints(ca=False, path_length=None), critical=True
             )
+        )
 
-        with open(key_file, "w", encoding="utf-8") as key_file_handle:
+        # Sign certificate
+        certificate = cert_builder.sign(
+            private_key=private_key, algorithm=hashes.SHA256()
+        )
+
+        # Write cert and priv key to disk
+        with open(cert_file, "wb") as cert_file_handle:
+            cert_file_handle.write(certificate.public_bytes(serialization.Encoding.PEM))
+        with open(key_file, "wb") as key_file_handle:
             key_file_handle.write(
-                crypto.dump_privatekey(crypto.FILETYPE_PEM, k).decode()
+                private_key.private_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PrivateFormat.TraditionalOpenSSL,
+                    encryption_algorithm=serialization.NoEncryption(),
+                )
             )
+
+        logger.info("Self-signed certificate and key generation completed.")
+        Console.info("Self-signed certificate and key generation completed.")
+        return True
 
     @staticmethod
     def random_string_generator(size=6, chars=string.ascii_uppercase + string.digits):
