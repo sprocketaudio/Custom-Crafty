@@ -363,7 +363,8 @@
         "selfHost": "이 저장소를 호스팅하고 계신 경우, 주소를 확인하거나 문제 해결 가이드를 참조하세요.",
         "start-error": "서버 {} 시작에 실패했습니다. 오류 코드: {}",
         "superError": "이 작업을 수행할려면 'Super User' 이어야 합니다.",
-        "terribleFailure": "끔직한 실패에요!"
+        "terribleFailure": "끔직한 실패에요!",
+        "duplicateId": "요청 토큰에서 session_id와 token_id는 둘 중 하나만 선택해야 해요."
     },
     "footer": {
         "allRightsReserved": "All rights reserved",
@@ -378,7 +379,13 @@
         "login": "로그인",
         "password": "비밀번호",
         "username": "아이디",
-        "viewStatus": "공개 상태 페이지 보기"
+        "viewStatus": "공개 상태 페이지 보기",
+        "2fa": "(MFA가 활성화된 경우)",
+        "burnedBackupCode": "백업 코드 중 하나를 이미 사용하셨습니다. 잠김을 방지하기 위해 새 코드를 재발급해 주세요.",
+        "2faRecovery": "MFA 복구",
+        "backupCodeTitle": "백업 코드",
+        "backupCode": "백업 코드 입력",
+        "cancel": "취소"
     },
     "notify": {
         "activityLog": "활동 로그",
@@ -720,5 +727,16 @@
         "stop": "정지",
         "stopScroll": "자동 스크롤 중지",
         "updating": "업데이트 중..."
+    },
+    "otp": {
+        "deleteConfirm": "이 MFA 메서드를 삭제하시겠습니까?",
+        "id": "ID",
+        "config": "설정",
+        "copyBackupCodes": "코드 복사",
+        "delete": "삭제",
+        "yes": "네",
+        "no": "아니오",
+        "2faCreate": "새로운 MFA 메서드 추가",
+        "backupCodes": "백업 코드를 복사해 주세요."
     }
 }
