@@ -195,7 +195,7 @@ class APIUsersTOTPVerifyIndexHandler(BaseApiHandler):
             auth_data[4]["user_id"]
         )
         self.controller.management.add_to_audit_log(
-            auth_data[4]["username"],
+            auth_data[4]["user_id"],
             f"successfully added MFA {totp_id}",
             server_id=None,
             source_ip=self.get_remote_ip(),
