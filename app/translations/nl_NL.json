@@ -196,7 +196,8 @@
         "migration": "Crafty's primaire server opslag wordt gemigreerd naar een nieuwe locatie. Gedurende deze tijd zijn alle serverstarts opgeschort. Even geduld terwijl wij deze migratie afronden",
         "noInternet": "Crafty heeft moeite om het internet te bereiken. Server Creatie is uitgeschakeld. Controleer je internetverbinding en ververs deze pagina.",
         "return": "Terugkeren naar Dashboard",
-        "superError": "Je moet supergebruiker zijn om deze actie te voltooien."
+        "superError": "Je moet supergebruiker zijn om deze actie te voltooien.",
+        "duplicateId": "Verzoektokens moeten alleen session_id of token_id specificeren, niet beide."
     },
     "footer": {
         "allRightsReserved": "Alle rechten voorbehouden",
@@ -210,8 +211,18 @@
         "username": "Gebruikersnaam",
         "disabled": "Gebruikersaccount uitgeschakeld. Neem contact op met jouw systeembeheerder voor meer informatie.",
         "defaultPath": "Het wachtwoord dat je hebt ingevoerd is het standaardpad voor referenties, niet het wachtwoord. Zoek het standaardwachtwoord op die locatie.",
-        "incorrect": "Incorrecte gebruikersnaam of wachtwoord",
-        "viewStatus": "Bekijk Publieke Statuspagina"
+        "incorrect": "Incorrecte gebruikersnaam, wachtwoord of MFA",
+        "viewStatus": "Bekijk Publieke Statuspagina",
+        "burnedBackupCode": "Je hebt één van je back-upcodes verbruikt. Gelieve je back-upcodes te hergenereren om te voorkomen dat je wordt buitengesloten",
+        "2fa": "(Als MFA is Ingeschakeld)",
+        "2faRecovery": "MFA Herstellen",
+        "cancel": "Annuleren",
+        "cooldown": "Afkoelperiode actief. Probeer opnieuw in",
+        "totpSelect": "Authenticatie-app",
+        "passwordRecovery": "Wachtwoord Herstellen",
+        "totp": "Voer Authenticatiecode In",
+        "backupCodeTitle": "Back-upcode",
+        "backupCode": "Voeg Back-upcode In"
     },
     "notify": {
         "activityLog": "Activiteit-logboeken",
@@ -225,7 +236,8 @@
         "backup_desc": "Wij hebben gedetecteerd dat de back-upmigratie mogelijk gedeeltelijk of volledig mislukt is. Controleer jouw back-upgegevens in het tabblad Backups.",
         "backup_title": "Back-upmigratie Waarschuwing",
         "schedule_desc": "We hebben gedetecteerd dat sommige of alle geplande taken niet succesvol overgezet zijn tijdens de upgrade. Bevestig uw roosters in het tabblad 'Roosters'.",
-        "schedule_title": "Roosters Migratiewaarschuwing"
+        "schedule_title": "Roosters Migratiewaarschuwing",
+        "accountSettings": "Accountinstellingen"
     },
     "panelConfig": {
         "adminControls": "Admin Bediening",
@@ -311,8 +323,8 @@
         "storageLocationDesc": "Waar wil je back-ups opslaan?",
         "actions": "Acties",
         "after": "Voer commando uit na back-up",
-        "defaultExplain": "De backup die Crafty zal gebruiken vóór updates. Deze kan niet veranderd of verwijderd worden.",
-        "backups": "Serverbackups",
+        "defaultExplain": "De back-up die Crafty zal gebruiken vóór updates. Deze kan niet veranderd of verwijderd worden.",
+        "backups": "Serverback-ups",
         "before": "Voer commando uit vóór back-up",
         "default": "Standaardback-up",
         "edit": "Bewerken",
@@ -599,7 +611,8 @@
         "documentation": "Documentatie",
         "newServer": "Nieuwe server maken",
         "servers": "Servers",
-        "inApp": "In-App Documentatie"
+        "inApp": "In-App Documentatie",
+        "panelSettings": "Paneelinstellingen"
     },
     "userConfig": {
         "apiKey": "API-sleutels",
@@ -639,7 +652,14 @@
         "uses": "Aantal keer toegestaan (-1==Geen limiet)",
         "manager": "Manager",
         "selectManager": "Selecteer Manager voor Gebruiker",
-        "userTheme": "UI-thema"
+        "userTheme": "UI-thema",
+        "otpReq": "TOTP is nodig voor supergebruikers. Je kan je enige TOTP-methode niet verwijderen.",
+        "changePass": "Wachtwoord Veranderen",
+        "editTOTP": "Gebruiker MFA bewerken",
+        "changeUser": "Gebruikersnaam Veranderen",
+        "hints": "Aanzetten Hints?",
+        "totpIdReq": "TOTP ID Benodigd voor verzoek",
+        "totpHeader": "Multi Factor Authenticatie"
     },
     "customLogin": {
         "apply": "Toepassen",
@@ -679,7 +699,9 @@
         "typeBool": "moet true of false zijn (type boolean)",
         "typeIntMinVal0": "moet een geheel getal zijn met een minimumwaarde van 0.",
         "typeInteger": "moet een getal zijn.",
-        "typeString": "moet van het type string zijn."
+        "typeString": "moet van het type string zijn.",
+        "2FAerror": "Multi-factorcode moet 6 cijfers (b.v.b. 000000) of een back-upcode of 16 karakters, elke vier gescheiden door - (b.v.b. ABCD-EFGH-IJKL-MNOP) zijn",
+        "totp": "TOTP-code moet 6 nummers zijn"
     },
     "serverMetrics": {
         "zoomHint1": "Om in te zoomen op de grafiek, houdt je de shift-toets ingedrukt en gebruik je vervolgens je scrollwiel.",
@@ -720,5 +742,56 @@
         "url": "Webhook-URL",
         "webhook_body": "Webhook-body",
         "webhooks": "Webhooks"
+    },
+    "otp": {
+        "saveWarn": "Zorg ervoor dat je deze back-upcodes opslaat, anders kan je toegang verliezen",
+        "name": "Naam",
+        "deleteConfirm": "Weet je zeker dat je deze MFA-methode wilt verwijderen?",
+        "verify": "MFA kan niet worden geverifieerd. De verkeerde code is ingevuld.",
+        "mfaWarn": "Je moet MFA ingeschakeld hebben om met dit systeem te kunnen interacteren. Maak een MFA-sleutel. Als je dit bericht ziet en al een sleutel hebt gemaakt, log dan uit en log dan opnieuw in met MFA.",
+        "config": "Configuratie",
+        "id": "ID",
+        "copyBackupCodes": "Kopieer Codes",
+        "delete": "Verwijderen",
+        "yes": "Ja",
+        "no": "Nee",
+        "2faCreate": "Nieuwe MFA-Methode Toevoegen",
+        "backupCodes": "Gelieve je back-upcodes te kopiëren.",
+        "backupCodesMax": "Een maximum van 6 back-upcodes is al bereikt.",
+        "backupOtp": "Een MFA-methode is benodigd om back-upcodes te verzoeken",
+        "confirm2FA": "Gelieve Authenicatiecode Bevestigen",
+        "newName": "Voeg een vriendelijke naam in voor deze MFA-methode",
+        "otpTitle": "MFA-Methodes",
+        "renewRecovery": "Herstelcodes Vernieuwen",
+        "newOTP": "Nieuwe Multi-Factor Authenticatie Toevoegen",
+        "verifyTitle": "MFA-methode verifiëren met authenticator",
+        "goToPage": "Ga naar MFA-pagina"
+    },
+    "configJson": {
+        "delete_default_json": "Verwijder standaard JSON-bestand tijdens opstarten",
+        "max_audit_entries": "Maximale aantal toegestane vermeldingen in Crafty's activiteitenlog",
+        "cookie_expire": "Sessiecookies verlopen na (dagen)",
+        "history_max_age": "Hoe lang Crafty serverstatistieken moet bewaren (dagen)",
+        "show_contribute_link": "Toon bijdragelinks in paneel",
+        "virtual_terminal_lines": "Hoeveel regels we moeten toestaan in de terminalbuffer van jouw server",
+        "allow_nsfw_profile_pictures": "Gravatar™ NSFW-profielfoto's toestaan",
+        "big_bucket_repo": "Systeem Big Bucket™ externe URL",
+        "crafty_logs_delete_after_days": "Hoe lang Crafty app logs moet bewaren (dagen)",
+        "dir_size_poll_freq_minutes": "Hoe vaak Crafty je servermappen moet peilen voor hun grootte (minuten)",
+        "disabled_language_files": "Globaal uitgeschakelde taalbestanden",
+        "enable_user_self_delete": "Gebruikers toestaan hun eigen account te verwijderen",
+        "enable_otp_skew": "MFA-scheefstand Aanzetten (+-1)",
+        "False": "Onjuist",
+        "https_port": "Crafty's poort",
+        "keywords": "Trefwoorden die Crafty moet benadrukken in jouw serverterminals",
+        "language": "Globale systeemtaal. (Voor publieke pagina's en vertaalterugval)",
+        "max_log_lines": "Maximale nummer van loglijnen per bestand",
+        "max_login_attempts": "Maximale aantal keren dat een extern IP-adres de aanmelding kan laten mislukken voordat een time-out optreedt",
+        "monitored_mounts": "Opslagbevestigingen zichtbaar op dashboard",
+        "reset_secrets_on_next_boot": "Geheimen opnieuw instellen bij volgende keer opstarten",
+        "show_errors": "Toon webserver debug fouten",
+        "stats_update_frequency_seconds": "Hoe vaak we jouw server moeten peilen voor statistieken (seconden)",
+        "submit": "Indienen",
+        "True": "Juist"
     }
 }
