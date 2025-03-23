@@ -210,7 +210,8 @@
         "selfHost": "se stai ospitando te questo repo, controlla il tuo indirizzo o consulta la nostra guida di risoluzione dei problemi.",
         "start-error": "Server {} failed to start with error code: {}",
         "superError": "Devi essere un super utente per eseguire questa azione.",
-        "terribleFailure": "What a Terrible Failure!"
+        "terribleFailure": "What a Terrible Failure!",
+        "duplicateId": "La richiesta di token deve includere solo session_id o token_id, non entrambi."
     },
     "footer": {
         "allRightsReserved": "Tutti i diritti Riservati",
@@ -221,11 +222,21 @@
         "defaultPath": "La password immessa è il percorso delle credenziali predefinite, non la password. Trova la password predefinita in quella posizione.",
         "disabled": "Account utente disabilitato. Per ulteriori informazioni, contatta l'amministratore di sistema.",
         "forgotPassword": "Password dimenticata",
-        "incorrect": "nome utente o password errati",
+        "incorrect": "nome utente, password o MFA errati",
         "login": "Accedi",
         "password": "Password",
         "username": "Nome utente",
-        "viewStatus": "Visualizza la pagina di stato pubblica"
+        "viewStatus": "Visualizza la pagina di stato pubblica",
+        "burnedBackupCode": "Hai bruciato uno dei tuoi codici di backup. Per evitare di essere bloccato, ti preghiamo di ricaricare i tuoi codici di backup",
+        "2fa": "(Se MFA è abilitato)",
+        "2faRecovery": "Ripristina MFA",
+        "backupCodeTitle": "Codice di backup",
+        "backupCode": "Inserisci il codice di backup",
+        "cancel": "Annulla",
+        "cooldown": "Tempo di recupero attivo. Riprova tra",
+        "totpSelect": "App di autenticazione",
+        "passwordRecovery": "Ripristina password",
+        "totp": "Inserisci il codice di autenticazione"
     },
     "notify": {
         "activityLog": "Registri di Attività",
@@ -237,7 +248,10 @@
         "preparingLogs": "Per favore aspetta mentre prepariamo i tuoi registri... Ti invieremo una notifica quando saranno pronti. Potrebbe volerci un po' per installazioni grosse.",
         "supportLogs": "Registri di supporto",
         "backup_desc": "Abbiamo rilevato che la migrazione del backup potrebbe essere parzialmente o completamente fallita. Controlla i backup effettuati nella scheda Backup.",
-        "backup_title": "Avviso migrazione di backup"
+        "backup_title": "Avviso migrazione di backup",
+        "schedule_desc": "Abbiamo rilevato che alcune o tutte le tue attività pianificate non sono state trasferite correttamente durante l'aggiornamento. Conferma le tue pianificazioni nella scheda delle pianificazioni.",
+        "accountSettings": "Impostazioni dell'account",
+        "schedule_title": "Avviso di migrazione delle pianificazioni"
     },
     "offline": {
         "offline": "Disconnesso",
@@ -342,7 +356,10 @@
         "status": "Stato",
         "storage": "Percorso archiviazione",
         "storageLocation": "Percorso di memorizzazione",
-        "storageLocationDesc": "Dove vuoi memorizzare i backup?"
+        "storageLocationDesc": "Dove vuoi memorizzare i backup?",
+        "radioRequired": "Devi scegliere un'opzione per ripristinare il tuo backup",
+        "replace": " Ripristina i file di backup e reimposta la directory del server in modo che sia nella struttura esatta del backup",
+        "inplace": "Ripristina i file di backup in posizione: i file che non sono nello zip di backup rimarranno nella directory del server"
     },
     "serverConfig": {
         "bePatientDelete": "Per favore sii paziente mentre rimuoviamo il tuo server dal pannello di Crafty. Questa schermata si chiuderà in pochi istanti.",
@@ -505,7 +522,7 @@
     },
     "serverSchedules": {
         "action": "Azione",
-        "actionId": "Seleziona azione da eseguire",
+        "actionId": "Azione da eseguire",
         "areYouSure": "Eliminare l'azione programmata?",
         "cancel": "Cancella",
         "cannotSee": "Non vedi tutto?",
@@ -529,7 +546,8 @@
         "no": "No",
         "no-schedule": "Non sono attualmente presenti schedari per questo server. Per iniziare, clicca",
         "scheduledTasks": "Attività schedate",
-        "yes": "Sì"
+        "yes": "Sì",
+        "backupPol": "Politica di backup"
     },
     "serverStats": {
         "cpuUsage": "Utilizzo del Processore",
@@ -616,7 +634,8 @@
         "documentation": "Documentazione",
         "inApp": "Documenti in app",
         "newServer": "Crea un Nuovo Server",
-        "servers": "Servers"
+        "servers": "Servers",
+        "panelSettings": "Impostazioni del pannello"
     },
     "startup": {
         "almost": "Finalizzazione. Tieniti forte...",
@@ -666,13 +685,38 @@
         "userRolesDesc": "Ruoli di cui l'utente fa parte.",
         "userSettings": "Impostazioni Utente",
         "userTheme": "Tema IU",
-        "uses": "Numero di usi permessi (-1==Nessun limite)"
+        "uses": "Numero di usi permessi (-1==Nessun limite)",
+        "changePass": "Cambia password",
+        "changeUser": "Cambia nome utente",
+        "editTOTP": "Modifica utente MFA",
+        "hints": "Abilitare i suggerimenti?",
+        "totpIdReq": "ID TOTP necessario per la richiesta",
+        "totpHeader": "Autenticazione a più fattori",
+        "otpReq": "TOTP è obbligatorio per i super utenti. Non puoi rimuovere il tuo unico metodo TOTP."
     },
     "validators": {
         "passLength": "La password è troppo corta. Lunghezza minima: 8",
         "enumErr": "Validazione fallita. Valori accettabili includono: ",
         "serverExeCommand": "Il comando di esecuzione del server dev’essere una stringa con lunghezza minima di 1.",
-        "serverLogPath": "Il percorso del registro del server dev’essere una stringa con lunghezza minima di 1"
+        "serverLogPath": "Il percorso del registro del server dev’essere una stringa con lunghezza minima di 1",
+        "roleServerPerms": "Le autorizzazioni del server devono essere una stringa a 8 bit",
+        "backupName": "Il nome del backup deve essere una stringa e avere una lunghezza minima di 3.",
+        "userName": " deve essere di tipo stringa, tutto in MINUSCOLO, un minimo di 4 caratteri e un massimo di 20 caratteri",
+        "serverCreateName": "Il nome del server deve essere una stringa con una lunghezza minima di 2 e non deve includere: \\ / o # ",
+        "typeInteger": "deve essere un numero.",
+        "2FAerror": "Il codice dell'autenticazione deve essere composto da 6 cifre (ad esempio 000000) o da un codice di backup di 16 caratteri separati ogni 4 da - (ad esempio ABCD-EFGH-IJKL-MNOP)",
+        "filesPageLen": "la lunghezza deve essere maggiore di 1 per la proprietà",
+        "insufficientPerms": "Errore di autorizzazione: autorizzazioni mancanti per questa risorsa",
+        "roleManager": "Il gestore dei ruoli deve essere di tipo intero (ID gestore) o Nessuno",
+        "roleName": "Il nome del ruolo deve essere una stringa maggiore di 1 carattere. Non deve includere nessuno dei seguenti simboli: [ ] , ",
+        "roleServerId": "La proprietà ID server deve essere una stringa con una lunghezza minima di 1",
+        "taskIntervalType": "Il tipo di intervallo di attività deve essere uno dei seguenti: ",
+        "totp": "Il codice TOTP deve essere composto da 6 numeri",
+        "typeBool": "deve essere vero o falso (tipo booleano)",
+        "typeEmail": "deve essere di tipo email.",
+        "typeIntMinVal0": "deve essere un numero intero con valore minimo pari a 0.",
+        "typeList": "deve essere di tipo elenco/array ",
+        "typeString": "deve essere di tipo stringa."
     },
     "webhooks": {
         "areYouSureDel": "Sei sicuro di voler eliminare questo webhook?",
@@ -698,5 +742,56 @@
         "url": "URL del Webhook",
         "webhook_body": "Corpo del Webhook",
         "webhooks": "Webhook"
+    },
+    "otp": {
+        "newOTP": "Aggiungi nuova autenticazione a più fattori",
+        "saveWarn": "Assicurati di salvare questi codici di backup o potresti perdere l'accesso",
+        "renewRecovery": "Rinnova i codici di recupero",
+        "mfaWarn": "Devi avere MFA abilitato per interagire con questo sistema. Crea una chiave MFA. Se vedi questo messaggio e hai già creato una chiave, esci e accedi di nuovo con MFA.",
+        "name": "Nome",
+        "id": "ID",
+        "config": "Configurazione",
+        "copyBackupCodes": "Copia codici",
+        "delete": "Elimina",
+        "deleteConfirm": "Sei sicuro di voler eliminare questo metodo MFA?",
+        "yes": "Sì",
+        "no": "No",
+        "2faCreate": "Aggiungi nuovo metodo MFA",
+        "backupCodes": "Copia i codici di backup.",
+        "backupCodesMax": "È già stato raggiunto il massimo di 6 codici arretrati.",
+        "backupOtp": "È necessario un metodo MFA per richiedere codici di backup",
+        "confirm2FA": "Si prega di confermare il codice di autenticazione",
+        "newName": "Inserisci un nome descrittivo per questo metodo MFA",
+        "otpTitle": "Metodi MFA",
+        "verifyTitle": "Verifica il metodo MFA utilizzando l'autenticatore",
+        "verify": "Impossibile verificare MFA. Codice inserito non corretto.",
+        "goToPage": "Vai alla pagina MFA"
+    },
+    "configJson": {
+        "virtual_terminal_lines": "Quante righe dobbiamo consentire nel buffer del terminale del server",
+        "dir_size_poll_freq_minutes": "Con quale frequenza Crafty dovrebbe interrogare le directory del tuo server per ottenere le loro dimensioni (minuti)",
+        "enable_otp_skew": "Abilita MFA skew (+-1)",
+        "history_max_age": "Per quanto tempo Crafty deve conservare le statistiche del tuo server (giorni)",
+        "max_log_lines": "Numero massimo di righe di registro per file",
+        "show_contribute_link": "Mostra i link dei contributi nel pannello",
+        "allow_nsfw_profile_pictures": "Consenti le immagini del profilo NSFW di Gravatar™",
+        "big_bucket_repo": "URL remoto del System Big Bucket™",
+        "cookie_expire": "I cookie di sessione scadono dopo (giorni)",
+        "crafty_logs_delete_after_days": "Per quanto tempo Crafty deve conservare i registri dell'app (giorni)",
+        "delete_default_json": "Elimina il file json predefinito all'avvio",
+        "disabled_language_files": "File di lingua disabilitati globalmente",
+        "enable_user_self_delete": "Consenti agli utenti di eliminare il proprio account",
+        "False": "Falso",
+        "https_port": "Porta di Crafty",
+        "keywords": "Le parole chiave che Crafty deve evidenziare nei terminali del tuo server",
+        "language": "Lingua del sistema globale. (Per pagine pubbliche e fallback di traduzione)",
+        "max_audit_entries": "Numero massimo di voci consentite nel registro delle attività di Crafty",
+        "max_login_attempts": "Numero massimo di volte in cui un IP remoto può non riuscire ad accedere prima che scada il tempo",
+        "monitored_mounts": "Supporti di archiviazione visibili sulla pagina iniziale",
+        "reset_secrets_on_next_boot": "Reimposta i segreti al prossimo avvio",
+        "show_errors": "Mostra errori di debug del server web",
+        "stats_update_frequency_seconds": "Con quale frequenza dobbiamo interrogare il tuo server per le statistiche (secondi)",
+        "submit": "Invia",
+        "True": "Vero"
     }
 }
