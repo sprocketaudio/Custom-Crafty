@@ -210,7 +210,8 @@
         "selfHost": "如果您自托管此仓库，请检查您的地址或参考我们的故障排除指南。",
         "start-error": "服务器 {} 启动失败，错误代码为：{}",
         "superError": "您必须作为超级用户来完成此操作。",
-        "terribleFailure": "多糟糕的错误！"
+        "terribleFailure": "多糟糕的错误！",
+        "duplicateId": "请求令牌必须仅指定 session_id 或 token_id，而非两者。"
     },
     "footer": {
         "allRightsReserved": "All rights reserved",
@@ -221,11 +222,21 @@
         "defaultPath": "您输入的密码是默认凭据的路径，不是其中的密码。请在此路径中找到默认密码。",
         "disabled": "用户账号已禁用。请联系您的系统管理员以了解更多信息。",
         "forgotPassword": "忘记密码",
-        "incorrect": "用户名或密码错误",
+        "incorrect": "用户名、密码或 MFA 错误",
         "login": "登录",
         "password": "密码",
         "username": "用户名",
-        "viewStatus": "查看公开状态页面"
+        "viewStatus": "查看公开状态页面",
+        "burnedBackupCode": "您已焚毁您的一个备份代码。请重新生成您的备份代码以避免被封锁",
+        "2fa": "（如果 MFA 已启用）",
+        "2faRecovery": "恢复 MFA",
+        "backupCodeTitle": "备份代码",
+        "backupCode": "输入备份代码",
+        "cancel": "取消",
+        "cooldown": "冷却中。此时间后重试：",
+        "totpSelect": "认证器应用",
+        "passwordRecovery": "恢复密码",
+        "totp": "输入认证器代码"
     },
     "notify": {
         "activityLog": "活动日志",
@@ -239,7 +250,8 @@
         "backup_title": "备份迁移警告",
         "schedule_title": "计划迁移警告",
         "backup_desc": "我们检测到备份迁移可能已经部分或完全失败。请在备份选项卡中确认您的备份记录。",
-        "schedule_desc": "我们检测到您的一些或全部计划任务在升级时未成功转移。请在计划选项卡中确认您的计划。"
+        "schedule_desc": "我们检测到您的一些或全部计划任务在升级时未成功转移。请在计划选项卡中确认您的计划。",
+        "accountSettings": "账号设置"
     },
     "offline": {
         "offline": "离线",
@@ -622,7 +634,8 @@
         "documentation": "文档",
         "inApp": "内置文档",
         "newServer": "创建新服务器",
-        "servers": "服务器"
+        "servers": "服务器",
+        "panelSettings": "面板设置"
     },
     "startup": {
         "almost": "即将完成。请稍候……",
@@ -672,7 +685,14 @@
         "userRolesDesc": "此用户充当成员的角色。",
         "userSettings": "用户设置",
         "userTheme": "UI 主题",
-        "uses": "使用次数限制（-1==无限制）"
+        "uses": "使用次数限制（-1==无限制）",
+        "otpReq": "超级用户需要 TOTP。您不能删除您仅有的 TOTP 方式。",
+        "totpIdReq": "请求需要 TOTP ID",
+        "changePass": "更改密码",
+        "changeUser": "更改用户名",
+        "editTOTP": "编辑用户 MFA",
+        "hints": "启用提示？",
+        "totpHeader": "多因素验证"
     },
     "validators": {
         "passLength": "密码过短。最短长度：8",
@@ -694,7 +714,9 @@
         "typeEmail": "必须为邮箱类型。",
         "typeIntMinVal0": "必须为最小值为 0 的整数。",
         "typeInteger": "必须为数字。",
-        "typeString": "必须为字符串类型。"
+        "typeString": "必须为字符串类型。",
+        "2FAerror": "多因素代码必须为 6 位（例如：000000）或一个以 - 分隔为每 4 位一段的备份代码（例如：ABCD-EFGH-IJKL-MNOP）",
+        "totp": "TOTP 代码必须为 6 个数字"
     },
     "webhooks": {
         "areYouSureDel": "您确定要删除此 webhook 吗？",
@@ -720,5 +742,56 @@
         "url": "Webhook 地址",
         "webhook_body": "Webhook 消息体（Body）",
         "webhooks": "Webhook"
+    },
+    "otp": {
+        "backupOtp": "需要一个新的 MFA 方式以请求备份代码",
+        "mfaWarn": "您必须启用 MFA 来与此系统交互。请创建一个 MFA 密钥。如果您已经创建了一个密钥，但仍看见此消息，请注销并使用 MFA 重新登录。",
+        "deleteConfirm": "您确定要删除此 MFA 方式吗？",
+        "verifyTitle": "使用认证器验证 MFA 方式",
+        "name": "名称",
+        "id": "ID",
+        "config": "配置",
+        "copyBackupCodes": "复制代码",
+        "delete": "删除",
+        "yes": "是",
+        "no": "否",
+        "2faCreate": "添加新的 MFA 方式",
+        "backupCodes": "请复制您的备份代码。",
+        "backupCodesMax": "已达到 6 个备份代码的上限。",
+        "saveWarn": "请确保您保存了这些备份代码，否则您可能失去访问",
+        "confirm2FA": "请确认认证器代码",
+        "newName": "为此 MFA 方式输入一个易于辨认的名称",
+        "otpTitle": "MFA 方式",
+        "renewRecovery": "更新恢复代码",
+        "newOTP": "添加新的多因素验证",
+        "verify": "验证 MFA 失败。输入了错误的代码。",
+        "goToPage": "前往 MFA 页面"
+    },
+    "configJson": {
+        "history_max_age": "Crafty 应该保存您的服务器统计多久（天）",
+        "allow_nsfw_profile_pictures": "允许 Gravatar™ NSFW 个人资料图片",
+        "crafty_logs_delete_after_days": "Crafty 应该保存应用日志多久（天）",
+        "dir_size_poll_freq_minutes": "Crafty 应该多久拉取一次您的服务器目录以获取大小（分钟）",
+        "stats_update_frequency_seconds": "我们应该多久拉取一次您的服务器以获取统计（秒）",
+        "big_bucket_repo": "系统 Big Bucket™ 远端 URL",
+        "cookie_expire": "会话 cookie 过期时间（天）",
+        "delete_default_json": "启动时删除 default json 文件",
+        "disabled_language_files": "全局禁用的语言文件",
+        "enable_user_self_delete": "允许用户删除自己的账号",
+        "enable_otp_skew": "启用 MFA 偏移（+-1）",
+        "False": "否",
+        "https_port": "Crafty 的端口",
+        "keywords": "Crafty 应该在您的服务器终端中高亮的关键词",
+        "language": "全局系统语言。（用于公开页面和翻译回落）",
+        "max_audit_entries": "Crafty 的活动日志中允许的最大条目数量",
+        "max_log_lines": "每文件的最大日志行数",
+        "max_login_attempts": "远程 IP 在被我们置于冷却前的最大失败登录次数",
+        "monitored_mounts": "仪表板上可见的存储挂载",
+        "reset_secrets_on_next_boot": "下次启动时重置密钥",
+        "show_contribute_link": "在面板中显示贡献链接",
+        "show_errors": "显示 web 服务器的调试错误",
+        "submit": "提交",
+        "True": "是",
+        "virtual_terminal_lines": "我们应该允许您的服务器终端缓冲中有多少行"
     }
 }
