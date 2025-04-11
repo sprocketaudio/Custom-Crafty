@@ -32,7 +32,9 @@
         "yes": "Yes"
     },
     "base": {
-        "doesNotWorkWithoutJavascript": "<strong>Warning: </strong>Crafty doesn't work properly when JavaScript isn't enabled!"
+        "doesNotWorkWithoutJavascript": "<strong>Warning: </strong>Crafty doesn't work properly when JavaScript isn't enabled!",
+        "getMFA": "Secure your servers!",
+        "createMFA": "Add Multi Factor Authentication to your account!"
     },
     "credits": {
         "developmentTeam": "Development Team",
@@ -279,7 +281,8 @@
         "verifyTitle": "Verify MFA method using authenticator",
         "verify": "Failed to verify MFA. Incorrect code entered.",
         "mfaWarn": "You must have MFA enabled to interact with this system. Please create a MFA key. If you are seeing this message and have already created a key please log out then log back in with MFA.",
-        "goToPage": "Go to MFA page"
+        "goToPage": "Go to MFA page",
+        "otpReq": "MFA is required for this user. You cannot remove your only TOTP method."
     },
     "panelConfig": {
         "adminControls": "Admin Controls",
@@ -313,6 +316,11 @@
         "users": "Users"
     },
     "configJson": {
+        "general": "General",
+        "security": "Security",
+        "logs": "Logging",
+        "monitoring": "Monitoring",
+        "miscellaneous": "Miscellaneous",
         "allow_nsfw_profile_pictures": "Allow Gravatar™ NSFW profile pictures",
         "big_bucket_repo": "System Big Bucket™ remote URL",
         "cookie_expire": "Session cookies expire after (days)",
@@ -336,6 +344,7 @@
         "show_errors": "Show webserver debug errors",
         "stats_update_frequency_seconds": "How often we should poll your server for stats (seconds)",
         "submit": "Submit",
+        "superMFA": "Require superusers to enable MFA",
         "True": "True",
         "virtual_terminal_lines": "How many lines we should allow in your server terminal buffer"
     },
@@ -346,6 +355,7 @@
         "created": "Created: ",
         "delRole": "Delete Role",
         "doesNotExist": "You cannot delete something that does not exist yet",
+        "requireMFA": "Require role users to enable MFA (Multi Factor Authentication)",
         "pageTitle": "Edit Role",
         "pageTitleNew": "New Role",
         "permAccess": "Access?",
@@ -733,7 +743,7 @@
         "roleName": "Role Name",
         "selectManager": "Select Manager for User",
         "super": "Super User",
-        "totpIdReq": "TOTP ID Required for request",
+        "totpIdReq": "MFA ID Required for request",
         "totpHeader": "Multi Factor Auth",
         "userLang": "User Language",
         "userName": "User Name",
@@ -742,11 +752,11 @@
         "userRolesDesc": "Roles this user is a member of.",
         "userSettings": "User Settings",
         "userTheme": "UI Theme",
-        "uses": "Number of uses allowed (-1==No Limit)",
-        "otpReq": "TOTP is required for super users. You cannot remove your only TOTP method."
+        "uses": "Number of uses allowed (-1==No Limit)"
     },
     "validators": {
         "2FAerror": "Multi Factor code must be 6 digits (i.e. 000000) or a backup code of 16 characters separated every 4 by - (i.e. ABCD-EFGH-IJKL-MNOP)",
+        "additionalProperties": "Additional Properties are not allowed to be passed",
         "backupName": "Backup name must be a string and a minimum length of 3.",
         "enumErr": "failed validating. Acceptable data includes: ",
         "filesPageLen": "length must be greater than 1 for property",

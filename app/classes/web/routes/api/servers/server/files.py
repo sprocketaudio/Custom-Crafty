@@ -317,7 +317,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -403,7 +403,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -483,7 +483,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -576,7 +576,7 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -668,7 +668,7 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -761,7 +761,7 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
