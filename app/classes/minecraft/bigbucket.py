@@ -71,7 +71,7 @@ class BigBucket:
                 del data["manifest_version"]
                 return data
             return {}
-        except TimeoutError as e:
+        except (TimeoutError, ConnectionError) as e:
             logger.error(f"Unable to get jars from remote with error {e}")
             return {}
 
