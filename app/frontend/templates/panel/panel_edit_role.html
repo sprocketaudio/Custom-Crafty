@@ -83,6 +83,17 @@
                       </select>
                     </div>
                     {% end %}
+                    <div class="form-group">
+                      <div class="custom-control custom-switch">
+                        {% if data['role']['mfa_required']%}
+                        <input type="checkbox" class="custom-control-input" id="mfa_required" name="mfa_required" checked="">
+                        {% else %}
+                        <input type="checkbox" class="custom-control-input" id="mfa_required" name="mfa_required">
+                        {% end %}
+                        <label for="mfa_required" class="custom-control-label">{{ translate('rolesConfig', 'requireMFA',
+                          data['lang']) }}</label>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -347,7 +358,6 @@
         return value;
       }
       if (typeof value == "boolean") {
-        console.log(value);
         return value
       } else {
         return (isNaN(value) ? value : +value);
@@ -402,6 +412,7 @@
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
       formDataObject.servers = servers;
+      formDataObject.mfa_required = $("#mfa_required").prop('checked');
       console.log(formDataObject);
 
       //We need to make sure these are sent regardless of whether or not they're checked

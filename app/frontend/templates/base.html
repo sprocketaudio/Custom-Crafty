@@ -5,6 +5,11 @@
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
+  {% if not data.get("mfa", None) %}
+  <meta name="mfa_warn" content="{{translate('base', 'getMFA', data['lang'])}}">
+  <meta name="mfa_link" content="{{translate('base', 'createMFA', data['lang'])}}">
+  <meta name="userId" content="{{data['user_data']['user_id']}}">
+  {% end %}
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   {% block meta %}{% end %}
   <title>{% block title %}{{ _('Default') }}{% end %}</title>
@@ -27,7 +32,7 @@
   <link rel="stylesheet" href="/static/assets/css/crafty.css">
   <link rel="stylesheet" href="/static/assets/css/crafty-toggle-btn.css">
   <link rel="stylesheet" href="/static/assets/css/partial/crafty-notification.css">
-
+  <link rel="stylesheet" href="/static/assets/css/partial/crafty-warn.css">
   <link rel="manifest" href="/static/assets/crafty.webmanifest">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -131,6 +136,12 @@
   <script type="text/javascript" src="/static/assets/js/motd.js"></script>
 
   <script>
+    const MFA_WARN = document.querySelector('meta[name="mfa_warn"]');
+    const MFA_LINK = document.querySelector('meta[name="mfa_link"]');
+    const USER_ID = document.querySelector('meta[name="userId"]');
+    if (MFA_WARN) {
+      warn(MFA_WARN.content, link = `/panel/edit_user_otp?id=${USER_ID.content}`, link_msg = `${MFA_LINK.content}`, className = "clean-link", bg_color = "#cf0000")
+    }
     /**
       * Returns a random number between min (inclusive) and max (exclusive)
       */

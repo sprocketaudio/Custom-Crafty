@@ -33,7 +33,7 @@ class APIUsersTOTPIndexHandler(BaseApiHandler):
             _,
         ) = auth_data
 
-        if user_id in ["@me", user["user_id"]]:
+        if str(user_id) in ["@me", str(user["user_id"])]:
             user_id = user["user_id"]
         elif (
             EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
@@ -81,7 +81,7 @@ class APIUsersTOTPIndexHandler(BaseApiHandler):
         if totp_id:
             return
 
-        if user_id in ["@me", user["user_id"]]:
+        if str(user_id) in ["@me", str(user["user_id"])]:
             user_id = user["user_id"]
             res_user = self.controller.users.get_user_object(user_id)
         elif (
@@ -150,7 +150,7 @@ class APIUsersTOTPVerifyIndexHandler(BaseApiHandler):
                 },
             )
 
-        if user_id in ["@me", auth_data[4]["user_id"]]:
+        if str(user_id) in ["@me", str(auth_data[4]["user_id"])]:
             user_id = auth_data[4]["user_id"]
             res_user = self.controller.users.get_user_object(user_id)
         elif (
@@ -221,7 +221,7 @@ class APIUsersTOTPHandler(BaseApiHandler):
         if totp_id:
             return
 
-        if user_id in ["@me", user["user_id"]]:
+        if str(user_id) in ["@me", str(user["user_id"])]:
             user_id = user["user_id"]
             res_user = self.controller.users.get_user_object(user_id)
         elif (
@@ -285,9 +285,8 @@ class APIUsersTOTPHandler(BaseApiHandler):
                 },
             )
 
-        if user_id in ["@me", user["user_id"]]:
+        if str(user_id) in ["@me", str(user["user_id"])]:
             user = self.controller.users.get_user_object(user_id)
-            self.controller.users.remove_user(user_id)
         elif (
             EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
             and not auth_data[4]["superuser"]
@@ -302,14 +301,23 @@ class APIUsersTOTPHandler(BaseApiHandler):
         else:
             # has User_Config permission
             user = self.controller.users.get_user_object(user_id)
-        if len(list(user.totp_user)) <= 1 and user.superuser:
+        role_mfa = False
+        for role in self.controller.users.get_user_roles_id(user.user_id):
+            if self.controller.roles.get_role(role)["mfa_required"]:
+                role_mfa = True
+                break
+        if (
+            (len(list(user.totp_user)) <= 1 and user.superuser)
+            and self.helper.get_setting("superMFA")
+            or (len(list(user.totp_user)) <= 1 and role_mfa)
+        ):
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "NOT_AUTHORIZED",
                     "error_data": self.helper.translation.translate(
-                        "userConfig", "otpReq", self.helper.get_setting("language")
+                        "otp", "otpReq", self.helper.get_setting("language")
                     ),
                 },
             )
@@ -343,7 +351,7 @@ class APIUsersTOTPRecovery(BaseApiHandler):
         if totp_id:
             return
 
-        if user_id in ["@me", user["user_id"]]:
+        if str(user_id) in ["@me", str(user["user_id"])]:
             user_id = user["user_id"]
             res_user = self.controller.users.get_user_object(user_id)
         elif (

@@ -10,3 +10,11 @@
     cursor: pointer;
     z-index: 10;
 }
+
+.dropdown-menu {
+    max-height: 50vh !important;
+}
+
+.hand {
+    cursor: grab;
+}

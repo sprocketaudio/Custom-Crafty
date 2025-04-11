@@ -188,6 +188,30 @@ class BaseHandler(tornado.web.RequestHandler):
             return True
         return False
 
+    def is_mfa_satisfied(self, user, token_data) -> bool:
+        """Checks to see if panel settings or role settings require user
+        to have MFA enabled and passed in token. Checks token to see
+        if user has signed in with MFA.
+
+        Args:
+            user (dict): dictionary of user object
+            token_data (dict): decoded token data
+
+        Returns:
+            bool: Returns True if user has signed in with MFA or if they have not and
+            it is not required. Returns False if user is required to have MFA and
+            has not signed in with it.
+        """
+        su_mfa = self.helper.get_setting(
+            "superMFA"
+        )  # Get super user forced MFA setting
+        role_mfa = False
+        for role in self.controller.users.get_user_roles_id(user["user_id"]):
+            if self.controller.roles.get_role(role)["mfa_required"]:
+                role_mfa = True
+                break
+        return (user["superuser"] and su_mfa or role_mfa) and not token_data.get("mfa")
+
     def authenticate_user(
         self,
     ) -> t.Optional[
@@ -217,12 +241,12 @@ class BaseHandler(tornado.web.RequestHandler):
                         ),
                     },
                 )
-            if (
-                (user["superuser"] and not token_data.get("mfa"))
-                and not self.is_totp_method()
+            if self.is_mfa_satisfied(user, token_data) and (
+                not self.is_totp_method()
                 and not token_data.get("token_id")
                 and user["username"] != "anti-lockout-user"
-            ):  # check to see if user is superuser
+            ):
+                # check to see if user is superuser
                 # and MFA is not in token.
                 # Also check to see if user is trying to add MFA or access backup codes.
                 # Check for token ID because only API keys will have this.

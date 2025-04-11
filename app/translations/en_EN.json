@@ -282,7 +282,7 @@
         "verify": "Failed to verify MFA. Incorrect code entered.",
         "mfaWarn": "You must have MFA enabled to interact with this system. Please create a MFA key. If you are seeing this message and have already created a key please log out then log back in with MFA.",
         "goToPage": "Go to MFA page",
-        "otpReq": "MFA is required for this user. You cannot remove your only TOTP method."
+        "otpReq": "MFA is required for this user. You cannot remove your only MFA method."
     },
     "panelConfig": {
         "adminControls": "Admin Controls",
@@ -770,7 +770,7 @@
         "serverExeCommand": "Server execution command must be a string with a minimum length of 1.",
         "serverLogPath": "Server log path must be a string with a minimum length of 1",
         "taskIntervalType": "Task Interval Type must be one of the following: ",
-        "totp": "TOTP Code must be 6 numbers",
+        "totp": "MFA Code must be 6 numbers",
         "typeBool": "must be true or false (type boolean)",
         "typeEmail": "must be of type email.",
         "typeIntMinVal0": "must be an integer with a minimum value of 0.",

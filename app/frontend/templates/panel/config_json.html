@@ -6,8 +6,7 @@
 {% block title %}Crafty Controller - {{ translate('panelConfig', 'pageTitle', data['lang']) }}{% end %}
 
 {% block content %}
-<link rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.10/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="/static/assets/css/vendors/bootstrap-select-1.13.18.css">
 <link rel="stylesheet" href="/static/assets/css/partial/crafty-config-json.css">
 
 
@@ -53,9 +52,10 @@
 
           <form id="config-form" method="post" action="/panel/config_json">
             {% for section in data['config-json'].items() %}
-            <div class="card-header header-sm d-flex position-relative">
+            <div class="card-header header-sm d-flex position-relative hand" data-toggle="collapse"
+              data-target="#{{section[0]}}">
               <h3>{{translate('configJson', section[0], data['lang'])}}</h3>
-              <div class="right position-absolute top-0 end-0 p-2" data-toggle="collapse" data-target="#{{section[0]}}">
+              <div class="right position-absolute top-0 end-0 p-2">
                 <i class="fa-solid fa-arrow-down-wide-short"></i>
               </div>
             </div>
@@ -74,9 +74,10 @@
                   <select name="{{item[0]}}" class="form-control">
                     {% for lang in data['availables_languages'] %}
                     {% if lang == item[1] %}
-                    <option selected>{{lang}}</option>
+                    <option value="{{lang}}" selected>{{translate('language', lang, 'humanized_index', False)}}</option>
                     {% else %}
-                    <option>{{lang}}</option>
+                    <option value="{{lang}}">{{translate('language', lang, 'humanized_index', False)}}
+                    </option>
                     {% end %}
                     {% end %}
                   </select>
@@ -85,15 +86,16 @@
                     <button type="button" class="btn btn-outline-default custom-picker"
                       onclick="$('option', $('#lang_select')).each(function(element) {$(this).removeAttr('selected').prop('selected', false); $('.selectpicker').selectpicker('refresh')});">{{
                       translate('panelConfig', 'enableLang', data['lang']) }}</button>
-                    <select id="lang_select" class="form-control selectpicker show-tick custom-picker"
-                      data-icon-base="fas" data-tick-icon="fa-check" multiple data-style="custom-picker">
+                    <select id="lang_select" class="form-control selectpicker show-tick" data-icon-base="fas"
+                      data-tick-icon="fa-check" multiple data-style="custom-picker">
                       {% for lang in data['all_languages'] %}
                       {% if lang in item[1] %}
-                      <option selected>{{lang}}</option>
+                      <option value="{{lang}}" selected>{{translate('language', lang, 'humanized_index', False)}}
+                      </option>
                       {% else %}
-                      <option>{{lang}}</option>
-                      {% end %}
-                      {% end %}
+                      <option value="{{lang}}">{{translate('language', lang, 'humanized_index', False)}}
+                        {% end %}
+                        {% end %}
                     </select>
                     <textarea id="disabled_lang" name="{{item[0]}}" class="form-control list hidden"
                       rows="{{ len(data['all_languages']) }}" value="{{','.join(item[1])}}"
@@ -221,7 +223,6 @@
     // Format the plain form data as JSON
     let formDataJsonString = JSON.stringify(formDataObject, replacer);
 
-    console.log(formDataJsonString)
 
     let res = await fetch(`/api/v2/crafty/config/`, {
       method: 'PATCH',

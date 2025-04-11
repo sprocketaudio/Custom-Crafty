@@ -36,6 +36,7 @@ create_role_schema = {
             },
         },
         "manager": {"type": ["integer", "null"], "error": "roleManager"},
+        "mfa_requried": {"type": ["boolean"], "error": "typeBool", "fill": True},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -70,6 +71,7 @@ basic_create_role_schema = {
                 "required": ["server_id", "permissions"],
             },
         },
+        "mfa_requried": {"type": "boolean", "error": "typeBool", "fill": True},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -168,7 +170,7 @@ class ApiRolesIndexHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -209,7 +211,9 @@ class ApiRolesIndexHandler(BaseApiHandler):
                 },
             )
 
-        role_id = self.controller.roles.add_role_advanced(role_name, servers, manager)
+        role_id = self.controller.roles.add_role_advanced(
+            role_name, servers, manager, data["mfa_required"]
+        )
 
         self.controller.management.add_to_audit_log(
             user["user_id"],

@@ -243,7 +243,7 @@ class PanelHandler(BaseHandler):
             datetime.datetime.fromtimestamp(now).strftime("%Y-%m-%d %H:%M:%S")
         )
 
-        api_key, _token_data, exec_user = self.current_user
+        api_key, token_data, exec_user = self.current_user
         superuser = exec_user["superuser"]
         if api_key is not None:
             superuser = superuser and api_key.full_access
@@ -315,6 +315,10 @@ class PanelHandler(BaseHandler):
 
         page_data: t.Dict[str, t.Any] = {
             # todo: make this actually pull and compare version data
+            "mfa": token_data.get(
+                "mfa"
+            ),  # set value if the token has MFA set to true or not
+            # for warning banner
             "update_available": self.helper.update_available,
             "docker": self.helper.is_env_docker(),
             "background": self.controller.cached_login,
@@ -870,9 +874,9 @@ class PanelHandler(BaseHandler):
 
         elif page == "config_json":
             if exec_user["superuser"]:
-                with open(self.helper.settings_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                page_data["config-json"] = data
+                page_data["config-json"] = self.helper.get_categorized_settings(
+                    self.helper.get_all_settings()
+                )
                 page_data["availables_languages"] = []
                 page_data["all_languages"] = []
                 page_data["all_partitions"] = self.helper.get_all_mounts()
@@ -1580,6 +1584,7 @@ class PanelHandler(BaseHandler):
             page_data["role"]["role_id"] = -1
             page_data["role"]["created"] = "N/A"
             page_data["role"]["last_update"] = "N/A"
+            page_data["role"]["mfa_required"] = False
             page_data["role"]["servers"] = set()
             page_data["user-roles"] = user_roles
             page_data["users"] = self.controller.users.get_all_users()
