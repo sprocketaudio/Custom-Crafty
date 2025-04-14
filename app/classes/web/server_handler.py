@@ -25,7 +25,7 @@ class ServerHandler(BaseHandler):
     def get(self, page):
         (
             api_key,
-            _token_data,
+            token_data,
             exec_user,
         ) = self.current_user
         superuser = exec_user["superuser"]
@@ -90,6 +90,10 @@ class ServerHandler(BaseHandler):
             return self.redirect("/panel/panel_config")
 
         page_data = {
+            "mfa": token_data.get(
+                "mfa"
+            ),  # set value if the token has MFA set to true or not
+            # for warning banner
             "update_available": self.helper.update_available,
             "version_data": self.helper.get_version_string(),
             "user_data": exec_user,
