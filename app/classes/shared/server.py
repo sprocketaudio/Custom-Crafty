@@ -1660,12 +1660,10 @@ class ServerInstance:
     def get_servers_stats(self):
         server_stats = {}
 
-        logger.info("Getting Stats for Server " + self.name + " ...")
+        logger.debug("Getting Stats for Server %s | %s...", self.name, server_id)
 
         server_id = self.server_id
         server = HelperServers.get_server_data_by_id(server_id)
-
-        logger.debug(f"Getting stats for server: {server_id}")
 
         # get our server object, settings and data dictionaries
         self.reload_server_settings()
