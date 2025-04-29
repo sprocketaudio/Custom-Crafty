@@ -580,7 +580,8 @@ class Helpers:
 
         # Add miscellaneous last
         if miscellaneous:
-            categorized["Miscellaneous"] = miscellaneous
+            for key, value in miscellaneous.items():
+                categorized["miscellaneous"][key] = value
 
         return categorized
 
