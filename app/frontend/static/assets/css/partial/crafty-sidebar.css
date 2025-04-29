@@ -5,3 +5,16 @@
 .panel-settings {
     color: var(--info) !important;
 }
+
+.ribbon {
+    margin: -10px;
+    padding: 0;
+    background: var(--info);
+    color: var(--white);
+    padding: 1em 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translateX(30%) translateY(0%) rotate(45deg);
+    transform-origin: top left;
+}
