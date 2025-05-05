@@ -890,7 +890,7 @@
       try {
         cSelect.add(newOption);  // this will fail in DOM browsers but is needed for IE
       }
-      catch (e) {
+      catch {
         cSelect.appendChild(newOption);
       }
     })
@@ -955,7 +955,7 @@
       try {
         jcSelect.add(jnewOption);  // this will fail in DOM browsers but is needed for IE
       }
-      catch (e) {
+      catch {
         jcSelect.appendChild(jnewOption);
       }
     })
