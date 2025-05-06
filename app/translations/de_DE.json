@@ -225,7 +225,8 @@
         "login": "Einloggen",
         "password": "Passwort",
         "username": "Nutzername",
-        "viewStatus": "Öffentliche Statusseite anzeigen"
+        "viewStatus": "Öffentliche Statusseite anzeigen",
+        "2fa": "(Wenn MFA aktiviert ist)"
     },
     "notify": {
         "activityLog": "Aktivitätsprotokolle",

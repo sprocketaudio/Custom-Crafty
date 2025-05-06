@@ -111,7 +111,7 @@ class ApiAuthLoginHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.helper.get_setting("language"),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(

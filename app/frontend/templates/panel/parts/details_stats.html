@@ -261,12 +261,6 @@
       console.log(responseData)
       $("#server-name-nav").html(`${responseData.data['server_name']}`)
       $("#server-name-nav").toggleClass("d-none");
-    } else {
-
-      bootbox.alert({
-        title: responseData.error,
-        message: responseData.error_data
-      });
     }
   }
 </script>

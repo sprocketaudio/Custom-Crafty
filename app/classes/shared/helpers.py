@@ -45,6 +45,65 @@ if os.name == "nt":
 
 logger = logging.getLogger(__name__)
 
+MASTER_CONFIG = {
+    "https_port": 8443,
+    "language": "en_EN",
+    "cookie_expire": 30,
+    "show_errors": True,
+    "history_max_age": 7,
+    "stats_update_frequency_seconds": 30,
+    "delete_default_json": False,
+    "show_contribute_link": True,
+    "virtual_terminal_lines": 70,
+    "max_log_lines": 700,
+    "max_audit_entries": 300,
+    "disabled_language_files": [],
+    "keywords": ["help", "chunk"],
+    "allow_nsfw_profile_pictures": False,
+    "enable_user_self_delete": False,
+    "reset_secrets_on_next_boot": False,
+    "dir_size_poll_freq_minutes": 5,
+    "crafty_logs_delete_after_days": 0,
+    "big_bucket_repo": "https://jars.arcadiatech.org",
+    "enable_otp_skew": False,
+    "max_login_attempts": 3,
+    "superMFA": True,
+}
+
+CONFIG_CATEGORIES = {
+    "general": [
+        "https_port",
+        "language",
+        "show_errors",
+        "show_contribute_link",
+        "disabled_language_files",
+        "big_bucket_repo",
+        "enable_user_self_delete",
+    ],
+    "security": [
+        "allow_nsfw_profile_pictures",
+        "cookie_expire",
+        "reset_secrets_on_next_boot",
+        "enable_otp_skew",
+        "superMFA",
+        "max_login_attempts",
+    ],
+    "logs": [
+        "max_log_lines",
+        "max_audit_entries",
+        "history_max_age",
+        "crafty_logs_delete_after_days",
+        "virtual_terminal_lines",
+        "keywords",
+    ],
+    "monitoring": [
+        "monitored_mounts",
+        "dir_size_poll_freq_minutes",
+        "stats_update_frequency_seconds",
+    ],
+    "miscellaneous": ["delete_default_json"],
+}
+
 try:
     import requests
     from requests import get
@@ -503,6 +562,30 @@ class Helpers:
         return True
 
     @staticmethod
+    def get_categorized_settings(all_settings):
+        # Start with empty dicts for each defined category
+        categorized = {cat: {} for cat in CONFIG_CATEGORIES}
+
+        miscellaneous = {}
+
+        for key, value in all_settings.items():
+            added = False
+            for category, keys in CONFIG_CATEGORIES.items():
+                if key in keys:
+                    categorized[category][key] = value
+                    added = True
+                    break
+            if not added:
+                miscellaneous[key] = value
+
+        # Add miscellaneous last
+        if miscellaneous:
+            for key, value in miscellaneous.items():
+                categorized["miscellaneous"][key] = value
+
+        return categorized
+
+    @staticmethod
     def get_master_config():
         # Let's get the mounts and only show the first one by default
         mounts = Helpers.get_all_mounts()
@@ -511,30 +594,8 @@ class Helpers:
         # Make changes for users' local config.json files here. As of 4.0.20
         # Config.json was removed from the repo to make it easier for users
         # To make non-breaking changes to the file.
-        return {
-            "https_port": 8443,
-            "language": "en_EN",
-            "cookie_expire": 30,
-            "show_errors": True,
-            "history_max_age": 7,
-            "stats_update_frequency_seconds": 30,
-            "delete_default_json": False,
-            "show_contribute_link": True,
-            "virtual_terminal_lines": 70,
-            "max_log_lines": 700,
-            "max_audit_entries": 300,
-            "disabled_language_files": [],
-            "keywords": ["help", "chunk"],
-            "allow_nsfw_profile_pictures": False,
-            "enable_user_self_delete": False,
-            "reset_secrets_on_next_boot": False,
-            "monitored_mounts": mounts,
-            "dir_size_poll_freq_minutes": 5,
-            "crafty_logs_delete_after_days": 0,
-            "big_bucket_repo": "https://jars.arcadiatech.org",
-            "enable_otp_skew": False,
-            "max_login_attempts": 3,
-        }
+        MASTER_CONFIG["monitored_mounts"] = mounts
+        return MASTER_CONFIG
 
     def get_all_settings(self):
         try:

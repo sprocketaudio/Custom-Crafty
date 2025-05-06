@@ -71,7 +71,7 @@ class BigBucket:
                 del data["manifest_version"]
                 return data
             return {}
-        except TimeoutError as e:
+        except (TimeoutError, ConnectionError) as e:
             logger.error(f"Unable to get jars from remote with error {e}")
             return {}
 
@@ -216,7 +216,7 @@ class BigBucket:
 
         # Post-download actions
         if success:
-            if server == "forge-installer":
+            if server == "forge-installer" or server == "neoforge-installer":
                 # If this is the newer Forge version, run the installer
                 ServersController.finish_import(server_id, True)
             else:

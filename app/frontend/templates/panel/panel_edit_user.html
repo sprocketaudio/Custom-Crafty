@@ -135,7 +135,7 @@ data['lang']) }}{% end %}
                           {% if not 'incomplete' in lang %}
                           <option value="{{lang}}" >{{translate('language', lang, 'humanized_index', False)}}</option>
                           {% else %}
-                          <option value="{{lang}}" disabled>{{lang}}</option>
+                          <option value="{{lang}}" disabled>{{translate('language', lang, 'humanized_index', False)}}</option>
                           {% end %}
                           {% end %}
                         </select>
