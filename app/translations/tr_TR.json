@@ -356,7 +356,10 @@
         "status": "Durum",
         "storage": "Depolama Konumu",
         "storageLocation": "Depolama Konumu",
-        "storageLocationDesc": "Yedekleri nerede saklamak istiyorsunuz?"
+        "storageLocationDesc": "Yedekleri nerede saklamak istiyorsunuz?",
+        "inplace": "Yedek dosyalarını yerine geri yükleyin - yedekleme zip'inde olmayan dosyalar sunucu dizininde kalacaktır",
+        "radioRequired": "Yedeğinizi geri yüklemek için bir seçenek seçmelisiniz",
+        "replace": " Yedek dosyaları geri yükleyin ve sunucu dizinini tam olarak yedeğin yapısında olacak şekilde sıfırlayın"
     },
     "serverConfig": {
         "bePatientDelete": "Sunucunuzu Crafty panelinden kaldırırken lütfen sabırlı olun. Bu ekran birazdan kapanacaktır.",
@@ -543,7 +546,8 @@
         "no": "Hayır",
         "no-schedule": "Şu anda bu sunucu için herhangi bir zamanlama bulunmamaktadır. Başlamak için:",
         "scheduledTasks": "Zamanlanmış Görevler",
-        "yes": "Evet"
+        "yes": "Evet",
+        "backupPol": "Yedekleme Politikası"
     },
     "serverStats": {
         "cpuUsage": "CPU Kullanımı",
@@ -630,7 +634,8 @@
         "documentation": "Dokümantasyon",
         "inApp": "Uygulama İçi Dokümanlar",
         "newServer": "Yeni Sunucu Oluştur",
-        "servers": "Sunucular"
+        "servers": "Sunucular",
+        "panelSettings": "Panel Ayarları"
     },
     "startup": {
         "almost": "Bitiriliyor. Sıkı tutun...",
@@ -680,10 +685,38 @@
         "userRolesDesc": "Bu kullanıcının üye olduğu roller.",
         "userSettings": "Kullanıcı Ayarları",
         "userTheme": "UI Teması",
-        "uses": "İzin verilen kullanım sayısı (-1==Sınır Yok)"
+        "uses": "İzin verilen kullanım sayısı (-1==Sınır Yok)",
+        "hints": "İpuçlarını Etkinleştir?",
+        "totpIdReq": "TOTP ID Talep için gerekli",
+        "otpReq": "TOTP süper kullanıcılar için zorunludur. Tek TOTP yönteminizi kaldıramazsınız.",
+        "changePass": "Şifre Değiştir",
+        "changeUser": "Kullanıcı Adını Değiştir",
+        "editTOTP": "Kullanıcı MFA'sını düzenle",
+        "totpHeader": "Çok Faktörlü Kimlik Doğrulama"
     },
     "validators": {
-        "passLength": "Şifre çok kısa. Şifre en az 8 karakter olmalı."
+        "passLength": "Şifre çok kısa. Şifre en az 8 karakter olmalı.",
+        "serverLogPath": "Sunucu günlük yolu en az 1 uzunluğundaki bir dize olmalıdır",
+        "roleName": "Rol adı 1 karakterden büyük bir dize olmalıdır. Ayrıca şu sembollerden herhangi birini içermemelidir: [ ] , ",
+        "typeList": "liste/dizi türünde olmalıdır ",
+        "backupName": "Yedek adı bir dize ve en az 3 uzunlukta olmalıdır.",
+        "enumErr": "doğrulama başarısız oldu. Kabul edilebilir veriler şunları içerir: ",
+        "filesPageLen": "özellik için uzunluk 1'den büyük olmalıdır",
+        "insufficientPerms": "Yetki Hatası: Bu kaynak için eksik yetki",
+        "roleManager": "Rol yöneticisi tamsayı (yönetici kimliği) türünde veya boş olmalıdır",
+        "2FAerror": "Çoklu Faktör kodu 6 basamaklı (örn. 000000) veya her 4'ü \"-\" ile ayrılmış 16 karakterden oluşan bir yedek kod olmalıdır (örn. ABCD-EFGH-IJKL-MNOP)",
+        "roleServerId": "Sunucu ID özelliği en az 1 uzunluğundaki bir dize olmalıdır",
+        "roleServerPerms": "Sunucu yetkileri 8-bitlik bir dize olmalıdır",
+        "serverCreateName": "Sunucu adı en az 2 uzunluğunda bir dize olmalı ve şunları içermemelidir: \\ / veya # ",
+        "serverExeCommand": "Sunucu çalıştırma komutu en az 1 uzunluğundaki bir dize olmalıdır.",
+        "taskIntervalType": "Görev Aralığı Türü aşağıdakilerden biri olmalıdır: ",
+        "totp": "TOTP Kodu 6 rakamdan oluşmalıdır",
+        "typeBool": "doğru veya yanlış olmalıdır (boolean türünde)",
+        "typeEmail": "e-posta türünde olmalıdır.",
+        "typeIntMinVal0": "minimum değeri 0 olan bir tamsayı olmalıdır.",
+        "typeInteger": "bir sayı olmalıdır.",
+        "typeString": "dize türünde olmalıdır.",
+        "userName": " dize türünde, tümü KÜÇÜK HARF, en az 4 karakter ve en fazla 20 karakter olmalıdır"
     },
     "webhooks": {
         "areYouSureDel": "Bu webhooku silmek istediğinizden emin misiniz?",
@@ -752,6 +785,13 @@
         "max_audit_entries": "Crafty'nin etkinlik günlüğünde izin verilen maksimum kayıt sayısı",
         "max_log_lines": "Dosya başına maksimum günlük satırı sayısı",
         "max_login_attempts": "Uzak IP'nin zaman aşımına uğramadan önce deneyebileceği maksimum oturum açma sayısı",
-        "monitored_mounts": "Arayüz üzerinde görülebilen depolama bağlantıları"
+        "monitored_mounts": "Arayüz üzerinde görülebilen depolama bağlantıları",
+        "reset_secrets_on_next_boot": "Bir sonraki açılışta parolaları sıfırla",
+        "show_contribute_link": "Panelde katkı bağlantılarını göster",
+        "show_errors": "Web sunucusu hata ayıklama hatalarını göster",
+        "stats_update_frequency_seconds": "Sunucunuzu istatistikler için ne sıklıkta yoklamalıyız (saniye)",
+        "submit": "Gönder",
+        "True": "Doğru",
+        "virtual_terminal_lines": "Sunucu terminal arabelleğinizde kaç satıra izin vermeliyiz"
     }
 }

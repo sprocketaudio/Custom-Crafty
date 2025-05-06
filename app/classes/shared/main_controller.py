@@ -656,6 +656,7 @@ class Controller:
                 role_id = self.roles.add_role(
                     f"Creator of Server with id={new_server_id}",
                     exec_user["user_id"],
+                    False,
                 )
                 self.server_perms.add_role_server(new_server_id, role_id, "11111111")
                 self.users.add_role_to_user(exec_user["user_id"], role_id)

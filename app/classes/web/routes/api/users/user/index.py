@@ -75,12 +75,12 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             user,
             _,
         ) = auth_data
-
+        can_delete = False
         if (user_id in ["@me", user["user_id"]]) and self.helper.get_setting(
             "allow_self_delete", False
         ):
             user_id = user["user_id"]
-            self.controller.users.remove_user(user_id)
+            can_delete = True
         elif EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions:
             return self.finish_json(
                 400,
@@ -91,7 +91,21 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             )
         else:
             # has User_Config permission
-            self.controller.users.remove_user(user_id)
+            can_delete = True
+
+        if not can_delete:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                },
+            )
+        user_model = self.controller.users.get_user_object(user_id)
+        for totp in list(user_model.totp_user):
+            self.controller.totp.delete_user_totp(totp)
+        self.controller.totp.remove_all_recovery_codes(user_model.user_id)
+        self.controller.users.remove_user(user_id)
 
         self.controller.management.add_to_audit_log(
             user["user_id"],
@@ -140,7 +154,7 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(

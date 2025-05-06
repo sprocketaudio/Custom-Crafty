@@ -120,6 +120,7 @@ config_json_schema = {
             "fill": True,
         },
         "max_login_attempts": {"type": "integer", "error": "typeInt", "fill": True},
+        "superMFA": {"type": "boolean", "error": "typeBool", "fill": True},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -234,7 +235,7 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(

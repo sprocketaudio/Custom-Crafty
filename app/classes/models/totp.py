@@ -87,4 +87,4 @@ class HelperTOTP:
 
     def remove_all_recovery_codes(self, user_id):
         with self.database.atomic():
-            TOTPRecovery.delete().where(TOTPRecovery.user == user_id).execute()
+            TOTPRecovery.delete().where(TOTPRecovery.user == int(user_id)).execute()

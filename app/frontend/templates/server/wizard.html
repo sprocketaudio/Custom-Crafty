@@ -600,7 +600,12 @@
     if (responseData.status === "ok") {
       window.location.href = '/panel/dashboard';
     } else {
+      var classList = $('.waitMsg').first().attr('class').split(/\s+/);
 
+      // Loop through classes and remove all elements with any of them
+      classList.forEach(function(cls) {
+          $('.' + cls).remove();
+      });
       bootbox.alert({
         title: responseData.error,
         message: responseData.error_data
@@ -798,6 +803,7 @@
     bootbox.alert({
       title: importing ? '{% raw translate("serverWizard", "importing", data["lang"]) %}' : '{% raw translate("serverWizard", "downloading", data["lang"]) %}',
       message: importing ? '<i class="fas fa-cloud-download"></i> {% raw translate("serverWizard", "bePatient", data["lang"]) %}' : '<i class="fas fa-cloud-download"></i> {% raw translate("serverWizard", "bePatient", data["lang"]) %}',
+      className: "waitMsg",
     });
   }
 
@@ -884,7 +890,7 @@
       try {
         cSelect.add(newOption);  // this will fail in DOM browsers but is needed for IE
       }
-      catch (e) {
+      catch {
         cSelect.appendChild(newOption);
       }
     })
@@ -949,7 +955,7 @@
       try {
         jcSelect.add(jnewOption);  // this will fail in DOM browsers but is needed for IE
       }
-      catch (e) {
+      catch {
         jcSelect.appendChild(jnewOption);
       }
     })

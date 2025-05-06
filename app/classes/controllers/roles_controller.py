@@ -64,8 +64,8 @@ class RolesController:
             HelperRoles.update_role(role_id, up_data)
 
     @staticmethod
-    def add_role(role_name, manager):
-        return HelperRoles.add_role(role_name, manager)
+    def add_role(role_name, manager, mfa_required):
+        return HelperRoles.add_role(role_name, manager, mfa_required)
 
     class RoleServerJsonType(t.TypedDict):
         server_id: t.Union[str, int]
@@ -93,6 +93,7 @@ class RolesController:
         name: str,
         servers: t.Iterable[RoleServerJsonType],
         manager: int,
+        mfa_requried: bool,
     ) -> int:
         """Add a role with a name and a list of servers
 
@@ -103,7 +104,7 @@ class RolesController:
         Returns:
             int: The new role's ID
         """
-        role_id: t.Final[int] = HelperRoles.add_role(name, manager)
+        role_id: t.Final[int] = HelperRoles.add_role(name, manager, mfa_requried)
         for server in servers:
             PermissionsServers.get_or_create(
                 role_id, server["server_id"], server["permissions"]
@@ -116,6 +117,7 @@ class RolesController:
         role_name: t.Optional[str],
         servers: t.Optional[t.Iterable[RoleServerJsonType]],
         manager: int,
+        mfa_required: bool,
     ) -> None:
         """Update a role with a name and a list of servers
 
@@ -155,6 +157,7 @@ class RolesController:
                 "role_name": role_name,
                 "last_update": Helpers.get_time_as_string(),
                 "manager": manager,
+                "mfa_required": mfa_required,
             }
             # TODO: do the last_update on the db side
             HelperRoles.update_role(role_id, up_data)
