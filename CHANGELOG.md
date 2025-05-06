@@ -16,7 +16,7 @@
 - Fix ignored names being ignored on all unzips and not just server updates ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/830))
 - Fix unzipping archive with db_stats would cause system crash ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/839))
 ### Tweaks
-TBD
+- Add neoforge support in server builder ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/843))
 ### Lang
 TBD
 <br><br>
