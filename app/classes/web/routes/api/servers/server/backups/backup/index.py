@@ -260,34 +260,10 @@ class ApiServersServerBackupsBackupIndexHandler(BaseApiHandler):
                     "error_data": str(e),
                 },
             )
-        in_place = data.get("inPlace")
         svr_obj = self.controller.servers.get_server_instance_by_id(server_id)
-        server_data = self.controller.servers.get_server_data_by_id(server_id)
-        zip_name = data["filename"]
-        # import the server again based on zipfile
-        backup_config = self.controller.management.get_backup_config(backup_id)
-        backup_location = os.path.join(
-            backup_config["backup_location"],
-            backup_config["backup_id"],
-            data["filename"],
+        svr_obj.server_restore_threader(
+            backup_id, data["filename"], data.get("inPlace")
         )
-
-        if Helpers.validate_traversal(backup_location, zip_name):
-            if svr_obj.check_running():
-                svr_obj.stop_server()
-            if (
-                not in_place
-            ):  # If user does not want to backup in place we will clean the server dir
-                for item in os.listdir(server_data["path"]):
-                    if os.path.isdir(os.path.join(server_data["path"], item)):
-                        self.file_helper.del_dirs(
-                            os.path.join(server_data["path"], item)
-                        )
-                    else:
-                        self.file_helper.del_file(
-                            os.path.join(server_data["path"], item)
-                        )
-            self.file_helper.restore_archive(backup_location, server_data["path"])
 
         return self.finish_json(200, {"status": "ok"})
 

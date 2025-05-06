@@ -1123,6 +1123,24 @@ class ServerInstance:
             f.write("eula=true")
         self.run_threaded_server(user_id)
 
+    def server_restore_threader(self, backup_id, backup_file, in_place=False):
+        backup_config = HelpersManagement.get_backup_config(backup_id)
+        # import the server again based on zipfile
+        backup_config = HelpersManagement.get_backup_config(backup_id)
+        backup_location = os.path.join(
+            backup_config["backup_location"],
+            backup_config["backup_id"],
+            backup_file,
+        )
+        restore_thread = threading.Thread(
+            target=self.backup_mgr.restore_starter,
+            daemon=True,
+            name=f"backup_{backup_config['backup_id']}",
+            args=[backup_config, backup_location, backup_file, self, in_place],
+        )
+
+        restore_thread.start()
+
     def server_backup_threader(self, backup_id, update=False):
         # Check to see if we're already backing up
         if self.check_backup_by_id(backup_id):
@@ -1148,10 +1166,10 @@ class ServerInstance:
                     self.was_running = True
 
         backup_thread = threading.Thread(
-            target=self.backup_mgr.backup_starter,
+            target=self.backup_server,
             daemon=True,
             name=f"backup_{backup_config['backup_id']}",
-            args=[backup_config, self],
+            args=[backup_id],
         )
         logger.info(
             f"Starting Backup Thread for server {self.settings['server_name']}."
@@ -1171,8 +1189,7 @@ class ServerInstance:
         logger.info(f"Backup Thread started for server {self.settings['server_name']}.")
 
     @callback
-    def backup_server(self, backup_id, _update):
-        was_server_running = None
+    def backup_server(self, backup_id):
         logger.info(f"Starting server {self.name} (ID {self.server_id}) backup")
         server_users = PermissionsServers.get_server_user_list(self.server_id)
         # Alert the start of the backup to the authorized users.
@@ -1204,10 +1221,10 @@ class ServerInstance:
             self.send_command(conf["before"])
             # Pause to let command run
             time.sleep(5)
-
+        self.backup_mgr.backup_starter(conf, self)
         if conf["after"]:
             self.send_command(conf["after"])
-        if conf["shutdown"] and was_server_running:
+        if conf["shutdown"] and self.was_running:
             logger.info(
                 "Backup complete. User had shutdown preference. Starting server."
             )
