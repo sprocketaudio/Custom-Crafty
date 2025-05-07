@@ -90,3 +90,16 @@ class CryptoHelper:
 
         """
         return input_bytes.hex()
+
+    @staticmethod
+    def str_to_b64(input_str: str) -> str:
+        """
+        Given source string, converts to base64 encoded string.
+
+        Args:
+            input_str: String to convert.
+
+        Returns: b64 encoded string.
+
+        """
+        return base64.b64encode(input_str.encode("UTF-8")).decode("UTF-8").rstrip("\n")
