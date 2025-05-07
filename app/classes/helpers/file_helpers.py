@@ -475,13 +475,112 @@ class FileHelpers:
 
         Return: Path to chunk in repository.
         """
-        if len(chunk_hash) != 128:
+        hash_hex = CryptoHelper.bytes_to_hex(chunk_hash)
+        if len(hash_hex) != 128:
             raise ValueError(
                 f"Provided hash is of incorrect length."
                 f"Hash: {CryptoHelper.bytes_to_hex(chunk_hash)}"
             )
-        hash_hex = CryptoHelper.bytes_to_hex(chunk_hash)
         return repository_location / "chunks" / hash_hex[:2] / hash_hex[-126:]
+
+    @staticmethod
+    def get_file_path_from_hash(file_hash: bytes, repository_location: Path) -> Path:
+        """
+        Get path to file manifest file in repository location given file hash and
+        repository location.
+
+        Args:
+            file_hash: Hash of file.
+            repository_location: Path to the backup repository.
+
+        Returns: Path to file manifest file in the backup repository.
+
+        """
+        hash_hex: str = CryptoHelper.bytes_to_hex(file_hash)
+        if len(hash_hex) != 128:
+            raise ValueError(
+                f"Provided hash is of incorrect length."
+                f"Hash: {CryptoHelper.bytes_to_hex(file_hash)}"
+            )
+        return repository_location / "files" / hash_hex[:2] / hash_hex[-126:]
+
+    def save_file(
+        self,
+        source_file: Path,
+        repository_location: Path,
+        file_hash: bytes,
+        use_compression: bool,
+    ) -> None:
+        """
+        Saves given file to repository location. Will not save duplicate files or
+        duplicate chunks. All errors resolve to RuntimeErrors.
+
+        Args:
+            source_file: Source file to save to the backup repository.
+            repository_location: Path to the backup repository.
+            file_hash: Hash of file.
+            use_compression: If the file in the backup repository should be compressed.
+
+        Returns:
+
+        """
+        # File is read and saved in 20mb chunks. Should allow memory use to stay low and
+        # for files to be processed that are larger than available memory.
+        try:
+            file_manifest_file_location: Path = self.get_file_path_from_hash(
+                file_hash, repository_location
+            )
+        except ValueError as why:
+            raise RuntimeError(
+                "Provided file hash does not appear to be of improper length!"
+            ) from why
+
+        # Exit if file is already present in the backup repository. Ensure that we don't
+        # try to save the save file twice.
+        if file_manifest_file_location.exists():
+            return
+        file_manifest_file_location.parent.mkdir(parents=True, exist_ok=True)
+
+        # Open source file and start saving chunks.
+        try:
+            source_file_obj = source_file.open("rb")
+        except OSError as why:
+            raise RuntimeError(f"Unable to read file at {source_file}.") from why
+
+        # Open target file manifest file to write chunks.
+        try:
+            file_manifest_file = file_manifest_file_location.open("w+")
+        except OSError as why:
+            source_file_obj.close()
+            raise RuntimeError(
+                f"Unable to open file manifest file at {file_manifest_file_location}."
+            ) from why
+
+        # Begin reading source and writing to manifest file.
+        # Write file manifest file version number as first line.
+        file_manifest_file.write("00\n")
+
+        # Loop through file contents writing to both files until empty.
+        while True:
+            chunk = source_file_obj.read(20_000_000)
+
+            if not chunk:
+                # Completed reading source file, close out.
+                source_file_obj.close()
+                file_manifest_file.close()
+                return
+
+            # Write chunk to file manifest file.
+            chunk_hash = CryptoHelper.blake2b_hash_bytes(chunk)
+            chunk_hash_as_b64 = CryptoHelper.bytes_to_b64(chunk_hash)
+            file_manifest_file.write(chunk_hash_as_b64 + "\n")
+
+            try:
+                self.save_chunk(chunk, repository_location, chunk_hash, use_compression)
+            except RuntimeError as why:
+                raise RuntimeError(
+                    f"Unable to save chunk with hash {chunk_hash}."
+                ) from why
 
     def save_chunk(
         self,
@@ -490,6 +589,19 @@ class FileHelpers:
         chunk_hash: bytes,
         use_compression: bool,
     ) -> None:
+        """
+        Saves chunk to backup repository. Space is made in this verison of the chunk
+        for encryption, but that functionality is not yet present.
+
+        Args:
+            file_chunk: chunk data to save to file.
+            repository_location: Path to repository.
+            chunk_hash: hash of chunk.
+            use_compression: If the chunk should be compressed before saving to file.
+
+        Return:
+
+        """
         file_location = self.get_chunk_path_from_hash(chunk_hash, repository_location)
 
         # If chunk is already present, stop here. Don't save the chunk again.
@@ -532,5 +644,6 @@ class FileHelpers:
             bytes_to_compress: Bytes to compress.
 
         Return: Compressed bytes.
+
         """
         return zlib.compress(bytes_to_compress)
