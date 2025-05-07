@@ -1,4 +1,6 @@
 import base64
+from hashlib import blake2b
+from pathlib import Path
 
 
 class CryptoHelper:
@@ -8,6 +10,45 @@ class CryptoHelper:
 
     def say_hello_world(self):
         print(self.test)
+
+    @staticmethod
+    def blake2b_hash_bytes(bytes_to_hash: bytes) -> bytes:
+        """
+        Hashes given bytes with blake2b hash function, returns digest as bytes.
+
+        Args:
+            bytes_to_hash: Bytes to be hashed.
+
+        Returns: Digest of bytes hashed
+        """
+        blake2 = blake2b()
+        blake2.update(bytes_to_hash)
+        return blake2.digest()
+
+    @staticmethod
+    def blake2_hash_file(path_to_file: Path) -> bytes:
+        """
+        Hashes given file at path with blake2b hash function, returns digest as bytes.
+
+        Args:
+            path_to_file: Path to file to hash.
+
+        Returns: Digest of file.
+        """
+        blake2 = blake2b()
+        try:
+            with path_to_file.open("rb") as file_to_hash:
+                while True:
+                    # Reads file 20kb at a time.
+                    data = file_to_hash.read(20_000)
+                    # Stops reading if at end of file.
+                    if not data:
+                        break
+                    blake2.update(data)
+        # Activity can raise FileNotFound, PermissionError, or OSError.
+        except OSError as why:
+            raise RuntimeError(f"Error accessing file: {path_to_file}.") from why
+        return blake2.digest()
 
     @staticmethod
     def bytes_to_b64(input_bytes: bytes) -> str:

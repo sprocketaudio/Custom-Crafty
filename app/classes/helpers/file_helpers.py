@@ -1,17 +1,18 @@
-import os
-import shutil
+import hashlib
 import logging
+import mimetypes
+import os
 import pathlib
+import shutil
+import ssl
 import tempfile
+import time
+import urllib.request
 import zipfile
 import zlib
-import hashlib
 from typing import BinaryIO
-import mimetypes
-from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
-import urllib.request
-import ssl
-import time
+from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile
+
 import certifi
 
 from app.classes.helpers.helpers import Helpers
@@ -150,40 +151,6 @@ class FileHelpers:
     def check_mime_types(self, file_path):
         m_type, _value = self.mime_types.guess_type(file_path)
         return m_type
-
-    @staticmethod
-    def calculate_file_hash_blake2b(value_to_hash: pathlib.Path) -> bytes:
-        """
-        Calculates blake2b hash from file at specified Path. Output bytes hash.
-
-        :param value_to_hash: Path to file to hash.
-        :return: blake2b hash bytes.
-        """
-        # Hash input value
-        blake2 = hashlib.blake2b()
-
-        # Read file and hash. Catches file not found and permission error.
-        try:
-            with value_to_hash.open("rb") as f:
-                while True:
-                    # Read 2^16 byte chunks, 64 KiB.
-                    data = f.read(65536)
-
-                    # Break if end of file
-                    if not data:
-                        break
-
-                    blake2.update(data)
-
-        # Except file not found and permission error.
-        except FileNotFoundError as why:
-            raise FileNotFoundError(f"File at {value_to_hash} not found.") from why
-        except PermissionError as why:
-            raise PermissionError(
-                f"Insufficient permissions to read {value_to_hash}."
-            ) from why
-
-        return blake2.digest()
 
     @staticmethod
     def calculate_file_hash_sha256(file_path: str) -> str:
