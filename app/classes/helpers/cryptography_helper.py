@@ -104,7 +104,8 @@ class CryptoHelper:
         """
         return base64.b64encode(input_str.encode("UTF-8")).decode("UTF-8").rstrip("\n")
 
-    def b64_to_str(self, input_b64: str) -> str:
+    @staticmethod
+    def b64_to_str(input_b64: str) -> str:
         """
         Converts b64 encoded string to string. Can raise RuntimeError if code cannot be
         decoded.
@@ -116,6 +117,6 @@ class CryptoHelper:
 
         """
         try:
-            return self.b64_to_bytes(input_b64).decode("UTF-8")
+            return base64.b64decode(input_b64).decode("UTF-8")
         except (RuntimeError, UnicodeError) as why:
             raise RuntimeError(f"Unable to decode {input_b64} to b64.") from why
