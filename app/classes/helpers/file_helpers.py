@@ -530,71 +530,6 @@ class FileHelpers:
                 discovered_files.append(p)
         return discovered_files
 
-    def snapshot_backup(
-        self,
-        source_path: Path,
-        backup_repository: Path,
-        use_compression: bool,
-        keep_last: int,
-    ) -> None:
-        """
-        Creates a snapshot style backup.
-
-        Args:
-            source_path: Files to be backed up.
-            backup_repository: Path to backup repository.
-            use_compression: Should backup be compressed.
-            keep_last: Number of previous backups to keep. 0 for unlimited.
-
-        Returns:
-
-        """
-        backup_time = datetime.datetime.now()
-        backup_time_file_safe = backup_time.strftime(
-            self.SNAPSHOT_BACKUP_DATE_FORMAT_STRING
-        )
-        backup_manifest_path = (
-            backup_repository / "manifests" / f"{backup_time_file_safe}.manifest"
-        )
-
-        # Get list of files to backup
-        list_of_files = self.discover_files(source_path)
-
-        # Create manifest folder location
-        try:
-            backup_manifest_path.parent.mkdir(exist_ok=True, parents=True)
-            manifest_file = backup_manifest_path.open("w+")
-        except OSError as why:
-            raise RuntimeError(
-                f"Unable to create backup manifest directory at {backup_manifest_path}."
-            ) from why
-
-        # Write manifest file version.
-        manifest_file.write("00\n")
-
-        # Iterate over files in source location
-        for f in list_of_files:
-            try:
-                file_hash = CryptoHelper.blake2_hash_file(f)
-                self.save_file(f, backup_repository, file_hash, use_compression)
-                file_local_path = self.get_local_path_with_base(f, source_path)
-            except OSError as why:
-                manifest_file.close()
-                raise RuntimeError(
-                    f"Encountered error trying to save file {f}."
-                ) from why
-
-            manifest_file.write(
-                f"{CryptoHelper.bytes_to_b64(file_hash)}:"
-                f"{CryptoHelper.str_to_b64(file_local_path)}\n"
-            )
-
-        # Backup Complete
-        manifest_file.close()
-
-        # Cleanup old backups.
-        self.clean_old_backups(keep_last, backup_repository)
-
     def clean_old_backups(self, num_to_keep: int, backup_repository_path: Path) -> None:
         """
         Remove all old backups from the backup repository based on number of backups to
@@ -969,65 +904,6 @@ class FileHelpers:
                 file.write(output)
         except OSError as why:
             raise RuntimeError(f"Unable to save chunk to {file_location}") from why
-
-    def snapshot_restore(
-        self, source_manifest_path: Path, destination_path: Path, backup_repo_path: Path
-    ) -> None:
-        """
-        Restore a snapshot style backup.
-
-        Args:
-            source_manifest_path: Path to source backup manifest.
-            destination_path: Path to restore the backup to.
-            backup_repo_path: Path to the backup repository.
-
-        Returns:
-
-        """
-        # Ensure target is not a file.
-        if destination_path.is_file():
-            raise RuntimeError(
-                f"Destination path {destination_path} for restore is a file."
-            )
-
-        # Ensure target is empty.
-        if destination_path.exists():
-            shutil.rmtree(destination_path)
-
-        # Ensure target directory exists.
-        destination_path.parent.mkdir(exist_ok=True, parents=True)
-
-        # Open backup manifest
-        try:
-            backup_manifest_file: io.TextIOWrapper = source_manifest_path.open("r")
-        except OSError as why:
-            raise RuntimeError(
-                f"Unable to open backup manifest at {source_manifest_path}"
-            ) from why
-
-        if backup_manifest_file.readline() != "00\n":
-            backup_manifest_file.close()
-            raise RuntimeError(
-                f"Backup manifest file {source_manifest_path} is of unreadable version."
-            )
-
-        for file_hash_and_path in backup_manifest_file:
-            hash_and_local_path: list[str] = file_hash_and_path.split(":")
-            file_hash: bytes = CryptoHelper.b64_to_bytes(hash_and_local_path[0])
-            recovered_file_path: Path = Path(
-                destination_path,
-                CryptoHelper.b64_to_str(input_b64=hash_and_local_path[1]),
-            ).resolve()
-
-            # Recover file
-            try:
-                self.read_file(file_hash, recovered_file_path, backup_repo_path)
-            except RuntimeError as why:
-                backup_manifest_file.close()
-                raise RuntimeError(f"Unable to recover file {file_hash}.") from why
-
-        # Done restoring files.
-        backup_manifest_file.close()
 
     def read_file(
         self, file_hash: bytes, target_path: Path, backup_repo_path: Path

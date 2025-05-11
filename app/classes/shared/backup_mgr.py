@@ -1,28 +1,34 @@
-import os
-import time
 import datetime
+import io
 import json
 import logging
-import pathlib
-
-from zoneinfo import ZoneInfo
+import os
+import shutil
+import time
+from logging import raiseExceptions
+from pathlib import Path
 
 # TZLocal is set as a hidden import on win pipeline
-from zoneinfo import ZoneInfoNotFoundError
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
 from tzlocal import get_localzone
 
-from app.classes.models.management import HelpersManagement
-from app.classes.models.users import HelperUsers
-from app.classes.models.server_permissions import PermissionsServers
-from app.classes.shared.console import Console
-from app.classes.helpers.helpers import Helpers
-from app.classes.shared.websocket_manager import WebSocketManager
+from app.classes.helpers.cryptography_helper import CryptoHelper
 from app.classes.helpers.file_helpers import FileHelpers
+from app.classes.helpers.helpers import Helpers
+from app.classes.models.management import HelpersManagement
+from app.classes.models.server_permissions import PermissionsServers
+from app.classes.models.users import HelperUsers
+from app.classes.shared.console import Console
+from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
 
 
 class BackupManager:
+
+    SNAPSHOT_BACKUP_DATE_FORMAT_STRING = "%Y-%m-%d-%H-%M-%S"
+
     def __init__(self, helper, file_helper, management_helper):
         self.helper = helper
         self.file_helper = file_helper
@@ -44,7 +50,7 @@ class BackupManager:
             if svr_obj.check_running():
                 svr_obj.stop_server()
             if backup_config["backup_type"] != "zip_vault":
-                print("snapshot")
+                print("snapshot")  # TODO: Link Snapshot restore.
             else:
                 if not in_place:  # If user does not want to backup in place we will
                     # clean the server dir
@@ -199,7 +205,8 @@ class BackupManager:
             {"status": json.dumps({"status": "Failed", "message": f"{why}"})},
         )
 
-    def list_backups(self, backup_config: dict, server_id) -> list:
+    @staticmethod
+    def list_backups(backup_config: dict, server_id) -> list:
         if not backup_config:
             logger.info(
                 f"Error putting backup file list for server with ID: {server_id}"
@@ -245,281 +252,139 @@ class BackupManager:
             logger.info(f"Removing old backup '{oldfile['path']}'")
             os.remove(Helpers.get_os_understandable_path(oldfile_path))
 
-    def snapshot_backup(self, backup_config, server):
+    def snapshot_backup(self, backup_config, server) -> None:
+        """
+        Creates snapshot style backup of server. No file will be saved more than once
+        over all backups. Designed to enable encryption of files and s3 compatability in
+        the future.
 
+        Args:
+            backup_config: Backup config to use.
+            server: Server instance.
+
+        Returns:
+
+        """
         logger.info(f"Starting snapshot style backup for {server.name}")
 
-        server_path = pathlib.Path(server.server_path)
-
-        # Adjust the location to include the backup ID for destination.
-        backup_target_location = (
-            pathlib.Path(backup_config["backup_location"]) / "snapshot_backups"
+        # Create backup variables.
+        use_compression = backup_config["compress"]
+        source_path = Path(server.server_path)
+        backup_repository_path = (
+            Path(backup_config["backup_location"]) / "snapshot_backups"
         )
+        backup_time = datetime.datetime.now()
+        backup_time_filesafe = backup_time.strftime(
+            self.SNAPSHOT_BACKUP_DATE_FORMAT_STRING
+        )
+        backup_manifest_path = (
+            backup_repository_path / "manifests" / f"{backup_time_filesafe}.manifest"
+        )
+
+        list_of_files: list[Path] = FileHelpers.discover_files(source_path)
+
+        # Create manifest file
         try:
-            self.ensure_snapshot_directory_is_valid(backup_target_location)
-        except PermissionError as why:
+            backup_manifest_path.parent.mkdir(exist_ok=True, parents=True)
+            manifest_file: io.TextIOWrapper = backup_manifest_path.open("w+")
+        except OSError as why:
             self.fail_backup(why, backup_config, server)
+            return
 
-        # Create backup manifest for server files.
-        backup_manifest, count_of_files = self.create_snapshot_backup_manifest(
-            server_path
-        )
+        # Write manifest file version.
+        manifest_file.write("00\n")
 
-        # Generate depends file for this backup.
-        self.create_depends_file_from_backup_manifest(
-            backup_manifest, backup_target_location, backup_config["backup_id"]
-        )
-
-        # Save chunks to disk.
-        self.save_chunks_from_manifest(
-            backup_manifest, backup_target_location, server_path, True
-        )
-
-    @staticmethod
-    def ensure_snapshot_directory_is_valid(backup_path: pathlib.Path) -> bool:
-        backup_path.mkdir(exist_ok=True)
-        backup_readme_path = backup_path / "README.txt"
-
-        if not backup_readme_path.exists():
-            logger.info("Is this doing anything?")
+        # Iterate over source files and save into backup repository.
+        for file in list_of_files:
             try:
-                logger.info("Attempting to make snapshot storage directory.")
-                with open(backup_readme_path, "w", encoding="UTF-8") as f:
-                    f.write(
-                        "Crafty snapshot backup storage dir. Please do not touch"
-                        "these files."
-                    )
-
-            except PermissionError as why:
-                raise PermissionError(
-                    f"Unable to write to snapshot backup storage path"
-                    f": {backup_readme_path}"
-                ) from why
-        return True
-
-    @staticmethod
-    def get_local_path_with_base(desired_path: pathlib.Path, base: pathlib.Path) -> str:
-        """Takes a given path with a given base, and removes the base from the path.
-
-        Example:
-            # Base: /root/crafty/servers
-            # Full path to file: /root/crafty/servers/path/to/dir
-            # What gets returned: path/to/dir
-
-        """
-        # Check that path is contained in base
-        if base not in desired_path.parents:
-            raise ValueError(
-                f"{base} does not appear to be a base directory of {desired_path}."
-            )
-
-        # Return path with base remove
-        return str(desired_path)[len(str(base.absolute())) + 1 :]
-
-    def create_snapshot_backup_manifest(self, backup_dir: pathlib.Path) -> (dict, int):
-        """
-        Creates dict showing all directories in backup source as a relative path, and
-        all files with their hashes as a relative path. All returned paths are relative
-        to the root of the server.
-
-        Args:
-            backup_dir: Path to files that need to be backed up.
-
-        Returns: Dict {directories: [], "files": [()]}
-            File hashes are calculated as raw bytes and encoded in base64 strings.
-
-        """
-        output = {"directories": [], "files": []}
-        files_count = 0
-
-        # Iterate over backups source dir.
-        for p in backup_dir.rglob("*"):
-
-            if p.is_dir():
-                # For files.
-                # Append local path to dir. For example:
-                # Base: /root/crafty/servers
-                # Full path to file: /root/crafty/servers/path/to/dir
-                # What gets stored: path/to/dir
-                output["directories"].append(
-                    str(self.get_local_path_with_base(p, backup_dir))
+                file_hash = CryptoHelper.blake2_hash_file(file)
+                self.file_helper.save_file(
+                    file, backup_repository_path, file_hash, use_compression
                 )
-
-            else:
-                # For files.
-                files_count += 1
-
-                # We must store file hash and path to file.
-                # calculate_file_hash_blake2b returns bytes, b64 is stored as a string.
-                file_hash = FileHelpers.calculate_file_hash_blake2b(p)
-
-                # Store tuple for file with local path and b64 hash.
-                output["files"].append(
-                    (file_hash, str(self.get_local_path_with_base(p, backup_dir)))
+                # May return OSError if file path is not logical.
+                file_local_path = self.file_helper.get_local_path_with_base(
+                    file, source_path
                 )
-        return output, files_count
+            except OSError as why:
+                manifest_file.close()
+                backup_manifest_path.unlink(missing_ok=True)
+                self.fail_backup(why, backup_config, server)
+                return
 
-    def create_depends_file_from_backup_manifest(
-        self, manifest: dict, backup_repository: pathlib.Path, backup_id: str
-    ) -> None:
-        """
-        Creates the .depends file associated with this backup based on the backup's
-        manifest.
-
-        Args:
-            manifest: Backup manifest for this backup.
-            backup_repository: Where the backup is being stored as a pathlib Path
-            object.
-            backup_id: Backup's ID as a string.
-
-        Returns: None
-
-        """
-        # Create file path for depends file
-        depends_file_path = (
-            backup_repository / "manifest_files" / f"{backup_id}.depends"
-        )
-
-        # Ensure manifest_files folder exists
-        depends_file_path.parent.mkdir(exist_ok=True)
-
-        # Write base64 encoded hashes to depends file. This file may not contain
-        # sensitive information as it will not be encrypted.
-        with depends_file_path.open("x", encoding="UTF-8") as f:
-            # Append version number to file.
-            f.write("1\n")
-            # Iterate through files and add b64 hashes to file.
-            for depended_file in manifest["files"]:
-                f.write(self.helper.crypto_helper.bytes_to_b64(depended_file[0]) + "\n")
-
-    def find_files_not_in_repository(
-        self, backup_manifest: dict, backup_repository: pathlib.Path
-    ) -> list[(str, str)]:
-        """
-        Discovers what files are not already contained in the backup repository by hash.
-        Returns a hash of files that are not in the repository in backup manifest
-        format.
-
-        Args:
-            self: self
-            backup_manifest: backup manifest as generated by
-            create_snapshot_backup_manifest.
-            backup_repository: Path to the backup storage location or backup
-            "repository."
-
-        Returns: List of files that are not in the repository in backup manifest format.
-        [(file hash), (file name)]
-
-        """
-        output = []
-
-        # If file does not exist add it array.
-        for file_tuple in backup_manifest["files"]:
-            file_path = self.get_path_from_hash(
-                self.helper.crypto_helper.bytes_to_hex(file_tuple[0]), backup_repository
-            )
-            if not file_path.exists():
-                output.append(file_tuple)
-        return output
-
-    @staticmethod
-    def get_path_from_hash(file_hash: str, repository: pathlib.Path) -> pathlib.Path:
-        """
-        Get file path in backup repository based on file hash and path to the backup
-        repository.
-
-        Args:
-            file_hash: Hash of target file.
-            repository: Path to the backup repository.
-
-        Returns: Path to where file should be stored.
-
-        """
-        # Example:
-        # Repo path: /path/to/backup/repo/
-        # Hash: 1234...890
-        # Example: /path/to/backup/repo/data/12/34...890
-        return repository / "data" / file_hash[:2] / str(file_hash[-126:])
-
-    # TODO: Implement this function to save all new chunks using save_chunk.
-    def save_chunks_from_manifest(
-        self,
-        backup_manifest: dict,
-        backup_repository: pathlib.Path,
-        files_source: pathlib.Path,
-        use_compression: bool,
-    ):
-
-        files_to_save = self.find_files_not_in_repository(
-            backup_manifest, backup_repository
-        )
-
-        # Ensure snapshot data directory exists.
-        backup_repository_data_folder = backup_repository / "data"
-        backup_repository_data_folder.mkdir(exist_ok=True)
-
-        for file_tuple in files_to_save:
-            file_path = files_source / file_tuple[1]
-            self.save_chunk(
-                self.file_helper.read_path_as_bytes(file_path),
-                backup_repository,
-                file_tuple[0],
-                use_compression,
+            # Write saved file into manifest.
+            manifest_file.write(
+                f"{CryptoHelper.bytes_to_b64(file_hash)}:"
+                f"{CryptoHelper.str_to_b64(file_local_path)}\n"
             )
 
-    def save_chunk(
-        self,
-        file: bytes,
-        repository_location: pathlib.Path,
-        file_hash: str,
-        use_compression: bool = False,
-    ) -> None:
-        """Main save chunk file, saves the individual chunks and performs compression.
-        Function will also perform encryption when applied. Max size that will work with
-        this file is ~2 GB due to the bytes being held in memory. Larger chunks must be
-        split before this function.
+        manifest_file.close()
 
-        Args:
-            file: Bytes/chunk of file to be saved.
-            repository_location: Location of snapshot repository.
-            file_hash: File has of file in bytes.
-            use_compression: Boolean if the chunk should be compressed before saving.
-            Uses zlib default compression option.
-
-        Returns: None
-
-        """
-        # Chunk Schema version
-        output = bytes.fromhex("00")
-
-        # Append zero bytes for compression bool and nonce. Will be used later for
-        # encryption. 1 byte bool and 12 bytes of nonce.
-        output += bytes.fromhex("00000000000000000000000000")
-
-        # Compress chunk if set
-        # Append compression byte to output bytes.
-        if use_compression:
-            file = self.file_helper.zlib_compress_bytes(file)
-            output += bytes.fromhex("01")
-        else:
-            output += bytes.fromhex("00")
-
-        # Output matches version 1 schema.
-        # version + encryption byte + nonce + compression byte + file bytes
-        # Reuse file var to prevent extra memory. Not sure if python would do that but
-        # avoiding it anyway.
-        file = output + file
-
-        # Get file location and save to location
-        file_location = self.get_path_from_hash(
-            self.helper.crypto_helper.bytes_to_hex(file_hash), repository_location
+        self.file_helper.clean_old_backups(
+            backup_config["max_backups"], backup_repository_path
         )
 
-        # Saves file, double check it does not already exist.
-        if not file_location.exists():
-            # Make folder to chunk.
-            file_location.parent.mkdir(exist_ok=True)
+    def snapshot_restore(self, backup_config, server) -> None:
+        """
+        Restores snapshot style backup.
 
-            # Write file to path.
-            with file_location.open("wb") as f:
-                f.write(file)
+        Args:
+            backup_config: Backup Config.
+            server: Server config.
+
+        Returns:
+        """
+        return  # TODO: Implement restore functionally. See TODOs.
+
+        destination_path = Path(__file__)  # TODO: Get proper destination path.
+        source_manifest_path = Path(__file__)  # TODO: Get manifest of backup.
+        backup_reposititory_path = Path(__file__)  # TODO: Get backup repo path.
+
+        # Ensure destination is not a file.
+        if destination_path.is_file():
+            raise RuntimeError(
+                f"Destination path {destination_path} for restore is a file."
+            )
+
+        # Ensure target is empty.
+        if destination_path.exists():
+            shutil.rmtree(destination_path)
+
+        # Ensure target directory exists.
+        destination_path.mkdir(exist_ok=True, parents=True)
+
+        # Open backup manifest.
+        try:
+            backup_manifest_file: io.TextIOWrapper = source_manifest_path.open("r")
+        except OSError as why:
+            raise RuntimeError(
+                f"Unable to open backup manifest at {source_manifest_path}."
+            ) from why
+
+        # Ensure backup manifest is of readable version.
+        if backup_manifest_file.readline() != "00\n":
+            backup_manifest_file.close()
+            raise RuntimeError(
+                f"Backup manifest file {source_manifest_path} is of unreadable "
+                f"version."
+            )
+
+        # Begin restoring files from manifest.
+        for file_hash_and_path in backup_manifest_file:
+            hash_and_local_path: list[str] = file_hash_and_path.split(":")
+            file_hash: bytes = CryptoHelper.b64_to_bytes(hash_and_local_path[0])
+            recovered_file_path: Path = Path(
+                destination_path,
+                CryptoHelper.b64_to_str(input_b64=hash_and_local_path[1]),
+            ).resolve()
+
+            # Recover file
+            try:
+                self.file_helper.read_file(
+                    file_hash, recovered_file_path, backup_repository_path
+                )
+            except RuntimeError as why:
+                backup_manifest_file.close()
+                raise RuntimeError(f"Unable to recover file {file_hash}.") from why
+
+        # Restore complete, close backup manifest file.
+        backup_manifest_file.close()
