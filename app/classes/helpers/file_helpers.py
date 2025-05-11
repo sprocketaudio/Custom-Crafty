@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+import io
 import logging
 import mimetypes
 import os
@@ -27,8 +28,9 @@ logger = logging.getLogger(__name__)
 
 class FileHelpers:
     allowed_quotes = ['"', "'", "`"]
-    BYTE_TRUE = bytes.fromhex("01")
-    BYTE_FALSE = bytes.fromhex("00")
+    BYTE_TRUE: bytes = bytes.fromhex("01")
+    BYTE_FALSE: bytes = bytes.fromhex("00")
+    SNAPSHOT_BACKUP_DATE_FORMAT_STRING: str = "%Y-%m-%d-%H-%M-%S"
 
     def __init__(self, helper):
         self.helper: Helpers = helper
@@ -529,10 +531,28 @@ class FileHelpers:
         return discovered_files
 
     def snapshot_backup(
-        self, source_path: Path, backup_repository: Path, use_compression: bool
+        self,
+        source_path: Path,
+        backup_repository: Path,
+        use_compression: bool,
+        keep_last: int,
     ) -> None:
+        """
+        Creates a snapshot style backup.
+
+        Args:
+            source_path: Files to be backed up.
+            backup_repository: Path to backup repository.
+            use_compression: Should backup be compressed.
+            keep_last: Number of previous backups to keep. 0 for unlimited.
+
+        Returns:
+
+        """
         backup_time = datetime.datetime.now()
-        backup_time_file_safe = backup_time.strftime("%Y-%m-%d-%H-%M-%S")
+        backup_time_file_safe = backup_time.strftime(
+            self.SNAPSHOT_BACKUP_DATE_FORMAT_STRING
+        )
         backup_manifest_path = (
             backup_repository / "manifests" / f"{backup_time_file_safe}.manifest"
         )
@@ -549,6 +569,9 @@ class FileHelpers:
                 f"Unable to create backup manifest directory at {backup_manifest_path}."
             ) from why
 
+        # Write manifest file version.
+        manifest_file.write("00\n")
+
         # Iterate over files in source location
         for f in list_of_files:
             try:
@@ -563,11 +586,236 @@ class FileHelpers:
 
             manifest_file.write(
                 f"{CryptoHelper.bytes_to_b64(file_hash)}:"
-                f"{CryptoHelper.str_to_b64(file_local_path)}"
+                f"{CryptoHelper.str_to_b64(file_local_path)}\n"
             )
 
         # Backup Complete
         manifest_file.close()
+
+        # Cleanup old backups.
+        self.clean_old_backups(keep_last, backup_repository)
+
+    def clean_old_backups(self, num_to_keep: int, backup_repository_path: Path) -> None:
+        """
+        Remove all old backups from the backup repository based on number of backups to
+        keep.
+
+        Args:
+            num_to_keep: Number of backups to keep. Keeps latest n.
+            backup_repository_path: Path to the backup repository.
+
+        Return:
+        """
+        if num_to_keep <= 0:
+            return
+
+        # get list of manifest files in the backup repo.
+        manifest_files_path: Path = backup_repository_path / "manifests"
+        manifest_files_generator = manifest_files_path.rglob("*")
+        # List used later to delete manifest files.
+        manifest_files_list: list[Path] = []
+
+        # Extract the datetimes from the filenames of the manifest files.
+        manifests_datetime: list[datetime.datetime] = []
+        for manifest_file in manifest_files_generator:
+            manifest_files_list.append(manifest_file)
+            manifests_datetime.append(
+                datetime.datetime.strptime(
+                    manifest_file.name.split(".")[0],
+                    self.SNAPSHOT_BACKUP_DATE_FORMAT_STRING,
+                )
+            )
+
+        # sort list of manifests.
+        # Oldest datetime events will be sorted first.
+        manifests_datetime.sort()
+
+        # Determine number of manifest files to remove
+        # For example, we have 10, want to keep 7.
+        # 10 - 7 = 3.
+        num_to_remove = len(manifests_datetime) - num_to_keep
+
+        # Return if we don't need to remove any files.
+        if num_to_remove <= 0:
+            return
+
+        # Oldest first, delete n oldest files from list.
+        for _ in range(num_to_remove):
+            del manifests_datetime[0]
+
+        # Delete manifest files that are no longer used.
+        self.delete_unused_manifest_files(manifests_datetime, manifest_files_list)
+
+        files_to_keep, chunks_to_keep = self.create_file_keepers_set(
+            backup_repository_path, manifests_datetime
+        )
+
+        # Delete unused files and chunks.
+        self.delete_unused_items_from_repository(
+            files_to_keep, backup_repository_path, False
+        )
+        self.delete_unused_items_from_repository(
+            chunks_to_keep, backup_repository_path, True
+        )
+
+    @staticmethod
+    def delete_unused_items_from_repository(
+        items_to_keep: set[bytes], backup_repository_path: Path, mode: bool
+    ) -> None:
+        """
+        Delete unused chunks for files from the backup repository. Switches type based
+        on mode.
+
+        Args:
+            items_to_keep: Set of chunks or files to keep.
+            backup_repository_path: Path to backup repository.
+            mode: False for file, True for chunks.
+
+        Return:
+        """
+        # Mode False = files. True = chunks.
+        if mode:
+            item_manifests_path = backup_repository_path / "chunks"
+        else:
+            item_manifests_path = backup_repository_path / "files"
+        item_generator = item_manifests_path.rglob("*")
+        for item in item_generator:
+            # Generator returns both directories and files. We can ignore directories.
+            if item.is_dir():
+                continue
+
+            # Reconstruct item hash from item path.
+            # Stored as first two octets as a directory and rest of hash as filename.
+            item_hash: bytes = bytes.fromhex(str(item.parent.name) + str(item.name))
+
+            # If item is not present in the ones that we want to keep, delete it.
+            if item_hash not in items_to_keep:
+                item.unlink()
+
+    def delete_unused_manifest_files(
+        self,
+        manifest_files_to_keep: list[datetime.datetime],
+        manifest_files_list: list[Path],
+    ) -> None:
+        """
+        Deletes unused backup manifest files from the backup repository.
+        :param manifest_files_to_keep: List of manifest files to keep. Datetime list of
+        backups to keep.
+        :param manifest_files_list: List of all files currently found in the backup
+        repository.
+        :return:
+        """
+        # This is a little nasty.
+        # Iterate over files found in the backup repository.
+        for manifest_file in manifest_files_list:
+            # If that file, converted to a datetime, is not present in the files_to_keep
+            # list.
+            if (
+                datetime.datetime.strptime(
+                    manifest_file.name.split(".")[0],
+                    self.SNAPSHOT_BACKUP_DATE_FORMAT_STRING,
+                )
+                not in manifest_files_to_keep
+            ):
+                # Delete the file.
+                manifest_file.unlink(missing_ok=True)
+
+    def create_file_keepers_set(
+        self, backup_repository_path: Path, keepers_datetime_list
+    ) -> (set[bytes], set[bytes]):
+        """
+        Creates a set of files to keep from a given backup manifest files to keep.
+
+        Args:
+            backup_repository_path: Path to backup repository.
+            keepers_datetime_list: List of manifest files to keep. Datetime list.
+
+        Returns: Set of files to keep, set of chunks to keep.
+        """
+        files_to_keep = set()
+        for keeper_manifest_datetime in keepers_datetime_list:
+            # Open file
+            manifest_file_path = (
+                backup_repository_path
+                / "manifests"
+                / f"{keeper_manifest_datetime.strftime(
+                self.SNAPSHOT_BACKUP_DATE_FORMAT_STRING)}"
+                f".manifest"
+            )
+            try:
+                manifest_file: io.TextIOWrapper = manifest_file_path.open("r")
+            except OSError as why:
+                raise RuntimeError(
+                    f"Unable to open manifest file at {manifest_file_path}"
+                ) from why
+
+            # Check that manifest is readable with this version.
+            if manifest_file.readline() != "00\n":
+                manifest_file.close()
+                raise RuntimeError(
+                    f"Backup manifest is not of correct version. Manifest: "
+                    f"{manifest_file_path}."
+                )
+
+            for line in manifest_file:
+                # Add hash to keep to output set.
+                files_to_keep.add(CryptoHelper.b64_to_bytes(line.split(":")[0]))
+
+            # Close this file.
+            manifest_file.close()
+
+        keeper_chunks = set()
+
+        # Iterate over files to keep, and record all chunks to keep for those files.
+        for file_to_keep in files_to_keep:
+            file_chunks = self.get_keeper_chunks_file_file_hash(
+                backup_repository_path, file_to_keep
+            )
+            for chunk in file_chunks:
+                keeper_chunks.add(chunk)
+        return files_to_keep, keeper_chunks
+
+    def get_keeper_chunks_file_file_hash(
+        self, backup_repository_location: Path, file_hash: bytes
+    ) -> list[bytes]:
+        """
+        Get chunks that should be kept based on given file.
+
+        Args:
+            backup_repository_location: Path to the backup repository.
+            file_hash: Hash of file.
+
+        Returns: List of chunk hashes that should be kept.
+
+        """
+        file_manifest_path: Path = self.get_file_path_from_hash(
+            file_hash, backup_repository_location
+        )
+
+        # Open file and read keeper chunks.
+        try:
+            file_manifest_file = file_manifest_path.open("r")
+        except OSError as why:
+            raise RuntimeError(
+                f"Unable to open file manifest file at {file_manifest_path}"
+            ) from why
+
+        if file_manifest_file.readline() != "00\n":
+            file_manifest_file.close()
+            raise RuntimeError(
+                f"File manifest file {file_manifest_path} is not of a readable version."
+            )
+
+        output = set()
+
+        for line in file_manifest_file:
+            output.add(CryptoHelper.b64_to_bytes(line))
+
+        output_list: list[bytes] = []
+        for item in output:
+            output_list.append(item)
+
+        return output_list
 
     @staticmethod
     def get_local_path_with_base(desired_path: Path, base: Path) -> str:
@@ -649,7 +897,7 @@ class FileHelpers:
 
         # Loop through file contents writing to both files until empty.
         while True:
-            chunk = source_file_obj.read(20_000_000)
+            chunk = source_file_obj.read(10_000_000)
 
             if not chunk:
                 # Completed reading source file, close out.
@@ -677,7 +925,7 @@ class FileHelpers:
         use_compression: bool,
     ) -> None:
         """
-        Saves chunk to backup repository. Space is made in this verison of the chunk
+        Saves chunk to backup repository. Space is made in this version of the chunk
         for encryption, but that functionality is not yet present.
 
         Args:
@@ -722,6 +970,176 @@ class FileHelpers:
         except OSError as why:
             raise RuntimeError(f"Unable to save chunk to {file_location}") from why
 
+    def snapshot_restore(
+        self, source_manifest_path: Path, destination_path: Path, backup_repo_path: Path
+    ) -> None:
+        """
+        Restore a snapshot style backup.
+
+        Args:
+            source_manifest_path: Path to source backup manifest.
+            destination_path: Path to restore the backup to.
+            backup_repo_path: Path to the backup repository.
+
+        Returns:
+
+        """
+        # Ensure target is not a file.
+        if destination_path.is_file():
+            raise RuntimeError(
+                f"Destination path {destination_path} for restore is a file."
+            )
+
+        # Ensure target is empty.
+        if destination_path.exists():
+            shutil.rmtree(destination_path)
+
+        # Ensure target directory exists.
+        destination_path.parent.mkdir(exist_ok=True, parents=True)
+
+        # Open backup manifest
+        try:
+            backup_manifest_file: io.TextIOWrapper = source_manifest_path.open("r")
+        except OSError as why:
+            raise RuntimeError(
+                f"Unable to open backup manifest at {source_manifest_path}"
+            ) from why
+
+        if backup_manifest_file.readline() != "00\n":
+            backup_manifest_file.close()
+            raise RuntimeError(
+                f"Backup manifest file {source_manifest_path} is of unreadable version."
+            )
+
+        for file_hash_and_path in backup_manifest_file:
+            hash_and_local_path: list[str] = file_hash_and_path.split(":")
+            file_hash: bytes = CryptoHelper.b64_to_bytes(hash_and_local_path[0])
+            recovered_file_path: Path = Path(
+                destination_path,
+                CryptoHelper.b64_to_str(input_b64=hash_and_local_path[1]),
+            ).resolve()
+
+            # Recover file
+            try:
+                self.read_file(file_hash, recovered_file_path, backup_repo_path)
+            except RuntimeError as why:
+                backup_manifest_file.close()
+                raise RuntimeError(f"Unable to recover file {file_hash}.") from why
+
+        # Done restoring files.
+        backup_manifest_file.close()
+
+    def read_file(
+        self, file_hash: bytes, target_path: Path, backup_repo_path: Path
+    ) -> None:
+        """
+        Read file from file manifest, restores to target path.
+
+        Args:
+            file_hash: Hash of file to restore.
+            target_path: Path to restore file to.
+            backup_repo_path: Path to the backup repo.
+
+        Returns:
+
+        """
+        # Get file manifest file path.
+        try:
+            source_file_manifest_path: Path = self.get_file_path_from_hash(
+                file_hash, backup_repo_path
+            )
+        except ValueError as why:
+            raise RuntimeError(
+                f"Provided hash does not appear to be of proper length. Hash: "
+                f"{CryptoHelper.bytes_to_hex(file_hash)}"
+            ) from why
+
+        # Ensure target folder exists.
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Open target.
+        try:
+            target_file: io.BufferedReader = target_path.open("wb+")
+            source_file_manifest = source_file_manifest_path.open("r")
+        except OSError as why:
+            raise RuntimeError("Error opening file for backup restore.") from why
+
+        # Ensure manifest version is of expected value.
+        if source_file_manifest.readline() != "00\n":
+            target_file.close()
+            source_file_manifest.close()
+            raise RuntimeError(
+                f"File manifest is not of correct version. File: {file_hash}."
+            )
+
+        # Iterate over file manifest and restore file.
+        for line in source_file_manifest:
+            chunk_hash: bytes = CryptoHelper.b64_to_bytes(line)
+            try:
+                target_file.write(self.read_chunk(chunk_hash, backup_repo_path))
+            except RuntimeError as why:
+                target_file.close()
+                source_file_manifest.close()
+                raise RuntimeError(
+                    f"Error restoring chunk with hash: {chunk_hash}."
+                ) from why
+
+        target_file.close()
+        source_file_manifest.close()
+
+    def read_chunk(self, chunk_hash: bytes, repo_path: Path) -> bytes:
+        """
+        Reads data out of a data chunk. Set for version 00 chunks. Does not currently
+        handle encryption.
+
+        Args:
+            chunk_hash: Hash of chunk to get out of storage.
+            repo_path: Path to the backup repository.
+
+        Returns: Data in chunk.
+
+        """
+        # Get chunk path.
+        chunk_path: Path = self.get_chunk_path_from_hash(chunk_hash, repo_path)
+
+        # Attempt to read chunk
+        try:
+            chunk_file: io.BufferedReader = chunk_path.open("rb")
+        except OSError as why:
+            raise RuntimeError(
+                f"Unable to read chunk with hash "
+                f"{CryptoHelper.bytes_to_hex(chunk_hash)}."
+            ) from why
+
+        # confirm version byte is expected value.
+        version: bytes = chunk_file.read(1)
+        if version != bytes.fromhex("00"):
+            chunk_file.close()
+            raise RuntimeError(
+                f"Chunk is of unexpected version. Unable to read. Version was "
+                f"{CryptoHelper.bytes_to_hex(version)}."
+            )
+
+        # Read encryption byte and none. Code not currently used.
+        # One byte for use encryption byte and 12 bytes of nonce.from
+        _ = chunk_file.read(13)
+
+        # Read compression byte.
+        use_compression_byte: bytes = chunk_file.read(1)
+
+        chunk_data: bytes = chunk_file.read()
+
+        if use_compression_byte == self.BYTE_TRUE:
+            try:
+                chunk_data = self.zlib_decompress_bytes(chunk_data)
+            except zlib.error as why:
+                raise RuntimeError(
+                    f"Unable to decompress chunk with hash: "
+                    f"{CryptoHelper.bytes_to_hex(chunk_hash)}."
+                ) from why
+
+        return chunk_data
+
     @staticmethod
     def zlib_compress_bytes(bytes_to_compress: bytes) -> bytes:
         """
@@ -734,3 +1152,17 @@ class FileHelpers:
 
         """
         return zlib.compress(bytes_to_compress)
+
+    @staticmethod
+    def zlib_decompress_bytes(bytes_to_decompress: bytes) -> bytes:
+        """
+        Decompress given bytes with zlib. Can throw zlib.error if bytes are not zlib
+        compressed bytes.
+
+        Args:
+            bytes_to_decompress: Bytes to decompress.
+
+        Returns: Decompressed bytes.
+
+        """
+        return zlib.decompress(bytes_to_decompress)
