@@ -76,6 +76,7 @@ from app.classes.web.routes.api.users.user.public import ApiUsersUserPublicHandl
 from app.classes.web.routes.api.crafty.announcements.index import (
     ApiAnnounceIndexHandler,
 )
+from app.classes.web.routes.api.crafty.check import ApiCraftyCheck
 from app.classes.web.routes.api.crafty.config.index import (
     ApiCraftyConfigIndexHandler,
     ApiCraftyCustomizeIndexHandler,
@@ -111,6 +112,11 @@ def api_handlers(handler_args):
         (
             r"/api/v2/crafty/announcements/?",
             ApiAnnounceIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/crafty/check/?",
+            ApiCraftyCheck,
             handler_args,
         ),
         (
