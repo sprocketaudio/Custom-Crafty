@@ -223,6 +223,7 @@
     "login": {
         "2fa": "(If MFA is Enabled)",
         "2faRecovery": "Recover MFA",
+        "accountDisabled": "Your user account has been administratively disabled. Please contact your system administrator for more detials.",
         "backupCodeTitle": "Backup Code",
         "backupCode": "Enter Backup Code",
         "burnedBackupCode": "You have burned one of your backup codes. Please reroll your backup codes to avoid being locked out",
