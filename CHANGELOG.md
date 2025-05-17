@@ -19,6 +19,7 @@
 ### Tweaks
 - Add neoforge support in server builder ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/843))
 - Add lightweight health check endpoint ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/848))
+- Force user logout when account is disabled ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/847))
 ### Lang
 TBD
 <br><br>
