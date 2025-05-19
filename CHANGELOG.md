@@ -1,13 +1,7 @@
 # Changelog
-## --- [4.4.9] - 2025/TBD
-### New features
-TBD
-### Bug fixes
-TBD
+## --- [4.4.9] - 2025/05/20
 ### Tweaks
-TBD
-### Lang
-TBD
+- Remove default SuperUser MFA Requirement ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/851))
 <br><br>
 
 ## --- [4.4.8] - 2025/05/17
