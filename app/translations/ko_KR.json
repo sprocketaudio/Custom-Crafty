@@ -106,7 +106,7 @@
         "userTheme": "UI 테마",
         "uses": "허용되는 사용 횟수 (-1은 제한 없음)",
         "editTOTP": "사용자 다중 인증(MFA) 편집",
-        "totpIdReq": "요청 시 TOTP ID가 필요",
+        "totpIdReq": "MFA ID가 필요합니다",
         "changePass": "비밀번호 변경",
         "changeUser": "사용자 이름 변경",
         "hints": "힌트 활성화",
@@ -134,7 +134,8 @@
         "typeString": "문자열 이어야합니다.",
         "userName": " 문자열이어야 하며, 모두 소문자로 입력해야 하고, 최소 4자에서 최대 20자까지 입력할 수 있습니다",
         "2FAerror": "다중 인증 코드는 6자리 숫자(예: 000000)여야 하거나, 16자 문자열을 4글자씩 하이픈(-)으로 구분한 백업 코드(예: ABCD-EFGH-IJKL-MNOP)여야 합니다.",
-        "totp": "TOTP 코드는 6자리 숫자여야 합니다."
+        "totp": "MFA 코드는 6자리 숫자여야 합니다.",
+        "additionalProperties": "추가 속성을 전달할 수 없습니다"
     },
     "webhooks": {
         "trigger": "트리거",
@@ -194,7 +195,9 @@
         "yes": "예"
     },
     "base": {
-        "doesNotWorkWithoutJavascript": "<strong>경고: </strong>Crafty는 JavaScript가 활성화되지 않으면 제대로 작동하지 않습니다!"
+        "doesNotWorkWithoutJavascript": "<strong>경고: </strong>Crafty는 JavaScript가 활성화되지 않으면 제대로 작동하지 않습니다!",
+        "getMFA": "서버를 안전하게 보호하세요!",
+        "createMFA": "계정에 다중인증(2FA)을 추가하세요!"
     },
     "credits": {
         "developmentTeam": "개발자 팀",
@@ -398,7 +401,8 @@
         "cooldown": "쿨다운이 진행 중입니다. 다시 시도해 주세요.",
         "totpSelect": "인증 앱",
         "passwordRecovery": "비밀번호 재설정",
-        "totp": "인증 앱에서 생성된 코드를 입력하세요."
+        "totp": "인증 앱에서 생성된 코드를 입력하세요.",
+        "accountDisabled": "사용자 계정이 관리적으로 비활성화되었습니다. 자세한 내용은 시스템 관리자에게 문의하세요."
     },
     "notify": {
         "activityLog": "활동 로그",
@@ -473,7 +477,8 @@
         "selectManager": "이 역할의 관리자를 선택하세요",
         "serverAccess": "액세스?",
         "serverName": "서버 이름",
-        "serversDesc": "이 역할이 접근할 수 있는 서버"
+        "serversDesc": "이 역할이 접근할 수 있는 서버",
+        "requireMFA": "역할 사용자에게 MFA(멀티팩터 인증)를 활성화해야 합니다"
     },
     "serverBackups": {
         "actions": "동작",
@@ -764,7 +769,8 @@
         "verifyTitle": "Authenticator 앱으로 MFA 인증 방법을 확인해 주세요.",
         "verify": "MFA 인증 실패: 잘못된 코드를 입력했습니다.",
         "goToPage": "인증(MFA) 페이지로 이동",
-        "name": "이름"
+        "name": "이름",
+        "otpReq": "이 사용자에게는 MFA가 필요합니다. 유일한 MFA 메서드는 제거할 수 없습니다."
     },
     "configJson": {
         "allow_nsfw_profile_pictures": "Gravatar™ NSFW 프로필 사진 허용",
@@ -791,6 +797,12 @@
         "stats_update_frequency_seconds": "서버에서 통계를 가져오는 주기 (초)",
         "submit": "제출",
         "True": "활성화",
-        "virtual_terminal_lines": "서버 터미널 버퍼에서 허용할 최대 줄 수"
+        "virtual_terminal_lines": "서버 터미널 버퍼에서 허용할 최대 줄 수",
+        "superMFA": "MFA를 활성화하기 위해서는 슈퍼 유저가 필요합니다",
+        "general": "일반",
+        "security": "보안",
+        "logs": "로그",
+        "monitoring": "모니터링",
+        "miscellaneous": "기타"
     }
 }
