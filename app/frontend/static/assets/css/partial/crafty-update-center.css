@@ -1,4 +1,11 @@
 #selectHead {
     max-width: 30vw;
-    margin-left: 1%;
+}
+
+.form-adapability {
+    padding-left: 12.5px;
+}
+
+.full {
+    width: 100%;
 }

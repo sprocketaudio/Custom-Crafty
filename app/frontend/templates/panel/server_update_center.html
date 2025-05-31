@@ -36,26 +36,118 @@
                     <span class="d-block d-sm-none">
                         {% include "parts/m_server_controls_list.html %}
                     </span>
-                    <div id="selectHead">
-                        <select class="form-control">
-                            <option value="0">Basic</option>
-                            <option value="1">Advanced</option>
-                        </select>
-                    </div>
-                    <br>
-                    <div id="basic">
-                        {% include "../panel/parts/big_bucket_wiz.html" %}
-                    </div>
-                    <div id="advanced">
-                        Test
+                    <div class="row">
+                        <div class="col-md-9 col-sm-12">
+                            <div id="selectHead" class="form-adapability">
+                                <select id="ba" class="form-control">
+                                    <option value="0">Basic</option>
+                                    <option value="1">Advanced</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div id="basic">
+                                <div
+                                    class="card-header header-sm d-flex justify-content-between align-items-center form-adapability">
+                                    <span class="text-secondary" style="font-size: .9vw;">{{
+                                        data['server_stats']['server_id']['executable_update_url'] }}</span> 🔒
+                                </div>
+                                <br>
+                                {% include "../panel/parts/big_bucket_wiz.html" %}
+                            </div>
+                            <div id="advanced" class="d-none form-adapability">
+                                {% if data['super_user'] %}
+                                {% if data['server_stats']['server_type'] != "minecraft-bedrock" %}
+                                <div class="form-group">
+                                    <label for="executable_update_url">{{ translate('serverConfig', 'exeUpdateURL',
+                                        data['lang']) }}
+                                        <small class="text-muted ml-1"> - {{ translate('serverConfig',
+                                            'exeUpdateURLDesc',
+                                            data['lang'])
+                                            }}</small> </label>
+                                    <input type="text" class="form-control" name="executable_update_url"
+                                        id="executable_update_url"
+                                        value="{{ data['server_stats']['server_id']['executable_update_url']  }}"
+                                        placeholder="{{ translate('serverConfig', 'exeUpdateURL', data['lang']) }}">
+                                </div>
+                                {% end %}
+                                {% end %}
+                            </div>
+                            <div class="form-group form-adapability">
+                                <label for="executable">{{ translate('serverConfig', 'serverExecutable',
+                                    data['lang'])
+                                    }}
+                                    <small class="text-muted ml-1"> - {{ translate('serverConfig',
+                                        'serverExecutableDesc',
+                                        data['lang'])
+                                        }}</small> </label>
+                                <input type="text" class="form-control" name="executable" id="executable"
+                                    value="{{ data['server_stats']['server_id']['executable']  }}"
+                                    placeholder="{{ translate('serverConfig', 'serverExecutable', data['lang']) }}"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 grid-margin">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title text-center">Update Information
+                                    </h4>
+                                    <blockquote class="blockquote">
+                                        <p class="mb-0">
+                                            Remote Version: x.x.x
+                                            <br>
+                                            <br>
+                                            New Version Available? Yes
+                                            <br>
+                                            <br>
+                                            Current Executable: <br> vanilla-1.21.5.jar
+                                            <br>
+                                            <br>
+                                            Next Check: 2025/05/30 00:00
+                                            <br>
+                                            <br>
+                                        </p>
+                                        {% if data['server_stats']['updating'] %}
+                                        <i id="update-spinner" class="fa fa-spinner fa-spin"></i>&nbsp;<button
+                                            onclick="send_command(serverId, 'update_executable');"
+                                            id="update_executable" style="max-width: 7rem;"
+                                            class="btn btn-outline-warning">{{
+                                            translate('serverConfig',
+                                            'update', data['lang']) }}</button>
+                                        {% else %}
+                                        <i style="visibility: hidden;" id="update-spinner"
+                                            class="fa fa-spinner fa-spin"></i>&nbsp;<button
+                                            onclick="send_command(serverId, 'update_executable');"
+                                            id="update_executable" style="max-width: 7rem;"
+                                            class="btn btn-outline-warning">{{
+                                            translate('serverConfig',
+                                            'update', data['lang']) }}</button>
+                                        {% end %}
+                                    </blockquote>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-9 grid-margin">
+                            <button class="btn btn-outline-success full">Submit</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<link rel="stylesheet" href="../../static/assets/css/partial/crafty-update-center.css">
-{% end %}
-<script>
-
-</script>
+    <link rel="stylesheet" href="../../static/assets/css/partial/crafty-update-center.css">
+    {% end %}
+    {% block js %}
+    <script>
+        const serverId = new URLSearchParams(document.location.search).get('id')
+        $("#ba").on("change", function () {
+            console.log("TEST")
+            if ($("#ba").val() === "0") {
+                $("#advanced").addClass("d-none");
+                $("#basic").removeClass("d-none");
+            } else {
+                $("#basic").addClass("d-none");
+                $("#advanced").removeClass("d-none");
+            }
+        })
+    </script>
+    {% end %}
