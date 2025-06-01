@@ -142,6 +142,9 @@ class ServersController(metaclass=Singleton):
 
     def remove_server(self, server_id):
         roles_list = PermissionsServers.get_roles_from_server(server_id)
+        logger.info(
+            "Delete request: removing roles access associated with %s", server_id
+        )
         for role in roles_list:
             role_id = role.role_id
             role_data = RolesController.get_role_with_servers(role_id)
@@ -150,9 +153,29 @@ class ServersController(metaclass=Singleton):
             PermissionsServers.delete_roles_permissions(role_id, role_data["servers"])
         # Remove roles from server
         PermissionsServers.remove_roles_of_server(server_id)
+        logger.info(
+            "Delete request: Removing all server backup policies for server %s",
+            server_id,
+        )
         self.management_helper.remove_all_server_backups(server_id)
+        logger.info("Delete Request: Removing server from database %s", server_id)
         # Finally remove server
         self.servers_helper.remove_server(server_id)
+
+    def remove_server_db_files(self, server_id: str):
+        """Removes server DB files. This is called by the remove server method.
+
+        Args:
+            server_id (str): ID of server being deleted.
+        """
+        logger.info(
+            "Delete request: Purging server stats database and playercache from "
+            "Crafty storage for %s",
+            server_id,
+        )
+        self.file_helper.del_dirs(
+            self.helper.root_dir, "app", "config", "db", "servers", str(server_id)
+        )
 
     @staticmethod
     def get_server_data_by_id(server_id):

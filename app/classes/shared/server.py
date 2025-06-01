@@ -189,7 +189,15 @@ class ServerInstance:
 
         try:
             with open(
-                os.path.join(self.server_object.path, "db_stats", "players_cache.json"),
+                os.path.join(
+                    self.helper.root_dir,
+                    "app",
+                    "config",
+                    "db",
+                    "servers",
+                    self.server_id,
+                    "players_cache.json",
+                ),
                 "r",
                 encoding="utf-8",
             ) as f:
@@ -1255,7 +1263,15 @@ class ServerInstance:
         for item in self.player_cache:
             write_json[item["name"]] = item
         with open(
-            os.path.join(self.server_path, "db_stats", "players_cache.json"),
+            os.path.join(
+                self.helper.root_dir,
+                "app",
+                "config",
+                "db",
+                "servers",
+                self.server_id,
+                "players_cache.json",
+            ),
             "w",
             encoding="utf-8",
         ) as f:
