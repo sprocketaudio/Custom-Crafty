@@ -216,6 +216,10 @@ class BackupManager:
             backup_config["backup_location"],
             backup_config["backup_id"],
         )
+        if backup_config["backup_type"] == "snapshot":
+            backup_location = os.path.join(
+                backup_config["backup_location"], "snapshot_backups", "manifests"
+            )
         if not Helpers.check_path_exists(
             Helpers.get_os_understandable_path(backup_location)
         ):
@@ -225,6 +229,18 @@ class BackupManager:
                 Helpers.get_os_understandable_path(backup_location)
             )
         )
+        if backup_config["backup_type"] == "snapshot":
+            return [
+                {
+                    "path": os.path.relpath(
+                        f["path"],
+                        start=Helpers.get_os_understandable_path(backup_location),
+                    ),
+                    "size": "",
+                }
+                for f in files
+                if f["path"].endswith(".manifest")
+            ]
         return [
             {
                 "path": os.path.relpath(
