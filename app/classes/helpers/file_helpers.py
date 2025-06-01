@@ -669,13 +669,12 @@ class FileHelpers:
         """
         files_to_keep = set()
         for keeper_manifest_datetime in keepers_datetime_list:
+            backup_time = keeper_manifest_datetime.strftime(
+                self.SNAPSHOT_BACKUP_DATE_FORMAT_STRING
+            )
             # Open file
             manifest_file_path = (
-                backup_repository_path
-                / "manifests"
-                / f"{keeper_manifest_datetime.strftime(
-                self.SNAPSHOT_BACKUP_DATE_FORMAT_STRING)}"
-                f".manifest"
+                backup_repository_path / "manifests" / f"{backup_time}.manifest"
             )
             try:
                 manifest_file: io.TextIOWrapper = manifest_file_path.open("r")
