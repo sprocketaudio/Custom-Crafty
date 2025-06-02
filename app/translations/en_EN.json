@@ -414,6 +414,7 @@
         "restore": "Restore",
         "restoring": "Restoring Backup. This may take a while. Please be patient.",
         "run": "Run Backup",
+        "snapshotDisclaimer": "Snapshot backups are currently in beta. Snapshot backups should only store one copy of a file and use much less disk space. Backup and restore do work well in testing but you may encounter unforeseen issues. You should not solely rely on this backup style for any mission critical backups. Please report any issues you encounter.",
         "save": "Save",
         "shutdown": "Shutdown server for duration of backup",
         "size": "Size",
