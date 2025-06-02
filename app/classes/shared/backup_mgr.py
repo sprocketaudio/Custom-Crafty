@@ -62,7 +62,6 @@ class BackupManager:
                             self.file_helper.del_dirs(os.path.join(SERVER_PATH, item))
                         else:
                             self.file_helper.del_file(os.path.join(SERVER_PATH, item))
-                print("restoring")
                 self.file_helper.restore_archive(backup_location, SERVER_PATH)
 
     def backup_starter(self, backup_config, server):
@@ -357,7 +356,6 @@ class BackupManager:
 
         Returns:
         """
-        print(server.settings["path"])
         destination_path = Path(server.settings["path"])
         source_manifest_path = Path(
             backup_config["backup_location"],
