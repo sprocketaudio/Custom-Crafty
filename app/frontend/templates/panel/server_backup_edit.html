@@ -41,6 +41,9 @@
           </span>
           <div class="row">
             <div class="col-md-6 col-sm-12">
+              <span id="beta-ribbon" class="d-none">
+                <h4 class="ribbon">BETA</h4>
+              </span>
               <br>
               <br>
               <div id="{{data['backup_config'].get('backup_id', None)}}_status" class="progress"
@@ -407,9 +410,17 @@
 
   $("#snapshot").on("change", function () {
     if ($("#snapshot").is(':checked')) {
+      $("#beta-ribbon").removeClass("d-none")
       console.log($("#snapshot").data("disclaimer"))
       bootbox.alert($("#snapshot").data("disclaimer"))
+    } else {
+      console.log("In else")
+      $("#beta-ribbon").addClass("d-none")
     }
+  })
+  $("#zip_vault").on("change", function () {
+    console.log("In else")
+    $("#beta-ribbon").addClass("d-none")
   })
 
   $(document).ready(function () {
