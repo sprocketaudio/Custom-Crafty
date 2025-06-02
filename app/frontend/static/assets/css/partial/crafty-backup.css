@@ -74,3 +74,10 @@
 .ribbon:after {
     left: 100%;
 }
+
+.parent {
+    overflow: hidden;
+    /* required */
+    position: relative;
+    /* required  for demo*/
+}

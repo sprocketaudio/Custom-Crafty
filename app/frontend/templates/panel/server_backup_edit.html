@@ -40,8 +40,12 @@
             {% include "parts/m_server_controls_list.html %}
           </span>
           <div class="row">
-            <div class="col-md-6 col-sm-12">
+            <div class="col-md-6 col-sm-12 parent">
+              {% if data["backup_config"].get("backup_type") != "snapshot" %}
               <span id="beta-ribbon" class="d-none">
+                {% else %}
+                <span id="beta-ribbon"></span>
+                {% end %}
                 <h4 class="ribbon">BETA</h4>
               </span>
               <br>
