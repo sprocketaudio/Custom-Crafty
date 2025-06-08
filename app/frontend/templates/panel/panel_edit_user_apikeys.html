@@ -32,11 +32,13 @@
                 <div class="card-body  pt-0">
                     <ul class="nav nav-tabs col-md-12 tab-simple-styled " role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link" href="/panel/edit_user?id={{ data['user']['user_id'] }}&subpage=config" role="tab" aria-selected="false">
+                            <a class="nav-link" href="/panel/edit_user?id={{ data['user']['user_id'] }}&subpage=config"
+                                role="tab" aria-selected="false">
                                 <i class="fas fa-cogs"></i>{{ translate('apiKeys', 'config', data['lang']) }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="/panel/edit_user_apikeys?id={{ data['user']['user_id'] }}" role="tab" aria-selected="true">
+                            <a class="nav-link active" href="/panel/edit_user_apikeys?id={{ data['user']['user_id'] }}"
+                                role="tab" aria-selected="true">
                                 <i class="fas fa-key"></i>{{ translate('apiKeys', 'apiKeys', data['lang']) }}</a>
                         </li>
                         <li class="nav-item">
@@ -91,9 +93,13 @@
                                                             apikey.server_permissions }}
                                                             {{ translate('apiKeys', 'crafty', data['lang']) }} {{
                                                             apikey.crafty_permissions }}</td>
-                                                        <td><button class="btn btn-danger delete-api-key" data-key-id="{{ apikey.token_id }}" data-key-name="{{ apikey.name }}">{{translate('panelConfig',
+                                                        <td><button class="btn btn-danger delete-api-key"
+                                                                data-key-id="{{ apikey.token_id }}"
+                                                                data-key-name="{{ apikey.name }}">{{translate('panelConfig',
                                                                 'delete', data['lang'])}}</button>
-                                                            <button class="btn btn-outline-primary get-a-token" data-key-id="{{ apikey.token_id }}" data-key-name="{{ apikey.name }}">{{translate('apiKeys',
+                                                            <button class="btn btn-outline-primary get-a-token"
+                                                                data-key-id="{{ apikey.token_id }}"
+                                                                data-key-name="{{ apikey.name }}">{{translate('apiKeys',
                                                                 'getToken', data['lang'])}}</button>
                                                         </td>
                                                     </tr>
@@ -119,7 +125,8 @@
                                             <label class="form-label" for="username">{{ translate('apiKeys', 'name',
                                                 data['lang']) }}<small class="text-muted ml-1"> - {{
                                                     translate('apiKeys', 'nameDesc', data['lang']) }}</small> </label>
-                                            <input type="text" class="form-control" name="name" id="name" placeholder="API Key">
+                                            <input type="text" class="form-control" name="name" id="name"
+                                                placeholder="API Key">
                                         </div>
 
                                         <table class="table table-hover mb-3">
@@ -136,7 +143,9 @@
                                                             }}</label>
                                                     </td>
                                                     <td>
-                                                        <input type="checkbox" class="server_perm" id="permission_{{ permission.name }}" name="permission_{{ permission.name }}" value="1">
+                                                        <input type="checkbox" class="server_perm"
+                                                            id="permission_{{ permission.name }}"
+                                                            name="permission_{{ permission.name }}" value="1">
                                                     </td>
                                                 </tr>
                                                 {% end %}
@@ -147,9 +156,13 @@
                                                     </td>
                                                     <td>
                                                         {% if permission in data['user_crafty_permissions'] %}
-                                                        <input type="checkbox" class="crafty_perm" id="permission_{{ permission.name }}" name="permission_{{ permission.name }}" value="1">
+                                                        <input type="checkbox" class="crafty_perm"
+                                                            id="permission_{{ permission.name }}"
+                                                            name="permission_{{ permission.name }}" value="1">
                                                         {% else %}
-                                                        <input type="checkbox" class="crafty_perm" id="permission_{{ permission.name }}" name="permission_{{ permission.name }}" value="1" disabled>
+                                                        <input type="checkbox" class="crafty_perm"
+                                                            id="permission_{{ permission.name }}"
+                                                            name="permission_{{ permission.name }}" value="1" disabled>
                                                         {% end %}
                                                     </td>
                                                 </tr>
@@ -300,8 +313,8 @@
             let responseData = await res.json();
             if (responseData.status === "ok") {
                 bootbox.alert({
-                    title: `API token for ${keyName}`,
-                    message: `Here is an API token for ${keyName}:\n<pre class="api-key">${responseData.data}</pre>`
+                    title: `API token for ${escape(keyName)}`,
+                    message: `Here is an API token for ${escape(keyName)}:\n<pre class="api-key">${responseData.data}</pre>`
                 });
             } else {
 
