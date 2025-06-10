@@ -67,7 +67,7 @@ MASTER_CONFIG = {
     "big_bucket_repo": "https://jars.arcadiatech.org",
     "enable_otp_skew": False,
     "max_login_attempts": 3,
-    "superMFA": True,
+    "superMFA": False,
 }
 
 CONFIG_CATEGORIES = {
