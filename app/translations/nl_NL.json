@@ -653,7 +653,6 @@
         "manager": "Manager",
         "selectManager": "Selecteer Manager voor Gebruiker",
         "userTheme": "UI-thema",
-        "otpReq": "TOTP is nodig voor supergebruikers. Je kan je enige TOTP-methode niet verwijderen.",
         "changePass": "Wachtwoord Veranderen",
         "editTOTP": "Gebruiker MFA bewerken",
         "changeUser": "Gebruikersnaam Veranderen",
