@@ -778,7 +778,8 @@
         "typeInteger": "must be a number.",
         "typeList": "must be of type list/array ",
         "typeString": "must be of type string.",
-        "userName": " must be of type string, all LOWERCASE, a minimum of 4 characters and a max of 20 characters"
+        "userName": " must be of type string, all LOWERCASE, a minimum of 4 characters and a max of 20 characters",
+        "mfaName": "Input must be of type string and a minumum of 3 characters for property"
     },
     "webhooks": {
         "areYouSureDel": "Are you sure you want to delete this webhook?",
