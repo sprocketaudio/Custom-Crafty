@@ -3,11 +3,12 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Revert min length of username from `4 > 3` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/853))
 ### Tweaks
-TBD
+- Add border around QR code to improve scanning ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/853))
+- Add error when user does not provide a valid username ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/853))
 ### Lang
-TBD
+- Correct spelling of `login.accountDisabled` on English localization ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/855))
 <br><br>
 
 ## --- [4.4.9] - 2025/05/20
