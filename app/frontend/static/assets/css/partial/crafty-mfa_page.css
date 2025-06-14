@@ -74,5 +74,5 @@
 }
 
 #qrcode {
-    outline: 3px dotted var(--info);
+    outline: 4px solid var(--info);
 }
