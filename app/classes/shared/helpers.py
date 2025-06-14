@@ -203,25 +203,20 @@ class Helpers:
 
             if not "links" in response_data:
                 raise KeyError("Unable to find links key in Bedrock response payload")
-            bedrock_data = {"windows": {}, "linux": {}}
+            bedrock_data = {}
             for link in response_data["links"]:
-                if "bedrock" not in link["downloadType"].lower():
-                    continue
-                if "linux" in link["downloadType"].lower():
-                    if "preview" in link["downloadType"].lower():
-                        bedrock_data["linux"]["preview"] = link["downloadUrl"]
-                    else:
-                        bedrock_data["linux"]["latest"] = link["downloadUrl"]
-                else:
-                    if "preview" in link["downloadType"].lower():
-                        bedrock_data["windows"]["preview"] = link["downloadUrl"]
-                    else:
-                        bedrock_data["windows"]["latest"] = link["downloadUrl"]
+                dtype = link["downloadType"]
+                url = link["downloadUrl"]
+                match = re.match(r"serverBedrock(Preview)?(Windows|Linux)", dtype)
+                if match:
+                    preview = "preview" if match.group(1) else "stable"
+                    operating_system = match.group(2).lower()
+                    bedrock_data[f"{operating_system}_{preview}"] = url
             print(bedrock_data)
             if os.name == "nt":
-                return bedrock_data["windows"]["latest"]
+                return bedrock_data["windows_stable"]
 
-            return bedrock_data["linux"]["latest"]
+            return bedrock_data["linux_stable"]
 
         except Exception as e:
             logger.error(f"Unable to resolve remote bedrock download url! \n{e}")
