@@ -7,7 +7,7 @@ TBD
 ### Tweaks
 TBD
 ### Lang
-TBD
+- Correct spelling of `login.accountDisabled` on English localization ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/855))
 <br><br>
 
 ## --- [4.4.9] - 2025/05/20
