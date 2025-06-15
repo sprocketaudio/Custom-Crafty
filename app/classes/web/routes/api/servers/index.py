@@ -880,7 +880,7 @@ class ApiServersIndexHandler(BaseApiHandler):
         except Exception as e:
             self.controller.servers.stats.record_stats()
 
-            self.finish_json(
+            return self.finish_json(
                 503,
                 {
                     "status": "error",
