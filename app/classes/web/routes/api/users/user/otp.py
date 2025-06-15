@@ -11,7 +11,12 @@ logger = logging.getLogger(__name__)
 totp_verify_schema = {
     "type": "object",
     "properties": {
-        "name": {"type": "string", "minLength": 3},
+        "name": {
+            "type": "string",
+            "minLength": 3,
+            "error": "mfaName",
+            "fill": True,
+        },
         "totp": {"type": "integer", "minLength": 6, "maxLength": 6},
     },
     "additionalProperties": False,
@@ -140,13 +145,19 @@ class APIUsersTOTPVerifyIndexHandler(BaseApiHandler):
 
         try:
             validate(data, totp_verify_schema)
-        except ValidationError as e:
+        except ValidationError as why:
+            offending_key = why.path[0] if why.path else None
+            err = f"""{self.translator.translate(
+                "validators",
+                why.schema.get("error", "additionalProperties"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {offending_key}"""
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
-                    "error_data": str(e),
+                    "error_data": f"{str(err)}",
                 },
             )
 

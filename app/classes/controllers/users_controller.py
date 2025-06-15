@@ -52,7 +52,7 @@ class UsersController:
             "username": {
                 "type": "string",
                 "maxLength": 20,
-                "minLength": 4,
+                "minLength": 3,
                 "pattern": "^[a-z0-9_]+$",
                 "examples": ["admin"],
                 "title": "Username",

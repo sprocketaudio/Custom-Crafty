@@ -609,10 +609,6 @@ class PanelHandler(BaseHandler):
             except Exception as e:
                 logger.error(f"Failed to get server waiting to start: {e}")
                 page_data["waiting_start"] = False
-            if not self.failed_server:
-                page_data["get_players"] = server.get_server_players()
-            else:
-                page_data["get_players"] = []
             page_data["permissions"] = {
                 "Commands": EnumPermissionsServer.COMMANDS,
                 "Terminal": EnumPermissionsServer.TERMINAL,

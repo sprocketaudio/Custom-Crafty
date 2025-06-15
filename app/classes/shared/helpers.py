@@ -143,7 +143,7 @@ class Helpers:
         self.translation = Translation(self)
         self.update_available = False
         self.migration_notifications = []
-        self.ignored_names = ["crafty_managed.txt", "db_stats"]
+        self.ignored_names = ["crafty_managed.txt"]
         self.crafty_starting = False
         self.minimum_password_length = 8
 

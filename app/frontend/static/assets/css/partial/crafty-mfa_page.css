@@ -72,3 +72,7 @@
 .list-group-item {
     background-color: var(--outline) !important;
 }
+
+#qrcode {
+    outline: 4px solid var(--info);
+}

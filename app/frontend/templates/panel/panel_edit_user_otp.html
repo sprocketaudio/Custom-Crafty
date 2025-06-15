@@ -229,6 +229,12 @@
                     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
                     document.cookie = "_xsrf=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
                 } else {
+                    if (responseData.error === "INVALID_JSON_SCHEMA") {
+                        bootbox.hideAll()
+                        setTimeout(
+                            bootbox.alert(responseData.error_data),
+                            2000)
+                    }
                     $("#verify-status").html(`<i class="fas fa-exclamation-triangle"></i>`);
                     $("#verify-input").addClass("wrong");
                 }
