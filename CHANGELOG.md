@@ -4,6 +4,7 @@
 TBD
 ### Bug fixes
 - Fix issue causing some server creations to silently fail ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/862))
+- Check if `servers/` dir exists before attempting to migrate server stats db(s) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/863))
 ### Tweaks
 TBD
 ### Lang

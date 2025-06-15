@@ -9,6 +9,10 @@ helper = Helpers()
 
 
 def migrate(_migrator, _database, **kwargs):
+    # Skip migration if servers dir does not exist
+    if not os.path.exists(helper.servers_dir):
+        return
+
     servers = os.listdir(helper.servers_dir)
     for server in servers:
         if os.path.exists(os.path.join(helper.servers_dir, server, "db_stats")):
