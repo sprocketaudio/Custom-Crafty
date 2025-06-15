@@ -72,12 +72,15 @@ class HelperServerStats:
 
     def __init__(self, server_id):
         self.server_id = server_id
+        self.root_dir = os.path.abspath(os.path.curdir)
         self.init_database(self.server_id)
 
     def init_database(self, server_id):
         try:
-            server = HelperServers.get_server_data_by_id(server_id)
-            db_folder = os.path.join(f"{server['path']}", "db_stats")
+            db_folder = os.path.join(
+                self.root_dir, "app", "config", "db", "servers", str(server_id)
+            )
+            Helpers.ensure_dir_exists(db_folder)
             db_file = os.path.join(
                 db_folder,
                 "crafty_server_stats.sqlite",
@@ -109,8 +112,12 @@ class HelperServerStats:
         try:
             server = HelperServers.get_server_data_by_id(self.server_id)
             db_file = os.path.join(
-                f"{server['path']}",
-                "db_stats",
+                self.root_dir,
+                "app",
+                "config",
+                "db",
+                "servers",
+                str(server["server_id"]),
                 "crafty_server_stats.sqlite",
             )
             self.database = SqliteDatabase(
