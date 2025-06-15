@@ -8,6 +8,7 @@ TBD
 - Add border around QR code to improve scanning ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/853))
 - Add error when user does not provide a valid username ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/853))
 - Moves db_stats directory from the servers directories to the db directory in config ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/850))
+- Bump tornado for CVE-2025-47287 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/858))
 ### Lang
 - Correct spelling of `login.accountDisabled` on English localization ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/855))
 <br><br>
