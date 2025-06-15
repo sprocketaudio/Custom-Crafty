@@ -691,8 +691,7 @@
         "editTOTP": "Modifica utente MFA",
         "hints": "Abilitare i suggerimenti?",
         "totpIdReq": "ID TOTP necessario per la richiesta",
-        "totpHeader": "Autenticazione a più fattori",
-        "otpReq": "TOTP è obbligatorio per i super utenti. Non puoi rimuovere il tuo unico metodo TOTP."
+        "totpHeader": "Autenticazione a più fattori"
     },
     "validators": {
         "passLength": "La password è troppo corta. Lunghezza minima: 8",

@@ -32,7 +32,9 @@
         "yes": "是"
     },
     "base": {
-        "doesNotWorkWithoutJavascript": "<strong>警告：</strong>Crafty 无法在没有 JavaScript 的情况下使用！"
+        "doesNotWorkWithoutJavascript": "<strong>警告：</strong>Crafty 无法在没有 JavaScript 的情况下使用！",
+        "createMFA": "为您的账号添加多因素验证！",
+        "getMFA": "保护您的服务器！"
     },
     "credits": {
         "developmentTeam": "开发团队",
@@ -234,9 +236,10 @@
         "backupCode": "输入备份代码",
         "cancel": "取消",
         "cooldown": "冷却中。此时间后重试：",
-        "totpSelect": "认证器应用",
+        "totpSelect": "验证器应用",
         "passwordRecovery": "恢复密码",
-        "totp": "输入认证器代码"
+        "totp": "输入验证器代码",
+        "accountDisabled": "您的用户账号出于管理原因已被禁用。请联系您的系统管理员以了解详情。"
     },
     "notify": {
         "activityLog": "活动日志",
@@ -311,7 +314,8 @@
         "selectManager": "选择此角色的管理员",
         "serverAccess": "访问？",
         "serverName": "服务器名称",
-        "serversDesc": "此角色允许访问的服务器"
+        "serversDesc": "此角色允许访问的服务器",
+        "requireMFA": "要求角色用户启用 MFA（多因素验证）"
     },
     "serverBackups": {
         "actions": "操作",
@@ -686,8 +690,7 @@
         "userSettings": "用户设置",
         "userTheme": "UI 主题",
         "uses": "使用次数限制（-1==无限制）",
-        "otpReq": "超级用户需要 TOTP。您不能删除您仅有的 TOTP 方式。",
-        "totpIdReq": "请求需要 TOTP ID",
+        "totpIdReq": "请求需要 MFA ID",
         "changePass": "更改密码",
         "changeUser": "更改用户名",
         "editTOTP": "编辑用户 MFA",
@@ -716,7 +719,8 @@
         "typeInteger": "必须为数字。",
         "typeString": "必须为字符串类型。",
         "2FAerror": "多因素代码必须为 6 位（例如：000000）或一个以 - 分隔为每 4 位一段的备份代码（例如：ABCD-EFGH-IJKL-MNOP）",
-        "totp": "TOTP 代码必须为 6 个数字"
+        "totp": "MFA 代码必须为 6 个数字",
+        "additionalProperties": "不允许传递额外属性"
     },
     "webhooks": {
         "areYouSureDel": "您确定要删除此 webhook 吗？",
@@ -747,7 +751,7 @@
         "backupOtp": "需要一个新的 MFA 方式以请求备份代码",
         "mfaWarn": "您必须启用 MFA 来与此系统交互。请创建一个 MFA 密钥。如果您已经创建了一个密钥，但仍看见此消息，请注销并使用 MFA 重新登录。",
         "deleteConfirm": "您确定要删除此 MFA 方式吗？",
-        "verifyTitle": "使用认证器验证 MFA 方式",
+        "verifyTitle": "使用验证器验证 MFA 方式",
         "name": "名称",
         "id": "ID",
         "config": "配置",
@@ -759,13 +763,14 @@
         "backupCodes": "请复制您的备份代码。",
         "backupCodesMax": "已达到 6 个备份代码的上限。",
         "saveWarn": "请确保您保存了这些备份代码，否则您可能失去访问",
-        "confirm2FA": "请确认认证器代码",
+        "confirm2FA": "请确认验证器代码",
         "newName": "为此 MFA 方式输入一个易于辨认的名称",
         "otpTitle": "MFA 方式",
         "renewRecovery": "更新恢复代码",
         "newOTP": "添加新的多因素验证",
         "verify": "验证 MFA 失败。输入了错误的代码。",
-        "goToPage": "前往 MFA 页面"
+        "goToPage": "前往 MFA 页面",
+        "otpReq": "此用户必须启用 MFA。您不能移除你的唯一 MFA 方式。"
     },
     "configJson": {
         "history_max_age": "Crafty 应该保存您的服务器统计多久（天）",
@@ -792,6 +797,12 @@
         "show_errors": "显示 web 服务器的调试错误",
         "submit": "提交",
         "True": "是",
-        "virtual_terminal_lines": "我们应该允许您的服务器终端缓冲中有多少行"
+        "virtual_terminal_lines": "我们应该允许您的服务器终端缓冲中有多少行",
+        "general": "通用",
+        "security": "安全",
+        "logs": "日志",
+        "miscellaneous": "其他",
+        "superMFA": "要求超级用户启用 MFA",
+        "monitoring": "监控"
     }
 }

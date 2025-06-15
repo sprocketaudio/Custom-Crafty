@@ -1017,6 +1017,9 @@ class Controller:
                 # remove the server from servers list
                 self.servers.servers_list.pop(counter)
 
+                # After server is removed from servers list delete database files
+                self.servers.remove_server_db_files(server_id)
+
             counter += 1
 
     def remove_unloaded_server(self, server_id):
