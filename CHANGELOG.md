@@ -11,6 +11,7 @@ TBD
 - Moves db_stats directory from the servers directories to the db directory in config ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/850))
 - Bump tornado for CVE-2025-47287 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/858))
 - Bump requests for CVE-2024-47081 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/859))
+- Update Bedrock Server binary download url ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/857))
 ### Lang
 - Correct spelling of `login.accountDisabled` on English localization ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/855))
 <br><br>

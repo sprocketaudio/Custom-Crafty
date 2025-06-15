@@ -184,7 +184,7 @@ class Helpers:
         Get latest bedrock executable url \n\n
         returns url if successful, False if not
         """
-        url = "https://www.minecraft.net/en-us/download/server/bedrock/"
+        url = "https://net-secondary.web.minecraft-services.net/api/v1.0/download/links"
         headers = {
             "Accept-Encoding": "identity",
             "Accept-Language": "en",
@@ -194,34 +194,32 @@ class Helpers:
                 "Chrome/104.0.0.0 Safari/537.36"
             ),
         }
-        target_win = 'https://www.minecraft.net/bedrockdedicatedserver/bin-win/[^"]*'
-        target_linux = (
-            'https://www.minecraft.net/bedrockdedicatedserver/bin-linux/[^"]*'
-        )
         try:
             # Get minecraft server download page
             # (hopefully the don't change the structure)
-            download_page = get(url, headers=headers, timeout=1)
-            download_page.raise_for_status()
-            # Search for our string targets
-            win_search_result = re.search(target_win, download_page.text)
-            linux_search_result = re.search(target_linux, download_page.text)
-            if win_search_result is None or linux_search_result is None:
-                raise RuntimeError(
-                    "Could not determine download URL from minecraft.net."
-                )
+            response = get(url, headers=headers, timeout=1)
 
-            win_download_url = win_search_result.group(0)
-            linux_download_url = linux_search_result.group(0)
-            print(win_download_url, linux_download_url)
+            response_data = response.json()["result"]
+
+            if "links" not in response_data:
+                raise KeyError("Unable to find links key in Bedrock response payload")
+            bedrock_data = {}
+            for link in response_data["links"]:
+                dtype = link["downloadType"]
+                url = link["downloadUrl"]
+                match = re.match(r"serverBedrock(Preview)?(Windows|Linux)", dtype)
+                if match:
+                    preview = "preview" if match.group(1) else "stable"
+                    operating_system = match.group(2).lower()
+                    bedrock_data[f"{operating_system}_{preview}"] = url
             if os.name == "nt":
-                return win_download_url
+                return bedrock_data["windows_stable"]
 
-            return linux_download_url
+            return bedrock_data["linux_stable"]
+
         except Exception as e:
             logger.error(f"Unable to resolve remote bedrock download url! \n{e}")
             raise e
-        return False
 
     def get_execution_java(self, value, execution_command):
         if self.is_os_windows():
