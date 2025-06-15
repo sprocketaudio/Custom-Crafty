@@ -3,7 +3,7 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Check if `servers/` dir exists before attempting to migrate server stats db(s) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/863))
 ### Tweaks
 TBD
 ### Lang
