@@ -169,11 +169,11 @@ class Helpers:
             if response.status_code == 200:
                 remote_version = pkg_version.parse(json.loads(response.text)[0]["name"])
 
-            # Get local version data from the file and parse the semver
-            local_version = pkg_version.parse(self.get_version_string())
+                # Get local version data from the file and parse the semver
+                local_version = pkg_version.parse(self.get_version_string())
 
-            if remote_version > local_version:
-                return remote_version
+                if remote_version > local_version:
+                    return remote_version
 
         except Exception as e:
             logger.error(f"Unable to check for new crafty version! \n{e}")
