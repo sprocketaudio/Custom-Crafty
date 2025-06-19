@@ -99,7 +99,7 @@ class Migrator(object):
         """
         Cleans the operations.
         """
-        self.operations = list()
+        self.operations = []
 
     def sql(self, sql: str, *params):
         """
@@ -438,7 +438,7 @@ class MigrationManager(object):
         """
         Reads a migration from a file.
         """
-        call_params = dict()
+        call_params = {}
         if Helpers.is_os_windows() and sys.version_info >= (3, 0):
             # if system is windows - force utf-8 encoding
             call_params["encoding"] = "utf-8"
