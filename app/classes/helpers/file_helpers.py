@@ -455,7 +455,7 @@ class FileHelpers:
             except Exception as ex:
                 Console.error(ex)
         else:
-            return "false"
+            return None
         return
 
     @staticmethod
