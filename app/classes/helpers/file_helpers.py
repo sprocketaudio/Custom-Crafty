@@ -454,9 +454,7 @@ class FileHelpers:
                         logger.error(f"ERROR IN ZIP IMPORT: {ex}")
             except Exception as ex:
                 Console.error(ex)
-        else:
-            return None
-        return
+        return None
 
     @staticmethod
     def unzip_server(zip_path, user_id):
