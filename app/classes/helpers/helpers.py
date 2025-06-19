@@ -1353,15 +1353,16 @@ class Helpers:
             rel = os.path.join(folder, raw_filename)
             dpath = os.path.join(folder, filename)
             if os.path.isdir(rel):
-                output += f"""<li class="tree-item" data-path="{dpath}">
-                    \n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">
-                    <input type="radio" name="root_path" value="{dpath}">
-                    <span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">
-                      <i class="text-info far fa-folder"></i>
-                      <i class="text-info far fa-folder-open"></i>
-                      {filename}
-                      </span>
-                    </input></div><li>"""
+                # lines below had too long warnings disabled for readability
+                output += (f"""<li class="tree-item" data-path="{dpath}">""" +
+                    """\n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">""" + #pylint: disable=line-too-long
+                    """<input type="radio" name="root_path" value="{dpath}">""" +
+                    """<span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">""" + #pylint: disable=line-too-long
+                    """  <i class="text-info far fa-folder"></i>""" +
+                    """  <i class="text-info far fa-folder-open"></i>""" +
+                    """  {filename}""" +
+                    """  </span>""" +
+                    """</input></div><li>""")
         return output
 
     @staticmethod
