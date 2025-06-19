@@ -37,7 +37,7 @@ class FileHelpers:
         self.mime_types = mimetypes.MimeTypes()
 
     @staticmethod
-    def ssl_get_file( #pylint: disable=too-many-positional-arguments
+    def ssl_get_file(  # pylint: disable=too-many-positional-arguments
         url, out_path, out_file, max_retries=3, backoff_factor=2, headers=None
     ):
         """
@@ -266,7 +266,7 @@ class FileHelpers:
 
         return True
 
-    def make_backup( #pylint: disable=too-many-positional-arguments
+    def make_backup(  # pylint: disable=too-many-positional-arguments
         self,
         path_to_destination,
         path_to_zip,

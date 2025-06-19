@@ -41,7 +41,7 @@ class BackupManager:
             )
             self.tz = ZoneInfo("Europe/London")
 
-    def restore_starter( #pylint: disable=too-many-positional-arguments
+    def restore_starter(  # pylint: disable=too-many-positional-arguments
         self, backup_config, backup_location, backup_file, svr_obj, in_place
     ):
         server_path = svr_obj.settings["path"]
@@ -380,7 +380,9 @@ class BackupManager:
 
         # Open backup manifest.
         try:
-            backup_manifest_file: io.TextIOWrapper = source_manifest_path.open("r", encoding='utf-8')
+            backup_manifest_file: io.TextIOWrapper = source_manifest_path.open(
+                "r", encoding="utf-8"
+            )
         except OSError as why:
             raise RuntimeError(
                 f"Unable to open backup manifest at {source_manifest_path}."

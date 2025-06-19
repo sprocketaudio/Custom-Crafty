@@ -1331,16 +1331,18 @@ class Helpers:
             dpath = os.path.join(folder, filename)
             if os.path.isdir(rel):
                 # lines below had too long warnings disabled for readability
-                output += (f"""<li class="tree-item" data-path="{dpath}">""" +
-                    """\n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">""" + #pylint: disable=line-too-long
-                    """<input type="radio" name="root_path" value="{dpath}">""" +
-                    """<span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">""" + #pylint: disable=line-too-long
-                    """  <i class="text-info far fa-folder"></i>""" +
-                    """  <i class="text-info far fa-folder-open"></i>""" +
-                    """  {filename}""" +
-                    """  </span>""" +
-                    """</input></div><li>""" +
-                    """\n""")
+                output += (
+                    f"""<li class="tree-item" data-path="{dpath}">"""
+                    + """\n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">"""  # pylint: disable=line-too-long
+                    + """<input type="radio" name="root_path" value="{dpath}">"""
+                    + """<span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">"""  # pylint: disable=line-too-long
+                    + """  <i class="text-info far fa-folder"></i>"""
+                    + """  <i class="text-info far fa-folder-open"></i>"""
+                    + """  {filename}"""
+                    + """  </span>"""
+                    + """</input></div><li>"""
+                    + """\n"""
+                )
         return output
 
     @staticmethod
@@ -1354,15 +1356,17 @@ class Helpers:
             dpath = os.path.join(folder, filename)
             if os.path.isdir(rel):
                 # lines below had too long warnings disabled for readability
-                output += (f"""<li class="tree-item" data-path="{dpath}">""" +
-                    """\n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">""" + #pylint: disable=line-too-long
-                    """<input type="radio" name="root_path" value="{dpath}">""" +
-                    """<span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">""" + #pylint: disable=line-too-long
-                    """  <i class="text-info far fa-folder"></i>""" +
-                    """  <i class="text-info far fa-folder-open"></i>""" +
-                    """  {filename}""" +
-                    """  </span>""" +
-                    """</input></div><li>""")
+                output += (
+                    f"""<li class="tree-item" data-path="{dpath}">"""
+                    + """\n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">"""  # pylint: disable=line-too-long
+                    + """<input type="radio" name="root_path" value="{dpath}">"""
+                    + """<span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">"""  # pylint: disable=line-too-long
+                    + """  <i class="text-info far fa-folder"></i>"""
+                    + """  <i class="text-info far fa-folder-open"></i>"""
+                    + """  {filename}"""
+                    + """  </span>"""
+                    + """</input></div><li>"""
+                )
         return output
 
     @staticmethod
