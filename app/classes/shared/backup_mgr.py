@@ -42,7 +42,7 @@ class BackupManager:
             )
             self.tz = ZoneInfo("Europe/London")
 
-    def restore_starter(
+    def restore_starter( #pylint: disable=too-many-positional-arguments
         self, backup_config, backup_location, backup_file, svr_obj, in_place
     ):
         SERVER_PATH = svr_obj.settings["path"]
