@@ -72,6 +72,7 @@ class FileHelpers:
             return False
 
         ssl_context = ssl.create_default_context(cafile=certifi.where())
+        ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
 
         if not headers:
             headers = {
