@@ -1,4 +1,6 @@
 # pylint: disable=too-many-lines
+import anyio
+import httpx
 import time
 import datetime
 import os
@@ -380,15 +382,16 @@ class PanelHandler(BaseHandler):
             template = "public/error.html"
 
         elif page == "credits":
-            with open(
+            async with await anyio.open_file(
                 self.helper.credits_cache, encoding="utf-8"
             ) as credits_default_local:
                 try:
-                    remote = requests.get(
-                        "https://craftycontrol.com/credits-v2",
-                        allow_redirects=True,
-                        timeout=10,
-                    )
+                    async with httpx.AsyncClient() as client:
+                        remote = await client.get(
+                            "https://craftycontrol.com/credits-v2",
+                            follow_redirects=True,
+                            timeout=10,
+                        )
                     credits_dict: dict = remote.json()
                     if not credits_dict["staff"]:
                         logger.error("Issue with upstream Staff, using local.")
@@ -1688,7 +1691,7 @@ class PanelHandler(BaseHandler):
                 self.redirect("/panel/error?error=Invalid path detected")
                 return
 
-            self.download_file(name, file)
+            await self.download_file(name, file)
             self.redirect(f"/panel/server_detail?id={server_id}&subpage=files")
 
         elif page == "wiki":
@@ -1703,14 +1706,14 @@ class PanelHandler(BaseHandler):
             )
             chunk_size = 1024 * 1024 * 4  # 4 MiB
             if temp_zip_storage != "":
-                with open(temp_zip_storage, "rb") as f:
+                async with await anyio.open_file(temp_zip_storage, "rb") as f:
                     while True:
-                        chunk = f.read(chunk_size)
+                        chunk = await f.read(chunk_size)
                         if not chunk:
                             break
                         try:
                             self.write(chunk)  # write the chunk to response
-                            self.flush()  # send the chunk to client
+                            await self.flush()  # send the chunk to client
                         except iostream.StreamClosedError:
                             # this means the client has closed the connection
                             # so break the loop
@@ -1721,7 +1724,6 @@ class PanelHandler(BaseHandler):
                             # same time, the chunks in memory will keep
                             # increasing and will eat up the RAM
                             del chunk
-                self.redirect("/panel/dashboard")
             else:
                 self.redirect("/panel/error?error=No path found for support logs")
                 return

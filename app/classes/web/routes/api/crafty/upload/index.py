@@ -1,6 +1,7 @@
 import os
 import logging
 import shutil
+import anyio
 from PIL import Image
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.helpers.helpers import Helpers
@@ -195,10 +196,10 @@ class ApiFilesUploadHandler(BaseApiHandler):
         # if it doesn't exist
         if not self.chunked:
             # Write the file directly to the upload dir
-            with open(os.path.join(self.upload_dir, self.filename), "wb") as file:
+            async with await anyio.open_file(os.path.join(self.upload_dir, self.filename), "wb") as file:
                 chunk = self.request.body
                 if chunk:
-                    file.write(chunk)
+                    await file.write(chunk)
             # We'll check the file hash against the sent hash once the file is
             # written. We cannot check this buffer.
             calculated_hash = self.file_helper.calculate_file_hash_sha256(
@@ -278,8 +279,8 @@ class ApiFilesUploadHandler(BaseApiHandler):
         )
 
         # Save the chunk
-        with open(chunk_path, "wb") as f:
-            f.write(self.request.body)
+        async with await anyio.open_file(chunk_path, "wb") as f:
+            await f.write(self.request.body)
 
         # Check if all chunks are received
         received_chunks = [
@@ -290,11 +291,11 @@ class ApiFilesUploadHandler(BaseApiHandler):
         # When we've reached the total chunks we'll
         # Compare the hash and write the file
         if len(received_chunks) == total_chunks:
-            with open(file_path, "wb") as outfile:
+            async with await anyio.open_file(file_path, "wb") as outfile:
                 for i in range(total_chunks):
                     chunk_file = os.path.join(self.temp_dir, f"{self.filename}.part{i}")
-                    with open(chunk_file, "rb") as infile:
-                        outfile.write(infile.read())
+                    async with await anyio.open_file(chunk_file, "rb") as infile:
+                        await outfile.write(await infile.read())
                     os.remove(chunk_file)
             if upload_type == "background":
                 # Strip EXIF data
