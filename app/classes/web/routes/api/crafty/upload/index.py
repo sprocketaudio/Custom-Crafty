@@ -196,7 +196,9 @@ class ApiFilesUploadHandler(BaseApiHandler):
         # if it doesn't exist
         if not self.chunked:
             # Write the file directly to the upload dir
-            async with await anyio.open_file(os.path.join(self.upload_dir, self.filename), "wb") as file:
+            async with await anyio.open_file(
+                os.path.join(self.upload_dir, self.filename), "wb"
+            ) as file:
                 chunk = self.request.body
                 if chunk:
                     await file.write(chunk)
