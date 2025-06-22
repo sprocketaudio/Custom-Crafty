@@ -763,6 +763,7 @@
         "filesPageLen": "length must be greater than 1 for property",
         "insufficientPerms": "Permission Error: Missing permissions for this resource",
         "passLength": "Password Too Short. Minimum Length: 8",
+        "numbericPassword": "Numeric Password. Needs at least 1 alphabetic character",
         "roleManager": "Role manager must be of type integer (manager ID) or None",
         "roleName": "Role name must be a string that is greater than 1 character. It must not include any of the following symbols: [ ] , ",
         "roleServerId": "Server ID property must be a string with a minimum length of 1",

@@ -62,9 +62,14 @@ class UsersController:
             "password": {
                 "type": "string",
                 "minLength": self.helper.minimum_password_length,
+                "pattern": "(?=.*[^0-9])",
                 "examples": ["crafty"],
                 "title": "Password",
-                "error": "passLength",
+                "error": {
+                    "minLength": "passLength",
+                    "type": "numbericPassword",
+                    "pattern": "numbericPassword",
+                },
             },
             "email": {
                 "type": "string",
