@@ -421,7 +421,7 @@ class Controller:
         create_data = root_create_data[root_create_data["create_type"] + "_create_data"]
         if data["create_type"] == "minecraft_java":
             if root_create_data["create_type"] == "download_jar":
-                server_file = f"{create_data['type']}-{create_data['version']}.jar"
+                server_file = f"{create_data['type']}.jar"
 
                 # Create an EULA file
                 if "agree_to_eula" in create_data:
@@ -837,59 +837,6 @@ class Controller:
         )
         ServersController.set_import(new_id)
         self.import_helper.download_bedrock_server(new_server_dir, new_id)
-        return new_id
-
-    def restore_bedrock_zip_server(
-        self,
-        server_name: str,
-        zip_path: str,
-        server_exe: str,
-        port: int,
-        user_id: int,
-    ):
-        server_id = Helpers.create_uuid()
-        new_server_dir = os.path.join(self.helper.servers_dir, server_id)
-        backup_path = os.path.join(self.helper.backup_path, server_id)
-        if Helpers.is_os_windows():
-            new_server_dir = Helpers.wtol_path(new_server_dir)
-            backup_path = Helpers.wtol_path(backup_path)
-            new_server_dir.replace(" ", "^ ")
-            backup_path.replace(" ", "^ ")
-
-        temp_dir = Helpers.get_os_understandable_path(zip_path)
-        Helpers.ensure_dir_exists(new_server_dir)
-        Helpers.ensure_dir_exists(backup_path)
-
-        full_jar_path = os.path.join(new_server_dir, server_exe)
-
-        if Helpers.is_os_windows():
-            server_command = f'"{full_jar_path}"'
-        else:
-            server_command = f"./{server_exe}"
-        logger.debug("command: " + server_command)
-        server_log_file = ""
-        server_stop = "stop"
-
-        new_id = self.register_server(
-            server_name,
-            server_id,
-            new_server_dir,
-            server_command,
-            server_exe,
-            server_log_file,
-            server_stop,
-            port,
-            user_id,
-            server_type="minecraft-bedrock",
-        )
-        ServersController.set_import(new_id)
-        self.import_helper.import_bedrock_zip_server(
-            temp_dir, new_server_dir, full_jar_path, port, new_id
-        )
-        if os.name != "nt":
-            if Helpers.check_file_exists(full_jar_path):
-                os.chmod(full_jar_path, 0o2760)
-
         return new_id
 
     # **********************************************************************************
