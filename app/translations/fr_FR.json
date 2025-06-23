@@ -6,7 +6,7 @@
     },
     "accessDenied": {
         "accessDenied": "Accès interdit",
-        "contact": "Contacter le Support de Crafty Control via Discord",
+        "contact": "Contacter le support de Crafty Control via Discord",
         "contactAdmin": "Contactez l'administrateur du serveur pour avoir accès à cette ressource, ou si vous pensez que vous devriez avoir accès à cette ressource, contactez le support.",
         "noAccess": "Vous n'avez pas accès à cette ressource"
     },
@@ -188,11 +188,11 @@
         "bigBucket1": "Échec de vérification de l'état de Big Bucket. Veuillez vérifier",
         "bigBucket2": "pour les informations les plus récentes.",
         "cancel": "Annuler",
-        "contact": "Contacter le Support de Crafty Control via Discord",
+        "contact": "Contacter le support de Crafty Control via Discord",
         "craftyStatus": "Page de statut de Crafty",
         "cronFormat": "Format Cron invalide détecté",
         "embarassing": "Oulà, c'est embarrassant.",
-        "error": "Erreur !",
+        "error": "Erreur !",
         "eulaAgree": "Êtes-vous d'accord ?",
         "eulaMsg": "Vous devez accepter le ",
         "eulaTitle": "Accepter le EULA",
