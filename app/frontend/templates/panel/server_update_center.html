@@ -97,16 +97,18 @@
                                     </h4>
                                     <blockquote class="blockquote">
                                         <p class="mb-0">
-                                            Remote Version: x.x.x
+                                            {% if not data['update'] %}
+                                            Up to date ✅
+                                            {% else %}
+                                            New Version Available ⚠️
+                                            {% end %}
                                             <br>
                                             <br>
-                                            New Version Available? Yes
+                                            Current Executable: <br> <span id="span_executable"> {{
+                                                data['server_data']['executable'] }} </span>
                                             <br>
                                             <br>
-                                            Current Executable: <br> vanilla-1.21.5.jar
-                                            <br>
-                                            <br>
-                                            Next Check: 2025/05/30 00:00
+                                            Next Check: {{ data['update_next_run']}}
                                             <br>
                                             <br>
                                         </p>
@@ -176,10 +178,30 @@
                         message: responseData.error_data
                     });
                 }
+                payload = { "executable": $("#executable").val() };
+                formDataJsonString = JSON.stringify(payload);
+                let res1 = await fetch(`/api/v2/servers/${serverId}/`, {
+                    method: 'PATCH',
+                    body: formDataJsonString,
+                    headers: {
+                        'X-XSRFToken': token
+                    },
+                });
+                let responseData1 = await res1.json()
+                if (responseData1.status === "ok") {
+                    $("#span_executable").text($("#executable").val())
+
+                } else {
+
+                    bootbox.alert({
+                        title: responseData1.error,
+                        message: responseData1.error_data
+                    });
+                }
             } else {
-                let payload = { "executable_update_url": "" }
+                let payload = { "executable_update_url": $("#executable_update_url").val(), "executable": $("#executable").val() }
                 formDataJsonString = JSON.stringify(payload)
-                let res = await fetch(`/api/v2/servers/${serverId}/update/config/`, {
+                let res = await fetch(`/api/v2/servers/${serverId}/`, {
                     method: 'PATCH',
                     body: formDataJsonString,
                     headers: {

@@ -200,6 +200,11 @@
                       href="/panel/server_detail?id={{server['server_data']['server_id']}}">
                       {{ server['server_data']['server_name'] }}&nbsp; <i class="fas fa-exclamation-triangle"></i>
                     </a>
+                    {% elif server['update'] %}
+                    <a class="text-warning" draggable="false"
+                      href="/panel/server_detail?id={{server['server_data']['server_id']}}">
+                      {{ server['server_data']['server_name'] }}&nbsp; <i class="fas fa-exclamation-triangle"></i>
+                    </a>
                     {% else %}
                     <a draggable="false" href="/panel/server_detail?id={{server['server_data']['server_id']}}">
                       {{ server['server_data']['server_name'] }}

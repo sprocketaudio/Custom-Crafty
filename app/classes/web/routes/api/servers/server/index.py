@@ -138,6 +138,7 @@ server_patch_schema = {
             "error": "typeBool",
             "fill": True,
         },
+        "update_watcher": {"type": "boolean", "error": "typeBool", "fill": True},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -203,6 +204,7 @@ basic_server_patch_schema = {
             "error": "typeBool",
             "fill": True,
         },
+        "update_watcher": {"type": "boolean", "error": "typeBool", "fill": True},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -229,11 +231,18 @@ class ApiServersServerIndexHandler(BaseApiHandler):
             )
 
         server_obj = self.controller.servers.get_server_obj(server_id)
+        srv_instance = self.controller.servers.get_server_instance_by_id(server_id)
         server = model_to_dict(server_obj)
+        status_dict = {
+            "update_available": srv_instance.update_available,
+            "updating": srv_instance.updating,
+            "backing_up": srv_instance.is_backingup,
+            "last_backup": srv_instance.last_backup_failed,
+        }
+        server["status"] = status_dict
 
         # TODO: limit some columns for specific permissions?
-
-        self.finish_json(200, {"status": "ok", "data": server})
+        return self.finish_json(200, {"status": "ok", "data": server})
 
     def patch(self, server_id: str):
         auth_data = self.authenticate_user()

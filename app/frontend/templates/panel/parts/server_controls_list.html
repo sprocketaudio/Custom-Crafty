@@ -60,11 +60,11 @@
     </li>
     {% end %}
     {% if data['permissions']['Config'] in data['user_permissions'] %}
-    <li class="nav-item term-nav-item">
+    <li class="nav-item term-nav-item update-control">
         <a class="nav-link {% if data['active_link'] == 'update_center' %}active{% end %}"
             href="/panel/server_detail?id={{ data['server_stats']['server_id']['server_id'] }}&subpage=update_center"
             role="tab" aria-selected="true">
-            <i class="fa-regular fa-bell"></i>{{ translate('serverUpdate', 'updateCtr', data['lang']) }}</a>
+            <span class="update-nav-text"><i class="fa-regular fa-bell"></i>{{ translate('serverUpdate', 'updateCtr', data['lang']) }}</span>&nbsp;<span class="update-icon"></span></a>
     </li>
     {% end %}
 </ul>
