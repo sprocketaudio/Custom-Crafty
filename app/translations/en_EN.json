@@ -454,7 +454,7 @@
         "serverAutostartDelayDesc": "Delay before auto starting (If enabled below)",
         "serverCrashDetection": "Server Crash Detection",
         "serverExecutable": "Server Executable",
-        "serverExecutableDesc": "The server's executable file",
+        "serverExecutableDesc": "The executable file you call in your server execution command. This is the file we will update.",
         "serverExecutionCommand": "Server Execution Command",
         "serverExecutionCommandDesc": "What will be launched in a hidden terminal",
         "serverIP": "Server IP",
