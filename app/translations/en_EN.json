@@ -743,6 +743,7 @@
         "repeat": "Confirm Password",
         "roleName": "Role Name",
         "selectManager": "Select Manager for User",
+        "selfDisable": "You cannot disable your own account",
         "super": "Super User",
         "totpIdReq": "MFA ID Required for request",
         "totpHeader": "Multi Factor Auth",

@@ -165,6 +165,21 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
+        if (
+            user_id == "@me" or str(auth_data[4]["user_id"]) == str(user_id)
+        ) and data.get(
+            "enabled"
+        ) is False:  # User cannot enable or disable themselves
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "userConfig", "selfDisable", auth_data[4]["lang"]
+                    ),
+                },
+            )
         if user_id == "@me":
             user_id = user["user_id"]
         if (
