@@ -12,8 +12,10 @@ import subprocess
 import html
 import glob
 import json
-
 from zoneinfo import ZoneInfo
+
+import requests
+from pathlib import Path
 
 # TZLocal is set as a hidden import on win pipeline
 from zoneinfo import ZoneInfoNotFoundError
@@ -171,7 +173,7 @@ class ServerInstance:
         self.server_command = None
         self.server_path = None
         self.server_thread = None
-        self.settings = None
+        self.settings = {}
         self.updating = False
         self.server_id = server_id
         self.jar_update_url = None
@@ -219,6 +221,14 @@ class ServerInstance:
         # Reset crash and update at initialization
         self.stats_helper.server_crash_reset()
         self.stats_helper.set_update(False)
+        # Start update watcher
+        self.server_scheduler.add_job(
+            self.check_server_version,
+            "interval",
+            hours=12,
+            id=f"{str(self.server_id)}_update_watcher",
+        )
+        self.update_available = False
 
     # **********************************************************************************
     #                               Minecraft Server Management
@@ -249,6 +259,9 @@ class ServerInstance:
         self.server_id = server_id
         self.name = server_name
         self.settings = server_data_obj
+
+        self.check_server_version()  # Check update relies on information from self.settings.
+        # Running it after instead of during init function
 
         self.record_server_stats()
 
@@ -1282,9 +1295,6 @@ class ServerInstance:
             )
         self.set_backup_status()
 
-    def last_backup_status(self):
-        return self.last_backup_failed
-
     def set_backup_status(self):
         backups = HelpersManagement.get_backups_by_server(self.server_id, True)
         alert = False
@@ -1545,8 +1555,37 @@ class ServerInstance:
                 )
             logger.error("Executable download failed.")
             self.stats_helper.set_update(False)
+        self.check_server_version()  # Check to make sure the update was
+        # successful and that we match remote
         for user in server_users:
             WebSocketManager().broadcast_user(user, "remove_spinner", {})
+
+    def check_server_version(self):
+        if not self.settings.get("update_watcher"):
+            logger.debug("User has update watcher turned off. Killing out of function")
+            self.update_available = False
+            return
+        current_hash = self.helper.create_sha_256_hash(
+            Path(
+                str(self.settings.get("server_path")),
+                str(self.settings.get("executable")),
+            )
+        )
+        try:  # Get hash from Big Bucket remote
+            response = requests.get(
+                f"{self.server_object.executable_update_url}.hash", timeout=1
+            )
+        except TimeoutError as why:
+            self.update_available = True
+            return logger.error("Could not capture remote URL hash with error %s", why)
+        remote_hash = None
+        if response.status_code == 200:
+            remote_hash = response.text
+
+        if remote_hash != current_hash:  # Compare hashes
+            self.update_available = True
+        else:
+            self.update_available = False
 
     def start_dir_calc_task(self):
         server_dt = HelperServers.get_server_data_by_id(self.server_id)
