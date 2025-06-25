@@ -201,12 +201,13 @@
                       {{ server['server_data']['server_name'] }}&nbsp; <i class="fas fa-exclamation-triangle"></i>
                     </a>
                     {% elif server['update'] %}
-                    <a class="text-warning" draggable="false"
-                      href="/panel/server_detail?id={{server['server_data']['server_id']}}">
-                      {{ server['server_data']['server_name'] }}&nbsp; <i class="fas fa-exclamation-triangle"></i>
-                    </a>
-                    {% else %}
                     <a draggable="false" href="/panel/server_detail?id={{server['server_data']['server_id']}}">
+                      {{ server['server_data']['server_name'] }}&nbsp;
+                    </a><a
+                      href="/panel/server_detail?id={{server['server_data']['server_id']}}&subpage=update_center"><i
+                        class="fa-solid fa-cloud-arrow-down text-warning"></i></a>
+                    {% else %} <a draggable="false"
+                      href="/panel/server_detail?id={{server['server_data']['server_id']}}">
                       {{ server['server_data']['server_name'] }}
                     </a>
                     {% end %}
@@ -366,6 +367,12 @@
                         href="/panel/server_detail?id={{server['server_data']['server_id']}}">
                         <i class="fas fa-server"></i> {{ server['server_data']['server_name'] }}&nbsp; <i
                           class="fas fa-exclamation-triangle"></i>
+                      </a>
+                      {% elif server['update'] %}
+                      <a style="font-size: 16px;" draggable="false"
+                        href="/panel/server_detail?id={{server['server_data']['server_id']}}">
+                        {{ server['server_data']['server_name'] }}&nbsp;<i
+                          class="fa-solid fa-cloud-arrow-down text-warning"></i>
                       </a>
                       {% else %}
                       <a class="btn btn-link d-flex justify-content-start" type="button"
