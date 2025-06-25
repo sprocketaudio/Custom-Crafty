@@ -507,7 +507,10 @@ class PanelHandler(BaseHandler):
                     server["server_data"]["server_id"]
                 )
                 server["alert"] = server_obj.last_backup_failed
-                server["update"] = server_obj.update_available
+                server["update"] = (
+                    server_obj.update_available
+                    and server["server_data"]["update_watcher"]
+                )  # Only add update notify if user has the watcher enabled
 
             # num players is set to zero here. If we poll all servers while
             # dashboard is loading it takes FOREVER. We leave this to the

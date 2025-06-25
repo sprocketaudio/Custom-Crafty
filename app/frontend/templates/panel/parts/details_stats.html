@@ -280,7 +280,7 @@
       console.log(responseData)
       $("#server-name-nav").text(`${responseData.data['server_name']}`).html()
       $("#server-name-nav").toggleClass("d-none");
-      if (responseData.data['status']['update_available']) {
+      if (responseData.data['status']['update_available'] && responseData.data["update_watcher"]) {
         $(".update-icon").html("⚠️");
         $(".update-nav-text").addClass("text-warning");
       }
