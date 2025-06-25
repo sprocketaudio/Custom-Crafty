@@ -48,6 +48,7 @@
                             </div>
                             <br>
                             <div id="basic">
+                                {% if data['server_stats']['server_type'] != "minecraft-bedrock" %}
                                 <div
                                     class="card-header header-sm d-flex justify-content-between align-items-center form-adapability">
                                     <span id="update-url" class="text-secondary" style="font-size: .9vw;">{{
@@ -55,6 +56,7 @@
                                 </div>
                                 <br>
                                 {% include "../panel/parts/big_bucket_wiz.html" %}
+                                {% end %}
                             </div>
                             <div id="advanced" class="d-none form-adapability">
                                 {% if data['super_user'] %}
@@ -162,7 +164,6 @@
     <script>
         const serverId = new URLSearchParams(document.location.search).get('id')
         $("#ba").on("change", function () {
-            console.log("TEST")
             if ($("#ba").val() === "0") {
                 $("#advanced").addClass("d-none");
                 $("#basic").removeClass("d-none");
