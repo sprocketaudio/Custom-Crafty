@@ -197,7 +197,10 @@ class FileHelpers:
     @staticmethod
     def make_archive(path_to_destination, path_to_zip, comment=""):
         # create a ZipFile object
-        path_to_destination += ".zip"
+        string_path = str(path_to_destination)
+        path_to_destination = string_path
+        if not path_to_destination.endswith(".zip"):
+            path_to_destination += ".zip"
         with ZipFile(path_to_destination, "w") as zip_file:
             zip_file.comment = bytes(
                 comment, "utf-8"
