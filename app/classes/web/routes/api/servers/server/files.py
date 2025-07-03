@@ -1,9 +1,13 @@
+import io
 import os
 import logging
 import json
 import html
+import zipfile
+from pathlib import Path
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.shared.helpers import Helpers
 from app.classes.shared.file_helpers import FileHelpers
@@ -798,4 +802,89 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                         "error_data": str(e),
                     },
                 )
+        return self.finish_json(200, {"status": "ok"})
+
+
+class ApiServersServerFileDownload(BaseApiHandler):
+    async def get(self, server_id: str, encoded_file_path: str):
+        auth_data = self.authenticate_user()
+        if not auth_data:
+            return
+
+        filepath = html.unescape(encoded_file_path)
+        file_path = Path(filepath)
+
+        if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
+            # if the user doesn't have access to the server, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
+                auth_data[4]["user_id"], server_id
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.FILES not in server_permissions:
+            # if the user doesn't have Files permission, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
+        if not Helpers.validate_traversal(
+            self.controller.servers.get_server_data_by_id(server_id)["path"],
+            file_path,
+        ):
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "TRAVERSAL DETECTED",
+                    "error_data": "TRAVERSAL DETECTED",
+                },
+            )
+
+        if not file_path.exists():
+            return self.finish_json(
+                404,
+                {
+                    "status": "error",
+                    "error": "File not found",
+                    "error_data": f"Path does not exist: {file_path}",
+                },
+            )
+        download_path = file_path
+        if file_path.is_dir():
+            logger.info("Requested download is a directory. Zipping...%s", file_path)
+            archive_path = Path(
+                self.controller.project_root,
+                "temp",
+                str(auth_data[4]["user_id"]),
+                file_path.name,
+            )
+            archive_path.parent.mkdir(parents=True, exist_ok=True)
+
+            self.file_helper.make_archive(archive_path, file_path)
+            download_path = archive_path.with_suffix(".zip")
+
+        await self.download_file(download_path)  # Make sure to check for permissions
+        # and traversal before calling download. There is no permission checking
+        # in this function
+
+        os.remove(download_path)
+
         return self.finish_json(200, {"status": "ok"})
