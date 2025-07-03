@@ -184,10 +184,6 @@ class UsersController:
         return HelperUsers.user_query(user_id)
 
     @staticmethod
-    def set_support_path(user_id, support_path):
-        HelperUsers.set_support_path(user_id, support_path)
-
-    @staticmethod
     def get_managed_users(exec_user_id):
         return HelperUsers.get_managed_users(exec_user_id)
 
