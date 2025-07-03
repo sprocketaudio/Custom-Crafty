@@ -361,7 +361,6 @@ end %} {% block content %}
 
       var isFile = e.target.classList.contains("tree-file");
       $("#deleteFile").toggle(isFile);
-      $("#downloadFile").toggle(isFile);
 
       if (e.target.classList.contains("root-dir")) {
         $("#createFile").show();
@@ -369,7 +368,6 @@ end %} {% block content %}
         $("#renameItem").hide();
         $("#deleteDir").hide();
         $("#deleteFile").hide();
-        $("#downloadFile").hide();
         $("#upload").show();
       }
       if (e.target.textContent.endsWith(".zip")) {
@@ -825,7 +823,7 @@ end %} {% block content %}
           return;
         }
         $("#renameItem").show();
-
+        $("#downloadFile").show();
         var isDir = event.target.classList.contains("files-tree-title");
         $("#createFile").toggle(isDir);
         $("#createDir").toggle(isDir);
@@ -836,7 +834,6 @@ end %} {% block content %}
 
         var isFile = event.target.classList.contains("tree-file");
         $("#deleteFile").toggle(isFile);
-        $("#downloadFile").toggle(isFile);
 
         if (event.target.classList.contains("root-dir")) {
           $("#createFile").show();
@@ -928,12 +925,11 @@ end %} {% block content %}
       }
     );
   }
-  function downloadFileE(event) {
+  async function downloadFileE(event) {
     path = event.target.parentElement.getAttribute("data-path");
     name = event.target.parentElement.getAttribute("data-name");
-    encoded_path = encodeURIComponent(path);
-    encoded_name = encodeURIComponent(name);
-    window.location.href = `/panel/download_file?id=${serverId}&path=${encoded_path}&name=${encoded_name}`;
+    window.open(`/api/v2/servers/${serverId}/files/${encodeURIComponent(path)}`, '_blank');
+
   }
 
   function renameItemE(event) {
