@@ -46,13 +46,13 @@
         </div>
       </span>
       {% else %}
-      <a class="dropdown-item" id="support_logs"><i
+      <a class="dropdown-item  support_logs" id="support_logs"><i
           class="dropdown-item-icon mdi mdi-download-outline text-primary"></i>{{ translate('notify', 'supportLogs',
         data['lang']) }}</i></a>
       {% end %}
       {% if data['superuser'] %}
-      <a class="dropdown-item" href="/panel/activity_logs"><i
-          class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i>{{ translate('notify',
+      <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i>{{
+        translate('notify',
         'activityLog', data['lang']) }}</a>
       {% end %}
       <a class="dropdown-item" href="/logout"><i class="dropdown-item-icon mdi mdi-power text-primary"></i>{{
@@ -168,6 +168,10 @@
       bootbox.alert(responseData.error_data)
     }
   }
+
+  $(".support_logs").click(async function () {
+    window.open(`/api/v2/crafty/support_logs`, '_blank');
+  })
 
   /* Open / Close with Button */
   $('li.dropdown.notif-li a').on('click', function (event) {
