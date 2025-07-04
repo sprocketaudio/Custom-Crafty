@@ -8,7 +8,7 @@ import logging
 from pathlib import Path
 from zoneinfo import ZoneInfoNotFoundError
 import httpx
-import anyio
+import aiofiles
 import nh3
 import tornado.web
 
@@ -209,7 +209,7 @@ class PanelHandler(BaseHandler):
             return response.json()
 
     async def async_read_config(self, file_path: Path):
-        async with await anyio.open_file(file_path, "r") as file:
+        async with aiofiles.open(file_path, "r") as file:
             data = await file.read()
         return data
 
