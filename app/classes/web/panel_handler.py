@@ -5,8 +5,10 @@ import os
 import typing as t
 import json
 import logging
-import httpx
+from pathlib import Path
 from zoneinfo import ZoneInfoNotFoundError
+import httpx
+import anyio
 import nh3
 import tornado.web
 
@@ -201,10 +203,15 @@ class PanelHandler(BaseHandler):
 
         return page_data
 
-    async def async_fetch_data(self, url):
+    async def async_fetch_data(self, url: str):
         async with httpx.AsyncClient() as client:
             response = await client.get(url, follow_redirects=True)
             return response.json()
+
+    async def async_read_config(self, file_path: Path):
+        async with await anyio.open_file(file_path, "r") as file:
+            data = await file.read()
+        return data
 
     @tornado.web.authenticated
     async def get(self, page):
@@ -359,40 +366,41 @@ class PanelHandler(BaseHandler):
             template = "public/error.html"
 
         elif page == "credits":
-            with open(
-                self.helper.credits_cache, encoding="utf-8"
-            ) as credits_default_local:
-                try:
-                    credits_dict: dict = await self.async_fetch_data(
-                        "https://craftycontrol.com/credits-v2"
+            credits_default_local = await self.async_read_config(
+                Path(self.helper.credits_cache)
+            )
+            try:
+                credits_dict: dict = await self.async_fetch_data(
+                    "https://craftycontrol.com/credits-v2"
+                )
+                if not credits_dict["staff"]:
+                    logger.error("Issue with upstream Staff, using local.")
+                    credits_dict: dict = json.loads(credits_default_local)
+            except Exception as e:
+                logger.error("Request to credits bucket failed, using local. %s", e)
+                credits_dict: dict = json.loads(credits_default_local)
+
+            timestamp = credits_dict["lastUpdate"] / 1000.0
+            page_data["patrons"] = credits_dict["patrons"]
+            page_data["staff"] = credits_dict["staff"]
+
+            # Filter Language keys to exclude joke prefix '*'
+            clean_dict = {
+                user.replace("*", ""): translation
+                for user, translation in credits_dict["translations"].items()
+            }
+            page_data["translations"] = clean_dict
+
+            # 0 Defines if we are using local credits file andd displays sadcat.
+            if timestamp == 0:
+                page_data["lastUpdate"] = "😿"
+            else:
+                page_data["lastUpdate"] = str(
+                    datetime.datetime.fromtimestamp(timestamp).strftime(
+                        "%Y-%m-%d %H:%M:%S"
                     )
-                    if not credits_dict["staff"]:
-                        logger.error("Issue with upstream Staff, using local.")
-                        credits_dict: dict = json.load(credits_default_local)
-                except Exception as e:
-                    logger.error("Request to credits bucket failed, using local. %s", e)
-                    credits_dict: dict = json.load(credits_default_local)
-
-                timestamp = credits_dict["lastUpdate"] / 1000.0
-                page_data["patrons"] = credits_dict["patrons"]
-                page_data["staff"] = credits_dict["staff"]
-
-                # Filter Language keys to exclude joke prefix '*'
-                clean_dict = {
-                    user.replace("*", ""): translation
-                    for user, translation in credits_dict["translations"].items()
-                }
-                page_data["translations"] = clean_dict
-
-                # 0 Defines if we are using local credits file andd displays sadcat.
-                if timestamp == 0:
-                    page_data["lastUpdate"] = "😿"
-                else:
-                    page_data["lastUpdate"] = str(
-                        datetime.datetime.fromtimestamp(timestamp).strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        )
-                    )
+                )
+            print(credits_default_local)
             template = "panel/credits.html"
 
         elif page == "contribute":
