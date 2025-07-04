@@ -1,8 +1,7 @@
-import os
 import logging
 from pathlib import Path
+import aiofiles
 from tornado.iostream import StreamClosedError
-from tornado.ioloop import IOLoop
 from concurrent.futures import ThreadPoolExecutor
 from typing import Awaitable, Callable, Optional
 from app.classes.web.base_handler import BaseHandler
@@ -66,11 +65,9 @@ class BaseApiHandler(BaseHandler):
                 "Content-Disposition", f'attachment; filename="{file_path.name}"'
             )
 
-            with open(file_path, "rb") as f:
+            async with aiofiles.open(file_path, "rb") as f:
                 while True:
-                    chunk = await IOLoop.current().run_in_executor(
-                        executor, f.read, chunk_size
-                    )
+                    chunk = await f.read(chunk_size)
                     if not chunk:
                         break
                     try:

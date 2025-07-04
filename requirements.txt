@@ -22,4 +22,4 @@ prometheus-client==0.17.1
 pyotp==2.9.0
 pillow==10.4.0
 httpx==0.28.1
-anyio==4.9.0
+aiofiles==24.1.0
