@@ -5,6 +5,7 @@ import os
 import typing as t
 import json
 import logging
+import httpx
 import threading
 import urllib.parse
 from zoneinfo import ZoneInfoNotFoundError
@@ -205,6 +206,11 @@ class PanelHandler(BaseHandler):
 
         return page_data
 
+    async def async_fetch_data(self, url):
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, follow_redirects=True)
+            return response.json()
+
     @tornado.web.authenticated
     async def get(self, page):
         self.failed_server = False
@@ -362,17 +368,14 @@ class PanelHandler(BaseHandler):
                 self.helper.credits_cache, encoding="utf-8"
             ) as credits_default_local:
                 try:
-                    remote = requests.get(
-                        "https://craftycontrol.com/credits-v2",
-                        allow_redirects=True,
-                        timeout=10,
+                    credits_dict: dict = await self.async_fetch_data(
+                        "https://craftycontrol.com/credits-v2"
                     )
-                    credits_dict: dict = remote.json()
                     if not credits_dict["staff"]:
                         logger.error("Issue with upstream Staff, using local.")
                         credits_dict: dict = json.load(credits_default_local)
-                except:
-                    logger.error("Request to credits bucket failed, using local.")
+                except Exception as e:
+                    logger.error("Request to credits bucket failed, using local. %s", e)
                     credits_dict: dict = json.load(credits_default_local)
 
                 timestamp = credits_dict["lastUpdate"] / 1000.0

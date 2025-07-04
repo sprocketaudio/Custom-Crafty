@@ -21,3 +21,4 @@ orjson==3.9.15
 prometheus-client==0.17.1
 pyotp==2.9.0
 pillow==10.4.0
+httpx==0.28.1
