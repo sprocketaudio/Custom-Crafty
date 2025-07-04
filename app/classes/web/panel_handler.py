@@ -400,7 +400,6 @@ class PanelHandler(BaseHandler):
                         "%Y-%m-%d %H:%M:%S"
                     )
                 )
-            print(credits_default_local)
             template = "panel/credits.html"
 
         elif page == "contribute":
