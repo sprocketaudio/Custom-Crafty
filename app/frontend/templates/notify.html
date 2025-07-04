@@ -35,6 +35,7 @@
           class="fa-solid fa-user-gear dropdown-item-icon text-primary"></i>{{
         translate('notify', 'accountSettings',
         data['lang']) }}</a>
+      {% if data['support_perm'] %}
       {% if data['user_data']['preparing'] %}
       <span class="dropdown-item" id="support_progress"><i
           class="dropdown-item-icon mdi mdi-download-outline text-primary"></i>{{ translate('notify', 'supportLogs',
@@ -49,6 +50,7 @@
       <a class="dropdown-item  support_logs" id="support_logs"><i
           class="dropdown-item-icon mdi mdi-download-outline text-primary"></i>{{ translate('notify', 'supportLogs',
         data['lang']) }}</i></a>
+      {% end %}
       {% end %}
       {% if data['superuser'] %}
       <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i>{{

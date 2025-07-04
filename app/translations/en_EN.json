@@ -332,6 +332,7 @@
         "enable_user_self_delete": "Allow users to delete their own account",
         "enable_otp_skew": "Enable MFA skew (+-1)",
         "False": "False",
+        "general_user_log_access": "Lower privilege users have access to crafty logs (Including Auth Logs)",
         "history_max_age": "How long Crafty should hold onto your server statistics (days)",
         "https_port": "Crafty's port",
         "keywords": "Keywords Crafty should highlight in your server terminals",

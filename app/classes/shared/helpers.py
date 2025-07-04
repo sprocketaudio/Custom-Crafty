@@ -68,6 +68,7 @@ MASTER_CONFIG = {
     "enable_otp_skew": False,
     "max_login_attempts": 3,
     "superMFA": False,
+    "general_user_log_access": False,
 }
 
 CONFIG_CATEGORIES = {
@@ -95,6 +96,7 @@ CONFIG_CATEGORIES = {
         "crafty_logs_delete_after_days",
         "virtual_terminal_lines",
         "keywords",
+        "general_user_log_access",
     ],
     "monitoring": [
         "monitored_mounts",

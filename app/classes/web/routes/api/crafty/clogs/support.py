@@ -18,6 +18,19 @@ class ApiCraftySupportIndexHandler(BaseApiHandler):
             _,
         ) = auth_data
 
+        if not auth_data[4]["superuser"] and not self.helper.get_setting(
+            "general_user_log_access"
+        ):
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
         # All server permission checking occurs in the package function
         await self.controller.package_support_logs(auth_data[4])
 

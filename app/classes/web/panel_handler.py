@@ -296,6 +296,8 @@ class PanelHandler(BaseHandler):
             ),  # set value if the token has MFA set to true or not
             # for warning banner
             "update_available": self.helper.update_available,
+            "support_perm": self.helper.get_setting("general_user_log_access")
+            or exec_user["superuser"],
             "docker": self.helper.is_env_docker(),
             "background": self.controller.cached_login,
             "login_opacity": self.controller.management.get_login_opacity(),
