@@ -32,7 +32,7 @@ class ApiCraftySupportIndexHandler(BaseApiHandler):
                 },
             )
         # All server permission checking occurs in the package function
-        await self.controller.package_support_logs(auth_data[4])
+        self.controller.package_support_logs(auth_data[4])
 
         await self.download_file(
             Path(

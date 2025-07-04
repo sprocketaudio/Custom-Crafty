@@ -170,7 +170,7 @@ class Controller:
         with open(self.helper.settings_file, "w", encoding="utf-8") as f:
             json.dump(sorted_data, f, indent=4)
 
-    async def package_support_logs(self, exec_user):
+    def package_support_logs(self, exec_user):
         if exec_user["preparing"]:
             return
         self.users.set_prepare(exec_user["user_id"])
