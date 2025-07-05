@@ -97,17 +97,65 @@
     image.src = "/static/assets/images/faces-clipart/pic-3.png";
     return true;
   }
+
+
+  function createAnnouncementItem(value) {
+    const li = document.createElement("li");
+    li.className = "card-header header-sm justify-content-between align-items-center annoucement-item";
+    li.id = value.id;
+
+    // Clear button
+    const iconWrapper = document.createElement("p");
+    const icon = document.createElement("i");
+    icon.className = "clear-button fa-regular fa-x";
+    icon.dataset.id = value.id;
+    iconWrapper.appendChild(icon);
+
+    // Link section
+    const a = document.createElement("a");
+    a.href = sanitizeUrl(value.link);
+    a.target = "_blank";
+
+    const title = document.createElement("h6");
+    title.className = "annoucement-title";
+    title.textContent = value.title;
+
+    const dateWrapper = document.createElement("small");
+    const date = document.createElement("p");
+    date.textContent = value.date;
+    dateWrapper.appendChild(date);
+
+    const desc = document.createElement("p");
+    desc.textContent = value.desc;
+
+    // Assemble link
+    a.appendChild(title);
+    a.appendChild(dateWrapper);
+    a.appendChild(desc);
+
+    // Assemble list item
+    li.appendChild(iconWrapper);
+    li.appendChild(a);
+
+    return li;
+  }
+
+  function sanitizeUrl(url) {
+    return /^https?:\/\//i.test(url) ? url : "#";
+  }
+
   function updateAnnouncements(data) {
     console.log(data);
     let text = "";
+    const container = document.querySelector("#announcements");
     for (let value of data) {
-      text += `<li class="card-header header-sm justify-content-between align-items-center annoucement-item" id="${value.id}"><p><i data-id="${value.id}" class="clear-button fa-regular fa-x"></i></p><a href=${value.link} target="_blank"><h6 class="annoucement-title">${value.title}</h6><small><p>${value.date}</p></small><p>${value.desc}</p></li></a>`
+      let annc_item = createAnnouncementItem(value)
+      container.appendChild(annc_item);
     }
     if (data.length > 0) {
       localStorage.setItem("notif-count", data.length);
       $("#notif-count").show()
       $("#notif-count").text(data.length).html();
-      $("#announcements").text(text).html();
     } else {
       $("#announcements").text(`<li><p class='my-3 text-center'><i class="fa fa-bell-slash" aria-hidden="true"></i></p></li>`).html();
       $("#notif-count").hide()
