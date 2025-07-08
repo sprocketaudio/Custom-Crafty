@@ -53,7 +53,8 @@
       {% end %}
       {% end %}
       {% if data['superuser'] %}
-      <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i>{{
+      <a class="dropdown-item" href="/panel/activity_logs"><i
+          class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i>{{
         translate('notify',
         'activityLog', data['lang']) }}</a>
       {% end %}
