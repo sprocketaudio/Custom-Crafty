@@ -1,6 +1,4 @@
 # pylint: disable=too-many-lines
-import anyio
-import httpx
 import time
 import datetime
 import os
@@ -10,10 +8,10 @@ import logging
 import threading
 import urllib.parse
 from zoneinfo import ZoneInfoNotFoundError
+import anyio
+import httpx
 import nh3
-import requests
 import tornado.web
-import tornado.escape
 from tornado import iostream
 
 # TZLocal is set as a hidden import on win pipeline
