@@ -104,9 +104,9 @@ class TOTPController:
             for item, timestamp in totp_dict.items():
                 if now - timestamp > timedelta(seconds=60):
                     # needs to ref the self var to remove expired entries
-                    del self.used_totp_codes[
+                    del self.used_totp_codes[  # pylint: disable=unnecessary-dict-index-lookup
                         key
-                    ][  # pylint: disable=unnecessary-dict-index-lookup
+                    ][
                         item
                     ]
 
