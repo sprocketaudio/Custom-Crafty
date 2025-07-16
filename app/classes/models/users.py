@@ -15,7 +15,7 @@ from peewee import (
 )
 from playhouse.shortcuts import model_to_dict
 
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.models.base_model import BaseModel
 from app.classes.models.roles import Roles, HelperRoles
 

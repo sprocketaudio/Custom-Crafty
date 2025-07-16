@@ -2,7 +2,7 @@ import logging
 
 from peewee import ForeignKeyField, CharField
 
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.models.users import Users
 from app.classes.models.base_model import BaseModel
 

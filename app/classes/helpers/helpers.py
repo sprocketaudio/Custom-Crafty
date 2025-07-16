@@ -1,37 +1,37 @@
+import base64
 import contextlib
-import os
-import re
-import sys
+import ctypes
+import html
+import itertools
 import json
+import logging
+import os
+import pathlib
+import re
+import secrets
+import shlex
+import shutil
+import socket
+import string
+import subprocess
+import sys
 import time
 import uuid
-import string
-import base64
-import socket
-import secrets
-import logging
-import html
-import pathlib
-import ctypes
-import shutil
-import shlex
-import subprocess
-import itertools
-from socket import gethostname
 from contextlib import redirect_stderr, suppress
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
+from socket import gethostname
 
 import libgravatar
-from packaging import version as pkg_version
 from cryptography import x509
-from cryptography.x509.oid import NameOID
-from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.x509.oid import NameOID
+from packaging import version as pkg_version
 
-
-from app.classes.shared.null_writer import NullWriter
+from app.classes.helpers.cryptography_helper import CryptoHelper
 from app.classes.shared.console import Console
 from app.classes.shared.installer import installer
+from app.classes.shared.null_writer import NullWriter
 from app.classes.shared.translation import Translation
 
 with redirect_stderr(NullWriter()):
@@ -106,8 +106,8 @@ CONFIG_CATEGORIES = {
 
 try:
     import requests
-    from requests import get
     from argon2 import PasswordHasher
+    from requests import get
 
 except ModuleNotFoundError as err:
     logger.critical(f"Import Error: Unable to load {err.name} module", exc_info=True)
@@ -146,6 +146,7 @@ class Helpers:
         self.ignored_names = ["crafty_managed.txt"]
         self.crafty_starting = False
         self.minimum_password_length = 8
+        self.crypto_helper = CryptoHelper(self)
 
         self.theme_list = self.load_themes()
 
@@ -168,11 +169,11 @@ class Helpers:
             if response.status_code == 200:
                 remote_version = pkg_version.parse(json.loads(response.text)[0]["name"])
 
-            # Get local version data from the file and parse the semver
-            local_version = pkg_version.parse(self.get_version_string())
+                # Get local version data from the file and parse the semver
+                local_version = pkg_version.parse(self.get_version_string())
 
-            if remote_version > local_version:
-                return remote_version
+                if remote_version > local_version:
+                    return remote_version
 
         except Exception as e:
             logger.error(f"Unable to check for new crafty version! \n{e}")
@@ -330,8 +331,7 @@ class Helpers:
     def check_file_perms(path):
         try:
             with open(path, "r", encoding="utf-8"):
-                pass
-            logger.info(f"{path} is readable")
+                logger.info(f"{path} is readable")
             return True
         except PermissionError:
             return False
@@ -412,7 +412,11 @@ class Helpers:
     def check_port(server_port):
         try:
             ip = get("https://api.ipify.org", timeout=1).content.decode("utf8")
-        except:
+        except Exception as e:
+            logger.info(
+                f"Unable to connect to api.ipify.org, \
+                        falling back to google.com: {e}"
+            )
             ip = "google.com"
         a_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         a_socket.settimeout(20.0)
@@ -619,23 +623,35 @@ class Helpers:
 
         return mounts
 
-    def is_subdir(self, child_path, parent_path):
+    @staticmethod
+    def is_subdir(child_path: str, parent_path: str) -> bool:
+        """
+        Checks if given child_path is a subdirectory of given parent_path. Returns True
+        or False.
+
+        Args:
+            child_path: Child path to check.
+            parent_path: Possible parent path of child path.
+
+        Returns:
+            True if child_path is a subdirectory of parent_path. Otherwise, False.
+
+        """
         server_path = os.path.realpath(child_path)
         root_dir = os.path.realpath(parent_path)
 
-        if self.is_os_windows():
-            try:
-                relative = os.path.relpath(server_path, root_dir)
-            except:
-                # Windows will crash out if two paths are on different
-                # Drives We can happily return false if this is the case.
-                # Since two different drives will not be relative to eachother.
-                return False
-        else:
+        try:
             relative = os.path.relpath(server_path, root_dir)
+            if relative.startswith(os.pardir):
+                return False
 
-        if relative.startswith(os.pardir):
+        except ValueError:
+            # Windows will crash out if two paths are on different Drives We can happily
+            # return false if this is the case. Since two different drives will not be
+            # relative to each-other.
             return False
+
+        # If all checks pass, child path must be a child of parent.
         return True
 
     def set_setting(self, key, new_value):
@@ -1263,7 +1279,7 @@ class Helpers:
         random_generator() = G8sjO2
         random_generator(3, abcdef) = adf
         """
-        return "".join(secrets.choice(chars) for x in range(size))
+        return "".join(secrets.choice(chars) for _ in range(size))
 
     @staticmethod
     def is_os_windows():
@@ -1317,16 +1333,19 @@ class Helpers:
             rel = os.path.join(folder, raw_filename)
             dpath = os.path.join(folder, filename)
             if os.path.isdir(rel):
-                output += f"""<li class="tree-item" data-path="{dpath}">
-                    \n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">
-                    <input type="radio" name="root_path" value="{dpath}">
-                    <span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">
-                      <i class="text-info far fa-folder"></i>
-                      <i class="text-info far fa-folder-open"></i>
-                      {filename}
-                      </span>
-                    </input></div><li>
-                    \n"""
+                # lines below had too long warnings disabled for readability
+                output += (
+                    f"""<li class="tree-item" data-path="{dpath}">"""
+                    + """\n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">"""  # pylint: disable=line-too-long
+                    + """<input type="radio" name="root_path" value="{dpath}">"""
+                    + """<span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">"""  # pylint: disable=line-too-long
+                    + """  <i class="text-info far fa-folder"></i>"""
+                    + """  <i class="text-info far fa-folder-open"></i>"""
+                    + """  {filename}"""
+                    + """  </span>"""
+                    + """</input></div><li>"""
+                    + """\n"""
+                )
         return output
 
     @staticmethod
@@ -1339,15 +1358,18 @@ class Helpers:
             rel = os.path.join(folder, raw_filename)
             dpath = os.path.join(folder, filename)
             if os.path.isdir(rel):
-                output += f"""<li class="tree-item" data-path="{dpath}">
-                    \n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">
-                    <input type="radio" name="root_path" value="{dpath}">
-                    <span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">
-                      <i class="text-info far fa-folder"></i>
-                      <i class="text-info far fa-folder-open"></i>
-                      {filename}
-                      </span>
-                    </input></div><li>"""
+                # lines below had too long warnings disabled for readability
+                output += (
+                    f"""<li class="tree-item" data-path="{dpath}">"""
+                    + """\n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">"""  # pylint: disable=line-too-long
+                    + """<input type="radio" name="root_path" value="{dpath}">"""
+                    + """<span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">"""  # pylint: disable=line-too-long
+                    + """  <i class="text-info far fa-folder"></i>"""
+                    + """  <i class="text-info far fa-folder-open"></i>"""
+                    + """  {filename}"""
+                    + """  </span>"""
+                    + """</input></div><li>"""
+                )
         return output
 
     @staticmethod
@@ -1380,9 +1402,9 @@ class Helpers:
                     decoded_bytes = base64.b64decode(prop["value"])
                     decoded_str = decoded_bytes.decode("utf-8")
                     texture_json = json.loads(decoded_str)
-            skin_url = texture_json["textures"]["SKIN"]["url"]
-            skin_response = requests.get(skin_url, stream=True, timeout=10)
-            if skin_response.status_code == 200:
-                return base64.b64encode(skin_response.content)
+                    skin_url = texture_json["textures"]["SKIN"]["url"]
+                    skin_response = requests.get(skin_url, stream=True, timeout=10)
+                    if skin_response.status_code == 200:
+                        return base64.b64encode(skin_response.content)
         else:
             return

@@ -4,7 +4,7 @@ import tornado.web
 import tornado.escape
 
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.shared.main_models import DatabaseShortcuts
 from app.classes.web.base_handler import BaseHandler
 

@@ -16,7 +16,7 @@ from app.classes.models.base_model import BaseModel
 from app.classes.models.users import HelperUsers
 from app.classes.models.servers import Servers
 from app.classes.models.server_permissions import PermissionsServers
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
@@ -117,6 +117,7 @@ class Backups(BaseModel):
     default = BooleanField(default=False)
     status = CharField(default='{"status": "Standby", "message": ""}')
     enabled = BooleanField(default=True)
+    backup_type = CharField(default="zip_vault")
 
     class Meta:
         table_name = "backups"
@@ -368,6 +369,7 @@ class HelpersManagement:
                     "after": backup.after,
                     "default": backup.default,
                     "enabled": backup.enabled,
+                    "backup_type": backup.backup_type,
                 }
         else:
             data = Backups.select().where(Backups.server_id == server_id).execute()

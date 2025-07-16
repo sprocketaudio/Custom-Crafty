@@ -48,6 +48,11 @@ backup_patch_schema = {
             "error": "typeList",
             "fill": True,
         },
+        "backup_type": {
+            "type": "string",
+            "enum": ["zip_vault", "snapshot"],
+            "error": "enumErr",
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -86,6 +91,11 @@ basic_backup_patch_schema = {
             "type": "array",
             "error": "typeList",
             "fill": True,
+        },
+        "backup_type": {
+            "type": "string",
+            "enum": ["zip_vault", "snapshot"],
+            "error": "enumErr",
         },
     },
     "additionalProperties": False,

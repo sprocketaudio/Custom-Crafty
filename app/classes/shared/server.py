@@ -32,8 +32,8 @@ from app.classes.models.management import HelpersManagement, HelpersWebhooks
 from app.classes.models.users import HelperUsers
 from app.classes.models.server_permissions import PermissionsServers
 from app.classes.shared.console import Console
-from app.classes.shared.helpers import Helpers
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.helpers import Helpers
+from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.shared.null_writer import NullWriter
 from app.classes.shared.websocket_manager import WebSocketManager
 from app.classes.web.webhooks.webhook_factory import WebhookFactory
@@ -160,10 +160,13 @@ class ServerInstance:
     stats: Stats
     stats_helper: HelperServerStats
 
-    def __init__(self, server_id, helper, management_helper, stats, file_helper):
+    def __init__(
+        self, server_id, helper, management_helper, stats, file_helper, backup_mgr
+    ):
         self.helper = helper
         self.file_helper = file_helper
         self.management_helper = management_helper
+        self.backup_mgr = backup_mgr
         # holders for our process
         self.process = None
         self.line = False
@@ -1128,16 +1131,52 @@ class ServerInstance:
             f.write("eula=true")
         self.run_threaded_server(user_id)
 
+    def server_restore_threader(self, backup_id, backup_file, in_place=False):
+        # import the server again based on zipfile
+        backup_config = HelpersManagement.get_backup_config(backup_id)
+        backup_location = os.path.join(
+            backup_config["backup_location"],
+            backup_config["backup_id"],
+            backup_file,
+        )
+        restore_thread = threading.Thread(
+            target=self.backup_mgr.restore_starter,
+            daemon=True,
+            name=f"backup_{backup_config['backup_id']}",
+            args=[backup_config, backup_location, backup_file, self, in_place],
+        )
+
+        restore_thread.start()
+
     def server_backup_threader(self, backup_id, update=False):
         # Check to see if we're already backing up
         if self.check_backup_by_id(backup_id):
             return False
+        backup_config = HelpersManagement.get_backup_config(backup_id)
+        if backup_config["before"]:
+            logger.debug(
+                "Found running server and send command option. Sending command"
+            )
+            self.send_command(backup_config["before"])
+            # Pause to let command run
+            time.sleep(5)
+
+        self.was_running = False
+        if backup_config["shutdown"]:
+            logger.info(
+                "Found shutdown preference. Delaying"
+                + "backup start. Shutting down server."
+            )
+            if not update:
+                if self.check_running():
+                    self.stop_server()
+                    self.was_running = True
 
         backup_thread = threading.Thread(
             target=self.backup_server,
             daemon=True,
-            name=f"backup_{backup_id}",
-            args=[backup_id, update],
+            name=f"backup_{backup_config['backup_id']}",
+            args=[backup_id],
         )
         logger.info(
             f"Starting Backup Thread for server {self.settings['server_name']}."
@@ -1157,8 +1196,7 @@ class ServerInstance:
         logger.info(f"Backup Thread started for server {self.settings['server_name']}.")
 
     @callback
-    def backup_server(self, backup_id, update):
-        was_server_running = None
+    def backup_server(self, backup_id):
         logger.info(f"Starting server {self.name} (ID {self.server_id}) backup")
         server_users = PermissionsServers.get_server_user_list(self.server_id)
         # Alert the start of the backup to the authorized users.
@@ -1190,126 +1228,15 @@ class ServerInstance:
             self.send_command(conf["before"])
             # Pause to let command run
             time.sleep(5)
-
-        if conf["shutdown"]:
+        self.backup_mgr.backup_starter(conf, self)
+        if conf["after"]:
+            self.send_command(conf["after"])
+        if conf["shutdown"] and self.was_running:
             logger.info(
-                "Found shutdown preference. Delaying"
-                + "backup start. Shutting down server."
+                "Backup complete. User had shutdown preference. Starting server."
             )
-            if not update:
-                was_server_running = False
-                if self.check_running():
-                    self.stop_server()
-                    was_server_running = True
-
-        self.helper.ensure_dir_exists(backup_location)
-
-        try:
-            backup_filename = (
-                f"{backup_location}/"
-                f"{datetime.datetime.now().astimezone(self.tz).strftime('%Y-%m-%d_%H-%M-%S')}"  # pylint: disable=line-too-long
-            )
-            logger.info(
-                f"Creating backup of server '{self.settings['server_name']}'"
-                f" (ID#{self.server_id}, path={self.server_path}) "
-                f"at '{backup_filename}'"
-            )
-            excluded_dirs = HelpersManagement.get_excluded_backup_dirs(backup_id)
-            server_dir = Helpers.get_os_understandable_path(self.settings["path"])
-
-            self.file_helper.make_backup(
-                Helpers.get_os_understandable_path(backup_filename),
-                server_dir,
-                excluded_dirs,
-                self.server_id,
-                backup_id,
-                conf["backup_name"],
-                conf["compress"],
-            )
-
-            while (
-                len(self.list_backups(conf)) > conf["max_backups"]
-                and conf["max_backups"] > 0
-            ):
-                backup_list = self.list_backups(conf)
-                oldfile = backup_list[0]
-                oldfile_path = f"{backup_location}/{oldfile['path']}"
-                logger.info(f"Removing old backup '{oldfile['path']}'")
-                os.remove(Helpers.get_os_understandable_path(oldfile_path))
-
-            logger.info(f"Backup of server: {self.name} completed")
-            results = {
-                "percent": 100,
-                "total_files": 0,
-                "current_file": 0,
-                "backup_id": backup_id,
-            }
-            if len(WebSocketManager().clients) > 0:
-                WebSocketManager().broadcast_page_params(
-                    "/panel/server_detail",
-                    {"id": str(self.server_id)},
-                    "backup_status",
-                    results,
-                )
-            server_users = PermissionsServers.get_server_user_list(self.server_id)
-            for user in server_users:
-                WebSocketManager().broadcast_user(
-                    user,
-                    "notification",
-                    self.helper.translation.translate(
-                        "notify",
-                        "backupComplete",
-                        HelperUsers.get_user_lang_by_id(user),
-                    ).format(self.name),
-                )
-            if was_server_running:
-                logger.info(
-                    "Backup complete. User had shutdown preference. Starting server."
-                )
-                self.run_threaded_server(HelperUsers.get_user_id_by_name("system"))
-            time.sleep(3)
-            if conf["after"]:
-                if self.check_running():
-                    logger.debug(
-                        "Found running server and send command option. Sending command"
-                    )
-                    self.send_command(conf["after"])
-            # pause to let people read message.
-            HelpersManagement.update_backup_config(
-                backup_id,
-                {"status": json.dumps({"status": "Standby", "message": ""})},
-            )
-            time.sleep(5)
-        except Exception as e:
-            logger.exception(
-                f"Failed to create backup of server {self.name} (ID {self.server_id})"
-            )
-            results = {
-                "percent": 100,
-                "total_files": 0,
-                "current_file": 0,
-                "backup_id": backup_id,
-            }
-            if len(WebSocketManager().clients) > 0:
-                WebSocketManager().broadcast_page_params(
-                    "/panel/server_detail",
-                    {"id": str(self.server_id)},
-                    "backup_status",
-                    results,
-                )
-            if was_server_running:
-                logger.info(
-                    "Backup complete. User had shutdown preference. Starting server."
-                )
-                self.run_threaded_server(HelperUsers.get_user_id_by_name("system"))
-            HelpersManagement.update_backup_config(
-                backup_id,
-                {"status": json.dumps({"status": "Failed", "message": f"{e}"})},
-            )
+            self.run_threaded_server(HelperUsers.get_user_id_by_name("system"))
         self.set_backup_status()
-
-    def last_backup_status(self):
-        return self.last_backup_failed
 
     def set_backup_status(self):
         backups = HelpersManagement.get_backups_by_server(self.server_id, True)
@@ -1319,35 +1246,8 @@ class ServerInstance:
                 alert = True
         self.last_backup_failed = alert
 
-    def list_backups(self, backup_config: dict) -> list:
-        if not backup_config:
-            logger.info(
-                f"Error putting backup file list for server with ID: {self.server_id}"
-            )
-            return []
-        backup_location = os.path.join(
-            backup_config["backup_location"], backup_config["backup_id"]
-        )
-        if not Helpers.check_path_exists(
-            Helpers.get_os_understandable_path(backup_location)
-        ):
-            return []
-        files = Helpers.get_human_readable_files_sizes(
-            Helpers.list_dir_by_date(
-                Helpers.get_os_understandable_path(backup_location)
-            )
-        )
-        return [
-            {
-                "path": os.path.relpath(
-                    f["path"],
-                    start=Helpers.get_os_understandable_path(backup_location),
-                ),
-                "size": f["size"],
-            }
-            for f in files
-            if f["path"].endswith(".zip")
-        ]
+    def last_backup_status(self):
+        return self.last_backup_failed
 
     @callback
     def jar_update(self):
@@ -1432,23 +1332,21 @@ class ServerInstance:
             self.stop_threaded_server()
         else:
             was_started = False
+        ws_params = {
+            "isUpdating": self.check_update(),
+            "server_id": self.server_id,
+            "wasRunning": was_started,
+        }
         if len(WebSocketManager().clients) > 0:
             # There are clients
             self.check_update()
             message = (
                 '<a data-id="' + str(self.server_id) + '" class=""> UPDATING...</i></a>'
             )
+            ws_params["string"] = message
         for user in server_users:
             WebSocketManager().broadcast_user_page(
-                "/panel/server_detail",
-                user,
-                "update_button_status",
-                {
-                    "isUpdating": self.check_update(),
-                    "server_id": self.server_id,
-                    "wasRunning": was_started,
-                    "string": message,
-                },
+                "/panel/server_detail", user, "update_button_status", ws_params
             )
         current_executable = os.path.join(
             Helpers.get_os_understandable_path(self.settings["path"]),

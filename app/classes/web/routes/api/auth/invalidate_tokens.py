@@ -1,6 +1,6 @@
 import logging
 from app.classes.web.base_api_handler import BaseApiHandler
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 
 logger = logging.getLogger(__name__)
 

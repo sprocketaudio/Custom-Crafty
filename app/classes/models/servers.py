@@ -13,7 +13,7 @@ from app.classes.shared.main_models import DatabaseShortcuts
 from app.classes.models.base_model import BaseModel
 
 # from app.classes.models.users import Users
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 
 logger = logging.getLogger(__name__)
 

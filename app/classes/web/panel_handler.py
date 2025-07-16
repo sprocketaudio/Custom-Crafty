@@ -8,10 +8,10 @@ import logging
 import threading
 import urllib.parse
 from zoneinfo import ZoneInfoNotFoundError
+import anyio
+import httpx
 import nh3
-import requests
 import tornado.web
-import tornado.escape
 from tornado import iostream
 
 # TZLocal is set as a hidden import on win pipeline
@@ -22,7 +22,7 @@ from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.models.management import HelpersManagement
 from app.classes.controllers.roles_controller import RolesController
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.shared.main_models import DatabaseShortcuts
 from app.classes.web.base_handler import BaseHandler
 from app.classes.web.webhooks.webhook_factory import WebhookFactory
@@ -380,15 +380,16 @@ class PanelHandler(BaseHandler):
             template = "public/error.html"
 
         elif page == "credits":
-            with open(
+            async with await anyio.open_file(
                 self.helper.credits_cache, encoding="utf-8"
             ) as credits_default_local:
                 try:
-                    remote = requests.get(
-                        "https://craftycontrol.com/credits-v2",
-                        allow_redirects=True,
-                        timeout=10,
-                    )
+                    async with httpx.AsyncClient() as client:
+                        remote = await client.get(
+                            "https://craftycontrol.com/credits-v2",
+                            follow_redirects=True,
+                            timeout=10,
+                        )
                     credits_dict: dict = remote.json()
                     if not credits_dict["staff"]:
                         logger.error("Issue with upstream Staff, using local.")
@@ -1296,8 +1297,8 @@ class PanelHandler(BaseHandler):
             ).is_backingup
             self.controller.servers.refresh_server_settings(server_id)
             try:
-                page_data["backup_list"] = server.list_backups(
-                    page_data["backup_config"]
+                page_data["backup_list"] = server.backup_mgr.list_backups(
+                    page_data["backup_config"], server.server_id
                 )
             except:
                 page_data["backup_list"] = []
@@ -1688,7 +1689,7 @@ class PanelHandler(BaseHandler):
                 self.redirect("/panel/error?error=Invalid path detected")
                 return
 
-            self.download_file(name, file)
+            await self.download_file(name, file)
             self.redirect(f"/panel/server_detail?id={server_id}&subpage=files")
 
         elif page == "wiki":
@@ -1703,14 +1704,14 @@ class PanelHandler(BaseHandler):
             )
             chunk_size = 1024 * 1024 * 4  # 4 MiB
             if temp_zip_storage != "":
-                with open(temp_zip_storage, "rb") as f:
+                async with await anyio.open_file(temp_zip_storage, "rb") as f:
                     while True:
-                        chunk = f.read(chunk_size)
+                        chunk = await f.read(chunk_size)
                         if not chunk:
                             break
                         try:
                             self.write(chunk)  # write the chunk to response
-                            self.flush()  # send the chunk to client
+                            await self.flush()  # send the chunk to client
                         except iostream.StreamClosedError:
                             # this means the client has closed the connection
                             # so break the loop
@@ -1721,7 +1722,6 @@ class PanelHandler(BaseHandler):
                             # same time, the chunks in memory will keep
                             # increasing and will eat up the RAM
                             del chunk
-                self.redirect("/panel/dashboard")
             else:
                 self.redirect("/panel/error?error=No path found for support logs")
                 return

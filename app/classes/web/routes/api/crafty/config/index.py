@@ -3,7 +3,7 @@ import json
 from jsonschema import ValidationError, validate
 import orjson
 from playhouse.shortcuts import model_to_dict
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.web.base_api_handler import BaseApiHandler
 
 config_json_schema = {

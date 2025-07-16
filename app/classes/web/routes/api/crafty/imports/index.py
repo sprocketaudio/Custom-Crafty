@@ -5,7 +5,7 @@ import html
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.web.base_api_handler import BaseApiHandler
 from app.classes.web.websocket_handler import WebSocketManager
 

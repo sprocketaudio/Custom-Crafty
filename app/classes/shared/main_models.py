@@ -1,7 +1,7 @@
 import logging
 from playhouse.shortcuts import model_to_dict
 
-from app.classes.shared.helpers import Helpers  # pylint: disable=unused-import
+from app.classes.helpers.helpers import Helpers  # pylint: disable=unused-import
 from app.classes.shared.console import Console
 
 logger = logging.getLogger(__name__)
