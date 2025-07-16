@@ -11,7 +11,8 @@
 ### Tweaks
 TBD
 ### Lang
-TBD
+- Fixed grammar, spelling/capitalization, and sentence structure issues ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/876))
+- Removed 2 unused statements ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/876))
 <br><br>
 
 ## --- [4.4.11] - 2025/06/15
