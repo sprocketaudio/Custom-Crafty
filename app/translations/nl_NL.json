@@ -32,7 +32,9 @@
         "fullAccess": "Volledige Toegang"
     },
     "base": {
-        "doesNotWorkWithoutJavascript": "<strong>Warning: </strong>Crafty werkt niet naar behoren als JavaScript niet ingeschakeld is!"
+        "doesNotWorkWithoutJavascript": "<strong>Warning: </strong>Crafty werkt niet naar behoren als JavaScript niet ingeschakeld is!",
+        "getMFA": "Beveilig je servers!",
+        "createMFA": "Voeg Multi Factor Authenticatie toe aan je account!"
     },
     "credits": {
         "developmentTeam": "Ontwikkelingsteam",
@@ -222,7 +224,8 @@
         "passwordRecovery": "Wachtwoord Herstellen",
         "totp": "Voer Authenticatiecode In",
         "backupCodeTitle": "Back-upcode",
-        "backupCode": "Voeg Back-upcode In"
+        "backupCode": "Voeg Back-upcode In",
+        "accountDisabled": "Je gebruikersaccount is uitgeschakeld door een administrator. Neem contact op met je systeembeheerder voor meer info."
     },
     "notify": {
         "activityLog": "Activiteit-logboeken",
@@ -293,7 +296,8 @@
         "serverAccess": "Toegang?",
         "serverName": "Servernaam",
         "serversDesc": "Servers waar deze rol toegang tot heeft",
-        "selectManager": "Selecteer een manager voor deze rol"
+        "selectManager": "Selecteer een manager voor deze rol",
+        "requireMFA": "Gebruikers met een rol moeten MFA (Multi Factor Authenticatie) aanzetten"
     },
     "serverBackups": {
         "backupAtMidnight": "Automatische back-up bij middernacht?",
@@ -657,7 +661,7 @@
         "editTOTP": "Gebruiker MFA bewerken",
         "changeUser": "Gebruikersnaam Veranderen",
         "hints": "Aanzetten Hints?",
-        "totpIdReq": "TOTP ID Benodigd voor verzoek",
+        "totpIdReq": "MFA ID Benodigd voor verzoek",
         "totpHeader": "Multi Factor Authenticatie"
     },
     "customLogin": {
@@ -700,7 +704,9 @@
         "typeInteger": "moet een getal zijn.",
         "typeString": "moet van het type string zijn.",
         "2FAerror": "Multi-factorcode moet 6 cijfers (b.v.b. 000000) of een back-upcode of 16 karakters, elke vier gescheiden door - (b.v.b. ABCD-EFGH-IJKL-MNOP) zijn",
-        "totp": "TOTP-code moet 6 nummers zijn"
+        "totp": "MFA-code moet 6 nummers zijn",
+        "mfaName": "Invoer moet van type String zijn van minstens 3 karakters voor deze eigenschap",
+        "additionalProperties": "Aanvullende Eigenschappen mogen niet meegestuurd worden"
     },
     "serverMetrics": {
         "zoomHint1": "Om in te zoomen op de grafiek, houdt je de shift-toets ingedrukt en gebruik je vervolgens je scrollwiel.",
@@ -764,7 +770,8 @@
         "renewRecovery": "Herstelcodes Vernieuwen",
         "newOTP": "Nieuwe Multi-Factor Authenticatie Toevoegen",
         "verifyTitle": "MFA-methode verifiëren met authenticator",
-        "goToPage": "Ga naar MFA-pagina"
+        "goToPage": "Ga naar MFA-pagina",
+        "otpReq": "MFA is benodigd voor deze gebruikers. Je kan niet je enigste MFA-methode verwijderen."
     },
     "configJson": {
         "delete_default_json": "Verwijder standaard JSON-bestand tijdens opstarten",
@@ -791,6 +798,12 @@
         "show_errors": "Toon webserver debug fouten",
         "stats_update_frequency_seconds": "Hoe vaak we jouw server moeten peilen voor statistieken (seconden)",
         "submit": "Indienen",
-        "True": "Juist"
+        "True": "Juist",
+        "security": "Beveiliging",
+        "general": "Algemeen",
+        "logs": "Registratie",
+        "monitoring": "Toezicht",
+        "miscellaneous": "Overig",
+        "superMFA": "Supergebruikers moeten MFA aanzetten"
     }
 }

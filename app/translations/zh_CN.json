@@ -718,9 +718,10 @@
         "typeIntMinVal0": "必须为最小值为 0 的整数。",
         "typeInteger": "必须为数字。",
         "typeString": "必须为字符串类型。",
-        "2FAerror": "多因素代码必须为 6 位（例如：000000）或一个以 - 分隔为每 4 位一段的备份代码（例如：ABCD-EFGH-IJKL-MNOP）",
+        "2FAerror": "多因素代码必须为 6 位（例如：000000）或一个 16 字符的备份代码，以 - 分隔为每 4 个字符一段（例如：ABCD-EFGH-IJKL-MNOP）",
         "totp": "MFA 代码必须为 6 个数字",
-        "additionalProperties": "不允许传递额外属性"
+        "additionalProperties": "不允许传递额外属性",
+        "mfaName": "输入的属性必须为字符串类型，且最短为 3 个字符"
     },
     "webhooks": {
         "areYouSureDel": "您确定要删除此 webhook 吗？",

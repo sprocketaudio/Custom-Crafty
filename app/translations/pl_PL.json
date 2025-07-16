@@ -14,7 +14,7 @@
         "apiKeys": "Klucze API",
         "auth": "Zezwól? ",
         "buttons": "Akcje",
-        "config": "Config",
+        "config": "Ustawienia",
         "crafty": "Crafty: ",
         "createNew": "Stwórz nowy klucz API",
         "created": "Stworzono",
@@ -32,12 +32,14 @@
         "yes": "Tak"
     },
     "base": {
-        "doesNotWorkWithoutJavascript": "<strong>Uwaga: </strong>Crafty nie działa gdy JavaScript jest wyłączone!"
+        "doesNotWorkWithoutJavascript": "<strong>Uwaga: </strong>Crafty nie działa gdy JavaScript jest wyłączone!",
+        "getMFA": "Zabezpiecz swoje serwery!",
+        "createMFA": "Dodaj logowanie wieloskładnikowe do swojego konta!"
     },
     "credits": {
         "developmentTeam": "Drużyna Deweloperów",
         "hugeDesc": "Wielkie",
-        "pageDescription": "Bez tych ludzi nie miał być Craftiego!",
+        "pageDescription": "Bez tych ludzi nie miał byś Craftiego!",
         "pageTitle": "Podziękowania",
         "patreonDesc": "dla naszych ludzi wsparcia z Patreon / Ko-fi!",
         "patreonOther": "Inne",
@@ -54,7 +56,7 @@
         "translator": "Tłumacze"
     },
     "customLogin": {
-        "apply": "Apply",
+        "apply": "Zastosuj",
         "backgroundUpload": "Załącz tło",
         "customLoginPage": "Dostosuj stronę zalogowania",
         "delete": "Usuń",
@@ -70,7 +72,7 @@
     "dashboard": {
         "actions": "Akcje",
         "allServers": "Wszystkie serwery",
-        "avg": "Avg",
+        "avg": "Śr.",
         "backups": "Backupy",
         "bePatientClone": "Poczekaj, gdy my klonujemy serwer.<br /> Strona za chwilę się odświeży",
         "bePatientRestart": "Poczekaj, gdy my restartujemy twój serwer.<br /> Strona za chwilę się odświeży",
@@ -170,9 +172,9 @@
                     "_": "%d kolumn zaznaczonych"
                 },
                 "rows": {
-                    "0": "Click on a row to select it",
-                    "1": "%d row selected",
-                    "_": "%d rows selected"
+                    "0": "Kliknij na rząd aby go zaznaczyć",
+                    "1": "%d rząd zaznaczony",
+                    "_": "%d rzędów zaznaczonych"
                 }
             },
             "thousands": ",",
@@ -188,8 +190,8 @@
         "cancel": "Anuluj",
         "contact": "Podrzebujesz pomocy? Zapraszamy na serwer discord Crafty Controler",
         "craftyStatus": "Status strony Craftyiego",
-        "cronFormat": "Nieprawidłowy format Cron",
-        "embarassing": "Oh, więc, to jest żenujące.",
+        "cronFormat": "Wykryto nieprawidłowy format Cron",
+        "embarassing": "Ojej, więc, to jest żenujące.",
         "error": "Błąd!",
         "eulaAgree": "Czy się zgadzasz?",
         "eulaMsg": "Musisz się zgodzić na EULA. Kopia EULA Minecraft jest zalinkowana pod tą wiadomością. ",
@@ -210,7 +212,8 @@
         "selfHost": "Jeśli zarządasz tą repozytorią upewnij się że adres hest poprawny, w innym przypadku odwiedź strone rozwiązywania problemów.",
         "start-error": "Serwer {} nie mógł się odpalić z powodu: {}",
         "superError": "Potrzebujesz uprawnienie Adminitsratora aby zakończyć tę akcję.",
-        "terribleFailure": "Okropny błąd!"
+        "terribleFailure": "Okropny błąd!",
+        "duplicateId": "Żądanie tokenów może zawierać tylko session_id lub token_id, nie oba jednocześnie."
     },
     "footer": {
         "allRightsReserved": "Wszelkie Prawa zastrzeżone",
@@ -221,11 +224,22 @@
         "defaultPath": "Hasło które wprowadziłeś jest podstawową ścieżką w której przechowywane są dane logowania. Znajdź podstawowe hasło w tej lokalizacji.",
         "disabled": "Konto tego użytkownika jest wyłączone. Skontaktuj się z administratorem by uzyskać więcej informacji.",
         "forgotPassword": "Zapomniałem hasła",
-        "incorrect": "Niepoprawny login lub hasło/Niepoprawna nazwa użytkownika lub hasło",
+        "incorrect": "Niepoprawny login lub hasło/Niepoprawna nazwa użytkownika, hasło lub kod MFA (wieloskładnikowy/2FA)",
         "login": "Zaloguj się",
         "password": "Hasło",
         "username": "Nazwa użytkownika",
-        "viewStatus": "Sprawdź status serwerów"
+        "viewStatus": "Sprawdź status serwerów",
+        "2fa": "(Jeśli logowanie wieloskładnikowe jest włączone)",
+        "2faRecovery": "Odzyskaj klucz logowania wieloskładnikowego",
+        "backupCodeTitle": "Kod zapasowy",
+        "backupCode": "Wprowadź kod zapasowy",
+        "burnedBackupCode": "Właśnie użyłeś jednego z twoich kodów zapasowych. Utwórz nowe abyś nie utracił dostępu",
+        "cancel": "Anuluj",
+        "cooldown": "Za dużo prób. Spróbuj ponownie za",
+        "totpSelect": "Aplikacja do logowania wieloskładnikowego",
+        "passwordRecovery": "Odzyskaj hasło",
+        "accountDisabled": "Twoje konto zostało wyłączone przez administratora. Skontaktuj się z administratorem systemu w celu uzyskania dalszych informacji.",
+        "totp": "Wprowadź kod wieloskładnikowy"
     },
     "notify": {
         "activityLog": "Logi Aktywności",
@@ -236,7 +250,8 @@
         "logout": "Wyloguj się",
         "preparingLogs": " Poczekaj kiedy my przygotowujemy twoje logi ... Wyślemy ci powiadomienie kiedy będą gotowe. To trochę zajmie na dużych serwerach.",
         "supportLogs": "Logi Pomocnicze",
-        "backup_desc": "Wykryliśmy, że migracja kopii zapasowych nie powiodła się, lub mogła zostać uszkodzona. Sprawdź status kopii sekcji backupów."
+        "backup_desc": "Wykryliśmy, że migracja kopii zapasowych nie powiodła się, lub mogła zostać uszkodzona. Sprawdź status kopii sekcji backupów.",
+        "accountSettings": "Ustawienia konta"
     },
     "offline": {
         "offline": "Offline",
@@ -445,7 +460,7 @@
         "deleteItemQuestionMessage": "Usuwasz \\\"\" + path + \"\\\"!<br/><br/>Ta akcja jest nieodwracalna i zostanie usunięta na zawsze!",
         "download": "Pobierz",
         "editingFile": "Edytuj plik",
-        "error": "Error while getting files",
+        "error": "Błąd podczas wczytywania plików",
         "fileReadError": "Error odczytu pliku",
         "files": "Pliki",
         "keybindings": "Skróty klawiszowe",
@@ -504,7 +519,7 @@
     },
     "serverSchedules": {
         "action": "Akcja",
-        "actionId": "Zaznacz zadanie podwładne",
+        "actionId": "Zadanie podwładne",
         "areYouSure": "Usuń zaplanowane (zadanie)?",
         "cancel": "Anuluj",
         "cannotSee": "Nie widzisz wszystkiego?",
@@ -543,7 +558,7 @@
         "serverStatus": "Status serwera",
         "serverTime": "Czas UTC",
         "serverTimeZone": "Strefa czasowa serwera",
-        "serverUptime": "Server Uptime",
+        "serverUptime": "Czas pracy serwera",
         "starting": "Opóźniony-Start",
         "unableToConnect": "Nie można połączyć",
         "version": "Wersja"
@@ -606,7 +621,7 @@
         "unsupported": "Wersje Minecrafta poniżej 1.8 nie są wspierane przez Crafty. Mimo to możesz je zainstalować - jednakże nie jesteśmy w stanie zagwarantować ich działanie.",
         "uploadButton": "Wgraj",
         "uploadZip": "Wgraj plik Zip pod importowanie serwera",
-        "zipPath": "Server Path"
+        "zipPath": "Ścieżka serwera"
     },
     "sidebar": {
         "contribute": "Wspomóż nas",
@@ -640,8 +655,8 @@
         "delSuper": "Nie możesz usunąć SuperUżytkownika",
         "deleteUser": "Usuń użytkownika: ",
         "deleteUserB": "Usuń użytkownika",
-        "enabled": "Enabled",
-        "gravDesc": "To jest email tylko używany do Gravatar™. Crafty nie użyje pod żadnymi okolicznościami twojego adresu email, niż sprawdzenie ikony Gravatar™",
+        "enabled": "Włączony?",
+        "gravDesc": "To jest email tylko używany przez Gravatar™. Crafty nie użyje pod żadnymi okolicznościami twojego adresu email, niż sprawdzenie ikony Gravatar™",
         "gravEmail": "Gravatar™ Email",
         "lastIP": "Ostatnie IP: ",
         "lastLogin": "Ostatni login: ",
@@ -665,7 +680,11 @@
         "userRolesDesc": "Role, które ten użytkownik posiada.",
         "userSettings": "Ustawienia użytkownika",
         "userTheme": "Wygląd interfejsu",
-        "uses": "Ilość użyć (-1==Bez limitu)"
+        "uses": "Ilość użyć (-1==Bez limitu)",
+        "totpHeader": "Logowanie wieloskładnikowe",
+        "hints": "Włącz porady?",
+        "changePass": "Zmień hasło",
+        "changeUser": "Zmień nazwę użytkownika"
     },
     "validators": {
         "passLength": "Hasło jest zbyt krótkie. Hasło musi mieć minimum 8 znaków."
@@ -694,5 +713,33 @@
         "url": "Link Webhooka",
         "webhook_body": "Treść Webhooka",
         "webhooks": "Webhooki"
+    },
+    "otp": {
+        "name": "Nazwa",
+        "id": "ID",
+        "copyBackupCodes": "Skopiuj kody",
+        "delete": "Usuń",
+        "deleteConfirm": "Czy jesteś pewny, że chcesz usunąć tą metodę logowania wieloskładnikowego?",
+        "yes": "Tak",
+        "no": "Nie",
+        "backupCodes": "Skopiuj swoje kody zapasowe.",
+        "backupCodesMax": "Max 6 kodów zapasowych został osiągnięty.",
+        "saveWarn": "Upewnij się że zapiszesz te kody zapasowe, w przeciwnym wypadku możesz utracić dostęp",
+        "renewRecovery": "Odnów kody zapasowe",
+        "newOTP": "Dodaj nowy autoryzator logowania wieloskładnikowego",
+        "2faCreate": "Dodaj nową metodę logowania wieloskładnikowego",
+        "verify": "Nie udało się zweryfikować kodu wieloskładnikowego. Kod jest niepoprawny.",
+        "backupOtp": "Metoda logowania wieloskładnikowego jest potrzebna aby uzyskać kody zapasowe/przywracania"
+    },
+    "configJson": {
+        "general": "Ogólne",
+        "security": "Bezpieczeństwo",
+        "logs": "Logi",
+        "monitoring": "Monitorowanie",
+        "miscellaneous": "Inne",
+        "disabled_language_files": "Systemowo wyłączone języki",
+        "enable_user_self_delete": "Zezwalaj użytkownikom na usuwanie ich własnego konta",
+        "True": "Prawda",
+        "False": "Fałsz"
     }
 }
