@@ -1,7 +1,10 @@
 # Changelog
 ## --- [4.4.12] - 2025/TBD
+
+### Refactor
+- Modularize helpers (file / crypto) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/795))
 ### New features
-TBD
+- Snapshot Style Backups ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/795))
 ### Bug fixes
 TBD
 ### Tweaks
