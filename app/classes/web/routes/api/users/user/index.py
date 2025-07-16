@@ -102,7 +102,7 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                 },
             )
         user_model = self.controller.users.get_user_object(user_id)
-        for totp in list(user_model.totp_user):
+        for totp in user_model.totp_user:
             self.controller.totp.delete_user_totp(totp)
         self.controller.totp.remove_all_recovery_codes(user_model.user_id)
         self.controller.users.remove_user(user_id)
@@ -163,6 +163,21 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
                     "status": "error",
                     "error": "INVALID_JSON_SCHEMA",
                     "error_data": f"{str(err)}",
+                },
+            )
+        if (
+            user_id == "@me" or str(auth_data[4]["user_id"]) == str(user_id)
+        ) and data.get(
+            "enabled"
+        ) is False:  # User cannot enable or disable themselves
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "userConfig", "selfDisable", auth_data[4]["lang"]
+                    ),
                 },
             )
         if user_id == "@me":
