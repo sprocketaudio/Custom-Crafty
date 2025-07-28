@@ -33,7 +33,7 @@
     },
     "base": {
         "doesNotWorkWithoutJavascript": "<strong>Attention : </strong>Crafty ne fonctionne pas correctement si JavaScript n'est pas activé !",
-        "createMFA": "Ajoutez l’authentification multifacteur à votre compte !",
+        "createMFA": "Ajoutez l’authentification multifacteur à votre compte !",
         "getMFA": "Sécurisez vos serveurs !"
     },
     "credits": {
@@ -361,7 +361,8 @@
         "storageLocationDesc": "Où voulez-vous stocker les sauvegardes ?",
         "inplace": "Restaurer les fichiers de sauvegarde à leur emplacement d'origine – les fichiers non présents dans l'archive de sauvegarde resteront dans le répertoire du serveur",
         "radioRequired": "Sélectionnez une option pour la restauration de votre sauvegarde",
-        "replace": " Restaurer la sauvegarde et réorganiser le répertoire du serveur à l’identique"
+        "replace": " Restaurer la sauvegarde et réorganiser le répertoire du serveur à l’identique",
+        "snapshotDisclaimer": "Les sauvegardes instantanées sont actuellement en version bêta. Les sauvegardes instantanées ne conservent qu'une seule copie de chaque fichier et utilisent beaucoup moins d'espace disque. Les fonctions de sauvegarde et de restauration fonctionnent bien lors des tests, mais vous pourriez rencontrer des problèmes imprévus. Vous ne devriez pas vous fier uniquement à ce type de sauvegarde pour des données critiques. Merci de signaler tout problème rencontré."
     },
     "serverConfig": {
         "bePatientDelete": "Merci de patienter pendant la suppression du serveur du tableau de bord de Crafty. Cet écran se fermera dans quelques instants.",
@@ -386,7 +387,7 @@
         "noDelete": "Non, revenir en arrière",
         "noDeleteFiles": "Non, supprimer simplement du tableau de bord",
         "removeOldLogsAfter": "Supprimer les anciens Logs après",
-        "removeOldLogsAfterDesc": "Combien de jours un fichier de log doit-il avoir avant d’être supprimé (0 pour désactiver)",
+        "removeOldLogsAfterDesc": "Combien de jours doit-on conserver les fichiers journaux ? (0 pour désactiver)",
         "save": "Sauvegarder",
         "sendingDelete": "Suppression du serveur",
         "sendingRequest": "Envoi de votre requête...",
@@ -430,7 +431,7 @@
             "Si vous devez modifier l'emplacement d'un serveur, vous pouvez le faire tant que vous accordez à l'utilisateur 'crafty' les permissions de lecture et d'écriture sur le chemin du serveur.",
             "<br />",
             "<br />",
-            "Sous Linux la meilleure façon de faire est d'exécuter les commandes suivantes :<br />",
+            "Sous Linux, la meilleure façon de faire est d'exécuter les commandes suivantes :<br />",
             "<code>",
             "    sudo chown crafty:crafty /chemin/de/ton/serveur -R<br />",
             "    sudo chmod 2775 /chemin/de/ton/serveur -R<br />",
@@ -693,7 +694,8 @@
         "editTOTP": "Modifier l'authentification multifacteur de l'utilisateur",
         "hints": "Activer les astuces ?",
         "totpIdReq": "Identifiant d'authentification multifacteur requis pour traiter la demande",
-        "totpHeader": "Authentification multifacteur"
+        "totpHeader": "Authentification multifacteur",
+        "selfDisable": "Vous ne pouvez pas désactiver votre propre compte"
     },
     "validators": {
         "passLength": "Mot de passe trop court. Longueur minimum : 8",
@@ -719,7 +721,8 @@
         "enumErr": "Échec de la validation. Les données acceptables incluent : ",
         "filesPageLen": "La longueur doit être supérieure à 1 pour cette propriété",
         "insufficientPerms": "Erreur de permission : permissions manquantes pour cette ressource",
-        "mfaName": "La saisie doit être une chaîne de caractères d'au moins 3 caractères pour ce champ"
+        "mfaName": "La saisie doit être une chaîne de caractères d'au moins 3 caractères pour ce champ",
+        "numbericPassword": "Mot de passe numérique. Doit contenir au moins 1 caractère alphabétique"
     },
     "webhooks": {
         "areYouSureDel": "Êtes-vous sûr de vouloir supprimer ce webhook ?",
