@@ -12,7 +12,7 @@
     },
     "apiKeys": {
         "apiKeys": "API Sleutels",
-        "auth": "Bevoegd? ",
+        "auth": "Bevoegd?. ",
         "buttons": "Knoppen",
         "config": "Config",
         "crafty": "Crafty: ",
@@ -32,7 +32,9 @@
         "yes": "Ja"
     },
     "base": {
-        "doesNotWorkWithoutJavascript": "<strong>Waarschuwing: </strong>Crafty werkt niet goed als JavaScript niet is ingeschakeld!"
+        "doesNotWorkWithoutJavascript": "<strong>Waarschuwing: </strong>Crafty werkt niet goed als JavaScript niet is ingeschakeld!",
+        "createMFA": "Voeg multi-factorauthenticatie toe aan je account!",
+        "getMFA": "Beveilig je servers!"
     },
     "credits": {
         "developmentTeam": "Ontwikkelingsteam",
@@ -48,7 +50,7 @@
         "subscriptionLevel": "Niveau",
         "supportTeam": "Ondersteunings- en documentatieteam",
         "thankYou": "DANK JE WEL",
-        "translationDesc": "aan onze gemeenschap die vertaalt!",
+        "translationDesc": "Aan onze gemeenschap die vertaalt! [ Actief = 🟢 Inactief/Gepensioneerd = ⚪ ]",
         "translationName": "Naam",
         "translationTitle": "Taal Vertaling",
         "translator": "Vertalers"
@@ -87,7 +89,7 @@
         "cpuUsage": "CPU gebruik",
         "crashed": "Gecrasht",
         "dashboard": "Dashboard",
-        "delay-explained": "De service/agent is onlangs gestart en vertraagt ​​de start van de minecraft-serverinstantie",
+        "delay-explained": "De service/agent is onlangs gestart en vertraagt de start van de Minecraft-serverinstantie",
         "host": "Gastheer",
         "installing": "Installeren...",
         "kill": "Proces doden",
@@ -113,7 +115,7 @@
         "stop": "Stoppen",
         "storage": "Opslagruimte",
         "version": "Versie",
-        "welcome": "Welkom bij Crafty Controller "
+        "welcome": "Welkom bij Crafty Controller"
     },
     "datatables": {
         "i18n": {
@@ -192,7 +194,7 @@
         "embarassing": "Oh, nou, dit is gênant.",
         "error": "Fout!",
         "eulaAgree": "Bent u het eens?",
-        "eulaMsg": "U moet akkoord gaan met de EULA. Een kopie van de Minecraft EULA is gelinkt onder dit bericht.",
+        "eulaMsg": "U moet akkoord gaan met de EULA. Een kopie van de Minecraft EULA is gelinkt onder dit bericht. ",
         "eulaTitle": "Akkoord gaan met EULA",
         "fileError": "Bestandstype moet een afbeelding zijn.",
         "hereIsTheError": "Hier is de fout",
@@ -209,7 +211,8 @@
         "selfHost": "Als u deze repository zelf host, controleer dan uw adres of raadpleeg onze handleiding voor probleemoplossing.",
         "start-error": "Server {} kan niet starten met foutcode: {}",
         "superError": "U moet een supergebruiker zijn om deze actie te voltooien.",
-        "terribleFailure": "Wat een verschrikkelijke mislukking!"
+        "terribleFailure": "Wat een verschrikkelijke mislukking!",
+        "duplicateId": "Verzoektokens mogen alleen session_id of token_id specificeren, niet beide."
     },
     "footer": {
         "allRightsReserved": "Alle rechten voorbehouden",
@@ -223,7 +226,18 @@
         "login": "Log In",
         "password": "Wachtwoord",
         "username": "gebruikersnaam",
-        "viewStatus": "Openbare statuspagina bekijken"
+        "viewStatus": "Openbare statuspagina bekijken",
+        "accountDisabled": "Je gebruikersaccount is administratief uitgeschakeld. Neem contact op met je systeembeheerder voor meer informatie.",
+        "2fa": "(Als MFA is ingeschakeld)",
+        "2faRecovery": "Herstel MFA",
+        "backupCode": "Voer back-upcode in",
+        "backupCodeTitle": "Backup Code",
+        "burnedBackupCode": "Je hebt een van je back-upcodes gebruikt. Genereer nieuwe back-upcodes om buitensluiting te voorkomen",
+        "cancel": "Annuleren",
+        "cooldown": "Afgkoelperiode actief. Probeer opnieuw over",
+        "passwordRecovery": "Wachtwoord herstellen",
+        "totp": "Voer authenticatiecode in",
+        "totpSelect": "Authenticator-app"
     },
     "notify": {
         "activityLog": "Activiteitslogboeken",
@@ -234,10 +248,11 @@
         "downloadLogs": "Ondersteuningslogboeken downloaden?",
         "finishedPreparing": "We zijn klaar met het voorbereiden van uw ondersteuningslogboeken. Klik op download om te downloaden",
         "logout": "Uitloggen",
-        "preparingLogs": "  Een ogenblik geduld alstublieft terwijl wij uw logboeken voorbereiden... We sturen een bericht als ze klaar zijn. Dit kan een tijdje duren voor grote implementaties.",
+        "preparingLogs": " Een ogenblik geduld alstublieft terwijl wij uw logboeken voorbereiden... We sturen een bericht als ze klaar zijn. Dit kan een tijdje duren voor grote implementaties.",
         "schedule_desc": "We hebben gedetecteerd dat sommige of alle geplande taken niet succesvol zijn overgedragen tijdens de upgrade. Controleer uw schema's op het tabblad Schema's.",
         "schedule_title": "Waarschuwing voor schemamigratie",
-        "supportLogs": "Ondersteuningslogboeken"
+        "supportLogs": "Ondersteuningslogboeken",
+        "accountSettings": "Accountinstellingen"
     },
     "offline": {
         "offline": "Offline",
@@ -297,14 +312,15 @@
         "selectManager": "Selecteer een manager voor deze rol",
         "serverAccess": "Toegang?",
         "serverName": "Servernaam",
-        "serversDesc": "servers waar deze rol toegang toe heeft"
+        "serversDesc": "servers waar deze rol toegang toe heeft",
+        "requireMFA": "Vereis dat gebruikers met een rol MFA (Multi-Factorauthenticatie) inschakelen"
     },
     "serverBackups": {
         "actions": "Acties",
         "after": "Voer opdracht uit na back-up",
         "backupAtMidnight": "Automatische back-up maken om middernacht?",
         "backupNow": "Nu een back-up maken!",
-        "backupTask": "Er is een back-uptaak ​​gestart.",
+        "backupTask": "Er is een back-uptaak gestart.",
         "backups": "Serverbackups",
         "before": "Voer opdracht uit vóór back-up",
         "cancel": "Annuleren",
@@ -342,7 +358,11 @@
         "status": "Status",
         "storage": "Opslaglocatie",
         "storageLocation": "Opslaglocatie",
-        "storageLocationDesc": "Waar wil je back-ups opslaan?"
+        "storageLocationDesc": "Waar wil je back-ups opslaan?",
+        "snapshotDisclaimer": "Snapshot-back-ups zijn momenteel in bèta. Ze bewaren slechts één kopie per bestand en gebruiken veel minder schijfruimte. Back-up en herstel werken goed tijdens tests, maar er kunnen onverwachte problemen optreden. Vertrouw niet uitsluitend op dit type back-up voor belangrijke gegevens. Meld eventuele problemen die je ondervindt.",
+        "inplace": "Herstel back-upbestanden op hun plaats – bestanden die niet in de back-up-zip staan, blijven in de servermap",
+        "radioRequired": "Je moet een optie kiezen om je back-up te herstellen",
+        "replace": " Herstel back-upbestanden en zet de servermap terug naar de exacte structuur van de back-up"
     },
     "serverConfig": {
         "bePatientDelete": "Even geduld terwijl we uw server uit het Crafty-paneel verwijderen. Dit scherm wordt over enkele ogenblikken gesloten.",
@@ -367,7 +387,7 @@
         "noDelete": "Nee, ga terug",
         "noDeleteFiles": "Nee, gewoon uit het paneel verwijderen",
         "removeOldLogsAfter": "Oude logboeken verwijderen na",
-        "removeOldLogsAfterDesc": "Hoeveel dagen een logbestand oud moet zijn om te worden verwijderd (0 is uitgeschakeld)",
+        "removeOldLogsAfterDesc": "Hoeveel dagen moeten we logbestanden bewaren? (0 is uitgeschakeld)",
         "save": "Sparen",
         "sendingDelete": "Server verwijderen",
         "sendingRequest": "Uw verzoek verzenden...",
@@ -482,7 +502,7 @@
         "command": "Opdracht",
         "command-explain": "Welk commando wilt u dat wij uitvoeren? Voeg de '/' niet toe",
         "cron": "Cron",
-        "cron-explain": "Voer uw cron string in",
+        "cron-explain": "Voer uw cron-string in — OPMERKING: 0 = maandag bij de laatste optie.",
         "custom": "Aangepast commando",
         "days": "Dagen",
         "enabled": "Ingeschakeld",
@@ -505,7 +525,7 @@
     },
     "serverSchedules": {
         "action": "Actie",
-        "actionId": "Selecteer onderliggende actie",
+        "actionId": "onderliggende actie",
         "areYouSure": "Verwijder Geplande Taak?",
         "cancel": "Annuleren",
         "cannotSee": "Ziet u niet alles?",
@@ -529,7 +549,8 @@
         "no": "Nee",
         "no-schedule": "Er zijn momenteel geen schema's voor deze server. Klik om te beginnen op",
         "scheduledTasks": "Geplande taken",
-        "yes": "Ja"
+        "yes": "Ja",
+        "backupPol": "Backup beleid"
     },
     "serverStats": {
         "cpuUsage": "CPU gebruik",
@@ -551,7 +572,7 @@
     },
     "serverTerm": {
         "commandInput": "Voer uw opdracht in",
-        "delay-explained": "De service/agent is onlangs gestart en vertraagt ​​de start van de minecraft-serverinstantie",
+        "delay-explained": "De service/agent is onlangs gestart en vertraagt de start van de minecraft-serverinstantie",
         "importing": "Importeren...",
         "installing": "Installeren...",
         "restart": "Herstarten",
@@ -581,7 +602,7 @@
         "labelZipFile": "Kies uw zip-bestand",
         "maxMem": "Maximaal geheugen",
         "minMem": "Minimaal geheugen",
-        "myNewServer": "My New Server",
+        "myNewServer": "Mijn nieuwe server",
         "newServer": "Nieuwe server maken",
         "noRole": "Geen rol gevonden met huidige zoekparameters",
         "noneRoles": "Geen rollen geselecteerd",
@@ -616,7 +637,8 @@
         "documentation": "Documentatie",
         "inApp": "In-app documentatie",
         "newServer": "Nieuwe server maken",
-        "servers": "Servers"
+        "servers": "Servers",
+        "panelSettings": "Paneelinstellingen"
     },
     "startup": {
         "almost": "De laatste hand leggen. Houd je vast...",
@@ -631,7 +653,7 @@
     "userConfig": {
         "apiKey": "API Sleutels",
         "auth": "Bevoegd? ",
-        "config": "Config",
+        "config": "Configuratie",
         "configArea": "Gebruikers Configuratie Zone",
         "configAreaDesc": "Hier kunt u al uw gebruikersinstellingen wijzigen",
         "confirmDelete": "Weet u zeker dat u deze gebruiker wilt verwijderen? Deze actie is onomkeerbaar.",
@@ -666,7 +688,14 @@
         "userRolesDesc": "Rollen waar deze gebruiker lid van is.",
         "userSettings": "Gebruikersinstellingen",
         "userTheme": "UI-thema",
-        "uses": "Aantal toegestane gebruiken (-1==Geen Limiet)"
+        "uses": "Aantal toegestane gebruiken (-1==Geen Limiet)",
+        "changePass": "Wachtwoord wijzigen",
+        "changeUser": "Gebruikersnaam wijzigen",
+        "editTOTP": "Gebruikers-MFA bewerken",
+        "hints": "Hints inschakelen?",
+        "selfDisable": "Je kunt je eigen account niet uitschakelen",
+        "totpHeader": "Multi Factorauthenticatie",
+        "totpIdReq": "MFA ID vereist voor aanvraag"
     },
     "validators": {
         "passLength": "Wachtwoord te kort. Minimumlengte: 8 tekens",
@@ -688,7 +717,12 @@
         "typeIntMinVal0": "moet een geheel getal zijn met een minimale waarde van 0.",
         "typeList": "moet van het type lijst/array zijn ",
         "typeString": "moet van het type string zijn.",
-        "userName": " moet van het type string zijn, volledig in KLEINE LETTERS, minimaal 4 tekens en maximaal 20 tekens"
+        "userName": " moet van het type string zijn, volledig in KLEINE LETTERS, minimaal 4 tekens en maximaal 20 tekens",
+        "mfaName": "Invoer moet van het type string zijn en minstens 3 tekens bevatten voor dit veld",
+        "additionalProperties": "Er mogen geen extra eigenschappen worden meegegeven",
+        "totp": "MFA-code moet uit 6 cijfers bestaan",
+        "2FAerror": "Multi-Factor code moet uit 6 cijfers bestaan (bijv. 000000) of een back-upcode van 16 tekens, gescheiden per 4 met een streepje (bijv. ABCD-EFGH-IJKL-MNOP)",
+        "numbericPassword": "Numeriek wachtwoord. Moet minstens 1 alfabetisch teken bevatten"
     },
     "webhooks": {
         "areYouSureDel": "Weet u zeker dat u deze webhook wilt verwijderen?",
@@ -714,5 +748,63 @@
         "url": "Webhook-URL",
         "webhook_body": "Webhook-body",
         "webhooks": "Webhooks"
+    },
+    "configJson": {
+        "False": "Onwaar",
+        "big_bucket_repo": "Systeem Big Bucket™ externe URL",
+        "max_login_attempts": "Maximale aantal mislukte aanmeldpogingen per extern IP-adres voor time-out",
+        "dir_size_poll_freq_minutes": "Hoe vaak Crafty je servermappen moet controleren op grootte (minuten)",
+        "language": "Globale systeemtaal. (Voor publieke pagina's en als vertaalfallback)",
+        "stats_update_frequency_seconds": "Hoe vaak we je server moeten bevragen voor statistieken (seconden)",
+        "True": "Waar",
+        "allow_nsfw_profile_pictures": "Sta Gravatar™ NSFW-profielafbeeldingen toe",
+        "cookie_expire": "Sessiecookies vervallen na (dagen)",
+        "crafty_logs_delete_after_days": "Hoe lang Crafty applicatielogs moet bewaren (dagen)",
+        "delete_default_json": "Verwijder standaard JSON-bestand bij opstarten",
+        "disabled_language_files": "Globaal uitgeschakelde taalbestanden",
+        "enable_user_self_delete": "Sta gebruikers toe hun eigen account te verwijderen",
+        "general": "Algemeen",
+        "history_max_age": "Hoe lang Crafty je serverstatistieken moet bewaren (dagen)",
+        "https_port": "Crafty's port",
+        "keywords": "Trefwoorden die Crafty moet markeren in je serverterminals",
+        "enable_otp_skew": "Inschakelen MFA skew (+-1)",
+        "max_audit_entries": "Maximum aantal vermeldingen in Crafty's activiteitenlogboek",
+        "logs": "Logboek",
+        "max_log_lines": "Maximum aantal logregels per bestand",
+        "miscellaneous": "Diversen",
+        "monitored_mounts": "Opslagstations zichtbaar op het dashboard",
+        "monitoring": "Monitoring",
+        "reset_secrets_on_next_boot": "Geheimen resetten bij volgende opstart",
+        "security": "Beveiliging",
+        "show_contribute_link": "Toon bijdragenlinks in het paneel",
+        "show_errors": "Toon foutopsporingsfouten van de webserver",
+        "submit": "Verzenden",
+        "superMFA": "Vereis dat supergebruikers MFA inschakelen",
+        "virtual_terminal_lines": "Hoeveel regels zijn toegestaan in je serverterminalbuffer"
+    },
+    "otp": {
+        "verify": "MFA-verificatie mislukt. Verkeerde code ingevoerd.",
+        "mfaWarn": "Je moet MFA ingeschakeld hebben om met dit systeem te werken. Maak een MFA-sleutel aan. Als je deze melding ziet en al een sleutel hebt, log dan uit en log opnieuw in met MFA.",
+        "config": "Configuratie",
+        "2faCreate": "Nieuwe MFA-methode toevoegen",
+        "backupCodes": "Kopieer je back-upcodes.",
+        "backupCodesMax": "Het maximum van 6 back-upcodes is al bereikt.",
+        "backupOtp": "Een MFA-methode is vereist om back-upcodes aan te vragen",
+        "confirm2FA": "Bevestig de authenticatiecode",
+        "copyBackupCodes": "Codes kopiëren",
+        "delete": "Verwijderen",
+        "deleteConfirm": "Weet je zeker dat je deze MFA-methode wilt verwijderen?",
+        "goToPage": "Ga naar MFA-pagina",
+        "id": "ID",
+        "name": "Naam",
+        "newName": "Geef een herkenbare naam aan deze MFA-methode",
+        "newOTP": "Nieuwe multi-factorauthenticatie toevoegen",
+        "no": "Nee",
+        "otpReq": "MFA is vereist voor deze gebruiker. Je kunt je enige MFA-methode niet verwijderen.",
+        "otpTitle": "MFA Methods",
+        "renewRecovery": "Herstelcodes vernieuwen",
+        "saveWarn": "Zorg ervoor dat je deze back-upcodes opslaat, anders kun je de toegang verliezen",
+        "verifyTitle": "Verifieer MFA-methode via authenticator",
+        "yes": "Ja"
     }
 }
