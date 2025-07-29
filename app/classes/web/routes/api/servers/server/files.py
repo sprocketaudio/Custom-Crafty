@@ -812,7 +812,18 @@ class ApiServersServerFileDownload(BaseApiHandler):
         )
         auth_data = self.authenticate_user()
         if not auth_data:
-            return
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators",
+                        "insufficientPerms",
+                        self.helper.get_setting("language"),
+                    ),
+                },
+            )
 
         filepath = html.unescape(encoded_file_path)
         file_path = Path(filepath)
@@ -848,10 +859,20 @@ class ApiServersServerFileDownload(BaseApiHandler):
                     ),
                 },
             )
-        if not Helpers.validate_traversal(
-            self.controller.servers.get_server_data_by_id(server_id)["path"],
-            file_path,
-        ):
+        try:
+            if not Helpers.validate_traversal(
+                self.controller.servers.get_server_data_by_id(server_id)["path"],
+                file_path,
+            ):
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "TRAVERSAL DETECTED",
+                        "error_data": "TRAVERSAL DETECTED",
+                    },
+                )
+        except ValueError:
             return self.finish_json(
                 400,
                 {
