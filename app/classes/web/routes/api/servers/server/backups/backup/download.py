@@ -31,12 +31,25 @@ class ApiServersServerBackupsBackupDownloadHandler(BaseApiHandler):
             auth_data[5],
         )
         if backup_conf["server_id"]["server_id"] != server_id:
+            # Check to make sure backup ID is related to server ID
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "ID_MISMATCH",
                     "error_data": ID_MISMATCH,
+                },
+            )
+        if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
+            # if the user doesn't have access to the server, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
                 },
             )
         server_permissions = self.controller.server_perms.get_permissions(mask)
@@ -50,9 +63,19 @@ class ApiServersServerBackupsBackupDownloadHandler(BaseApiHandler):
                     "error_data": GENERAL_AUTH_ERROR,
                 },
             )
-        if not self.helper.validate_traversal(
-            backup_conf["backup_location"], file_name
-        ):
+        try:
+            if not self.helper.validate_traversal(
+                backup_conf["backup_location"], file_name
+            ):
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "NOT_AUTHORIZED",
+                        "error_data": GENERAL_AUTH_ERROR,
+                    },
+                )
+        except ValueError:
             return self.finish_json(
                 400,
                 {
