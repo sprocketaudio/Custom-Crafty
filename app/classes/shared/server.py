@@ -1474,7 +1474,7 @@ class ServerInstance:
         )
         try:  # Get hash from Big Bucket remote
             response = requests.get(
-                f"{self.server_object.executable_update_url}.hash", timeout=1
+                f"{self.server_object.executable_update_url}.sha256", timeout=1
             )
         except TimeoutError as why:
             self.update_available = True
