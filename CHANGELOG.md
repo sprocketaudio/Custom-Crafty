@@ -8,6 +8,7 @@
 ### Bug fixes
 - Fixed inconsistent password schema error handling ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/868))
 - Fix cvalidation to stop users being able to disable their own account ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/870))
+- Fix annoucements not showing after `4.4.10` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/872))
 ### Tweaks
 TBD
 ### Lang
