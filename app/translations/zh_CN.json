@@ -198,12 +198,12 @@
         "eulaTitle": "同意最终用户许可协议（EULA）",
         "fileError": "文件类型必须是图片。",
         "hereIsTheError": "错误如下",
-        "installerJava": "安装 {} 失败：安装 Forge 服务器需要 Java。我们检测到 Java 未安装。请先安装 java 然后再安装服务器。",
+        "installerJava": "安装 {} 失败：安装 Forge 服务器需要 Java。我们检测到 Java 未安装。请先安装 Java 然后再安装服务器。",
         "internet": "我们检测到运行 Crafty 的设备没有网络连接。客户端到服务器的连接可能受限。",
         "migration": "Crafty 的主服务器存储正在被迁移到新位置。期间的所有服务器启动已被暂停。请等待我们完成迁移",
         "no-file": "我们似乎找不到请求的文件。请再次检查路径。Crafty 是否拥有了正确的权限？",
         "noInternet": "Crafty 无法访问网络。服务器创建已被禁用。请检查您的网络连接并刷新此页面。",
-        "noJava": "服务器 {} 启动失败，并输出了如下错误码：我们检测到 Java 未安装。请先安装 java 然后再启动服务器。",
+        "noJava": "服务器 {} 启动失败，并输出了以下错误：我们检测到 Java 未安装。请先安装 Java 然后再启动服务器。",
         "not-downloaded": "我们似乎找不到您的可执行文件。它下载完成了吗？可执行文件的权限设置正确了吗？",
         "portReminder": "我们检测到这是你首次运行 {}。请确保从您的路由器/防火墙转发 {} 端口，以使程序可以从公网远程访问。",
         "privMsg": "以及 ",
@@ -361,7 +361,8 @@
         "storageLocationDesc": "您想要在哪里存储备份？",
         "inplace": "在原位置恢复备份 - 备份 zip 中不存在的文件将保留在服务器目录中",
         "radioRequired": "您必须选择一个选项来恢复您的备份",
-        "replace": " 恢复备份文件并将服务器目录重置为备份中的结构"
+        "replace": " 恢复备份文件并将服务器目录重置为备份中的结构",
+        "snapshotDisclaimer": "快照备份当前处于 beta 阶段。快照备份只存储文件的一份副本，占用的磁盘空间更少。备份与恢复在测试中的确运行良好，但您可能遇到未预见的问题。您不应该在任何关键任务备份中仅依赖此备份方式。请报告您遇到的任何问题。"
     },
     "serverConfig": {
         "bePatientDelete": "请耐心等待，我们正在从 Crafty 面板中移除服务器。稍后此页面会关闭。",
@@ -386,7 +387,7 @@
         "noDelete": "否，返回",
         "noDeleteFiles": "否，只从面板中移除",
         "removeOldLogsAfter": "此时间后删除旧日志",
-        "removeOldLogsAfterDesc": "日志文件要在多少天后视为旧文件被删除（0 为关闭）",
+        "removeOldLogsAfterDesc": "我们要保留日志文件多少天？（0 为关闭）",
         "save": "保存",
         "sendingDelete": "正在删除服务器",
         "sendingRequest": "正在发送您的请求……",
@@ -427,7 +428,7 @@
             "我们<code>不推荐</code>更改由 Crafty 管理的服务器的路径。",
             "更改路径<code>可能会</code>破坏一些东西，尤其是在 Linux 这类文件权限锁定得更加严格的操作系统上。",
             "<br /><br/>",
-            "如果您认为您必须更改服务器存放的位置，你可能需要给予 \"crafty\" 用户对服务器路径的读取/写入权限。",
+            "如果您认为您必须更改服务器存放的位置，你可能需要给予“crafty”用户对服务器路径的读取/写入权限。",
             "<br />",
             "<br />",
             "在 Linux 上，最好通过执行如下命令来完成：<br />",
@@ -693,7 +694,8 @@
         "changeUser": "更改用户名",
         "editTOTP": "编辑用户 MFA",
         "hints": "启用提示？",
-        "totpHeader": "多因素验证"
+        "totpHeader": "多因素验证",
+        "selfDisable": "您不能禁用您自己的账号"
     },
     "validators": {
         "passLength": "密码过短。最短长度：8",
@@ -719,7 +721,8 @@
         "2FAerror": "多因素代码必须为 6 位（例如：000000）或一个 16 字符的备份代码，以 - 分隔为每 4 个字符一段（例如：ABCD-EFGH-IJKL-MNOP）",
         "totp": "MFA 代码必须为 6 个数字",
         "additionalProperties": "不允许传递额外属性",
-        "mfaName": "输入的属性必须为字符串类型，且最短为 3 个字符"
+        "mfaName": "输入的属性必须为字符串类型，且最短为 3 个字符",
+        "numbericPassword": "纯数字密码。需要至少 1 个字母"
     },
     "webhooks": {
         "areYouSureDel": "您确定要删除此 webhook 吗？",
@@ -748,7 +751,7 @@
     },
     "otp": {
         "backupOtp": "需要一个新的 MFA 方式以请求备份代码",
-        "mfaWarn": "您必须启用 MFA 来与此系统交互。请创建一个 MFA 密钥。如果您已经创建了一个密钥，但仍看见此消息，请注销并使用 MFA 重新登录。",
+        "mfaWarn": "您必须启用 MFA 来与此系统交互。请创建一个 MFA 密钥。如果您已经创建了一个密钥，但仍看见此消息，请注销，并使用 MFA 重新登录。",
         "deleteConfirm": "您确定要删除此 MFA 方式吗？",
         "verifyTitle": "使用验证器验证 MFA 方式",
         "name": "名称",
@@ -779,7 +782,7 @@
         "stats_update_frequency_seconds": "我们应该多久拉取一次您的服务器以获取统计（秒）",
         "big_bucket_repo": "系统 Big Bucket™ 远端 URL",
         "cookie_expire": "会话 cookie 过期时间（天）",
-        "delete_default_json": "启动时删除 default json 文件",
+        "delete_default_json": "启动时删除默认 JSON 文件",
         "disabled_language_files": "全局禁用的语言文件",
         "enable_user_self_delete": "允许用户删除自己的账号",
         "enable_otp_skew": "启用 MFA 偏移（+-1）",
