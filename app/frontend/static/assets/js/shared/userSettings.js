@@ -16,6 +16,11 @@ function validateForm() {
     }
 }
 
+$(document).on("submit", ".bootbox form", function (e) {
+    e.preventDefault();
+    $(".bootbox .btn-primary").click();
+});
+
 $(".edit_password").on("click", async function () {
     const token = getCookie("_xsrf");
     let user_id = $(this).data('id');
