@@ -382,6 +382,10 @@ data['lang']) }}{% end %}
 {% block js %}
 <script>
   const userId = new URLSearchParams(document.location.search).get('id');
+    $(document).on("submit", ".bootbox form", function (e) {
+    e.preventDefault();
+    $(".bootbox .btn-primary").click();
+  });
   function submit_user(event) {
     if (!validateForm()) {
       event.preventDefault();
