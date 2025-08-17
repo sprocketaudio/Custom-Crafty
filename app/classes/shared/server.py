@@ -1278,6 +1278,8 @@ class ServerInstance:
             logger.info("Cache file refreshed")
 
     def cache_players(self):
+        if not self.check_running():
+            return
         server_players = self.get_server_players()
         for p in self.player_cache[:]:
             if p["status"] == "Online" and p["name"] not in server_players:
