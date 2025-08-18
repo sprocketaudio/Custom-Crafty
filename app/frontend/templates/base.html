@@ -340,23 +340,6 @@
         if (x) {
           x.remove()
         }
-        bootbox.confirm({
-          title: "{{ translate('notify', 'downloadLogs', data['lang']) }}",
-          message: "{{ translate('notify', 'finishedPreparing', data['lang']) }}",
-          buttons: {
-            confirm: {
-              label: 'Download',
-              className: 'btn-info'
-            }
-          },
-          callback: function (result) {
-            if (result) {
-              location.href = "/panel/download_support_package";
-            } else {
-              return;
-            }
-          }
-        });
       });
       webSocket.on('send_eula_bootbox', function (server_id) {
         var x = document.querySelector('.bootbox');
@@ -545,16 +528,6 @@
           bg_color = '#6887dc'
         )
       }
-      $('#support_logs').click(function () {
-        var dialog = bootbox.dialog({
-          message: "<p class='text- center mb - 0'><i class='fa fa - spin fa - cog'></i>{{ translate('notify', 'preparingLogs', data['lang']) }}</p>",
-          closeButton: false
-        });
-        setTimeout(function () {
-          location.href = "/panel/support_logs";
-        }, 6000);
-
-      });
     });
     $(document).ready(() => {
       if ('serviceWorker' in navigator) {

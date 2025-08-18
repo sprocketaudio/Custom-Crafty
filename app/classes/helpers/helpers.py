@@ -68,6 +68,7 @@ MASTER_CONFIG = {
     "enable_otp_skew": False,
     "max_login_attempts": 3,
     "superMFA": False,
+    "general_user_log_access": False,
 }
 
 CONFIG_CATEGORIES = {
@@ -95,6 +96,7 @@ CONFIG_CATEGORIES = {
         "crafty_logs_delete_after_days",
         "virtual_terminal_lines",
         "keywords",
+        "general_user_log_access",
     ],
     "monitoring": [
         "monitored_mounts",
@@ -1077,18 +1079,6 @@ class Helpers:
         session_data = {"pid": pid, "started": now.strftime("%d-%m-%Y, %H:%M:%S")}
         with open(self.session_file, "w", encoding="utf-8") as f:
             json.dump(session_data, f, indent=4)
-
-    # because this is a recursive function, we will return bytes,
-    # and set human readable later
-    @staticmethod
-    def get_dir_size(path: str):
-        total = 0
-        for entry in os.scandir(path):
-            if entry.is_dir(follow_symlinks=False):
-                total += Helpers.get_dir_size(entry.path)
-            else:
-                total += entry.stat(follow_symlinks=False).st_size
-        return total
 
     @staticmethod
     def list_dir_by_date(path: str, reverse=False):

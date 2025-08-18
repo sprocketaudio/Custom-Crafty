@@ -3,8 +3,10 @@
 
 ### Refactor
 - Modularize helpers (file / crypto) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/795))
+- Refactor Downloads for API-v2 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/871))
 ### New features
 - Snapshot Style Backups ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/795))
+- Adds functionality for directory downloads ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/871))
 ### Bug fixes
 - Fixed inconsistent password schema error handling ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/868))
 - Fix validation to stop users being able to disable their own account ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/870))

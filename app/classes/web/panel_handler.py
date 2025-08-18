@@ -5,14 +5,12 @@ import os
 import typing as t
 import json
 import logging
-import threading
-import urllib.parse
+from pathlib import Path
 from zoneinfo import ZoneInfoNotFoundError
-import anyio
 import httpx
+import aiofiles
 import nh3
 import tornado.web
-from tornado import iostream
 
 # TZLocal is set as a hidden import on win pipeline
 from tzlocal import get_localzone
@@ -134,30 +132,6 @@ class PanelHandler(BaseHandler):
                 roles.add(role.role_id)
         return roles
 
-    def download_file(self, name: str, file: str):
-        self.set_header("Content-Type", "application/octet-stream")
-        self.set_header("Content-Disposition", f"attachment; filename={name}")
-        chunk_size = 1024 * 1024 * 4  # 4 MiB
-
-        with open(file, "rb") as f:
-            while True:
-                chunk = f.read(chunk_size)
-                if not chunk:
-                    break
-                try:
-                    self.write(chunk)  # write the chunk to response
-                    self.flush()  # send the chunk to client
-                except iostream.StreamClosedError:
-                    # this means the client has closed the connection
-                    # so break the loop
-                    break
-                finally:
-                    # deleting the chunk is very important because
-                    # if many clients are downloading files at the
-                    # same time, the chunks in memory will keep
-                    # increasing and will eat up the RAM
-                    del chunk
-
     def check_subpage_perms(self, user_perms, subpage):
         if SUBPAGE_PERMS.get(subpage, False) in user_perms:
             return True
@@ -228,6 +202,16 @@ class PanelHandler(BaseHandler):
                 logger.error(f"Failed server data for page with error: {e}")
 
         return page_data
+
+    async def async_fetch_data(self, url: str):
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, follow_redirects=True)
+            return response.json()
+
+    async def async_read_config(self, file_path: Path):
+        async with aiofiles.open(file_path, "r") as file:
+            data = await file.read()
+        return data
 
     @tornado.web.authenticated
     async def get(self, page):
@@ -320,6 +304,8 @@ class PanelHandler(BaseHandler):
             ),  # set value if the token has MFA set to true or not
             # for warning banner
             "update_available": self.helper.update_available,
+            "support_perm": self.helper.get_setting("general_user_log_access")
+            or exec_user["superuser"],
             "docker": self.helper.is_env_docker(),
             "background": self.controller.cached_login,
             "login_opacity": self.controller.management.get_login_opacity(),
@@ -380,44 +366,40 @@ class PanelHandler(BaseHandler):
             template = "public/error.html"
 
         elif page == "credits":
-            async with await anyio.open_file(
-                self.helper.credits_cache, encoding="utf-8"
-            ) as credits_default_local:
-                try:
-                    async with httpx.AsyncClient() as client:
-                        remote = await client.get(
-                            "https://craftycontrol.com/credits-v2",
-                            follow_redirects=True,
-                            timeout=10,
-                        )
-                    credits_dict: dict = remote.json()
-                    if not credits_dict["staff"]:
-                        logger.error("Issue with upstream Staff, using local.")
-                        credits_dict: dict = json.load(credits_default_local)
-                except:
-                    logger.error("Request to credits bucket failed, using local.")
-                    credits_dict: dict = json.load(credits_default_local)
+            credits_default_local = await self.async_read_config(
+                Path(self.helper.credits_cache)
+            )
+            try:
+                credits_dict: dict = await self.async_fetch_data(
+                    "https://craftycontrol.com/credits-v2"
+                )
+                if not credits_dict["staff"]:
+                    logger.error("Issue with upstream Staff, using local.")
+                    credits_dict: dict = json.loads(credits_default_local)
+            except Exception as e:
+                logger.error("Request to credits bucket failed, using local. %s", e)
+                credits_dict: dict = json.loads(credits_default_local)
 
-                timestamp = credits_dict["lastUpdate"] / 1000.0
-                page_data["patrons"] = credits_dict["patrons"]
-                page_data["staff"] = credits_dict["staff"]
+            timestamp = credits_dict["lastUpdate"] / 1000.0
+            page_data["patrons"] = credits_dict["patrons"]
+            page_data["staff"] = credits_dict["staff"]
 
-                # Filter Language keys to exclude joke prefix '*'
-                clean_dict = {
-                    user.replace("*", ""): translation
-                    for user, translation in credits_dict["translations"].items()
-                }
-                page_data["translations"] = clean_dict
+            # Filter Language keys to exclude joke prefix '*'
+            clean_dict = {
+                user.replace("*", ""): translation
+                for user, translation in credits_dict["translations"].items()
+            }
+            page_data["translations"] = clean_dict
 
-                # 0 Defines if we are using local credits file andd displays sadcat.
-                if timestamp == 0:
-                    page_data["lastUpdate"] = "😿"
-                else:
-                    page_data["lastUpdate"] = str(
-                        datetime.datetime.fromtimestamp(timestamp).strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        )
+            # 0 Defines if we are using local credits file andd displays sadcat.
+            if timestamp == 0:
+                page_data["lastUpdate"] = "😿"
+            else:
+                page_data["lastUpdate"] = str(
+                    datetime.datetime.fromtimestamp(timestamp).strftime(
+                        "%Y-%m-%d %H:%M:%S"
                     )
+                )
             template = "panel/credits.html"
 
         elif page == "contribute":
@@ -765,33 +747,6 @@ class PanelHandler(BaseHandler):
                     player["banned_on"] = (temp_date).strftime("%Y/%m/%d %H:%M:%S")
 
             template = f"panel/server_{subpage}.html"
-
-        elif page == "download_backup":
-            file = self.get_argument("file", "")
-            backup_id = self.get_argument("backup_id", "")
-
-            server_id = self.check_server_id()
-            if server_id is None:
-                return
-            backup_config = self.controller.management.get_backup_config(backup_id)
-            server_info = self.controller.servers.get_server_data_by_id(server_id)
-            backup_location = os.path.join(backup_config["backup_location"], backup_id)
-            backup_file = os.path.abspath(
-                os.path.join(
-                    Helpers.get_os_understandable_path(backup_location),
-                    file,
-                )
-            )
-            if not self.helper.is_subdir(
-                backup_file,
-                Helpers.get_os_understandable_path(backup_location),
-            ) or not os.path.isfile(backup_file):
-                self.redirect("/panel/error?error=Invalid path detected")
-                return
-
-            self.download_file(file, backup_file)
-
-            self.redirect(f"/panel/server_detail?id={server_id}&subpage=backup")
 
         elif page == "panel_config":
             auth_servers = {}
@@ -1671,75 +1626,8 @@ class PanelHandler(BaseHandler):
         elif page == "activity_logs":
             template = "panel/activity_logs.html"
 
-        elif page == "download_file":
-            file = Helpers.get_os_understandable_path(
-                urllib.parse.unquote(self.get_argument("path", ""))
-            )
-            name = urllib.parse.unquote(self.get_argument("name", ""))
-            server_id = self.check_server_id()
-            if server_id is None:
-                return
-
-            server_info = self.controller.servers.get_server_data_by_id(server_id)
-
-            if not self.helper.is_subdir(
-                file,
-                Helpers.get_os_understandable_path(server_info["path"]),
-            ) or not os.path.isfile(file):
-                self.redirect("/panel/error?error=Invalid path detected")
-                return
-
-            await self.download_file(name, file)
-            self.redirect(f"/panel/server_detail?id={server_id}&subpage=files")
-
         elif page == "wiki":
             template = "panel/wiki.html"
-
-        elif page == "download_support_package":
-            temp_zip_storage = exec_user["support_logs"]
-
-            self.set_header("Content-Type", "application/octet-stream")
-            self.set_header(
-                "Content-Disposition", "attachment; filename=" + "support_logs.zip"
-            )
-            chunk_size = 1024 * 1024 * 4  # 4 MiB
-            if temp_zip_storage != "":
-                async with await anyio.open_file(temp_zip_storage, "rb") as f:
-                    while True:
-                        chunk = await f.read(chunk_size)
-                        if not chunk:
-                            break
-                        try:
-                            self.write(chunk)  # write the chunk to response
-                            await self.flush()  # send the chunk to client
-                        except iostream.StreamClosedError:
-                            # this means the client has closed the connection
-                            # so break the loop
-                            break
-                        finally:
-                            # deleting the chunk is very important because
-                            # if many clients are downloading files at the
-                            # same time, the chunks in memory will keep
-                            # increasing and will eat up the RAM
-                            del chunk
-            else:
-                self.redirect("/panel/error?error=No path found for support logs")
-                return
-
-        elif page == "support_logs":
-            logger.info(
-                f"Support logs requested. "
-                f"Packinging logs for user with ID: {exec_user['user_id']}"
-            )
-            logs_thread = threading.Thread(
-                target=self.controller.package_support_logs,
-                daemon=True,
-                args=(exec_user,),
-                name=f"{exec_user['user_id']}_logs_thread",
-            )
-            logs_thread.start()
-            self.redirect("/panel/dashboard")
-            return
         if self.helper.crafty_starting:
             template = "panel/loading.html"
         self.render(

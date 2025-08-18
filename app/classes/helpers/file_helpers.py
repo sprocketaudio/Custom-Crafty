@@ -208,13 +208,19 @@ class FileHelpers:
     @staticmethod
     def make_archive(path_to_destination, path_to_zip, comment=""):
         # create a ZipFile object
-        path_to_destination += ".zip"
+        string_target_path = str(path_to_destination)
+        path_to_destination = string_target_path
+
+        string_zip_path = str(path_to_zip)
+
+        if not path_to_destination.endswith(".zip"):
+            path_to_destination += ".zip"
         with ZipFile(path_to_destination, "w") as zip_file:
             zip_file.comment = bytes(
                 comment, "utf-8"
             )  # comments over 65535 bytes will be truncated
-            for root, _dirs, files in os.walk(path_to_zip, topdown=True):
-                ziproot = path_to_zip
+            for root, _dirs, files in os.walk(string_zip_path, topdown=True):
+                ziproot = string_zip_path
                 for file in files:
                     try:
                         logger.info(f"backing up: {os.path.join(root, file)}")
@@ -282,7 +288,7 @@ class FileHelpers:
         path_to_destination += ".zip"
         ex_replace = [p.replace("\\", "/") for p in excluded_dirs]
         total_bytes = 0
-        dir_bytes = Helpers.get_dir_size(path_to_zip)
+        dir_bytes = FileHelpers.get_dir_size(path_to_zip)
         results = {
             "percent": 0,
             "total_files": self.helper.human_readable_file_size(dir_bytes),
@@ -1051,3 +1057,31 @@ class FileHelpers:
 
         """
         return zlib.decompress(bytes_to_decompress)
+
+    @staticmethod
+    def get_dir_size(server_path, raw_bytes=True):
+        # because this is a recursive function, we will return bytes,
+        # and set human readable later
+        total = 0
+        for entry in os.scandir(server_path):
+            if entry.is_dir(follow_symlinks=False):
+                total += FileHelpers.get_dir_size(entry.path, raw_bytes=raw_bytes)
+            else:
+                total += entry.stat(follow_symlinks=False).st_size
+        if raw_bytes:
+            return total
+
+        level_total_size = Helpers.human_readable_file_size(total)
+
+        return level_total_size
+
+    @staticmethod
+    def get_drive_free_space(file_location: Path):
+        _total, _used, free = shutil.disk_usage(file_location)
+        return free
+
+    @staticmethod
+    def has_enough_storage(target_size: float, target_free_storage: float):
+        if target_size > target_free_storage:
+            return False
+        return True

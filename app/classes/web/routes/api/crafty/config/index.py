@@ -121,6 +121,11 @@ config_json_schema = {
         },
         "max_login_attempts": {"type": "integer", "error": "typeInt", "fill": True},
         "superMFA": {"type": "boolean", "error": "typeBool", "fill": True},
+        "general_user_log_access": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,

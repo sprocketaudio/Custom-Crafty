@@ -40,10 +40,14 @@ from app.classes.web.routes.api.servers.server.backups.backup.index import (
     ApiServersServerBackupsBackupIndexHandler,
     ApiServersServerBackupsBackupFilesIndexHandler,
 )
+from app.classes.web.routes.api.servers.server.backups.backup.download import (
+    ApiServersServerBackupsBackupDownloadHandler,
+)
 from app.classes.web.routes.api.servers.server.files import (
     ApiServersServerFilesIndexHandler,
     ApiServersServerFilesCreateHandler,
     ApiServersServerFilesZipHandler,
+    ApiServersServerFileDownload,
 )
 from app.classes.web.routes.api.crafty.upload.index import ApiFilesUploadHandler
 from app.classes.web.routes.api.servers.server.tasks.task.children import (
@@ -86,6 +90,7 @@ from app.classes.web.routes.api.crafty.config.server_dir import (
 )
 from app.classes.web.routes.api.crafty.stats.stats import ApiCraftyHostStatsHandler
 from app.classes.web.routes.api.crafty.clogs.index import ApiCraftyLogIndexHandler
+from app.classes.web.routes.api.crafty.clogs.support import ApiCraftySupportIndexHandler
 from app.classes.web.routes.api.crafty.imports.index import ApiImportFilesIndexHandler
 from app.classes.web.routes.api.crafty.exe_cache import ApiCraftyJarCacheIndexHandler
 from app.classes.web.routes.api.crafty.antilockout.index import ApiCraftyLockoutHandler
@@ -252,6 +257,11 @@ def api_handlers(handler_args):
         ),
         # Server routes
         (
+            r"/api/v2/servers/([a-z0-9-]+)/files/(.+)/?",
+            ApiServersServerFileDownload,
+            handler_args,
+        ),
+        (
             r"/api/v2/servers/?",
             ApiServersIndexHandler,
             handler_args,
@@ -269,6 +279,11 @@ def api_handlers(handler_args):
         (
             r"/api/v2/servers/([a-z0-9-]+)/backups/?",
             ApiServersServerBackupsIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/servers/([a-z0-9-]+)/backups/backup/([a-z0-9-]+)/download/(.+)/?",
+            ApiServersServerBackupsBackupDownloadHandler,
             handler_args,
         ),
         (
@@ -294,6 +309,11 @@ def api_handlers(handler_args):
         (
             r"/api/v2/crafty/admin/upload/?",
             ApiFilesUploadHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/crafty/support_logs/?",
+            ApiCraftySupportIndexHandler,
             handler_args,
         ),
         (

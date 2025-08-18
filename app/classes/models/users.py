@@ -37,7 +37,6 @@ class Users(BaseModel):
     enabled = BooleanField(default=True)
     superuser = BooleanField(default=False)
     lang = CharField(default="en_EN")
-    support_logs = CharField(default="")
     valid_tokens_from = DateTimeField(default=Helpers.get_utc_now)
     server_order = CharField(default="")
     preparing = BooleanField(default=False)
@@ -172,7 +171,6 @@ class HelperUsers:
                 "superuser": True,
                 "roles": [],
                 "servers": [],
-                "support_logs": "",
                 "cleared_notifs": "",
             }
         user = model_to_dict(Users.get(Users.user_id == user_id))
@@ -290,12 +288,6 @@ class HelperUsers:
         with self.database.atomic():
             UserRoles.delete().where(UserRoles.user_id == user_id).execute()
             return Users.delete().where(Users.user_id == user_id).execute()
-
-    @staticmethod
-    def set_support_path(user_id, support_path):
-        Users.update(support_logs=support_path).where(
-            Users.user_id == user_id
-        ).execute()
 
     @staticmethod
     def set_prepare(user_id):
