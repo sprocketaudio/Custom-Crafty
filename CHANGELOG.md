@@ -11,6 +11,7 @@
 - Fix annoucements not showing after `4.4.10` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/872))
 - Fix use of 'Enter' Key on Username Form ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/876))
 - Disable player stats collection when servers are offline ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/875))
+- Fix display issues of local zip import modal following CSS refactor ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/874))
 ### Tweaks
 TBD
 ### Lang
