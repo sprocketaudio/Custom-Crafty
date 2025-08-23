@@ -1,5 +1,5 @@
 # Changelog
-## --- [4.4.12] - 2025/TBD
+## --- [4.4.12] - 2025/08/24
 
 ### Refactor
 - Modularize helpers (file / crypto) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/795))
@@ -14,8 +14,6 @@
 - Fix use of 'Enter' Key on Username Form ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/876))
 - Disable player stats collection when servers are offline ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/875))
 - Fix display issues of local zip import modal following CSS refactor ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/874))
-### Tweaks
-TBD
 ### Lang
 - Fixed grammar, spelling/capitalization, and sentence structure issues ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/876))
 - Removed 2 unused statements ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/876))
