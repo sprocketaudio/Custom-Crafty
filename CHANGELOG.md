@@ -1,4 +1,15 @@
 # Changelog
+## --- [4.5.1] - 2025/TBD
+### New features
+TBD
+### Bug fixes
+TBD
+### Tweaks
+TBD
+### Lang
+TBD
+<br><br>
+
 ## --- [4.5.0] - 2025/08/24
 ### Refactor
 - Modularize helpers (file / crypto) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/795))
