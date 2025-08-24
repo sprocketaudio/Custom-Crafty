@@ -89,7 +89,7 @@
         "cpuUsage": "CPU Kullanımı",
         "crashed": "Çöktü",
         "dashboard": "Arayüz",
-        "delay-explained": "Servis/ajan yakın zaman içerisinde başlatıldı ve minecraft sunucu örneğinin başlamasını erteliyor",
+        "delay-explained": "Servis/ajan yakın zaman içerisinde başlatıldı ve Minecraft sunucu örneğinin başlamasını erteliyor",
         "host": "Ana Makine",
         "installing": "İndiriliyor...",
         "kill": "İşlemi Sonlandır",
@@ -203,7 +203,7 @@
         "migration": "Crafty'nin ana sunucu veri deposu yeni bir yere taşınıyor. Bu süre zarfında tüm sunucu başlangıçları askıya alınmıştır. Lütfen biz bu taşıma işlemini tamamlarken bekleyin",
         "no-file": "Talep edilen dosyayı bulamıyoruz. Dosya yolunu tekrar kontrol edin. Crafty'nin doğru izinleri var mı?",
         "noInternet": "Crafty internete erişimde sorun yaşıyor. Sunucu oluşturma devre dışı bırakıldı. Lütfen internet bağlantınızı kontrol edin ve bu sayfayı yenileyin.",
-        "noJava": "{} sunucusu başlamatılamadı. Hata kodu: Java'nın yüklü olmadığını tespit ettik. Lütfen Java'yı yükleyin ve ardından sunucuyu başlatın.",
+        "noJava": "{} sunucusu başlamatılamadı. Hata: Java'nın yüklü olmadığını tespit ettik. Lütfen Java'yı yükleyin ve ardından sunucuyu başlatın.",
         "not-downloaded": "Çalıştırılabilir dosyanızı bulamıyoruz. İndirme işlemi tamamlandı mı? İzinler çalıştırılabilir olarak ayarlandı mı?",
         "portReminder": "{} ilk kez çalıştırılıyor olduğunu tespit ettik. Bunu internet üzerinden uzaktan erişilebilir kılmak için {} bağlantı noktasını yönlendiriciniz/güvenlik duvarınız üzerinden ilettiğinizden emin olun.",
         "privMsg": "ve ",
@@ -345,7 +345,7 @@
         "myBackup": "Benim Yeni Yedeğim",
         "name": "Ad",
         "newBackup": "Yeni Yedek Oluştur",
-        "no-backup": "Mevcut yedek bulunmuyor. Yeni bir yedek oluşturmak için lütfen Yeni Yedek Oluştur tuşuna basınız.",
+        "no-backup": "Mevcut yedek bulunmuyor. Yeni bir yedek oluşturmak için lütfen Yeni Yedek Oluştur tuşuna basınız",
         "options": "Seçenekler",
         "path": "Dosya Yolu",
         "restore": "Geri Yükleme",
@@ -361,7 +361,8 @@
         "storageLocationDesc": "Yedekleri nerede saklamak istiyorsunuz?",
         "inplace": "Yedek dosyalarını yerine geri yükleyin - yedekleme zip'inde olmayan dosyalar sunucu dizininde kalacaktır",
         "radioRequired": "Yedeğinizi geri yüklemek için bir seçenek seçmelisiniz",
-        "replace": " Yedek dosyaları geri yükleyin ve sunucu dizinini tam olarak yedeğin yapısında olacak şekilde sıfırlayın"
+        "replace": " Yedek dosyaları geri yükleyin ve sunucu dizinini tam olarak yedeğin yapısında olacak şekilde sıfırlayın",
+        "snapshotDisclaimer": "Anlık yedeklemeler şu anda beta aşamasındadır. Anlık yedeklemeler bir dosyanın yalnızca bir kopyasını depolamalı ve çok daha az disk alanı kullanmalıdır. Yedekleme ve geri yükleme testlerde iyi çalışmaktadır, ancak öngörülemeyen sorunlarla karşılaşabilirsiniz. Görev açısından kritik yedeklemeler için yalnızca bu yedekleme stiline güvenmemelisiniz. Karşılaştığınız sorunları lütfen bildirin."
     },
     "serverConfig": {
         "bePatientDelete": "Sunucunuzu Crafty panelinden kaldırırken lütfen sabırlı olun. Bu ekran birazdan kapanacaktır.",
@@ -571,7 +572,7 @@
     },
     "serverTerm": {
         "commandInput": "Komutunuzu girin",
-        "delay-explained": "Servis/ajan yakın zaman içerisinde başlatıldı ve minecraft sunucu örneğinin başlamasını erteliyor",
+        "delay-explained": "Servis/ajan yakın zaman içerisinde başlatıldı ve Minecraft sunucu örneğinin başlamasını erteliyor",
         "importing": "İçe Aktarılıyor...",
         "installing": "Kuruluyor...",
         "restart": "Yeniden Başlat",
@@ -693,7 +694,8 @@
         "changePass": "Şifre Değiştir",
         "changeUser": "Kullanıcı Adını Değiştir",
         "editTOTP": "Kullanıcı MFA'sını düzenle",
-        "totpHeader": "Çok Faktörlü Kimlik Doğrulama"
+        "totpHeader": "Çok Faktörlü Kimlik Doğrulama",
+        "selfDisable": "Kendi hesabınızı devre dışı bırakamazsınız"
     },
     "validators": {
         "passLength": "Şifre çok kısa. Şifre en az 8 karakter olmalı.",
@@ -719,7 +721,8 @@
         "typeString": "dize türünde olmalıdır.",
         "userName": " dize türünde, tümü KÜÇÜK HARF, en az 4 karakter ve en fazla 20 karakter olmalıdır",
         "additionalProperties": "Ek Özelliklerin geçirilmesine izin verilmez",
-        "mfaName": "Özellik için girdi, dize türünde olmalı ve en az 3 karakter içermelidir"
+        "mfaName": "Özellik için girdi, dize türünde olmalı ve en az 3 karakter içermelidir",
+        "numbericPassword": "Sayısal şifre. En az 1 alfabetik karakter içermelidir"
     },
     "webhooks": {
         "areYouSureDel": "Bu webhooku silmek istediğinizden emin misiniz?",
@@ -778,7 +781,7 @@
         "history_max_age": "Crafty'nin sunucu istatistiklerinizi ne kadar süre saklaması gerektiği (gün sayısı)",
         "big_bucket_repo": "Sistem Big Bucket™ uzak URL'si",
         "cookie_expire": "Oturum çerezleri (gün) sonra sona erer",
-        "delete_default_json": "Başlarken varsayılan json dosyasını sil",
+        "delete_default_json": "Başlarken varsayılan JSON dosyasını sil",
         "dir_size_poll_freq_minutes": "Crafty'nin sunucu dizinlerinizin boyutlarını ne sıklıkla sorgulaması gerektiği (dakika)",
         "disabled_language_files": "Küresel olarak devre dışı bırakılmış dil dosyaları",
         "enable_otp_skew": "MFA kaymasını etkinleştir (+-1)",

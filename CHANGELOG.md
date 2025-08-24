@@ -1,4 +1,9 @@
 # Changelog
+## --- [4.5.1] - 2025/08/25
+### Bug fixes
+- Fix bug where all file methods that were not `GET` methods, were returning "method not allowed" ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/882))
+<br><br>
+
 ## --- [4.5.0] - 2025/08/24
 ### Refactor
 - Modularize helpers (file / crypto) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/795))
