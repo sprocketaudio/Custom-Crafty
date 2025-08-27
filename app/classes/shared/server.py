@@ -775,14 +775,15 @@ class ServerInstance:
                         # We get the server command parameters from forge script
                         server_command = re.findall(
                             r"java @([a-zA-Z0-9_\.]+)"
-                            r" @([a-z.\/\-]+)([0-9.\-]+)"
-                            r"\/\b([a-z_0-9]+\.txt)\b( .{2,4})?",
+                            r" @([a-z./\-]+)"
+                            r"([0-9.\-]+(?:-[a-zA-Z0-9]+)?)"
+                            r"\/\b([a-z_0-9]+\.txt)\b"
+                            r"( .{2,4})?",
                             run_file_text,
                         )[0]
 
                         version = server_command[2]
                         executable_path = f"{server_command[1]}{server_command[2]}/"
-
                         # Let's set the proper server executable
                         server_obj.executable = os.path.join(
                             f"{executable_path}{version_info[0][0]}-{version}-server.jar"
