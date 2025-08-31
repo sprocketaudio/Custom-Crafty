@@ -5,6 +5,7 @@ TBD
 ### Bug fixes
 - Bedrock Builder | Utilize self call instead of static call for unzipping bedrock archives ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/884))
 - Fix Human Readable Sizes on Dashboard ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/885))
+- Correct Builder to support new Neoforge versioning scheme ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/886))
 ### Tweaks
 TBD
 ### Lang
