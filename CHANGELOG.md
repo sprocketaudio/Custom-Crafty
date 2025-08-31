@@ -1,15 +1,9 @@
 # Changelog
-## --- [4.5.2] - 2025/TBD
-### New features
-TBD
+## --- [4.5.2] - 2025/08/31
 ### Bug fixes
 - Bedrock Builder | Utilize self call instead of static call for unzipping bedrock archives ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/884))
 - Fix Human Readable Sizes on Dashboard ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/885))
 - Correct Builder to support new Neoforge versioning scheme ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/886))
-### Tweaks
-TBD
-### Lang
-TBD
 <br><br>
 
 ## --- [4.5.1] - 2025/08/25
