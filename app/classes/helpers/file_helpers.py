@@ -1059,21 +1059,25 @@ class FileHelpers:
         return zlib.decompress(bytes_to_decompress)
 
     @staticmethod
-    def get_dir_size(server_path, raw_bytes=True):
+    def get_dir_size(server_path):
+        """Recursively calculates dir size. Returns size in bytes. Must calculate human
+        readable based on returned data
+
+        Args:
+            server_path (str): Path to calculate size
+
+        Returns:
+            _type_: Integer
+        """
         # because this is a recursive function, we will return bytes,
         # and set human readable later
         total = 0
         for entry in os.scandir(server_path):
             if entry.is_dir(follow_symlinks=False):
-                total += FileHelpers.get_dir_size(entry.path, raw_bytes=raw_bytes)
+                total += FileHelpers.get_dir_size(entry.path)
             else:
                 total += entry.stat(follow_symlinks=False).st_size
-        if raw_bytes:
-            return total
-
-        level_total_size = Helpers.human_readable_file_size(total)
-
-        return level_total_size
+        return total
 
     @staticmethod
     def get_drive_free_space(file_location: Path):

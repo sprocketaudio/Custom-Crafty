@@ -902,9 +902,7 @@ class ApiServersServerFileDownload(BaseApiHandler):
             )
             archive_path.parent.mkdir(parents=True, exist_ok=True)
 
-            target_total_size = self.file_helper.get_dir_size(
-                Path(download_path), raw_bytes=True
-            )
+            target_total_size = self.file_helper.get_dir_size(Path(download_path))
             free_drive_storage = self.file_helper.get_drive_free_space(
                 Path(download_path)
             )

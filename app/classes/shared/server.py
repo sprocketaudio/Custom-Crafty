@@ -1476,7 +1476,9 @@ class ServerInstance:
 
     def start_dir_calc_task(self):
         server_dt = HelperServers.get_server_data_by_id(self.server_id)
-        self.server_size = self.file_helper.get_dir_size(server_dt["path"])
+        self.server_size = Helpers.human_readable_file_size(
+            self.file_helper.get_dir_size(server_dt["path"])
+        )
         self.dir_scheduler.add_job(
             self.calc_dir_size,
             "interval",
@@ -1492,7 +1494,9 @@ class ServerInstance:
 
     def calc_dir_size(self):
         server_dt = HelperServers.get_server_data_by_id(self.server_id)
-        self.server_size = self.file_helper.get_dir_size(server_dt["path"])
+        self.server_size = Helpers.human_readable_file_size(
+            self.file_helper.get_dir_size(server_dt["path"])
+        )
 
     # **********************************************************************************
     #                               Minecraft Servers Statistics
