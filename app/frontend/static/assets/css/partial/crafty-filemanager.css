@@ -141,3 +141,65 @@ span.separator {
   border-bottom: 2px solid var(--black);
   margin: 0 auto;
 }
+
+.file-size {
+  font-size: 0.85em;
+  font-weight: normal;
+  margin-left: 8px;
+  color: var(--muted);
+}
+
+/* Flexbox layout for file entries */
+.tree-file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 2px 0;
+  cursor: pointer;
+}
+
+.tree-file-name {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0; /* Allow text to truncate if needed */
+  cursor: pointer;
+}
+
+.tree-file-size {
+  flex-shrink: 0;
+  margin-left: 12px;
+  font-size: 0.85em;
+  color: var(--muted);
+  font-weight: normal;
+}
+
+/* Ensure directory entries maintain their layout */
+.tree-folder-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 2px 0;
+  cursor: pointer;
+}
+
+/* Improve hover effects for file rows */
+.tree-file:hover .tree-file-row {
+  background-color: rgba(var(--info-rgb), 0.1);
+  border-radius: 4px;
+}
+
+/* Maintain consistent indentation for nested items */
+.tree-item,
+.tree-file {
+  position: relative;
+}
+
+/* Ensure proper spacing for tree structure */
+.tree-file-row,
+.tree-folder-row {
+  margin-left: 0;
+  padding-left: 4px;
+  padding-right: 8px;
+}

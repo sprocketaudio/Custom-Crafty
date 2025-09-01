@@ -266,9 +266,26 @@ end %} {% block content %}
   let path = "",
     serverFileContent = "";
 
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
   async function clickOnFile(event) {
     const token = getCookie("_xsrf");
-    path = event.target.getAttribute("data-path");
+    // Find the element with data-path, looking up the DOM tree if necessary
+    let element = event.target;
+    while (element && !element.getAttribute("data-path")) {
+      element = element.parentElement;
+    }
+    path = element ? element.getAttribute("data-path") : null;
+    if (!path) {
+      console.error("Could not find data-path attribute");
+      return;
+    }
     let res = await fetch(`/api/v2/servers/${serverId}/files`, {
       method: "POST",
       headers: {
@@ -684,7 +701,16 @@ end %} {% block content %}
   }
 
   function getDirView(event) {
-    let path = event.target.parentElement.getAttribute("data-path");
+    // Find the element with data-path, looking up the DOM tree if necessary
+    let element = event.target;
+    while (element && !element.getAttribute("data-path")) {
+      element = element.parentElement;
+    }
+    let path = element ? element.getAttribute("data-path") : null;
+    if (!path) {
+      console.error("Could not find data-path attribute for directory");
+      return;
+    }
     if (document.getElementById(path).classList.contains("clicked")) {
       return;
     } else {
@@ -733,19 +759,34 @@ end %} {% block content %}
         text += `<li class="tree-item" id="${dpath}li" data-path="${dpath}">
                             \n<div id="${dpath}" data-path="${dpath}" data-name="${filename}" class="tree-caret tree-ctx-item tree-folder">
                             <input type="checkbox" class="checkBoxClass d-none file-check" name="root_path" value="${dpath}" ${checked}>
-                            <span id="${dpath}span" class="files-tree-title" data-path="${dpath}" data-name="${filename}" onclick="getDirView(event)">
-                            <i class="far fa-folder text-info"></i>
-                            <i class="far fa-folder-open text-info"></i>
-                            ${filename}
-                            </span>
+                            <div class="tree-folder-row" data-path="${dpath}" data-name="${filename}">
+                              <span id="${dpath}span" class="files-tree-title" data-path="${dpath}" data-name="${filename}" onclick="getDirView(event)">
+                                <i class="far fa-folder text-info"></i>
+                                <i class="far fa-folder-open text-info"></i>
+                                ${filename}
+                              </span>
+                            </div>
                             </input></div></li>`;
       } else {
+        const fileSize = value.size !== undefined ? formatFileSize(value.size) : '';
+        const sizeDisplay = fileSize ? `<span class="tree-file-size">${fileSize}</span>` : '';
         text += `<li
                         class="d-block tree-ctx-item tree-file"
                         data-path="${dpath}"
                         data-name="${filename}"
-                        onclick="clickOnFile(event)" id="${dpath}li"><input type='checkbox' class="checkBoxClass d-none file-check" name='root_path' value="${dpath}" ${checked}><span style="margin-right: 6px;">
-                        <i class="far fa-file"></i></span></input>${filename}</li>`;
+                        onclick="clickOnFile(event)" id="${dpath}li">
+                        <input type='checkbox' class="checkBoxClass d-none file-check" name='root_path' value="${dpath}" ${checked}>
+                        <div class="tree-file-row" data-path="${dpath}" data-name="${filename}" onclick="clickOnFile(event)">
+                          <div class="tree-file-name" data-path="${dpath}" data-name="${filename}">
+                            <span style="margin-right: 6px;">
+                              <i class="far fa-file"></i>
+                            </span>
+                            <span>${filename}</span>
+                          </div>
+                          ${sizeDisplay}
+                        </div>
+                        </input>
+                      </li>`;
       }
     });
     if (!response.data.root_path.top) {

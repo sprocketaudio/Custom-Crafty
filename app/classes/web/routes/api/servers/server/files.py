@@ -226,10 +226,15 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                                 "excluded": True,
                             }
                         else:
+                            try:
+                                file_size = os.path.getsize(rel)
+                            except (OSError, IOError):
+                                file_size = 0
                             return_json[filename] = {
                                 "path": dpath,
                                 "dir": False,
                                 "excluded": True,
+                                "size": file_size,
                             }
                     else:
                         if os.path.isdir(rel):
@@ -239,10 +244,15 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                                 "excluded": False,
                             }
                         else:
+                            try:
+                                file_size = os.path.getsize(rel)
+                            except (OSError, IOError):
+                                file_size = 0
                             return_json[filename] = {
                                 "path": dpath,
                                 "dir": False,
                                 "excluded": False,
+                                "size": file_size,
                             }
                 else:
                     if os.path.isdir(rel):
@@ -252,10 +262,15 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                             "excluded": False,
                         }
                     else:
+                        try:
+                            file_size = os.path.getsize(rel)
+                        except (OSError, IOError):
+                            file_size = 0
                         return_json[filename] = {
                             "path": dpath,
                             "dir": False,
                             "excluded": False,
+                            "size": file_size,
                         }
             self.finish_json(200, {"status": "ok", "data": return_json})
         else:
