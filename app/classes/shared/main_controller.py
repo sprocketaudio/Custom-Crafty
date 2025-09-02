@@ -69,7 +69,11 @@ class Controller:
         )
         self.server_perms: ServerPermsController = ServerPermsController()
         self.servers: ServersController = ServersController(
-            self.helper, self.servers_helper, self.management_helper, self.file_helper
+            self.helper,
+            self.servers_helper,
+            self.management_helper,
+            self.file_helper,
+            self.import_helper,
         )
         self.users: UsersController = UsersController(
             self.helper, self.users_helper, self.authentication
