@@ -1395,8 +1395,8 @@ class ServerInstance:
             )
         else:
             # downloads zip from remote url
+            downloaded = False
             try:
-                downloaded = True
                 bedrock_url = Helpers.get_latest_bedrock_url()
                 if bedrock_url:
                     # Use the new method for secure download
@@ -1408,7 +1408,6 @@ class ServerInstance:
                 logger.critical(
                     f"Failed to download bedrock executable for update \n{e}"
                 )
-                downloaded = False
 
         if downloaded:
             logger.info("Executable updated successfully. Starting Server")
