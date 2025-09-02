@@ -31,7 +31,9 @@ logger = logging.getLogger(__name__)
 class ServersController(metaclass=Singleton):
     servers_list: ServerInstance
 
-    def __init__(self, helper, servers_helper, management_helper, file_helper):
+    def __init__(
+        self, helper, servers_helper, management_helper, file_helper, import_helper
+    ):
         self.helper: Helpers = helper
         self.file_helper: FileHelpers = file_helper
         self.servers_helper: HelperServers = servers_helper
@@ -43,6 +45,7 @@ class ServersController(metaclass=Singleton):
         self.backups_mgr = BackupManager(
             self.helper, self.file_helper, self.management_helper
         )
+        self.import_helper = import_helper
 
     # **********************************************************************************
     #                                   Generic Servers Methods
@@ -240,6 +243,7 @@ class ServersController(metaclass=Singleton):
                     self.stats,
                     self.file_helper,
                     self.backups_mgr,
+                    self.import_helper,
                 ),
             }
 
