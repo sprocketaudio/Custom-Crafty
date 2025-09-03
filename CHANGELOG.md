@@ -1,5 +1,5 @@
 # Changelog
-## --- [4.5.2] - 2025/TBD
+## --- [4.5.4] - 2025/TBD
 ### New features
 - Snapshot Style Backups ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/795))
 ### Bug fixes
@@ -10,6 +10,19 @@ TBD
 ### Lang
 - Fixed grammar, spelling/capitalization, and sentence structure issues ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/876))
 - Removed 2 unused statements ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/876))
+<br><br>
+
+## --- [4.5.3] - 2025/09/03
+### Bug fixes
+- Refactor Bedrock update to use `import_helper` `download_threaded_bedrock_server` fixing bedrock update ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/890))
+- Fix GC logic deleting downloaded files instead of only temp directories ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/891))
+<br><br>
+
+## --- [4.5.2] - 2025/08/31
+### Bug fixes
+- Bedrock Builder | Utilize self call instead of static call for unzipping bedrock archives ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/884))
+- Fix Human Readable Sizes on Dashboard ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/885))
+- Correct Builder to support new Neoforge versioning scheme ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/886))
 <br><br>
 
 ## --- [4.5.1] - 2025/08/25
