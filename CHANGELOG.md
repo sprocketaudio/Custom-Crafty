@@ -3,7 +3,7 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Refactor to upload chunk removal to ensure file operations are asynchronous ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/894))
 ### Tweaks
 Remove all 3rd party font requests ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/893))
 ### Lang
