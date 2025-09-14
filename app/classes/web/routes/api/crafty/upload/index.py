@@ -298,7 +298,14 @@ class ApiFilesUploadHandler(BaseApiHandler):
                     chunk_file = os.path.join(self.temp_dir, f"{self.filename}.part{i}")
                     async with await anyio.open_file(chunk_file, "rb") as infile:
                         await outfile.write(await infile.read())
-                    os.remove(chunk_file)
+                    try:
+                        await anyio.Path(chunk_file).unlink(missing_ok=True)
+                    except (PermissionError, FileNotFoundError) as why:
+                        logger.error("Failed to remove chunk file with error: %s", why)
+            try:
+                self.file_helper.del_dirs(self.temp_dir)
+            except (PermissionError, FileNotFoundError) as why:
+                logger.error("Failed to import remove temp dir with error: %s", why)
             if upload_type == "background":
                 # Strip EXIF data
                 image_path = os.path.join(file_path)
