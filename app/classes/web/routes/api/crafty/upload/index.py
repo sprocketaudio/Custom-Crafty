@@ -300,11 +300,11 @@ class ApiFilesUploadHandler(BaseApiHandler):
                         await outfile.write(await infile.read())
                     try:
                         await anyio.Path(chunk_file).unlink(missing_ok=True)
-                    except (PermissionError, FileNotFoundError) as why:
+                    except OSError as why:
                         logger.error("Failed to remove chunk file with error: %s", why)
             try:
                 self.file_helper.del_dirs(self.temp_dir)
-            except (PermissionError, FileNotFoundError) as why:
+            except OSError as why:
                 logger.error("Failed to import remove temp dir with error: %s", why)
             if upload_type == "background":
                 # Strip EXIF data
