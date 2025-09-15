@@ -1,4 +1,11 @@
 # Changelog
+## --- [4.5.4] - 2025/09/15
+### Bug fixes
+- Refactor upload chunk removal to ensure file operations are asynchronous ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/894))
+### Tweaks
+- Remove all 3rd party font requests ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/893))
+<br><br>
+
 ## --- [4.5.3] - 2025/09/03
 ### Bug fixes
 - Refactor Bedrock update to use `import_helper` `download_threaded_bedrock_server` fixing bedrock update ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/890))
