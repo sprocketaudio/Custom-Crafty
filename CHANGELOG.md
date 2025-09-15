@@ -1,4 +1,15 @@
 # Changelog
+## --- [4.5.5] - 2025/TBD
+### New features
+TBD
+### Bug fixes
+TBD
+### Tweaks
+TBD
+### Lang
+TBD
+<br><br>
+
 ## --- [4.5.4] - 2025/09/15
 ### Bug fixes
 - Refactor upload chunk removal to ensure file operations are asynchronous ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/894))
