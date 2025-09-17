@@ -6,6 +6,7 @@ from PIL import Image
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.helpers.helpers import Helpers
 from app.classes.web.base_api_handler import BaseApiHandler
+from app.classes.web.websocket_handler import WebSocketManager
 
 logger = logging.getLogger(__name__)
 IMAGE_MIME_TYPES = [
@@ -295,6 +296,11 @@ class ApiFilesUploadHandler(BaseApiHandler):
         if len(received_chunks) == total_chunks:
             async with await anyio.open_file(file_path, "wb") as outfile:
                 for i in range(total_chunks):
+                    WebSocketManager().broadcast_user(
+                        auth_data[4]["user_id"],
+                        "upload_process",
+                        {"cur_file": i, "total_files": total_chunks, "type": u_type},
+                    )
                     chunk_file = os.path.join(self.temp_dir, f"{self.filename}.part{i}")
                     async with await anyio.open_file(chunk_file, "rb") as infile:
                         await outfile.write(await infile.read())
