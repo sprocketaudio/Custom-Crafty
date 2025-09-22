@@ -161,12 +161,20 @@ class ServerInstance:
     stats_helper: HelperServerStats
 
     def __init__(
-        self, server_id, helper, management_helper, stats, file_helper, backup_mgr
+        self,
+        server_id,
+        helper,
+        management_helper,
+        stats,
+        file_helper,
+        backup_mgr,
+        import_helper,
     ):
         self.helper = helper
         self.file_helper = file_helper
         self.management_helper = management_helper
         self.backup_mgr = backup_mgr
+        self.import_helper = import_helper
         # holders for our process
         self.process = None
         self.line = False
@@ -775,14 +783,15 @@ class ServerInstance:
                         # We get the server command parameters from forge script
                         server_command = re.findall(
                             r"java @([a-zA-Z0-9_\.]+)"
-                            r" @([a-z.\/\-]+)([0-9.\-]+)"
-                            r"\/\b([a-z_0-9]+\.txt)\b( .{2,4})?",
+                            r" @([a-z./\-]+)"
+                            r"([0-9.\-]+(?:-[a-zA-Z0-9]+)?)"
+                            r"\/\b([a-z_0-9]+\.txt)\b"
+                            r"( .{2,4})?",
                             run_file_text,
                         )[0]
 
                         version = server_command[2]
                         executable_path = f"{server_command[1]}{server_command[2]}/"
-
                         # Let's set the proper server executable
                         server_obj.executable = os.path.join(
                             f"{executable_path}{version_info[0][0]}-{version}-server.jar"
@@ -1386,41 +1395,19 @@ class ServerInstance:
             )
         else:
             # downloads zip from remote url
+            downloaded = False
             try:
                 bedrock_url = Helpers.get_latest_bedrock_url()
                 if bedrock_url:
                     # Use the new method for secure download
-                    download_path = os.path.join(
-                        self.settings["path"], "bedrock_server.zip"
+                    self.import_helper.download_threaded_bedrock_server(
+                        self.settings["path"], self.server_id, bedrock_url
                     )
-                    downloaded = FileHelpers.ssl_get_file(
-                        bedrock_url, self.settings["path"], "bedrock_server.zip"
-                    )
-
-                    if downloaded:
-                        unzip_path = download_path
-                        unzip_path = self.helper.wtol_path(unzip_path)
-
-                        # unzips archive that was downloaded.
-                        FileHelpers.unzip_file(unzip_path, server_update=True)
-
-                        # adjusts permissions for execution if os is not windows
-                        if not self.helper.is_os_windows():
-                            os.chmod(
-                                os.path.join(self.settings["path"], "bedrock_server"),
-                                0o0744,
-                            )
-
-                        # we'll delete the zip we downloaded now
-                        os.remove(download_path)
-                    else:
-                        logger.error("Failed to download the Bedrock server zip.")
-                        downloaded = False
+                    downloaded = True
             except Exception as e:
                 logger.critical(
                     f"Failed to download bedrock executable for update \n{e}"
                 )
-                downloaded = False
 
         if downloaded:
             logger.info("Executable updated successfully. Starting Server")
@@ -1476,7 +1463,9 @@ class ServerInstance:
 
     def start_dir_calc_task(self):
         server_dt = HelperServers.get_server_data_by_id(self.server_id)
-        self.server_size = self.file_helper.get_dir_size(server_dt["path"])
+        self.server_size = Helpers.human_readable_file_size(
+            self.file_helper.get_dir_size(server_dt["path"])
+        )
         self.dir_scheduler.add_job(
             self.calc_dir_size,
             "interval",
@@ -1492,7 +1481,9 @@ class ServerInstance:
 
     def calc_dir_size(self):
         server_dt = HelperServers.get_server_data_by_id(self.server_id)
-        self.server_size = self.file_helper.get_dir_size(server_dt["path"])
+        self.server_size = Helpers.human_readable_file_size(
+            self.file_helper.get_dir_size(server_dt["path"])
+        )
 
     # **********************************************************************************
     #                               Minecraft Servers Statistics

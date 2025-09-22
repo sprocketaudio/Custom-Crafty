@@ -257,11 +257,6 @@ def api_handlers(handler_args):
         ),
         # Server routes
         (
-            r"/api/v2/servers/([a-z0-9-]+)/files/(.+)/?",
-            ApiServersServerFileDownload,
-            handler_args,
-        ),
-        (
             r"/api/v2/servers/?",
             ApiServersIndexHandler,
             handler_args,
@@ -329,6 +324,11 @@ def api_handlers(handler_args):
         (
             r"/api/v2/servers/([a-z0-9-]+)/files(?:/([a-zA-Z0-9-]+))?/?",
             ApiServersServerFilesIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/servers/([a-z0-9-]+)/files/(.+)/?",
+            ApiServersServerFileDownload,
             handler_args,
         ),
         (

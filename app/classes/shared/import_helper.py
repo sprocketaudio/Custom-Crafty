@@ -244,7 +244,7 @@ class ImportHelpers:
 
                 unzip_path = self.helper.wtol_path(file_path)
                 # unzips archive that was downloaded.
-                FileHelpers.unzip_file(unzip_path)
+                self.file_helper.unzip_file(unzip_path)
                 # adjusts permissions for execution if os is not windows
 
                 if not self.helper.is_os_windows():

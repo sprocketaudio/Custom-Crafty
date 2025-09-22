@@ -417,8 +417,15 @@ noscript.noscript-warning {
 /**************************************************************/
 /* CSS for Fonts Displays */
 /**************************************************************/
+@font-face {
+    font-family: Sarabun;
+    src: url("/static/assets/fonts/Sarabun/Sarabun-Regular.ttf");
+    font-style: normal;
+    font-weight: 400;
+}
+
 *:lang(th-TH) :not(.fa, .fas, .fab, .fa-solid) {
-    font-family: 'Sarabun', 'roboto', sans-serif;
+    font-family: "Sarabun", "Atikinson Hyperlegible Next", sans-serif;
 }
 
 /**************************************************************/

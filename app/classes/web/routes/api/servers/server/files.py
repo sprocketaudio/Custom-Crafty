@@ -891,8 +891,10 @@ class ApiServersServerFileDownload(BaseApiHandler):
                     "error_data": f"Path does not exist: {file_path}",
                 },
             )
+        directory_download = False
         download_path = file_path
         if file_path.is_dir():
+            directory_download = True
             logger.info("Requested download is a directory. Zipping...%s", file_path)
             archive_path = Path(
                 self.controller.project_root,
@@ -902,9 +904,7 @@ class ApiServersServerFileDownload(BaseApiHandler):
             )
             archive_path.parent.mkdir(parents=True, exist_ok=True)
 
-            target_total_size = self.file_helper.get_dir_size(
-                Path(download_path), raw_bytes=True
-            )
+            target_total_size = self.file_helper.get_dir_size(Path(download_path))
             free_drive_storage = self.file_helper.get_drive_free_space(
                 Path(download_path)
             )
@@ -931,7 +931,7 @@ class ApiServersServerFileDownload(BaseApiHandler):
         await self.download_file(download_path)  # Make sure to check for permissions
         # and traversal before calling download. There is no permission checking
         # in this function
-
-        os.remove(download_path)
+        if directory_download:
+            os.remove(download_path)
 
         return self.finish_json(200, {"status": "ok"})
