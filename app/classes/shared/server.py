@@ -1463,12 +1463,26 @@ class ServerInstance:
                 )
             )
         )
+        url_pattern = (
+            r"^https:\/\/(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}"
+            r"(\/[a-zA-Z0-9-._~:/?#\[\]@!$&'()*+,;=]*)?$"
+        )
         try:  # Get hash from Big Bucket remote
-            response = requests.get(
-                f"{self.server_object.executable_update_url}.sha256", timeout=1
-            )
+            if re.match(
+                url_pattern,
+                str(self.server_object.executable_update_url),
+            ):
+                response = requests.get(
+                    f"{self.server_object.executable_update_url}.sha256", timeout=1
+                )
+            else:
+                self.update_available = False
+                return logger.error(
+                    "Server version check failed. Invalid url: %s",
+                    self.server_object.executable_update_url,
+                )
         except TimeoutError as why:
-            self.update_available = True
+            self.update_available = False
             return logger.error("Could not capture remote URL hash with error %s", why)
         remote_hash = None
         if response.status_code == 200:
