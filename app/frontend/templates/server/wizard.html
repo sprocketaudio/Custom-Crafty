@@ -78,25 +78,9 @@
                     </div>
                   </div>
                   <div class="col-sm-12">
-                    <div class="form-group">
-                      <label for="Role-1"> {{ translate('serverWizard', 'addRole', data['lang'])
-                        }}
-                        <small class="text-none"> - {{ translate('serverWizard', 'autoCreate',
-                          data['lang']) }}</small></label>
-                      <select data-container="body"
-                        data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
-                        data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
-                        class="selectpicker form-control form-control-lg select-css roles_select"
-                        data-styleBase="form-control" data-style="form-control" data-live-search="true"
-                        name="server_roles" multiple>
-                        {% for r in data['roles'] %}
-                        <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
-                          &nbsp; {{ r['role_name'].capitalize()
-                          }}
-                        </option>
-                        {% end %}
-                      </select>
-                    </div>
+                    {% include "../panel/parts/role_select.html" %}
+                    <br />
+                    <br />
                   </div>
                 </div>
                 <button type="submit" class="btn btn-primary mr-2">{{ translate('serverWizard', 'buildServer',
@@ -207,19 +191,7 @@
                     }}
                     <small class="text-none"> - {{ translate('serverWizard', 'autoCreate',
                       data['lang']) }}</small></label>
-                  <select data-container="body"
-                    data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
-                    data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
-                    class="selectpicker form-control form-control-lg select-css roles_select"
-                    data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles"
-                    multiple>
-                    {% for r in data['roles'] %}
-                    <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
-                      &nbsp; {{ r['role_name'].capitalize()
-                      }}
-                    </option>
-                    {% end %}
-                  </select>
+                  {% include "../panel/parts/role_select.html" %}
                 </div>
               </div>
             </div>
@@ -328,19 +300,7 @@
                       }}
                       <small class="text-none"> - {{ translate('serverWizard', 'autoCreate',
                         data['lang']) }}</small></label>
-                    <select data-container="body"
-                      data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
-                      data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
-                      class="selectpicker form-control form-control-lg select-css roles_select"
-                      data-styleBase="form-control" data-style="form-control" data-live-search="true"
-                      name="server_roles" multiple>
-                      {% for r in data['roles'] %}
-                      <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
-                        &nbsp; {{ r['role_name'].capitalize()
-                        }}
-                      </option>
-                      {% end %}
-                    </select>
+                    {% include "../panel/parts/role_select.html" %}
                   </div>
                 </div>
                 <div class="modal fade" id="dir_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
@@ -467,19 +427,7 @@
                   }}
                   <small class="text-none"> - {{ translate('serverWizard', 'autoCreate',
                     data['lang']) }}</small></label>
-                <select data-container="body"
-                  data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
-                  data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
-                  class="selectpicker form-control form-control-lg select-css roles_select"
-                  data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles"
-                  multiple>
-                  {% for r in data['roles'] %}
-                  <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
-                    &nbsp; {{ r['role_name'].capitalize()
-                    }}
-                  </option>
-                  {% end %}
-                </select>
+                {% include "../panel/parts/role_select.html" %}
               </div>
               <div class="modal fade" id="dir_upload_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
                 aria-hidden="true">
@@ -868,6 +816,4 @@
   });
 
 </script>
-
-<script src="../../static/assets/js/shared/bootstrap-select-1.13.18.js"></script>
 {% end %}
