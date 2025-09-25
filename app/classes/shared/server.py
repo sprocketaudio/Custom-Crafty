@@ -1455,10 +1455,12 @@ class ServerInstance:
             logger.debug("User has update watcher turned off. Killing out of function")
             self.update_available = False
             return
-        current_hash = self.helper.crypto_helper.create_sha_256_hash(
-            Path(
-                str(self.settings.get("server_path")),
-                str(self.settings.get("executable")),
+        current_hash = self.helper.crypto_helper.calculate_file_hash_sha256(
+            str(
+                Path(
+                    str(self.settings.get("server_path")),
+                    str(self.settings.get("executable")),
+                )
             )
         )
         try:  # Get hash from Big Bucket remote
