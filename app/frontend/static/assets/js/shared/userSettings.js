@@ -24,40 +24,59 @@ $(document).on("submit", ".bootbox form", function (e) {
 $(".edit_password").on("click", async function () {
     const token = getCookie("_xsrf");
     let user_id = $(this).data('id');
-    bootbox.confirm(`<form class="form" id='infos' action=''>\
+    bootbox.dialog({
+        message: `
+    <form class="form" id='infos' action=''>
       <div class="form-group">
-      <label for="new_password">${$(this).data("translate1")}</label>
-      <input class="form-control" type='password' id="password0" name='new_password' /></br>\
+        <label for="new_password">${$(this).data("translate1")}</label>
+        <input class="form-control" type='password' id="password0" name='new_password' /><br>
       </div>
       <div class="form-group">
-      <label for="confirm_password">${$(this).data("translate2")}</label>
-      <input class="form-control" type='password' id="password1" name='confirm_password' />\
+        <label for="confirm_password">${$(this).data("translate2")}</label>
+        <input class="form-control" type='password' id="password1" name='confirm_password' />
       </div>
-      </form>`, async function (result) {
-        if (result) {
-            let password = validateForm();
-            if (!password) {
-                return;
-            }
-            let res = await fetch(`/api/v2/users/${user_id}`, {
-                method: 'PATCH',
-                headers: {
-                    'X-XSRFToken': token
-                },
-                body: JSON.stringify({ "password": toString(password) }),
-            });
-            let responseData = await res.json();
-            if (responseData.status === "ok") {
-                console.log(responseData.data)
-            } else {
+    </form>
+  `,
+        buttons: {
+            cancel: {
+                label: "Cancel",
+                className: "btn-secondary"
+            },
+            confirm: {
+                label: "OK",
+                className: "btn-primary",
+                callback: function () {
+                    let password = validateForm();
+                    if (!password) {
+                        return false;
+                    }
 
-                bootbox.alert({
-                    title: responseData.status,
-                    message: responseData.error_data
-                });
+                    (async () => {
+                        password = password.toString();
+                        let res = await fetch(`/api/v2/users/${user_id}`, {
+                            method: 'PATCH',
+                            headers: { 'X-XSRFToken': token },
+                            body: JSON.stringify({ "password": password }),
+                        });
+                        let responseData = await res.json();
+
+                        if (responseData.status === "ok") {
+                            console.log(responseData.data);
+                            bootbox.hideAll();
+                        } else {
+                            bootbox.alert({
+                                title: responseData.status,
+                                message: responseData.error_data
+                            });
+                        }
+                    })();
+
+                    return false;
+                }
             }
         }
     });
+
 });
 
 $(".edit_user").on("click", function () {
