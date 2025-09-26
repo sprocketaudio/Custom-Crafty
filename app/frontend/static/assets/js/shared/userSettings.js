@@ -64,6 +64,7 @@ $(".edit_password").on("click", async function () {
                             console.log(responseData.data);
                             bootbox.hideAll();
                         } else {
+                            bootbox.hideAll();
                             bootbox.alert({
                                 title: responseData.status,
                                 message: responseData.error_data
