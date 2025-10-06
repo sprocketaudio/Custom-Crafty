@@ -4,8 +4,12 @@
 TBD
 ### Bug fixes
 - Resolve additional json being appended to downloaded files ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/902))
+- Fix certain users not showing up following a change made in `4.5.0` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/901))
+- Fix password dialogue closing with no indicator the password did not change when the passwords did not match ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/901))
 ### Tweaks
-TBD
+- Remove triple option for validation and use sole robust error ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/901))
+- Allow numeric passwords ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/901))
+- Enable use of `<enter>` key for password form submission ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/901))
 ### Lang
 TBD
 <br><br>
