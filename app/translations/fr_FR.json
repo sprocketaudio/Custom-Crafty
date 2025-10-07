@@ -120,8 +120,8 @@
     "datatables": {
         "i18n": {
             "aria": {
-                "sortAscending": ": activer pour trier les colonnes dans l'ordre croissant",
-                "sortDescending": ": activer pour trier les colonnes dans l'ordre décroissant"
+                "sortAscending": ": activer pour trier les colonnes dans l'ordre croissant",
+                "sortDescending": ": activer pour trier les colonnes dans l'ordre décroissant"
             },
             "buttons": {
                 "collection": "Collection <span class='ui-button-icon-primary ui-icon ui-icon-triangle-1-s'/>",
