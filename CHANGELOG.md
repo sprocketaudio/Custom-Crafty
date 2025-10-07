@@ -3,7 +3,8 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Fix MFA login failure when the totp `dict`'s attempted codes list changes size while being processed ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/899))
+- Resolve additional json being appended to downloaded files ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/902))
 ### Tweaks
 TBD
 ### Lang

@@ -109,8 +109,9 @@ class TOTPController:
         now = datetime.now(tz=timezone.utc)
         # Clean up expired entries reclaim some memory
         logger.debug("Checking for used codes entries older than 1 minute")
-        for key, totp_dict in self.used_totp_codes.items():
-            for item, timestamp in totp_dict.items():
+        for key, totp_dict in list(self.used_totp_codes.items()):
+            # Iterate over copy of dict (list) to prevent size change during iteration
+            for item, timestamp in list(totp_dict.items()):
                 if now - timestamp > timedelta(seconds=60):
                     logger.debug("Found saved code older than one minute. Deleting...")
                     # needs to ref the self var to remove expired entries
