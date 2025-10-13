@@ -410,10 +410,14 @@ data['lang']) }}{% end %}
     }
   }
   function replacer(key, value) {
-      if (typeof value == "boolean" || key === "email" || key === "permissions" || key === "roles" || key === "password") {
+      if (typeof value == "boolean" || key === "email" || key === "permissions" || key === "roles") {
         console.log(key)
         return value
-      } else {
+      } else if (key === "password"){
+        value = value.toString()
+        return value
+      }
+      else {
         console.log(key, value)
         return (isNaN(value) ? value : +value);
       }
