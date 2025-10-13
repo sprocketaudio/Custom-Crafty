@@ -55,7 +55,7 @@
                 <tr id="playerItem-{{ player }}" class="playerItem--">
                     <td><strong> {{ player['name'] }}</strong></td>
                     <td>Banned on {{ player['banned_on'] }}</td>
-                    <td>Banned by : {{ player['source'] }} <br />Reason : {{ player['reason'] }}</td>
+                    <td>Banned by : {{ player.get('source', '') }} <br />Reason : {{ player.get('reason', 'None') }}</td>
                     <td class="buttons">
                         <button onclick="send_command_to_server(`pardon {{ player['name'] }}`)" type="button" class="btn btn-danger">Unban</button>
                     </td>
