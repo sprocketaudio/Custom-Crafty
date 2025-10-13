@@ -1,7 +1,5 @@
 # Changelog
-## --- [4.5.5] - 2025/TBD
-### New features
-TBD
+## --- [4.5.5] - 2025/10/14
 ### Bug fixes
 - Fix MFA login failure when the totp `dict`'s attempted codes list changes size while being processed ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/899))
 - Resolve additional json being appended to downloaded files ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/902))
@@ -15,7 +13,7 @@ TBD
 - Add extended debug logging to help troubleshoot MFA issues ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/898))
 - Change upload progress bar to monitor chunk processing ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/896))
 ### Lang
-Consolidate "passLength" & "numbericPassword" to single "passProp" translation for validators ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/901))
+- Consolidate "passLength" & "numbericPassword" to single "passProp" translation for validators ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/901))
 <br><br>
 
 ## --- [4.5.4] - 2025/09/15
