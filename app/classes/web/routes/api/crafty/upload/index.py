@@ -40,7 +40,6 @@ ARCHIVE_MIME_TYPES = ["application/zip"]
 class ApiFilesUploadHandler(BaseApiHandler):
 
     upload_locks = {}
-    merged_uploads = set()
 
     def get_lock(self, key: str) -> asyncio.Lock:
         """Get or create a lock for the given key."""
