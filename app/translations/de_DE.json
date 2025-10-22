@@ -32,7 +32,8 @@
         "yes": "Ja"
     },
     "base": {
-        "doesNotWorkWithoutJavascript": "<strong>Warnung: </strong>Crafty funktioniert nicht richtig, wenn JavaScript nicht aktiviert ist!"
+        "doesNotWorkWithoutJavascript": "<strong>Warnung: </strong>Crafty funktioniert nicht richtig, wenn JavaScript nicht aktiviert ist!",
+        "createMFA": "Füge eine Zwei-Faktor-Authentifizierung zu deinem Konto hinzu!"
     },
     "credits": {
         "developmentTeam": "Entwicklungsteam",
@@ -715,5 +716,11 @@
         "url": "Webhook-URL",
         "webhook_body": "Webhook-Inhalt",
         "webhooks": "Webhooks"
+    },
+    "configJson": {
+        "allow_nsfw_profile_pictures": "Erlaube Gravatar™ NSFW Profilbilder",
+        "big_bucket_repo": "Big Bucket™ System URL",
+        "delete_default_json": "Standard-JSON-Datei beim Starten löschen",
+        "enable_user_self_delete": "Erlaube Nutzern ihren eigenen Account zu löschen"
     }
 }
