@@ -934,4 +934,4 @@ class ApiServersServerFileDownload(BaseApiHandler):
         if directory_download:
             os.remove(download_path)
 
-        return self.finish_json(200, {"status": "ok"})
+        return None

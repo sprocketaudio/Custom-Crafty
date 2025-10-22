@@ -44,8 +44,7 @@ docker-build:
       mkdir -p ~/.docker/cli-plugins
       mv docker-buildx ~/.docker/cli-plugins/docker-buildx
       docker version
-    - docker run --rm --privileged aptman/qus -- -r
-    - docker run --rm --privileged aptman/qus -s -- -p aarch64 x86_64
+    - docker run --rm --privileged tonistiigi/binfmt --install arm64,amd64
     - echo $CI_JOB_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - echo $DOCKERHUB_TOKEN | docker login -u "$DOCKERHUB_USER" --password-stdin $DOCKERHUB_REGISTRY
     - docker context create tls-environment-$CI_JOB_ID
@@ -83,7 +82,7 @@ docker-build:
           --build-arg "CRAFTY_VER=${VERSION}" \
           --provenance false \
           $TARGS \
-          --platform linux/arm64/v8,linux/amd64 \
+          --platform linux/arm64,linux/amd64 \
           --push .
       else
         echo "Using cache for build."
@@ -95,7 +94,7 @@ docker-build:
           --build-arg "CRAFTY_VER=${VERSION}" \
           --provenance false \
           $TARGS \
-          --platform linux/arm64/v8,linux/amd64 \
+          --platform linux/arm64,linux/amd64 \
           --push .
       fi
 
@@ -104,5 +103,5 @@ docker-build:
     - docker context rm tls-environment-$CI_JOB_ID || true
     - echo "Please review multi-arch manifests are present:"
     - if [ "$ENVIRONMENT_NAME" = "development" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"; fi
-    - if [ "$ENVIRONMENT_NAME" = "production" ] && [ -n "$VERSION" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:$VERSION"; fi
+    - if [ "$ENVIRONMENT_NAME" = "production" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:$VERSION"; fi
     - if [ "$ENVIRONMENT_NAME" = "nightly" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:nightly"; fi

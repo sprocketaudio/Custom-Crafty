@@ -224,3 +224,15 @@ function uuidv4() {
         return v.toString(16);
     });
 }
+
+
+if (webSocket) {
+    webSocket.on('upload_process', function (data) {
+        if (data.total_files === data.cur_file) {
+            updateProgressBar(100, data.type, data.cur_file)
+        } else {
+            let progress = Math.round((data.cur_file / data.total_files) * 100, 1);
+            updateProgressBar(progress, data.type, data.cur_file)
+        }
+    });
+}
