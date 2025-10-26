@@ -267,9 +267,12 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             self.finish_json(200, {"status": "ok", "data": return_json})
         else:
             try:
-                with open(data["path"], encoding="utf-8") as file:
-                    file_contents = file.read()
-            except UnicodeDecodeError as ex:
+                if Path(data["path"]).is_file():
+                    with open(data["path"], encoding="utf-8") as file:
+                        file_contents = file.read()
+                else:
+                    raise OSError("Item is not a valid File")
+            except (UnicodeDecodeError, OSError) as ex:
                 self.finish_json(
                     400,
                     {"status": "error", "error": "DECODE_ERROR", "error_data": str(ex)},
