@@ -35,6 +35,30 @@ class FileHelpers:
     def __init__(self, helper):
         self.helper: Helpers = helper
         self.mime_types = mimetypes.MimeTypes()
+        self.add_mime_types()  # Add to account for yml, conf, properties, etc
+        self.text_mime_prefixes = [
+            "text/",
+            "application/json",
+            "application/xml",
+            "application/javascript",
+        ]
+
+    def add_mime_types(self):
+        # Extend the default list
+        mimetypes.add_type("text/yaml", ".yml")
+        mimetypes.add_type("text/yaml", ".yaml")
+        mimetypes.add_type("text/plain", ".ini")
+        mimetypes.add_type("text/plain", ".conf")
+        mimetypes.add_type("text/plain", ".properties")
+        mimetypes.add_type("text/plain", ".env")
+
+    def probably_can_open_file(self, path: str) -> tuple:
+        mime = mimetypes.guess_type(path)
+        if str(mime[0]).startswith("text/"):
+            return (True, mime[0])
+        if mime[0] in self.text_mime_prefixes:
+            return (True, mime[0])
+        return (False, mime[0])
 
     @staticmethod
     def ssl_get_file(  # pylint: disable=too-many-positional-arguments
