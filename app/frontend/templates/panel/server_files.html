@@ -2,6 +2,8 @@
 Controller - {{ translate('serverDetails', 'serverDetails', data['lang']) }}{%
 end %} {% block content %}
 
+<link href="/static/assets/css/partial/crafty-files.css" rel="stylesheet">
+
 <div class="content-wrapper">
     <!-- Page Title Header Starts-->
     <div class="row page-title-header">
@@ -31,9 +33,13 @@ end %} {% block content %}
                         {% include "parts/m_server_controls_list.html %}
                     </span>
                     <div class="table-responsive">
-                        <table class="table no-scroll" id="root_dir"
+                        <table class="table no-scroll animated-table" id="root_dir"
                             data-path="{{data['server_stats']['server_id']['path'] }}">
                             <thead class="thead">
+                                <tr>
+                                    <th id="table-nav" class="table-nav">
+                                    </th>
+                                </tr>
                                 <tr>
                                     <th scope="col-4">Name</th>
                                     <th scope="col-2">Type</th>
@@ -43,7 +49,6 @@ end %} {% block content %}
                                 </tr>
                             </thead>
                             <tbody id="files-table-body">
-                                <p>loading</p>
                             </tbody>
                         </table>
                     </div> <!--table div-->
