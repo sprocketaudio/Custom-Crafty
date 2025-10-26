@@ -19,6 +19,12 @@ async function getTreeView(path) {
     }
 }
 
+function fileIcon(value) {
+    if (value.dir) return '<i class="fa-regular fa-folder text-info"></i>';
+    if (value.can_open) return '<i class="fa-regular fa-file text-success"></i>';
+    return '<i class="fa-regular fa-file-excel text-danger"></i>';
+}
+
 function process_tree_response(response) {
     console.log(response)
     let path = response.data.root_path.path;
@@ -32,9 +38,9 @@ function process_tree_response(response) {
         let filename = key;
         text += `
         <tr>
-        <td><a href="/panel/servers/${serverId}/files/${filename}/edit">${filename}</a></td>
-        <td>${value.dir ? "Dir" : "File"}</td>
-        <td>Modified</td>
+        <td>${fileIcon(value)}&nbsp;&nbsp;&nbsp;<a class="text-secondary" href="/panel/servers/${serverId}/files/${filename}/edit">${filename}</a></td>
+        <td>${value.mime ? value.mime : "Dir"}</td>
+        <td>${value.modified}</td>
         <td>Size</td>
         <td>...</td>
         </tr>
