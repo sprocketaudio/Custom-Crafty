@@ -159,7 +159,7 @@ async function get_file() {
 $(document).ready(function () {
     console.log("Getting file")
     add_server_name();
-    set_font_size(localStorage.getItem("font-size") || 12)
+    set_editor_font_size(localStorage.getItem("font-size") || 12)
     get_file();
 });
 
@@ -252,7 +252,7 @@ async function save() {
     }
 }
 
-function set_font_size(size) {
+function set_editor_font_size(size) {
     console.log(size.toString() + "px")
     editor.setOptions({
         fontSize: size.toString() + "px"
@@ -275,6 +275,6 @@ function loadMenuContent() {
     $("#font-size").on("input", function () {
         let font_size = $("#font-size").val();
         localStorage.setItem("font-size", font_size)
-        set_font_size(font_size)
+        set_editor_font_size(font_size)
     });
 }
