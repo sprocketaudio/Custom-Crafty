@@ -1,0 +1,39 @@
+{% extends ../base.html %} {% block meta %} {% end %} {% block title %}Crafty
+Controller - {{ translate('serverDetails', 'serverDetails', data['lang']) }}{%
+end %} {% block content %}
+
+<link href="/static/assets/css/partial/crafty-editor.css" rel="stylesheet">
+
+<div class="content-wrapper">
+    <!-- Page Title Header Starts-->
+    <div class="row page-title-header">
+        <div class="col-12">
+            <div class="page-header">
+                <h4 class="page-title">
+
+                    <small>UUID: <span id="server_uuid"></span> </small>
+                </h4>
+            </div>
+        </div>
+    </div>
+    <!-- Page Title Header Ends-->
+    <div id="editor_container" class="col-sm-12">
+        <div class="editorManager">
+            <h2 id="fileError"></h2>
+            <div id="editorParent">
+                {{ translate('serverFiles', 'editingFile', data['lang']) }}:&nbsp;
+                <span id="editingFile"></span>
+                <div id="editor" onresize="editor.resize()" style="resize: both; width: 100%">
+                </div>
+                <br />
+            </div>
+            <h3 id="file_warn"></h3>
+            <button class="btn btn-success" onclick="save()">
+                <i class="fas fa-save"></i> {{ translate('serverFiles',
+                'save', data['lang']) }}
+            </button>
+            <span class="text-success ml-2" id="save_status"></span>
+        </div>
+    </div>
+    <script src="/static/assets/vendors/ace-builds/src-min/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/assets/js/shared/editor.js"></script> {% end %}
