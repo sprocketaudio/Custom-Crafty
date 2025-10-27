@@ -41,6 +41,12 @@ class FileHelpers:
             "application/json",
             "application/xml",
             "application/javascript",
+            "text/x-shellscript",
+            "application/x-shellscript",
+            "text/x-sh",
+            "application/x-sh",
+            "text/x-bat",
+            "application/x-bat",
         ]
 
     def add_mime_types(self):
@@ -52,6 +58,7 @@ class FileHelpers:
         mimetypes.add_type("text/plain", ".conf")
         mimetypes.add_type("text/plain", ".properties")
         mimetypes.add_type("text/plain", ".env")
+        mimetypes.add_type("application/x-bat", ".ps1")
 
     def probably_can_open_file(self, path: str) -> tuple:
         mime = mimetypes.guess_type(path)
