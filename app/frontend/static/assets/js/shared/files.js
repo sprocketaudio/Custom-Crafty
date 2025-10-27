@@ -167,6 +167,7 @@ function process_tree_response(response) {
         const tr = document.createElement("tr");
         tr.className = value.dir ? "directory" : "file";
         tr.dataset.path = value.path;
+        tr.dataset.can_open = value.can_open;
 
         // Column 1: icon + filename
         const td1 = document.createElement("td");
@@ -211,10 +212,10 @@ function process_tree_response(response) {
     $(".file").click(function (e) {
         // Prevent the click from firing if it’s on the context menu button
         if ($(e.target).closest(".context-button").length) return;
+        if (!$(this).data("can_open")) return;
         window.open(`/panel/edit_file?server_id=${serverId}&file=${encodeURI($(this).data("path"))}`, "_blank")
     });
     $(".tree-nav").click(function (e) {
-        console.log("nav clicked")
         // Prevent the click from firing if it’s on the context menu button
         if ($(e.target).closest(".context-button").length) return;
         console.log("nav")
