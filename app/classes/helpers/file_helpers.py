@@ -47,6 +47,7 @@ class FileHelpers:
         # Extend the default list
         mimetypes.add_type("text/yaml", ".yml")
         mimetypes.add_type("text/yaml", ".yaml")
+        mimetypes.add_type("text/toml", ".toml")
         mimetypes.add_type("text/plain", ".ini")
         mimetypes.add_type("text/plain", ".conf")
         mimetypes.add_type("text/plain", ".properties")

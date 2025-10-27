@@ -116,6 +116,10 @@ let extensionChanges = [
         regex: /^log$/,
         replaceWith: "ace/mode/txt",
     },
+    {
+        regex: /^toml$/,
+        replaceWith: "ace/mode/txt",
+    },
 ];
 
 
