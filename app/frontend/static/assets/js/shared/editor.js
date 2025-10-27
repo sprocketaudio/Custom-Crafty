@@ -172,7 +172,9 @@ function setMode(extension) {
 }
 function setFileName(name) {
     let fileName = name || "default.txt";
-    document.getElementById("editingFile").innerText = fileName;
+    $("#editingFile").text(fileName);
+    document.title = "Crafty Controller - " + fileName
+
 
     if (fileName.match(".")) {
         // The pop method removes and returns the last element.
