@@ -450,6 +450,10 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        request_path = data["path"]
+        if not Path(data["path"]).is_absolute():
+            data["path"] = str(Path(server_path, request_path))
         if not Helpers.validate_traversal(
             self.controller.servers.get_server_data_by_id(server_id)["path"],
             data["path"],
