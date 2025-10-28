@@ -356,19 +356,13 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         request_path = data["filename"]
         if not Path(data["filename"]).is_absolute():
             data["filename"] = str(Path(server_path, request_path))
-        if not Helpers.validate_traversal(
-            self.controller.servers.get_server_data_by_id(server_id)["path"],
-            data["filename"],
-        ):
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "TRAVERSAL DETECTED",
-                    "error_data": str("Traversal"),
-                },
+        if (
+            not Helpers.validate_traversal(
+                self.controller.servers.get_server_data_by_id(server_id)["path"],
+                data["filename"],
             )
-        if data["filename"] == server_path:
+            or data["filename"] == server_path
+        ):
             return self.finish_json(
                 400,
                 {
