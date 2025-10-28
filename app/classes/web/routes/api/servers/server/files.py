@@ -333,11 +333,9 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             return self.finish_json(
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
-        print(type(data["filename"]))
         try:
             validate(data, file_delete_schema)
         except ValidationError as why:
-            print(why)
             offending_key = ""
             if why.schema.get("fill", None):
                 offending_key = why.path[0] if why.path else None
