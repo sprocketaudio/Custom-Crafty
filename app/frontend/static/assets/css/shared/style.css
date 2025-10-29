@@ -133,8 +133,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 
-@import url("/static/assets/fonts/Atikinson_Hyperlegible_Next/AtkinsonHyperlegibleMono-VariableFont_wght.ttf");
-@import url("/static/assets/fonts/Atikinson_Hyperlegible_Next/AtkinsonHyperlegibleNext-VariableFont_wght.ttf");
+@import url("/static/assets/fonts/Atkinson_Hyperlegible_Next/AtkinsonHyperlegible.css");
 
 :root {
   --blue: #00aeef;
@@ -178,8 +177,8 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 992px;
   --breakpoint-xl: 1200px;
-  --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", "Atikinson Hyperlegible Next", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-family-monospace: "Atikinson Hyperlegible Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", "Atkinson Hyperlegible Next", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-family-monospace: "Atkinson Hyperlegible Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 *,
@@ -211,7 +210,7 @@ section {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Atikinson Hyperlegible Next", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Atkinson Hyperlegible Next", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
@@ -8504,7 +8503,7 @@ a.close.disabled {
   z-index: 1070;
   display: block;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Atikinson Hyperlegible Next", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Atkinson Hyperlegible Next", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
@@ -8629,7 +8628,7 @@ a.close.disabled {
   z-index: 1060;
   display: block;
   max-width: 276px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Atikinson Hyperlegible Next", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Atkinson Hyperlegible Next", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
@@ -13958,7 +13957,7 @@ input:focus {
 :root,
 body {
   font-size: 1rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   color: #212529;
 }
 
@@ -13974,7 +13973,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-weight: normal;
   font-style: normal;
   font-stretch: normal;
@@ -14150,7 +14149,7 @@ address p {
 }
 
 .card-title {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-weight: 500;
   color: #212229;
   margin-bottom: 15px;
@@ -14164,14 +14163,14 @@ address p {
 
 .card-subtitle {
   font-weight: 300;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   margin-top: 0.625rem;
   margin-bottom: 0.625rem;
 }
 
 .card-description {
   margin-bottom: 0.9375rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 .rtl .card-description {
@@ -14986,7 +14985,7 @@ pre {
 
 .card-revenue-table .revenue-item .revenue-amount p {
   font-size: 1.25rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-weight: 600;
   text-align: right;
 }
@@ -15003,7 +15002,7 @@ pre {
 
 .card-revenue .highlight-text {
   font-size: 1.875rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-weight: 500;
 }
 
@@ -15978,7 +15977,7 @@ pre {
   font-weight: initial;
   line-height: 1;
   padding: 4px 6px;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-weight: 600;
   letter-spacing: 0.04rem;
 }
@@ -16415,7 +16414,7 @@ pre {
 .wizard>.actions a {
   font-size: 0.875rem;
   line-height: 1;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 .btn i,
@@ -18583,7 +18582,7 @@ pre {
 .typeahead {
   display: inline-block;
   border: 1px solid #dee2e6;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-size: 0.75rem;
   color: #212529;
   padding: 0 .75rem;
@@ -18721,7 +18720,7 @@ select.typeahead {
   -ms-flex-align: center;
   align-items: center;
   padding: 15px;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-size: 0.875rem;
 }
 
@@ -21128,7 +21127,7 @@ ul li {
 }
 
 .preview-list .preview-item .preview-item-content p .content-category {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   padding-right: 15px;
   border-right: 1px solid #dee2e6;
 }
@@ -21190,7 +21189,7 @@ ul li {
 .pricing-table .pricing-card .pricing-card-body .plan-features li {
   text-align: left;
   padding: 4px 0;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-size: 0.875rem;
 }
 
@@ -21204,7 +21203,7 @@ ul li {
 .jsgrid .jsgrid-table thead th {
   border-top: 0;
   border-bottom-width: 1px;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-weight: 500;
   color: #212529;
   border-bottom-color: #dee2e6;
@@ -21371,7 +21370,7 @@ ul li {
 /* Tabs */
 .nav-pills .nav-item .nav-link,
 .nav-tabs .nav-item .nav-link {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   line-height: 1;
   font-size: 0.875rem;
   color: #212529;
@@ -21387,7 +21386,7 @@ ul li {
 }
 
 .tab-content {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-size: 0.875rem;
   line-height: 1.71;
 }
@@ -21870,7 +21869,7 @@ ul li {
 }
 
 .settings-panel .events p {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 .rtl .settings-panel .events p {
@@ -22103,7 +22102,7 @@ ul li {
 }
 
 .tooltip .tooltip-inner {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 .tooltip-primary .tooltip-inner {
@@ -22980,7 +22979,7 @@ ul li {
   padding: 11px 25px;
   background: rgba(33, 150, 243, 0.2);
   width: 80%;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-size: 13px;
   font-weight: 300;
   border-radius: 4px;
@@ -22988,7 +22987,7 @@ ul li {
 
 .horizontal-timeline .time-frame .event .event-info {
   margin-top: 0.8rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-size: 12px;
   font-weight: 400;
   color: var(--gray);
@@ -24109,7 +24108,7 @@ ul li {
   font-size: 0.875rem;
   color: var(--gray);
   margin-bottom: 0;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 .email-wrapper .mail-sidebar .menu-bar .online-status .status {
@@ -24191,7 +24190,7 @@ ul li {
 
 .email-wrapper .mail-sidebar .menu-bar .profile-list-item a .user .u-name {
   margin: 0;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-size: 0.875rem;
   line-height: 1;
   color: #212529;
@@ -24253,7 +24252,7 @@ ul li {
 .email-wrapper .mail-list-container .mail-list .content .sender-name {
   margin-bottom: 0;
   font-size: 0.875rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-weight: 500;
   max-width: 95%;
 }
@@ -24308,17 +24307,17 @@ ul li {
 
 .email-wrapper .message-body .sender-details .details .msg-subject {
   margin-bottom: 0;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 .email-wrapper .message-body .sender-details .details .sender-email {
   margin-bottom: 20px;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 .email-wrapper .message-body .sender-details .details .sender-email i {
   font-size: 1rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   margin: 0 1px 0 7px;
 }
 
@@ -24446,7 +24445,7 @@ ul li {
   left: 50%;
   z-index: 1000;
   font-size: 0.875rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-weight: initial;
   line-height: 1.85;
   border-radius: 10px;
@@ -24456,7 +24455,7 @@ ul li {
 
 .avgrund-popin p {
   font-size: 0.875rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-weight: initial;
 }
 
@@ -24537,7 +24536,7 @@ body.avgrund-active {
 .tour-tour {
   padding: 0;
   border: 0;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   background: #fff;
 }
 
@@ -24545,7 +24544,7 @@ body.avgrund-active {
   background: var(--primary);
   var(--base-text);
   font-size: 0.8125rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   padding: 0.75rem;
 }
 
@@ -25080,7 +25079,7 @@ body.avgrund-active {
 
 .datepicker.datepicker-dropdown .datepicker-days table.table-condensed thead tr th.dow,
 .datepicker.datepicker-inline .datepicker-days table.table-condensed thead tr th.dow {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   color: var(--gray);
   font-size: 0.875rem;
   font-weight: initial;
@@ -25512,7 +25511,7 @@ body.avgrund-active {
 
 .jsgrid .jsgrid-table th {
   font-weight: initial;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   border-top-color: #dee2e6;
 }
 
@@ -25691,7 +25690,7 @@ body.avgrund-active {
 }
 
 .noUi-target .noUi-base .noUi-origin .noUi-handle .noUi-tooltip {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   border-radius: 4px;
   border: none;
   line-height: 1;
@@ -25718,7 +25717,7 @@ body.avgrund-active {
 .noUi-target .noUi-pips .noUi-value {
   color: #212529;
   font-size: 0.94rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 /* Slider Color variations */
@@ -26237,7 +26236,7 @@ body.avgrund-active {
 .swal2-modal .swal2-title {
   font-size: 25px;
   line-height: 1;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   color: #212529;
   font-weight: initial;
   margin-bottom: 0;
@@ -26276,7 +26275,7 @@ body.avgrund-active {
 
 .swal2-modal .swal2-content {
   font-size: 0.875rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   color: #212529;
   font-weight: initial;
   margin-top: 11px;
@@ -26683,7 +26682,7 @@ div.tagsinput span.tag a {
   text-decoration: none;
   border-radius: 5px;
   font-size: 0.875rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 .wizard>.steps a:hover {
@@ -27123,7 +27122,7 @@ div.tagsinput span.tag a {
 }
 
 .auth.theme-one .auto-form-wrapper .form-group .submit-btn {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-size: 13px;
   padding: 12px 8px;
   font-weight: 600;
@@ -27353,7 +27352,7 @@ div.tagsinput span.tag a {
 }
 
 .auth.theme-two .auto-form-wrapper form .form-group .submit-btn {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-size: 13px;
   padding: 11px 33px;
   font-weight: 600;
@@ -27578,7 +27577,7 @@ div.tagsinput span.tag a {
   padding-left: 1rem;
   padding-right: 1rem;
   font-size: 0.9375rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   text-align: left;
 }
 
@@ -27723,7 +27722,7 @@ div.tagsinput span.tag a {
 }
 
 .landing-page .feature-list .feature-list-row .feature-list-item .feature-description {
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 .landing-page .footer {
@@ -27766,7 +27765,7 @@ div.tagsinput span.tag a {
   padding-top: 0;
   padding-bottom: 0;
   font-size: 0.9375rem;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   line-height: 1;
 }
 
@@ -27804,7 +27803,7 @@ div.tagsinput span.tag a {
 
 .landing-page .footer .footer-bottom {
   var(--base-text)fff;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 .profile-page .profile-header {
@@ -27817,14 +27816,14 @@ div.tagsinput span.tag a {
 
 .profile-page .profile-header .profile-info .profile-user-name {
   margin-bottom: 0;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-weight: 600;
   var(--base-text);
 }
 
 .profile-page .profile-header .profile-info .profile-user-designation {
   margin-bottom: 0;
-  font-family: "Atikinson Hyperlegible Next", sans-serif;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
   var(--base-text);
 }
 
