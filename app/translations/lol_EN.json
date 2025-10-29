@@ -670,7 +670,6 @@
         "uses": "NUMBER OV USES ALLOWED (-1==NO LIMIT)"
     },
     "validators": {
-        "passLength": "PASSWRD TOO SMOL. NEEDZ 8 CATZ PLZ",
         "backupName": "BACKUP NAME GOTTA BE WURDZ, AT LEAST 3 FISH.",
         "enumErr": "OOFS IN VALIDATING. GOOD STUFF INCLUDES: ",
         "serverExeCommand": "SERVER EXECUTION COMMAND GOTTA BE WURDZ, AT LEAST 1 FISH LONG.",
