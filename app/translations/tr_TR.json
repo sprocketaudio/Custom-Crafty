@@ -698,7 +698,6 @@
         "selfDisable": "Kendi hesabınızı devre dışı bırakamazsınız"
     },
     "validators": {
-        "passLength": "Şifre çok kısa. Şifre en az 8 karakter olmalı.",
         "serverLogPath": "Sunucu günlük yolu en az 1 uzunluğundaki bir dize olmalıdır",
         "roleName": "Rol adı 1 karakterden büyük bir dize olmalıdır. Ayrıca şu sembollerden herhangi birini içermemelidir: [ ] , ",
         "typeList": "liste/dizi türünde olmalıdır ",
@@ -721,8 +720,7 @@
         "typeString": "dize türünde olmalıdır.",
         "userName": " dize türünde, tümü KÜÇÜK HARF, en az 4 karakter ve en fazla 20 karakter olmalıdır",
         "additionalProperties": "Ek Özelliklerin geçirilmesine izin verilmez",
-        "mfaName": "Özellik için girdi, dize türünde olmalı ve en az 3 karakter içermelidir",
-        "numbericPassword": "Sayısal şifre. En az 1 alfabetik karakter içermelidir"
+        "mfaName": "Özellik için girdi, dize türünde olmalı ve en az 3 karakter içermelidir"
     },
     "webhooks": {
         "areYouSureDel": "Bu webhooku silmek istediğinizden emin misiniz?",

@@ -3,7 +3,7 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Change hour and minute intervals in APScheudler to fix incorrect triggers ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/910))
 ### Tweaks
 TBD
 ### Lang

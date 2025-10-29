@@ -664,9 +664,6 @@
         "userTheme": "ערכת נושא UI",
         "uses": "מספר השימושים המותרים (-1==ללא הגבלה)"
     },
-    "validators": {
-        "passLength": "סיסמא קצרה מדי. אורך מינימלי: 8"
-    },
     "webhooks": {
         "areYouSureDel": "האם אתה בטוח שברצונך למחוק את ה-Webhook הזה?",
         "areYouSureRun": "האם אתה בטוח שברצונך לבדוק את ה-Webhook הזה?",
