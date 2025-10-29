@@ -862,6 +862,10 @@ class ApiServersServerFileDownload(BaseApiHandler):
             )
 
         filepath = html.unescape(encoded_file_path)
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        request_path = filepath
+        if not Path(filepath).is_absolute():
+            filepath = str(Path(server_path, request_path))
         file_path = Path(filepath)
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:

@@ -246,6 +246,7 @@ function loadMenuContent(tr) {
     $("<input>").val()
     add_rename_listener();
     add_delete_listener();
+    add_download_listener();
 
 }
 async function renameItem(path, name) {
@@ -380,4 +381,11 @@ async function deleteItem(path) {
             message: responseData.error_data
         });
     }
+}
+
+function add_download_listener() {
+    $("#download").on("click", function () {
+        const path = $(selected_row).attr("data-path");
+        window.open(`/api/v2/servers/${serverId}/files/${encodeURIComponent(path)}/download`, '_blank');
+    });
 }
