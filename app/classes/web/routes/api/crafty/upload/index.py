@@ -2,6 +2,7 @@ import os
 import logging
 import shutil
 import anyio
+from pathlib import Path
 from PIL import Image
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.helpers.helpers import Helpers
@@ -133,15 +134,19 @@ class ApiFilesUploadHandler(BaseApiHandler):
                 400, {"status": "error", "error": "TYPE ERROR", "error_data": {why}}
             )
         self.chunk_index = self.request.headers.get("chunkId")
-        if u_type == "server_upload":
-            self.upload_dir = self.request.headers.get("location", None)
         self.temp_dir = os.path.join(self.controller.project_root, "temp", self.file_id)
 
         if u_type == "server_upload":
+            # Check for absolute or relative path. Absolute paths should be deprecated
+            self.upload_dir = self.request.headers.get("location", None)
             # If this is an upload from a server the path will be what
             # Is requested
+            server_path = self.controller.servers.get_server_data_by_id(server_id)[
+                "path"
+            ]
+            if not Path(self.upload_dir).is_absolute():
+                self.upload_dir = str(Path(server_path, self.upload_dir))
             full_path = os.path.join(self.upload_dir, self.filename)
-
             # Check to make sure the requested path is inside the server's directory
             if not self.helper.is_subdir(
                 full_path,

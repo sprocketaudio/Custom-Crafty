@@ -145,46 +145,11 @@ async function uploadFile(type, file = null, path = null, file_num = 0, _onProgr
             }, 2000);
         }
     } else {
-        let caught = false;
-        let expanded = false;
-        try {
-            expanded = document.getElementById(path).classList.contains("clicked");
-        } catch { }
-
-        let par_el;
-        let items;
-        try {
-            par_el = document.getElementById(path + "ul");
-            items = par_el.children;
-        } catch (err) {
-            console.log(err);
-            caught = true;
-            par_el = document.getElementById("files-tree");
-            items = par_el.children;
-        }
-
-        let name = file.name;
-        let full_path = path + '/' + name;
-        let flag = false;
-
-        for (let item of items) {
-            if ($(item).attr("data-name") === name) {
-                flag = true;
-            }
-        }
-
-        if (!flag) {
-            if (caught && !expanded) {
-                $(par_el).append(`<li id="${full_path}li" class="d-block tree-ctx-item tree-file tree-item" data-path="${full_path}" data-name="${name}" onclick="clickOnFile(event)"><span style="margin-right: 6px;"><i class="far fa-file"></i></span>${name}</li>`);
-            } else if (expanded) {
-                $(par_el).append(`<li id="${full_path}li" class="tree-ctx-item tree-file tree-item" data-path="${full_path}" data-name="${name}" onclick="clickOnFile(event)"><span style="margin-right: 6px;"><i class="far fa-file"></i></span>${name}</li>`);
-            }
-            setTreeViewContext();
-        }
 
         $(`#upload-progress-bar-${file_num + 1}`).removeClass("progress-bar-striped");
         $(`#upload-progress-bar-${file_num + 1}`).addClass("bg-success");
         $(`#upload-progress-bar-${file_num + 1}`).html('<i style="color: black;" class="fas fa-box-check"></i>');
+        getTreeView(path);
     }
 }
 
