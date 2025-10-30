@@ -724,7 +724,14 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
-        path = os.path.join(data["parent"], data["name"])
+        # Check for absolute or relative path. Absolute paths should be deprecated
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        filepath = data["parent"]
+        request_path = filepath
+        if not Path(filepath).is_absolute():
+            filepath = str(Path(server_path, request_path))
+        file_path = Path(filepath)
+        path = os.path.join(file_path, data["name"])
         if not Helpers.validate_traversal(
             self.controller.servers.get_server_data_by_id(server_id)["path"],
             path,
