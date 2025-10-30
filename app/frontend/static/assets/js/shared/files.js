@@ -116,7 +116,6 @@ async function getTreeView(path) {
     });
     let responseData = await res.json();
     if (responseData.status === "ok") {
-        console.log(responseData);
         process_tree_response(responseData);
     } else {
         bootbox.alert({
@@ -247,6 +246,7 @@ function loadMenuContent(tr) {
     add_rename_listener();
     add_delete_listener();
     add_download_listener();
+    add_unzip_listener();
 
 }
 async function renameItem(path, name) {
@@ -400,6 +400,32 @@ function add_download_listener() {
     $("#download").on("click", function () {
         const path = $(selected_row).attr("data-path");
         window.open(`/api/v2/servers/${serverId}/files/${encodeURIComponent(path)}/download`, '_blank');
+    });
+}
+
+function add_unzip_listener() {
+    $("#unzip").on("click", async function () {
+        const path = $(selected_row).attr("data-path");
+        const cur_dir = $("#table-nav").attr("data-cur-path");
+        console.log(path)
+        let res = await fetch(`/api/v2/servers/${serverId}/files/zip/`, {
+            method: "POST",
+            headers: {
+                "X-XSRFToken": token,
+            },
+            body: JSON.stringify({ folder: path }),
+        });
+        let responseData = await res.json();
+        if (responseData.status === "ok") {
+            setTimeout(function () {
+                getTreeView(cur_dir);
+            }, 3000);
+        } else {
+            bootbox.alert({
+                title: responseData.error,
+                message: responseData.error_data
+            });
+        }
     });
 }
 

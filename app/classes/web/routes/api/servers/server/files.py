@@ -815,6 +815,10 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                 },
             )
         folder = data["folder"]
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        request_path = folder
+        if not Path(folder).is_absolute():
+            folder = str(Path(server_path, request_path))
         user_id = auth_data[4]["user_id"]
         if not Helpers.validate_traversal(
             self.controller.servers.get_server_data_by_id(server_id)["path"],
