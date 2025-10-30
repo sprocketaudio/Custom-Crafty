@@ -286,7 +286,6 @@ async function renameItem(path, name) {
 
 function add_rename_listener() {
     $("#rename").on("click", function () {
-        const path = $(selected_row).attr("data-path");
         const name = $(selected_row).children(".column-1").attr("data-name");
         bootbox.prompt({
             title:
@@ -574,3 +573,7 @@ async function calculateFileHash(file) {
 
     return hashHex;
 }
+
+$(".move-dialogue").on("click", function () {
+
+});
