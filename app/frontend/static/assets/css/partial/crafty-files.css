@@ -113,3 +113,31 @@
         transform: translateX(100%);
     }
 }
+
+#drop-zone {
+    position: relative;
+    transition: background-color 0.3s ease, border 0.3s ease;
+}
+
+#drop-zone-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    opacity: 0;
+    pointer-events: none;
+    /* always none! */
+    transition: opacity 0.2s ease;
+    z-index: 10;
+}
+
+#drop-zone-overlay img {
+    opacity: 0.9;
+}
+
+#drop-zone.drop-hover #drop-zone-overlay {
+    opacity: 1;
+}

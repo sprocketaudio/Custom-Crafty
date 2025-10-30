@@ -33,37 +33,43 @@ end %} {% block content %}
                         {% include "parts/m_server_controls_list.html %}
                     </span>
                     <div id="context-container" class="table-responsive">
-                        <table class="table no-scroll animated-table" id="files_table"
-                            data-path="{{data['server_stats']['server_id']['path'] }}"
-                            data-delete="{{ translate('serverFiles', 'delete', data['lang']) }}" data-rename="{{
+                        <div id="drop-zone">
+                            <div id="drop-zone-overlay">
+                                <i class="fa-solid fa-cloud-arrow-up fa-10x" id="drop-zone-img"></i>
+                            </div>
+                            <table class="table no-scroll animated-table" id="files_table"
+                                data-path="{{data['server_stats']['server_id']['path'] }}"
+                                data-delete="{{ translate('serverFiles', 'delete', data['lang']) }}" data-rename="{{
                     translate('serverFiles', 'rename', data['lang']) }}" data-unzip="{{
                     translate('serverFiles', 'unzip', data['lang']) }}" data-download="{{
                     translate('serverFiles', 'download', data['lang']) }}">
-                            <thead class="thead">
-                                <tr>
-                                    <th id="table-nav" class="table-nav">
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <th id="table-nav-buttons" class="table-nav-buttons">
-                                        <button id="create-dir" class="btn btn-outline-info">Create Directory</button>
-                                        &nbsp;
-                                        <button id="create-file" class="btn btn-outline-info">Create File</button>
-                                        &nbsp;
-                                        <button id="upload-file" class="btn btn-outline-info">Upload File</button>
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <th scope="col-7">Name</th>
-                                    <th scope="col-1">Type</th>
-                                    <th scope="col-2">Date Modified</th>
-                                    <th scope="col-1">Size</th>
-                                    <th scope="col-1">Options</th>
-                                </tr>
-                            </thead>
-                            <tbody id="files-table-body">
-                            </tbody>
-                        </table>
+                                <thead class="thead">
+                                    <tr>
+                                        <th id="table-nav" class="table-nav">
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th id="table-nav-buttons" class="table-nav-buttons">
+                                            <button id="create-dir" class="btn btn-outline-info">Create
+                                                Directory</button>
+                                            &nbsp;
+                                            <button id="create-file" class="btn btn-outline-info">Create File</button>
+                                            &nbsp;
+                                            <button id="upload-file" class="btn btn-outline-info">Upload File</button>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th scope="col-7">Name</th>
+                                        <th scope="col-1">Type</th>
+                                        <th scope="col-2">Date Modified</th>
+                                        <th scope="col-1">Size</th>
+                                        <th scope="col-1">Options</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="files-table-body">
+                                </tbody>
+                            </table>
+                        </div>
                     </div> <!--table div-->
                 </div> <!--card-body-->
             </div> <!--card-->
@@ -80,4 +86,5 @@ end %} {% block content %}
     })
 </script>
 <script src="/static/assets/js/shared/files.js"></script>
+<script src="../../static/assets/js/shared/upload.js"></script>
 {% end %}

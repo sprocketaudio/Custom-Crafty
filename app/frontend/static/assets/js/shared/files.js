@@ -432,13 +432,8 @@ function add_unzip_listener() {
 $(document).ready(function () {
     const $dropZone = $("#drop-zone");
     const $table = $("#files_table");
-    const serverId = new URLSearchParams(document.location.search).get("id");
     const uploadPath = $table.data("path");
 
-    // Your existing file tree setup
-    getTreeView(uploadPath);
-
-    // Highlight drop area when dragging
     $dropZone.on("dragover", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -451,7 +446,6 @@ $(document).ready(function () {
         $dropZone.removeClass("drop-hover");
     });
 
-    // Handle file drop
     $dropZone.on("drop", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -459,67 +453,10 @@ $(document).ready(function () {
 
         const files = e.originalEvent.dataTransfer.files;
         if (files.length === 0) return;
-
-        // Pass to your existing upload function
-        handleFileUpload(files, uploadPath, serverId);
+        console.log(files)
+        handleUpload(files, uploadPath);
     });
-
-    // Example upload logic — you can replace this with your existing code
-    function handleFileUpload(files, path, serverId) {
-        const formData = new FormData();
-        Array.from(files).forEach(file => {
-            formData.append("file", file);
-        });
-        do_upload(formData)
-    }
 });
-
-
-async function do_upload(files, path) {
-
-    let nFiles = files.files.length;
-    const uploadPromises = [];
-
-    for (let i = 0; i < nFiles; i++) {
-        const file = files.files[i];
-        const progressHtml = `
-                  <div style="width: 100%; min-width: 100%;">
-                      ${file.name}:
-                      <br><div
-                          id="upload-progress-bar-${i + 1}"
-                          class="progress-bar progress-bar-striped progress-bar-animated"
-                          role="progressbar"
-                          style="width: 100%; height: 10px;"
-                          aria-valuenow="0"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                      ></div>
-                  </div><br>
-                  `;
-
-        $("#upload-progress-bar-parent").append(progressHtml);
-
-        const uploadPromise = uploadFile(
-            "server_upload",
-            file,
-            path,
-            i,
-            (progress) => {
-                $(`#upload-progress-bar-${i + 1}`).attr(
-                    "aria-valuenow",
-                    progress
-                );
-                $(`#upload-progress-bar-${i + 1}`).css(
-                    "width",
-                    progress + "%"
-                );
-            }
-        );
-        uploadPromises.push(uploadPromise);
-    }
-
-    await Promise.all(uploadPromises);
-}
 
 $("#upload-file").on("click", async function uploadFilesE(event) {
     const path = $("#table-nav").attr("data-cur-path");
@@ -564,7 +501,7 @@ $("#upload-file").on("click", async function uploadFilesE(event) {
                             'px; width:100%; display: block;">' +
                             "</div>";
                         files = document.getElementById("files");
-                        handleUpload(files, path);
+                        handleUpload(files.files, path);
                     },
                 },
             },
@@ -575,11 +512,11 @@ $("#upload-file").on("click", async function uploadFilesE(event) {
 
 async function handleUpload(files, path) {
 
-    let nFiles = files.files.length;
+    let nFiles = files.length;
     const uploadPromises = [];
 
     for (let i = 0; i < nFiles; i++) {
-        const file = files.files[i];
+        const file = files[i];
         const progressHtml = `
       <div style="width: 100%; min-width: 100%;">
           ${file.name}:
