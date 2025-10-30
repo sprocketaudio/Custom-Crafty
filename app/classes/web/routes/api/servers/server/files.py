@@ -177,6 +177,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     "error_data": str(e),
                 },
             )
+        # Check for absolute or relative path. Absolute paths should be deprecated
         server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
         request_path = data["path"]
         if not Path(data["path"]).is_absolute():
@@ -352,6 +353,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
+        # Check for absolute or relative path. Absolute paths should be deprecated
         server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
         request_path = data["filename"]
         if not Path(data["filename"]).is_absolute():
@@ -444,6 +446,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
+        # Check for absolute or relative path. Absolute paths should be deprecated
         server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
         request_path = data["path"]
         if not Path(data["path"]).is_absolute():
@@ -621,6 +624,7 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
+        # Check for absolute or relative path. Absolute paths should be deprecated
         server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
         request_path = data["path"]
         if not Path(data["path"]).is_absolute():
@@ -862,6 +866,7 @@ class ApiServersServerFileDownload(BaseApiHandler):
             )
 
         filepath = html.unescape(encoded_file_path)
+        # Check for absolute or relative path. Absolute paths should be deprecated
         server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
         request_path = filepath
         if not Path(filepath).is_absolute():
