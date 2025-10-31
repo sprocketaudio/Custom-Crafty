@@ -1,4 +1,4 @@
-const urlParams = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(globalThis.location.search);
 const serverId = urlParams.get("server_id");
 let serverFileContent = "";
 
@@ -28,7 +28,7 @@ editor.commands.addCommand({
     },
 });
 
-is_saved = true;
+var is_saved = true;
 
 let extensionChanges = [
     {
@@ -132,7 +132,7 @@ let extensionChanges = [
 
 async function get_file() {
     const token = getCookie("_xsrf");
-    path = decodeURIComponent(urlParams.get("file"))
+    let path = decodeURIComponent(urlParams.get("file"))
     setFileName(path)
     $("#server_uuid").text(serverId);
     let res = await fetch(`/api/v2/servers/${serverId}/files`, {
@@ -174,18 +174,17 @@ function setMode(extension) {
         return extension.match(element.regex) ? element.replaceWith : output;
     }, extension);
 
-    if (!aceMode.startsWith("ace/mode/")) {
-        document.querySelector("#file_warn").innerText =
-            "{% raw translate('serverFiles', 'unsupportedLanguage', data['lang']) %}";
-    } else {
+    if (aceMode.startsWith("ace/mode/")) {
         document.querySelector("#file_warn").innerText = "";
 
         console.log(aceMode || "ace/mode/text");
         editor.session.setMode(aceMode || "ace/mode/text");
+    } else {
+        document.querySelector("#file_warn").innerText =
+            "{% raw translate('serverFiles', 'unsupportedLanguage', data['lang']) %}";
     }
 }
-function setFileName(name) {
-    let fileName = name || "default.txt";
+function setFileName(fileName = "default.txt") {
     $("#editingFile").text(fileName);
     document.title = "Crafty Controller - " + fileName
 
@@ -359,7 +358,7 @@ function setKeyboard(target) {
     $clickedBtn.removeClass("btn-secondary").addClass("btn-primary");
 }
 
-window.addEventListener('beforeunload', (e) => {
+globalThis.addEventListener('beforeunload', (e) => {
     if (!is_saved) {
         e.preventDefault();
         e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
