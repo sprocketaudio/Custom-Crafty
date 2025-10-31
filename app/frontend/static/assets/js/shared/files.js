@@ -154,7 +154,12 @@ function process_tree_response(response) {
             const span = document.createElement("span");
             span.className = "tree-nav";
             const previous = path_list.slice(0, index);
-            local_path = previous.join("/") + part
+            if (index != 0) {
+                local_path = previous.join("/") + "/" + part
+            } else {
+                local_path = previous.join("/") + part
+            }
+            console.log(local_path)
             span.dataset.path = local_path; // or set the actual path if needed // if we're on the first iteration and it's the server ID ignore it
             span.textContent = part; // safe text;
 
