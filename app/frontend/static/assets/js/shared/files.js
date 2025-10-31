@@ -135,14 +135,14 @@ function process_tree_response(response) {
     const tbody = document.querySelector("tbody");
     let path = response.data.root_path.local_path;
     path = path.split("\\").join("/"); //Remove \ marks
-    path_list = path.split("/");
+    let path_list = path.split("/");
     const container = document.querySelector("#table-nav"); // your container
     $(container).html("") // clear previous content
     $(container).attr("data-cur-path", path);
 
     const span = document.createElement("span");
     span.className = "tree-nav";
-    local_path = serverId
+    let local_path = serverId
     span.dataset.path = local_path; // or set the actual path if needed
     span.innerHTML = `<i class="fa-solid fa-server"></i>`; //Set root text as server icon
     container.appendChild(span);
