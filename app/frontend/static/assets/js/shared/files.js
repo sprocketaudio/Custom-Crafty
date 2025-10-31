@@ -131,8 +131,7 @@ function fileIcon(value) {
     return '<i class="fa-regular fa-file-excel text-danger"></i>';
 }
 
-function process_tree_response(response) {
-    const tbody = document.querySelector("tbody");
+function setup_table_nav(response) {
     let path = response.data.root_path.local_path;
     path = path.split("\\").join("/"); //Remove \ marks
     let path_list = path.split("/");
@@ -168,7 +167,10 @@ function process_tree_response(response) {
             container.appendChild(span);
         }
     }
-    $("#files-table-body").html("");
+}
+
+function setup_table_body(response) {
+    const tbody = document.querySelector("tbody");
     const response_entries = Object.entries(response.data)
     console.log(response_entries)
     for (let [key, value] of response_entries) {
@@ -213,6 +215,12 @@ function process_tree_response(response) {
         // Append row to tbody (also as jQuery object)
         $(tbody).append($tr);
     };
+}
+
+function process_tree_response(response) {
+    setup_table_nav(response);
+    $("#files-table-body").html("");
+    setup_table_body(response);
 
     $(".directory").click(function (e) {
         // Prevent the click from firing if it’s on the context menu button
