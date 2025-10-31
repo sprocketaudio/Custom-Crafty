@@ -51,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const tr = event.target.closest("tr");
 
             if (!th && tr) { //only allow right click menu on folder items
-                tr
                 event.preventDefault();
                 loadMenuContent(tr);
                 showMenu(event.clientX, event.clientY);
