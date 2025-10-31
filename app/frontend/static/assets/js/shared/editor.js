@@ -346,7 +346,7 @@ function setKeybinds(handlerName) {
 }
 
 function setKeyboard(target) {
-    let handlerName = target.getAttribute("data-handler-name");
+    let handlerName = target.dataset.handlerName;
     localStorage.setItem("keybind", handlerName);
     setKeybinds(handlerName);
 
