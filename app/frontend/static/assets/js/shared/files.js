@@ -148,14 +148,14 @@ function setup_table_nav(response) {
     span.className = "tree-nav";
     let local_path = serverId
     span.dataset.path = local_path; // or set the actual path if needed
-    span.innerHTML = `<i class="fa-solid fa-server"></i>`; //Set root text as server icon
+    span.innerHTML = `<i class="fa-solid fa-server"></i>${path_list[0] === serverId ? '&nbsp; <i class="fa-solid fa-rotate-right"></i>' : ""}`; //Set root text as server icon
     container.appendChild(span);
     for (let [index, part] of path_list.entries()) {
-        console.log("part", part, "index", index)
         if (!(part === serverId && index === 0)) {
             container.appendChild(document.createTextNode(" > "));
             // Create the span
             const span = document.createElement("span");
+            const refresh = document.createElement("span");
             span.className = "tree-nav";
             const previous = path_list.slice(0, index);
             if (index === 0) {
@@ -163,9 +163,12 @@ function setup_table_nav(response) {
             } else {
                 local_path = previous.join("/") + "/" + part
             }
-            console.log(local_path)
             span.dataset.path = local_path; // or set the actual path if needed // if we're on the first iteration and it's the server ID ignore it
             span.textContent = part; // safe text;
+            if (index == path_list.length - 1) {
+                refresh.innerHTML = `&nbsp; <i class="fa-solid fa-rotate-right"></i>`;
+                span.appendChild(refresh);
+            }
 
 
             // Append the span
@@ -177,9 +180,7 @@ function setup_table_nav(response) {
 function setup_table_body(response) {
     const tbody = document.querySelector("tbody");
     const response_entries = Object.entries(response.data)
-    console.log(response_entries)
     for (let [key, value] of response_entries) {
-        console.log(key)
         if (key === "root_path" || key === "db_stats") continue;
 
         const $tr = $("<tr>")
@@ -310,9 +311,7 @@ function add_rename_listener() {
             callback: function (result) {
                 if (!result) return;
                 if ($(selected_row).children(".column-1").attr("data-name") != result) {
-                    console.log("sending path" + result)
                     renameItem($(selected_row).attr("data-path"), result)
-                    console.log($(selected_row).children(".column-1").attr("data-name"), result)
                     $(selected_row).attr("data-path", $(selected_row).attr("data-path").replace($(selected_row).children(".column-1").attr("data-name"), result))
 
                     $(selected_row).children(".column-1").empty()
@@ -380,7 +379,6 @@ async function create(parent, name, dir = false) {
 function add_delete_listener() {
     $("#delete").on("click", function () {
         const path = $(selected_row).attr("data-path");
-        console.log(path)
         bootbox.confirm({
             size: "",
             title:
@@ -441,7 +439,6 @@ function add_unzip_listener() {
     $("#unzip").on("click", async function () {
         const path = $(selected_row).attr("data-path");
         const cur_dir = $("#table-nav").attr("data-cur-path");
-        console.log(path)
         let res = await fetch(`/api/v2/servers/${serverId}/files/zip/`, {
             method: "POST",
             headers: {
