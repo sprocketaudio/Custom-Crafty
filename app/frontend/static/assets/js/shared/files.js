@@ -154,10 +154,10 @@ function process_tree_response(response) {
             const span = document.createElement("span");
             span.className = "tree-nav";
             const previous = path_list.slice(0, index);
-            if (index != 0) {
-                local_path = previous.join("/") + "/" + part
-            } else {
+            if (index === 0) {
                 local_path = previous.join("/") + part
+            } else {
+                local_path = previous.join("/") + "/" + part
             }
             console.log(local_path)
             span.dataset.path = local_path; // or set the actual path if needed // if we're on the first iteration and it's the server ID ignore it
@@ -169,8 +169,11 @@ function process_tree_response(response) {
         }
     }
     $("#files-table-body").html("");
-    Object.entries(response.data).forEach(([key, value]) => {
-        if (key === "root_path" || key === "db_stats") return;
+    const response_entries = Object.entries(response.data)
+    console.log(response_entries)
+    for (let [key, value] of response_entries) {
+        console.log(key)
+        if (key === "root_path" || key === "db_stats") continue;
 
         const $tr = $("<tr>")
             .addClass(value.dir ? "directory" : "file")
@@ -209,7 +212,8 @@ function process_tree_response(response) {
 
         // Append row to tbody (also as jQuery object)
         $(tbody).append($tr);
-    });
+    };
+
     $(".directory").click(function (e) {
         // Prevent the click from firing if it’s on the context menu button
         if ($(e.target).closest(".context-button").length) return;
