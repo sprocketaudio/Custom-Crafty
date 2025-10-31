@@ -49,6 +49,7 @@ class FileHelpers:
             "application/x-sh",
             "text/x-bat",
             "application/x-bat",
+            "text/x-log",
         ]
 
     def add_mime_types(self):
@@ -61,6 +62,7 @@ class FileHelpers:
         mimetypes.add_type(PLAIN_TEXT, ".properties")
         mimetypes.add_type(PLAIN_TEXT, ".env")
         mimetypes.add_type("application/x-bat", ".ps1")
+        mimetypes.add_type("text/x-log", ".log")
 
     def probably_can_open_file(self, path: str) -> tuple:
         mime = mimetypes.guess_type(path)
