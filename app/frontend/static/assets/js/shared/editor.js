@@ -298,7 +298,7 @@ function load_keybind_control(menu) {
         { label: "VSCode", handler: "ace/keyboard/vscode" },
     ];
     let cur_selection = localStorage.getItem("keybind") || "null"
-    keyboardOptions.forEach(opt => {
+    for (opt of keyboardOptions) {
         const btn = document.createElement("button");
         let className = "btn-outline-info"
         if (cur_selection == opt.handler) {
@@ -306,7 +306,7 @@ function load_keybind_control(menu) {
         }
         btn.className = `btn ${className}`;
         btn.textContent = opt.label;
-        btn.setAttribute("data-handler-name", opt.handler);
+        btn.dataset.handlerName = opt.handler;
 
         btn.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -330,7 +330,7 @@ function load_keybind_control(menu) {
 
         controlContainer.append(btn);
         menu.append(controlContainer)
-    });
+    }
 }
 
 function setKeybinds(handlerName) {
