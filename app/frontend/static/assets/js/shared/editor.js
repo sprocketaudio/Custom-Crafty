@@ -363,6 +363,6 @@ function setKeyboard(target) {
 globalThis.addEventListener('beforeunload', (e) => {
     if (!is_saved) {
         e.preventDefault();
-        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        globalThis.alert('You have unsaved changes. Are you sure you want to leave?');
     }
 });
