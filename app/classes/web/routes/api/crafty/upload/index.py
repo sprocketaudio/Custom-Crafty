@@ -2,7 +2,6 @@ import os
 import logging
 import shutil
 import anyio
-from pathlib import Path
 from PIL import Image
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.helpers.helpers import Helpers
