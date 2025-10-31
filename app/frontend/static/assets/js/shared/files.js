@@ -316,9 +316,7 @@ $("#create-dir").on("click", function () {
         function (result) {
             if (!result) return;
             const cur_dir = $("#table-nav").attr("data-cur-path");
-            create(cur_dir, result, true, function () {
-                getTreeView(cur_dir);
-            });
+            create(cur_dir, result, true);
         }
     );
 })
@@ -329,14 +327,12 @@ $("#create-file").on("click", function () {
         function (result) {
             if (!result) return;
             const cur_dir = $("#table-nav").attr("data-cur-path");
-            create(cur_dir, result, false, function () {
-                getTreeView(cur_dir);
-            });
+            create(cur_dir, result, false);
         }
     );
 })
 
-async function create(parent, name, dir = false, callback) {
+async function create(parent, name, dir = false) {
     const token = getCookie("_xsrf");
     let res = await fetch(`/api/v2/servers/${serverId}/files/create/`, {
         method: "PUT",
@@ -446,7 +442,6 @@ $(document).ready(function () {
         toggle: true
     })
     const $dropZone = $("#drop-zone");
-    const $table = $("#files_table");
 
     $dropZone.on("dragover", function (e) {
         e.preventDefault();
@@ -475,7 +470,7 @@ $(document).ready(function () {
 $("#upload-file").on("click", async function uploadFilesE(event) {
     const path = $("#table-nav").attr("data-cur-path");
     $(function () {
-        var uploadHtml =
+        let uploadHtml =
             "<div>" +
             '<form id="upload-file-form"  enctype="multipart/form-data">' +
             "<label class='upload-area' style='width:100%;text-align:center;' for='files'>" +
@@ -499,22 +494,8 @@ $("#upload-file").on("click", async function uploadFilesE(event) {
                         if ($("#files").get(0).files.length === 0) {
                             return hideUploadBox();
                         }
-                        var height = files.files.length * 50;
 
-                        var waitMessage =
-                            '<p class="text-center mb-0">' +
-                            '<i class="fa fa-spin fa-cog"></i>&nbsp;' +
-                            "{{ translate('serverFiles', 'waitUpload', data['lang']) }}" +
-                            "<br>" +
-                            "<strong>" +
-                            "{{ translate('serverFiles', 'stayHere', data['lang']) }}" +
-                            "</strong>" +
-                            "</p>" +
-                            '<div class="progress" id="upload-progress-bar-parent" style="height:' +
-                            height +
-                            'px; width:100%; display: block;">' +
-                            "</div>";
-                        files = document.getElementById("files");
+                        let files = document.getElementById("files");
                         handleUpload(files.files, path);
                     },
                 },
@@ -547,8 +528,6 @@ async function handleUpload(files, path) {
       `;
 
         $("#upload-progress-bar-parent").append(progressHtml);
-
-        console.log
 
         const uploadPromise = uploadFile(
             "server_upload",
