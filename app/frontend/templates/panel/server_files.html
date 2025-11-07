@@ -50,7 +50,6 @@ end %} {% block content %}
                                     <button id="create-file" class="btn btn-outline-info">Create File</button>
                                     &nbsp;
                                     <button id="upload-file" class="btn btn-outline-info">Upload File</button>
-                                    <i class="fa-solid fa-bars-progress fa-2xl" id="status-icon"></i>
                                 </div>
                             </div>
                             <table class="table no-scroll animated-table" id="files_table"
@@ -76,6 +75,18 @@ end %} {% block content %}
                                 <tbody id="files-table-body">
                                 </tbody>
                             </table>
+                        </div>
+                        <div id="file-status">
+                            &nbsp;File Status<span id="status-caret"><i class="fa-solid fa-caret-up"></i></span>
+                            <div id="file-status-content" class="d-none">
+                                <br>
+                                <progress value="30" max="100">32%</progress>
+                                <progress value="30" max="100">32%</progress>
+                                <progress value="30" max="100">32%</progress>
+                                <progress value="30" max="100">32%</progress>
+                                <progress value="30" max="100">32%</progress>
+                                <progress value="30" max="100">32%</progress>
+                            </div>
                         </div>
                     </div> <!--table div-->
                 </div> <!--card-body-->
