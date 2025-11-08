@@ -103,5 +103,5 @@ docker-build:
     - docker context rm tls-environment-$CI_JOB_ID || true
     - echo "Please review multi-arch manifests are present:"
     - if [ "$ENVIRONMENT_NAME" = "development" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"; fi
-    - if [ "$ENVIRONMENT_NAME" = "production" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:$VERSION"; fi
+    - if [ "$ENVIRONMENT_NAME" = "production" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:latest"; fi
     - if [ "$ENVIRONMENT_NAME" = "nightly" ]; then docker buildx imagetools inspect "$CI_REGISTRY_IMAGE:nightly"; fi

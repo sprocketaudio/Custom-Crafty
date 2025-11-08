@@ -265,9 +265,8 @@ class TasksManager:
                     if schedule.interval_type == "hours":
                         new_job = self.scheduler.add_job(
                             self.controller.management.queue_command,
-                            "cron",
-                            minute=0,
-                            hour="*/" + str(schedule.interval),
+                            "interval",
+                            hours=int(schedule.interval),
                             id=str(schedule.schedule_id),
                             args=[
                                 {
@@ -283,8 +282,8 @@ class TasksManager:
                     elif schedule.interval_type == "minutes":
                         new_job = self.scheduler.add_job(
                             self.controller.management.queue_command,
-                            "cron",
-                            minute="*/" + str(schedule.interval),
+                            "interval",
+                            minutes=int(schedule.interval),
                             id=str(schedule.schedule_id),
                             args=[
                                 {
@@ -395,9 +394,8 @@ class TasksManager:
                 if job_data["interval_type"] == "hours":
                     new_job = self.scheduler.add_job(
                         self.controller.management.queue_command,
-                        "cron",
-                        minute=0,
-                        hour="*/" + str(job_data["interval"]),
+                        "interval",
+                        hours=int(job_data["interval"]),
                         id=str(sch_id),
                         args=[
                             {
@@ -413,8 +411,8 @@ class TasksManager:
                 elif job_data["interval_type"] == "minutes":
                     new_job = self.scheduler.add_job(
                         self.controller.management.queue_command,
-                        "cron",
-                        minute="*/" + str(job_data["interval"]),
+                        "interval",
+                        minutes=int(job_data["interval"]),
                         id=str(sch_id),
                         args=[
                             {
