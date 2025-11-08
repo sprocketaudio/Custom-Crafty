@@ -994,6 +994,20 @@ class ApiServersServerFileDownload(BaseApiHandler):
 
 
 class ApiServersServerFilesOperationHandler(BaseApiHandler):
+    def move_or_copy(self, operation: str, target_file: Path, data: dict):
+        if operation == "move":
+            target_destination = data.get("destionation")
+            if target_destination:
+                if Path(target_file).is_dir():
+                    FileHelpers.move_dir(target_file, target_destination)
+                FileHelpers.move_file(target_file, target_destination)
+        elif operation == "copy":
+            target_destination = data.get("destionation")
+            if target_destination:
+                if Path(target_file).is_dir():
+                    FileHelpers.copy_dir(target_file, target_destination)
+                FileHelpers.copy_file(target_file, target_destination)
+
     def post(self, server_id: str, operation: str):
         auth_data = self.authenticate_user()
         if not auth_data:
@@ -1061,17 +1075,5 @@ class ApiServersServerFilesOperationHandler(BaseApiHandler):
         target_file = self.file_helper.get_absolute_path(
             server_path, server_id, data["folder"]
         )
-
-        if operation == "move":
-            target_destination = data.get("destionation")
-            if target_destination:
-                if Path(target_file).is_dir():
-                    FileHelpers.move_dir(target_file, target_destination)
-                FileHelpers.move_file(target_file, target_destination)
-        elif operation == "copy":
-            target_destination = data.get("destionation")
-            if target_destination:
-                if Path(target_file).is_dir():
-                    FileHelpers.copy_dir(target_file, target_destination)
-                FileHelpers.copy_file(target_file, target_destination)
+        self.move_or_copy(operation, target_file, data)
         return self.finish_json(200, {"status": "ok"})
