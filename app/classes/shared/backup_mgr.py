@@ -65,7 +65,11 @@ class BackupManager:
                             if not result:
                                 error = True
                         else:
-                            self.file_helper.del_file(os.path.join(server_path, item))
+                            result = self.file_helper.del_file(
+                                os.path.join(server_path, item)
+                            )
+                            if not result:
+                                error = True
                 self.file_helper.restore_archive(backup_location, server_path)
         server_users = PermissionsServers.get_server_user_list(svr_obj.server_id)
         time.sleep(3)
@@ -74,12 +78,20 @@ class BackupManager:
                 WebSocketManager().broadcast_user(
                     user,
                     "send_start_error",
-                    "Restore failure. Could not delete existing files",
+                    self.helper.translation.translate(
+                        "notify", "restoreFailed", HelperUsers.get_user_lang_by_id(user)
+                    ),
                 )
         else:
             for user in server_users:
                 WebSocketManager().broadcast_user(
-                    user, "notification", "Restore completed"
+                    user,
+                    "notification",
+                    self.helper.translation.translate(
+                        "notify",
+                        "restoreSuccess",
+                        HelperUsers.get_user_lang_by_id(user),
+                    ),
                 )
 
     def backup_starter(self, backup_config, server):

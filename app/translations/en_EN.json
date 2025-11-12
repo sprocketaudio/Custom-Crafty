@@ -283,6 +283,8 @@
         "finishedPreparing": "We've finished preparing your support logs. Please click download to download",
         "logout": "Logout",
         "preparingLogs": " Please wait while we prepare your logs... We`ll send a notification when they`re ready. This may take a while for large deployments.",
+        "restoreFailed": "Backup restore failed. Could not delete files from server directory.",
+        "restoreSuccess": "Server files restored successfully.",
         "schedule_desc": "We detected some or all of your scheduled tasks were not successfully transferred during the upgrade. Please confirm your schedules in the schedules tab.",
         "schedule_title": "Schedules Migration Warning",
         "supportLogs": "Support Logs"
