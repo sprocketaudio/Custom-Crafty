@@ -184,7 +184,7 @@ function updateProgressBar(progress, type, _i, file_id) {
             $(`#upload-progress-bar-${file_id}`).removeClass("progress-bar-animated")
         }
         $(`#upload-progress-bar-${file_id}`).css('width', progress + '%');
-        $(`#upload-progress-bar-${file_id}`).html(progress + '%');
+        $(`#upload-percent-${file_id}`).html(progress + '%');
         $("#operation-total").html(`<span id="notif-count" class="badge bg-primary">${$("#upload-progress-bar-parent").children().length}</span>`);
     }
 }

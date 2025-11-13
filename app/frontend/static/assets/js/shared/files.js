@@ -494,15 +494,19 @@ function add_unzip_listener() {
         const unzip_progress = `      
         <div style="width: 100%; min-width: 100%;" id="upload-progress-bar-${unzip_id}-container">
           <small>${name}:</small>
-          <br><div
+          <br>
+        <div class="d-flex">
+          <span class="upload-percent" id="upload-percent-${unzip_id}"></span>
+          <div
               id="upload-progress-bar-${unzip_id}"
-              class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
+              class="progress-bar progress-bar-striped progress-bar-animated files-progress bg-warning"
               role="progressbar"
               style="width: 100%; height: 10px;"
               aria-valuenow="0"
               aria-valuemin="0"
               aria-valuemax="100"
           ></div>
+          </div>
       </div>`
         let res = await fetch(`/api/v2/servers/${serverId}/files/zip/`, {
             method: "POST",
@@ -575,15 +579,19 @@ async function handleUpload(files, path) {
         const progressHtml = `
       <div style="width: 100%; min-width: 100%;" id="upload-progress-bar-${file_id}-container">
           <small>${file.name}:</small>
-          <br><div
+          <br>
+          <div class="d-flex">
+          <span class="upload-percent" id="upload-percent-${file_id}"></span>
+          <div
               id="upload-progress-bar-${file_id}"
-              class="progress-bar progress-bar-striped progress-bar-animated"
+              class="progress-bar progress-bar-striped progress-bar-animated files-progress"
               role="progressbar"
               style="width: 100%; height: 10px;"
               aria-valuenow="0"
               aria-valuemin="0"
               aria-valuemax="100"
           ></div>
+          </div>
       </div>
       `;
 
