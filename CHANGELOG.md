@@ -3,7 +3,9 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Change hour and minute intervals in APScheudler to fix incorrect triggers ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/910))
+- Use asyncio locks to limit upload handler race condition ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/907))
+- Fix static fonts not working on some browsers ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/906))
 ### Tweaks
 TBD
 ### Lang

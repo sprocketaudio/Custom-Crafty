@@ -692,7 +692,6 @@
         "backupName": "Back-upnaam moet een string zijn en een minimumlengte van 3 hebben.",
         "filesPageLen": "lengte moet groter zijn dan 1 voor eigenschap",
         "insufficientPerms": "Toestemmingsfout: Ontbrekende rechten voor deze bron",
-        "passLength": "Wachtwoord Te Kort. Minimumlengte: 8",
         "roleName": "De rolnaam moet een string zijn die groter is dan 1 teken. Deze mag geen van de volgende symbolen bevatten: [], ",
         "roleServerId": "De eigenschap van Server-ID moet een string zijn met een minimumlengte van 1",
         "roleServerPerms": "Servertoestemmingen moeten een 8-bits string zijn",
@@ -707,7 +706,7 @@
         "totp": "MFA-code moet 6 nummers zijn",
         "mfaName": "Invoer moet van type String zijn van minstens 3 karakters voor deze eigenschap",
         "additionalProperties": "Aanvullende Eigenschappen mogen niet meegestuurd worden",
-        "numbericPassword": "Numeriek Wachtwoord. Vereist minstens 1 alfabetisch karakter"
+        "passProp": "Wachtwoord moet tekst zijn met een minimale lengte van 8 karakters."
     },
     "serverMetrics": {
         "zoomHint1": "Om in te zoomen op de grafiek, houdt je de shift-toets ingedrukt en gebruik je vervolgens je scrollwiel.",

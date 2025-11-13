@@ -698,7 +698,6 @@
         "totpIdReq": "MFA ID vereist voor aanvraag"
     },
     "validators": {
-        "passLength": "Wachtwoord te kort. Minimumlengte: 8 tekens",
         "backupName": "De naam van de back-up moet een string zijn en een minimale lengte van 3 hebben.",
         "enumErr": "validatie mislukt. Accepteerbare gegevens zijn: ",
         "filesPageLen": "De lengte moet groter zijn dan 1 voor eigenschap",
@@ -721,8 +720,7 @@
         "mfaName": "Invoer moet van het type string zijn en minstens 3 tekens bevatten voor dit veld",
         "additionalProperties": "Er mogen geen extra eigenschappen worden meegegeven",
         "totp": "MFA-code moet uit 6 cijfers bestaan",
-        "2FAerror": "Multi-Factor code moet uit 6 cijfers bestaan (bijv. 000000) of een back-upcode van 16 tekens, gescheiden per 4 met een streepje (bijv. ABCD-EFGH-IJKL-MNOP)",
-        "numbericPassword": "Numeriek wachtwoord. Moet minstens 1 alfabetisch teken bevatten"
+        "2FAerror": "Multi-Factor code moet uit 6 cijfers bestaan (bijv. 000000) of een back-upcode van 16 tekens, gescheiden per 4 met een streepje (bijv. ABCD-EFGH-IJKL-MNOP)"
     },
     "webhooks": {
         "areYouSureDel": "Weet u zeker dat u deze webhook wilt verwijderen?",
