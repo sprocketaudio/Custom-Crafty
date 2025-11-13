@@ -670,9 +670,9 @@ function close_copy_move() {
     move = false;
     copy = false;
     const container = $("#table-nav-buttons");
-    const createDir = $("<button>").attr("id", "create-dir").addClass("btn").addClass("btn-outline-info").text($("#table-nav-buttons").attr("data-dir"));
-    const createFile = $("<button>").attr("id", "create-file").addClass("btn").addClass("btn-outline-info").text($("#table-nav-buttons").attr("data-file"));
-    const upload = $("<button>").attr("id", "upload-file").addClass("btn").addClass("btn-outline-info").text($("#table-nav-buttons").attr("data-upload"));
+    const createDir = $("<button>").attr("id", "create-dir").addClass("btn").addClass("btn-info").text($("#table-nav-buttons").attr("data-dir"));
+    const createFile = $("<button>").attr("id", "create-file").addClass("btn").addClass("btn-info").text($("#table-nav-buttons").attr("data-file"));
+    const upload = $("<button>").attr("id", "upload-file").addClass("btn").addClass("btn-info").text($("#table-nav-buttons").attr("data-upload"));
 
     container.html("")
     container.append(createDir);
