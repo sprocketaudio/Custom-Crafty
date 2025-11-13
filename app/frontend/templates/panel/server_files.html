@@ -65,19 +65,28 @@ end %} {% block content %}
                                     data["lang"])}}'>
                                 <thead class="thead">
                                     <tr>
-                                        <th scope="col-7">Name</th>
-                                        <th scope="col-1">Type</th>
-                                        <th scope="col-2">Date Modified</th>
-                                        <th scope="col-1">Size</th>
-                                        <th scope="col-1">Options</th>
+                                        <th scope="col">{{translate("serverFiles", "name" , data["lang"])}}</th>
+                                        <th class="d-none d-sm-table-cell" scope="col">{{translate("serverFiles", "type"
+                                            ,
+                                            data["lang"])}}</th>
+                                        <th class="d-none d-sm-table-cell" scope="col">{{translate("serverFiles",
+                                            "modified" ,
+                                            data["lang"])}}</th>
+                                        <th class="d-none d-sm-table-cell" scope="col">{{translate("serverFiles", "size"
+                                            ,
+                                            data["lang"])}}</th>
+                                        <th class="d-none d-sm-table-cell" scope="col">{{translate("serverFiles",
+                                            "options" ,
+                                            data["lang"])}}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="files-table-body">
                                 </tbody>
                             </table>
                         </div>
-                        <div id="file-status">
-                            &nbsp;{{ translate('serverFiles', 'operationStatus', data['lang']) }}&nbsp;&nbsp;<span
+                        <div id="file-status"><span class="d-none d-sm-inline align-items-center">
+                                &nbsp;{{ translate('serverFiles', 'operationStatus', data['lang'])
+                                }}</span>&nbsp;<i class="fa-solid fa-chart-simple d-sm-none"></i>&nbsp;<span
                                 id="operation-total"></span><span id="status-caret"><i
                                     class="fa-solid fa-caret-up"></i></span>
                             <div id="file-status-content" class="d-none">

@@ -195,3 +195,7 @@
 #operation-total {
     color: var(--deep-bg)
 }
+
+#table-nav-buttons button {
+    margin-bottom: 10px;
+}

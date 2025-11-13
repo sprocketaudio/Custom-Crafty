@@ -196,27 +196,30 @@ function setup_table_body(response) {
             .append("\u00A0\u00A0\u00A0")
             .append(document.createTextNode(key));
 
-        // Column 2: MIME or "Dir"
-        const $td2 = $("<td>");
-        if (value.mime || value.dir) {
-            $td2.text(value.mime ? value.mime : "Dir");
-        } else {
-            $td2.html('<i class="fa fa-question-circle" aria-hidden="true"></i>');
+        $tr.append($td1);
+        if ($("#files_table thead tr:first th:visible").length > 1) {
+            // Column 2: MIME or "Dir"
+            const $td2 = $("<td>");
+            if (value.mime || value.dir) {
+                $td2.text(value.mime ? value.mime : "Dir");
+            } else {
+                $td2.html('<i class="fa fa-question-circle" aria-hidden="true"></i>');
+            }
+
+            // Column 3: modified date
+            const $td3 = $("<td>").text(value.modified);
+
+            // Column 4: size
+            const $td4 = $("<td>").text(value.size || "-");
+
+            // Column 5: context button
+            const $td5 = $("<td>")
+                .addClass("context-button")
+                .text("...");
+
+            // Append all columns to the row
+            $tr.append($td2, $td3, $td4, $td5);
         }
-
-        // Column 3: modified date
-        const $td3 = $("<td>").text(value.modified);
-
-        // Column 4: size
-        const $td4 = $("<td>").text(value.size || "-");
-
-        // Column 5: context button
-        const $td5 = $("<td>")
-            .addClass("context-button")
-            .text("...");
-
-        // Append all columns to the row
-        $tr.append($td1, $td2, $td3, $td4, $td5);
 
         // Append row to tbody (also as jQuery object)
         $(tbody).append($tr);
