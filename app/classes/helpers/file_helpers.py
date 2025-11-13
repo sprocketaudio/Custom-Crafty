@@ -18,6 +18,7 @@ from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile
 
 import certifi
 
+from app.classes.models.server_permissions import PermissionsServers
 from app.classes.helpers.cryptography_helper import CryptoHelper
 from app.classes.helpers.helpers import Helpers
 from app.classes.shared.console import Console
@@ -454,7 +455,9 @@ class FileHelpers:
         with zipfile.ZipFile(archive_location, "r") as zip_ref:
             zip_ref.extractall(destination)
 
-    def unzip_file(self, zip_path, server_update: bool = False) -> None:
+    def unzip_file(
+        self, zip_path, server_id, server_update: bool = False, proc_id=None
+    ) -> None:
         """
         Unzips zip file at zip_path to location generated at new_dir based on zip
         contents.
@@ -467,6 +470,7 @@ class FileHelpers:
         Returns: None
 
         """
+        server_users = PermissionsServers.get_server_user_list(server_id)
         ignored_names = [
             "server.properties",
             "permissions.json",
@@ -483,7 +487,16 @@ class FileHelpers:
             try:
                 with zipfile.ZipFile(zip_path, "r") as zip_ref:
                     # we'll extract this to the temp dir using zipfile module
-                    zip_ref.extractall(temp_dir)
+                    files_list = zip_ref.namelist()
+                    for idx, file in enumerate(files_list):
+                        percent = round((idx / len(files_list)) * 100)
+                        zip_ref.extract(file, temp_dir)
+                        for user in server_users:
+                            WebSocketManager().broadcast_user(
+                                user,
+                                "zip_status",
+                                {"id": proc_id, "percent": percent, "complete": False},
+                            )
                 # we'll iterate through the top level directory moving everything
                 # out of the temp directory and into it's final home.
                 for item in os.listdir(temp_dir):
@@ -495,6 +508,12 @@ class FileHelpers:
                         self.move_item_file_or_dir(temp_dir, new_dir, item)
                     except shutil.Error as ex:
                         logger.error(f"ERROR IN ZIP IMPORT: {ex}")
+                for user in server_users:
+                    WebSocketManager().broadcast_user(
+                        user,
+                        "zip_status",
+                        {"id": proc_id, "percent": 100, "complete": True},
+                    )
             except Exception as ex:
                 Console.error(ex)
 

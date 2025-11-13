@@ -2,6 +2,7 @@ import os
 import logging
 import json
 import html
+import threading
 from shutil import Error as shutilError
 from datetime import datetime
 from pathlib import Path, PurePath
@@ -57,6 +58,12 @@ files_unzip_schema = {
     "properties": {
         "folder": {
             "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "proc_id": {
+            "type": "string",
+            "desc": "uuid",
             "error": "typeString",
             "fill": True,
         },
@@ -867,7 +874,14 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                 },
             )
         if Helpers.check_file_exists(target_file):
-            self.file_helper.unzip_file(target_file)
+            unzip_thread = threading.Thread(
+                target=self.file_helper.unzip_file,
+                daemon=True,
+                args=(target_file, server_id),
+                kwargs={"proc_id": data.get("proc_id")},
+                name=f"{target_file}_unzip",
+            )
+            unzip_thread.start()
             self.controller.management.add_to_audit_log(
                 auth_data[4]["user_id"],
                 f"Unzipped file {target_file} in {data['folder']}",

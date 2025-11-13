@@ -165,7 +165,7 @@ async function calculateFileHash(file) {
     return hashHex;
 }
 
-function updateProgressBar(progress, type, i, file_id) {
+function updateProgressBar(progress, type, _i, file_id) {
     if (type !== "server_upload") {
         if (progress === 100) {
             $(`#upload-progress-bar`).removeClass("progress-bar-striped")

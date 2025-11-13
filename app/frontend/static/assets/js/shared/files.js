@@ -439,18 +439,31 @@ function add_unzip_listener() {
     $("#unzip").on("click", async function () {
         const path = $(selected_row).attr("data-path");
         const cur_dir = $("#table-nav").attr("data-cur-path");
+        const unzip_id = uuidv4()
+        const name = $(selected_row).children(".column-1").attr("data-name");
+        const unzip_progress = `      
+        <div style="width: 100%; min-width: 100%;" id="upload-progress-bar-${unzip_id}-container">
+          <small>${name}:</small>
+          <br><div
+              id="upload-progress-bar-${unzip_id}"
+              class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
+              role="progressbar"
+              style="width: 100%; height: 10px;"
+              aria-valuenow="0"
+              aria-valuemin="0"
+              aria-valuemax="100"
+          ></div>
+      </div>`
         let res = await fetch(`/api/v2/servers/${serverId}/files/zip/`, {
             method: "POST",
             headers: {
                 "X-XSRFToken": token,
             },
-            body: JSON.stringify({ folder: path }),
+            body: JSON.stringify({ folder: path, proc_id: unzip_id }),
         });
         let responseData = await res.json();
         if (responseData.status === "ok") {
-            setTimeout(function () {
-                getTreeView(cur_dir);
-            }, 3000);
+            $("#upload-progress-bar-parent").append(unzip_progress);
         } else {
             bootbox.alert({
                 title: responseData.error,
@@ -598,7 +611,7 @@ async function calculateFileHash(file) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//MOVE FILES FUNCTIONS
+//MOVE/COPY FILES FUNCTIONS
 ///////////////////////////////////////////////////////////////////////////////////////
 function add_move_listener() {
     $("#move").on("click", function () {
@@ -715,10 +728,6 @@ function setup_move_listener() {
         });
     }
 }
-///////////////////////////////////////////////////////////////////////////////////////
-//COPY FILES FUNCTIONS
-///////////////////////////////////////////////////////////////////////////////////////
-
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -734,4 +743,15 @@ $(document).ready(function () {
             $("#status-caret").html(`<i class="fa-solid fa-caret-down"></i>`)
         }
     });
+    if (webSocket) {
+        webSocket.on('zip_status', function (data) {
+            if (data.complete) {
+                const cur_dir = $("#table-nav").attr("data-cur-path");
+                $(`#upload-progress-bar-${data.id}-container`).remove();
+                getTreeView(cur_dir);
+            } else {
+                updateProgressBar(data.percent, "server_upload", 1, data.id);
+            }
+        });
+    }
 });
