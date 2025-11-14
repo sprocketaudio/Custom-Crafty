@@ -19,10 +19,20 @@
     justify-content: center;
 }
 
-#server-name {
+.info-flex {
     margin-right: 10px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+}
+
+#file-info {
+    background-color: var(--ram-bg);
+    border-radius: 15px;
+    padding: 15px;
+}
+
+.page-title-header {
+    margin-bottom: 5px !important;
 }
