@@ -101,19 +101,19 @@ class TeamsWebhook(WebhookProvider):
 
         return payload, headers
 
-    def send(self, server_name, title, url, message, **kwargs):
+    def send(self, server_name, title, url, message_template, event_data, **kwargs):
         """
         Sends a Teams Adaptive card notification using the given details.
 
         The method constructs and dispatches a payload suitable for
-        Discords's webhook system.
+        Teams's webhook system.
 
         Parameters:
         server_name (str): The name of the server triggering the notification.
         title (str): The title for the notification message.
         url (str): The webhook URL to send the notification to.
-        message (str): The main content or body of the notification message.
-        Defaults to a pretty blue if not provided.
+        message_template (str): The Jinja2 template for the message body.
+        event_data (dict): A dictionary containing variables for template rendering.
 
         Returns:
         str: "Dispatch successful!" if the message is sent successfully, otherwise an
@@ -122,5 +122,6 @@ class TeamsWebhook(WebhookProvider):
         Raises:
         Exception: If there's an error in dispatching the webhook.
         """
+        message = self.render_template(message_template, event_data)
         payload, headers = self._construct_teams_payload(server_name, title, message)
         return self._send_request(url, payload, headers)

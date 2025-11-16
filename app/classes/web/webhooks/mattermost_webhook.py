@@ -41,7 +41,7 @@ class MattermostWebhook(WebhookProvider):
 
         return payload, headers
 
-    def send(self, server_name, title, url, message, **kwargs):
+    def send(self, server_name, title, url, message_template, event_data, **kwargs):
         """
         Sends a Mattermost webhook notification using the given details.
 
@@ -52,7 +52,8 @@ class MattermostWebhook(WebhookProvider):
         server_name (str): The name of the server triggering the notification.
         title (str): The title for the notification message.
         url (str): The webhook URL to send the notification to.
-        message (str): The main content or body of the notification message.
+        message_template (str): The Jinja2 template for the message body.
+        event_data (dict): A dictionary containing variables for template rendering.
         bot_name (str): Override for the Webhook's name set on creation, see note!
 
         Returns:
@@ -67,6 +68,7 @@ class MattermostWebhook(WebhookProvider):
         - Mattermost's `config.json` setting is `"EnablePostUsernameOverride": true`
         - Mattermost's `config.json` setting is `"EnablePostIconOverride": true`
         """
+        message = self.render_template(message_template, event_data)
         bot_name = kwargs.get("bot_name", self.WEBHOOK_USERNAME)
         payload, headers = self._construct_mattermost_payload(
             server_name, title, message, bot_name
