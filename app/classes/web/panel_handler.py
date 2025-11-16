@@ -734,7 +734,7 @@ class PanelHandler(BaseHandler):
                     html += f"""
                     <li class="playerItem banned">
                         <h3>{player['name']}</h3>
-                        <span>Banned by {player['source']} for reason: {player['reason']}</span>
+                        <span>Banned by {player.get('source', '')} for reason: {player.get('reason', 'None')}</span>
                         <button onclick="send_command_to_server('pardon {player['name']}')" type="button" class="btn btn-danger">Unban</button>
                     </li>
                     """

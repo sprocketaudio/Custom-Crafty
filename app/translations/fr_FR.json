@@ -120,8 +120,8 @@
     "datatables": {
         "i18n": {
             "aria": {
-                "sortAscending": ": activer pour trier les colonnes dans l'ordre croissant",
-                "sortDescending": ": activer pour trier les colonnes dans l'ordre décroissant"
+                "sortAscending": ": activer pour trier les colonnes dans l'ordre croissant",
+                "sortDescending": ": activer pour trier les colonnes dans l'ordre décroissant"
             },
             "buttons": {
                 "collection": "Collection <span class='ui-button-icon-primary ui-icon ui-icon-triangle-1-s'/>",
@@ -698,7 +698,6 @@
         "selfDisable": "Vous ne pouvez pas désactiver votre propre compte"
     },
     "validators": {
-        "passLength": "Mot de passe trop court. Longueur minimum : 8",
         "2FAerror": "Le code d'authentification multifacteur doit comporter 6 chiffres (ex. : 000000) ou un code de secours de 16 caractères séparés tous les 4 par un tiret (ex. : ABCD-EFGH-IJKL-MNOP)",
         "additionalProperties": "L'envoi de propriétés supplémentaires n'est pas autorisé",
         "roleManager": "Le gestionnaire de rôle doit être de type entier (ID du gestionnaire) ou None",
@@ -722,7 +721,7 @@
         "filesPageLen": "La longueur doit être supérieure à 1 pour cette propriété",
         "insufficientPerms": "Erreur de permission : permissions manquantes pour cette ressource",
         "mfaName": "La saisie doit être une chaîne de caractères d'au moins 3 caractères pour ce champ",
-        "numbericPassword": "Mot de passe numérique. Doit contenir au moins 1 caractère alphabétique"
+        "passProp": "Le mot de passe doit être une chaîne comportant au minimum 8 caractères."
     },
     "webhooks": {
         "areYouSureDel": "Êtes-vous sûr de vouloir supprimer ce webhook ?",

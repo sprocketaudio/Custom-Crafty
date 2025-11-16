@@ -684,9 +684,6 @@
         "changePass": "Zmień hasło",
         "changeUser": "Zmień nazwę użytkownika"
     },
-    "validators": {
-        "passLength": "Hasło jest zbyt krótkie. Hasło musi mieć minimum 8 znaków."
-    },
     "webhooks": {
         "areYouSureDel": "Usunąć ten webhook?",
         "areYouSureRun": "Przetestować ten webhook?",

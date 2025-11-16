@@ -62,11 +62,14 @@ class TOTPController:
             _type_: _description_
         """
         user = HelperUsers.get_by_id(user_id)
+        logger.debug("Validating TOTP entry for user %s", user.username)
         authenticated = False
         # Iterate through just in case a user has multiple 2FA methods
         now = datetime.now(tz=timezone.utc)
+        logger.debug("TOTP sequence: current time is %s", now)
 
         # Check to see if someone is trying to reuse a key in the 60 second window
+        logger.debug("TOTP sequence: checking for reused code.")
         if str(user_id) in self.used_totp_codes:
             if str(totp_code) in self.used_totp_codes[
                 str(user_id)
@@ -78,14 +81,17 @@ class TOTPController:
                 )
                 return authenticated
         else:
+            logger.debug("TOTP sequence: No previous code dict found. Creating one")
             self.used_totp_codes[str(user_id)] = {}  # Init empty dict if not in there
 
+        logger.debug("TOTP sequence: reused code check passed. Validating user code")
         # Store OTP as used for 60 seconds
         self.used_totp_codes[str(user_id)][str(totp_code)] = now
 
         self.clear_stale_entries()
 
         for totp in user.totp_user:
+            logger.debug("TOTP sequence: Starting TOTP factory initialization")
             totp_factory = pyotp.TOTP(totp.totp_secret)
             if totp_factory.verify(
                 totp_code,
@@ -94,15 +100,20 @@ class TOTPController:
             ):
                 logger.info("Successfully verified user MFA %s", user_id)
                 authenticated = True
+        if not authenticated:
+            logger.error("TOTP sequence: Code validation failed. Code is not valid.")
         return authenticated
 
     def clear_stale_entries(self):
         """clears out totp codes older than 1 minute when one is sent"""
         now = datetime.now(tz=timezone.utc)
         # Clean up expired entries reclaim some memory
-        for key, totp_dict in self.used_totp_codes.items():
-            for item, timestamp in totp_dict.items():
+        logger.debug("Checking for used codes entries older than 1 minute")
+        for key, totp_dict in list(self.used_totp_codes.items()):
+            # Iterate over copy of dict (list) to prevent size change during iteration
+            for item, timestamp in list(totp_dict.items()):
                 if now - timestamp > timedelta(seconds=60):
+                    logger.debug("Found saved code older than one minute. Deleting...")
                     # needs to ref the self var to remove expired entries
                     del self.used_totp_codes[  # pylint: disable=unnecessary-dict-index-lookup
                         key

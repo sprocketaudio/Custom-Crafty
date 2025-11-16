@@ -698,7 +698,6 @@
         "selfDisable": "您不能禁用您自己的账号"
     },
     "validators": {
-        "passLength": "密码过短。最短长度：8",
         "backupName": "备份名称必须为字符串，且最短长度为 3。",
         "filesPageLen": "属性的长度必须大于 1",
         "typeList": "必须为列表/数组类型 ",
@@ -722,7 +721,7 @@
         "totp": "MFA 代码必须为 6 个数字",
         "additionalProperties": "不允许传递额外属性",
         "mfaName": "输入的属性必须为字符串类型，且最短为 3 个字符",
-        "numbericPassword": "纯数字密码。需要至少 1 个字母"
+        "passProp": "密码必须为最短 8 个字符的字符串。"
     },
     "webhooks": {
         "areYouSureDel": "您确定要删除此 webhook 吗？",
