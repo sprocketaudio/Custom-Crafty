@@ -6,8 +6,8 @@ import threading
 
 from app.classes.controllers.server_perms_controller import PermissionsServers
 from app.classes.controllers.servers_controller import ServersController
-from app.classes.shared.helpers import Helpers
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.helpers import Helpers
+from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
@@ -31,20 +31,19 @@ class ImportHelpers:
 
     def import_threaded_jar_server(self, server_path, new_server_dir, port, new_id):
         for item in os.listdir(server_path):
-            if not item == "db_stats":
-                try:
-                    if os.path.isdir(os.path.join(server_path, item)):
-                        FileHelpers.copy_dir(
-                            os.path.join(server_path, item),
-                            os.path.join(new_server_dir, item),
-                        )
-                    else:
-                        FileHelpers.copy_file(
-                            os.path.join(server_path, item),
-                            os.path.join(new_server_dir, item),
-                        )
-                except shutil.Error as ex:
-                    logger.error(f"Server import failed with error: {ex}")
+            try:
+                if os.path.isdir(os.path.join(server_path, item)):
+                    FileHelpers.copy_dir(
+                        os.path.join(server_path, item),
+                        os.path.join(new_server_dir, item),
+                    )
+                else:
+                    FileHelpers.copy_file(
+                        os.path.join(server_path, item),
+                        os.path.join(new_server_dir, item),
+                    )
+            except shutil.Error as ex:
+                logger.error(f"Server import failed with error: {ex}")
 
         has_properties = False
         for item in os.listdir(new_server_dir):
@@ -87,11 +86,10 @@ class ImportHelpers:
                         os.path.join(temp_dir, item), os.path.join(new_server_dir, item)
                     )
                 else:
-                    if item != "db_stats":
-                        FileHelpers.move_dir(
-                            os.path.join(temp_dir, item),
-                            os.path.join(new_server_dir, item),
-                        )
+                    FileHelpers.move_dir(
+                        os.path.join(temp_dir, item),
+                        os.path.join(new_server_dir, item),
+                    )
             except Exception as ex:
                 logger.error(f"ERROR IN ZIP IMPORT: {ex}")
         if not has_properties:
@@ -127,20 +125,19 @@ class ImportHelpers:
         self, server_path, new_server_dir, port, full_jar_path, new_id
     ):
         for item in os.listdir(server_path):
-            if not item == "db_stats":
-                try:
-                    if os.path.isdir(os.path.join(server_path, item)):
-                        FileHelpers.copy_dir(
-                            os.path.join(server_path, item),
-                            os.path.join(new_server_dir, item),
-                        )
-                    else:
-                        FileHelpers.copy_file(
-                            os.path.join(server_path, item),
-                            os.path.join(new_server_dir, item),
-                        )
-                except shutil.Error as ex:
-                    logger.error(f"Server import failed with error: {ex}")
+            try:
+                if os.path.isdir(os.path.join(server_path, item)):
+                    FileHelpers.copy_dir(
+                        os.path.join(server_path, item),
+                        os.path.join(new_server_dir, item),
+                    )
+                else:
+                    FileHelpers.copy_file(
+                        os.path.join(server_path, item),
+                        os.path.join(new_server_dir, item),
+                    )
+            except shutil.Error as ex:
+                logger.error(f"Server import failed with error: {ex}")
 
         has_properties = False
         for item in os.listdir(new_server_dir):
@@ -189,11 +186,10 @@ class ImportHelpers:
                         os.path.join(temp_dir, item), os.path.join(new_server_dir, item)
                     )
                 else:
-                    if item != "db_stats":
-                        FileHelpers.move_dir(
-                            os.path.join(temp_dir, item),
-                            os.path.join(new_server_dir, item),
-                        )
+                    FileHelpers.move_dir(
+                        os.path.join(temp_dir, item),
+                        os.path.join(new_server_dir, item),
+                    )
             except Exception as ex:
                 logger.error(f"ERROR IN ZIP IMPORT: {ex}")
         if not has_properties:
@@ -248,7 +244,7 @@ class ImportHelpers:
 
                 unzip_path = self.helper.wtol_path(file_path)
                 # unzips archive that was downloaded.
-                FileHelpers.unzip_file(unzip_path)
+                self.file_helper.unzip_file(unzip_path)
                 # adjusts permissions for execution if os is not windows
 
                 if not self.helper.is_os_windows():

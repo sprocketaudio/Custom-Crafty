@@ -13,8 +13,8 @@ import tornado.httpserver
 
 from app.classes.models.management import HelpersManagement
 from app.classes.shared.console import Console
-from app.classes.shared.helpers import Helpers
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.helpers import Helpers
+from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.shared.main_controller import Controller
 from app.classes.web.public_handler import PublicHandler
 from app.classes.web.panel_handler import PanelHandler

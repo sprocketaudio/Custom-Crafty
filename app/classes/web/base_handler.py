@@ -8,8 +8,8 @@ import tornado.web
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.models.users import ApiKeys
-from app.classes.shared.helpers import Helpers
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.helpers import Helpers
+from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.shared.main_controller import Controller
 from app.classes.shared.translation import Translation
 from app.classes.shared.main_models import DatabaseShortcuts
@@ -174,6 +174,46 @@ class BaseHandler(tornado.web.RequestHandler):
             api_token = self.get_cookie("token")
         return api_token
 
+    def is_totp_method(self):
+        if (
+            re.match(
+                r"^/api/v2/(users/.+/totp/|users/[^/]+/totp/.+/verify/)$",
+                self.request.path,
+            )
+            and self.request.method == "POST"
+        ) or (
+            re.match(r"^/api/v2/users/[^/]+/totp/recovery/renew/$", self.request.path)
+            and self.request.method == "GET"
+        ):
+            return True
+        return False
+
+    def is_mfa_not_present(self, user, token_data) -> bool:
+        """Checks to see if panel settings or role settings require user
+        to have MFA enabled and passed in token. Checks token to see
+        if user has signed in with MFA.
+
+        Args:
+            user (dict): dictionary of user object
+            token_data (dict): decoded token data
+
+        Returns:
+            bool: Returns False if user has signed in with MFA or if they have not and
+            it is not required. Returns True if user is required to have MFA and
+            has not signed in with it.
+        """
+        su_mfa = self.helper.get_setting(
+            "superMFA"
+        )  # Get super user forced MFA setting
+        role_mfa = False
+        for role in self.controller.users.get_user_roles_id(user["user_id"]):
+            if self.controller.roles.get_role(role)["mfa_required"]:
+                role_mfa = True
+                break
+        return ((user["superuser"] and su_mfa) or role_mfa) and not token_data.get(
+            "mfa"
+        )
+
     def authenticate_user(
         self,
     ) -> t.Optional[
@@ -187,9 +227,59 @@ class BaseHandler(tornado.web.RequestHandler):
         ]
     ]:
         try:
-            api_key, _token_data, user = self.controller.authentication.check_err(
+            api_key, token_data, user = self.controller.authentication.check_err(
                 self._auth_get_api_token()
             )
+            if not user["enabled"]:
+                # Log the user out and send error if disabled
+                self.clear_cookie("token")
+                return self.finish_json(
+                    403,
+                    {
+                        "status": "error",
+                        "error": "ACCESS_DENIED",
+                        "error_data": self.helper.translation.translate(
+                            "login", "accountDisabled", user["lang"]
+                        ),
+                    },
+                )
+            if token_data.get("token_id") and token_data.get(
+                "session_id"
+            ):  # Check to see if token defines session_id and token_id
+                return self.finish_json(
+                    403,
+                    {
+                        "status": "error",
+                        "error": "ACCESS_DENIED",
+                        "error_data": self.helper.translation.translate(
+                            "error", "duplicateId", user["lang"]
+                        ),
+                    },
+                )
+            if self.is_mfa_not_present(user, token_data) and (
+                not self.is_totp_method()
+                and not token_data.get("token_id")
+                and user["username"] != "anti-lockout-user"
+            ):
+                # check to see if user is superuser
+                # and MFA is not in token.
+                # Also check to see if user is trying to add MFA or access backup codes.
+                # Check for token ID because only API keys will have this.
+                warning = self.helper.translation.translate(
+                    "otp", "mfaWarn", user["lang"]
+                )
+                goto = self.helper.translation.translate(
+                    "otp", "goToPage", user["lang"]
+                )
+                url = f"/panel/edit_user_otp?id={user['user_id']}"
+                return self.finish_json(
+                    403,
+                    {
+                        "status": "error",
+                        "error": "ACCESS_DENIED",
+                        "error_data": (f"{warning} <br><a href='{url}'>{goto}</a>"),
+                    },
+                )
 
             superuser = user["superuser"]
             server_permissions_api_mask = ""
@@ -262,7 +352,7 @@ class BaseHandler(tornado.web.RequestHandler):
                 {
                     "status": "error",
                     "error": "ACCESS_DENIED",
-                    "info": "An error occured while authenticating the user",
+                    "error_data": "An error occured while authenticating the user",
                 },
             )
             return None

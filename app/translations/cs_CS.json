@@ -195,7 +195,6 @@
         "eulaMsg": "Musíte souhlasit s ",
         "eulaTitle": "Souhlas s EULA",
         "fileError": "Typ souboru musí být obrázek.",
-        "fileTooLarge": "Odeslání se nezdařilo. Příliš velký nahraný soubor. Obraťte se na správce systému.",
         "hereIsTheError": "Zde je chyba",
         "installerJava": "Selhala instalace {} : Forge servery potřebují k instalaci Javu. Zjistili jsme že java není nainstalovaná. Prosím nainstalujte java na server.",
         "internet": "Zjistili jsme, že počítač se spuštěným programem Crafty není připojen k internetu. Připojení klientů k serveru může být omezeno.",
@@ -219,7 +218,6 @@
     },
     "login": {
         "defaultPath": "Heslo které jste vložili je výchozí cesta k pověření. Prosím najděte výchozí heslo v této lokaci.",
-        "disabled": "Uživatelský účet byl pozastaven. Prosím kontaktujte vašeho správce systému pro více informací.",
         "forgotPassword": "Zapomenuté heslo",
         "incorrect": "Nesprávné uživatelské jméno nebo heslo",
         "login": "Přihlásit se",
@@ -311,7 +309,6 @@
         "compress": "Komprimovat zálohu",
         "confirm": "Potvrdit",
         "confirmDelete": "Chcete tuto zálohu odstranit? Tuto akci nelze vrátit zpět.",
-        "confirmRestore": "Jste si jisti, že chcete provést obnovu z této zálohy. Všechny aktuální soubory serveru se změní na stav zálohy a nebude možné je obnovit.",
         "currentBackups": "Aktuální zálohy",
         "default": "Defaultní záloha",
         "defaultExplain": "Tuto zálohu Crafty používalo před aktualizací. Nemůžete ji změnit nebo smazat",
@@ -667,9 +664,6 @@
         "userSettings": "Nastavení uživatele",
         "userTheme": "Motiv UI",
         "uses": "Počet povolených použití (-1==bez omezení)"
-    },
-    "validators": {
-        "passLength": "Heslo je příliš krátké. Minimální délka je 8 znaků"
     },
     "webhooks": {
         "areYouSureDel": "Seš si jistý že chceš smazat tento webhook?",

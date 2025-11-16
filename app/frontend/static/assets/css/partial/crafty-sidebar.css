@@ -1,0 +1,7 @@
+.sidebar {
+    height: 91vh;
+}
+
+.panel-settings {
+    color: var(--info) !important;
+}

@@ -1,10 +1,13 @@
 import os
 import logging
 import shutil
+import asyncio
+import anyio
 from PIL import Image
 from app.classes.models.server_permissions import EnumPermissionsServer
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.web.base_api_handler import BaseApiHandler
+from app.classes.web.websocket_handler import WebSocketManager
 
 logger = logging.getLogger(__name__)
 IMAGE_MIME_TYPES = [
@@ -35,6 +38,15 @@ ARCHIVE_MIME_TYPES = ["application/zip"]
 
 
 class ApiFilesUploadHandler(BaseApiHandler):
+
+    upload_locks = {}
+
+    def get_lock(self, key: str) -> asyncio.Lock:
+        """Get or create a lock for the given key."""
+        if key not in self.upload_locks:
+            self.upload_locks[key] = asyncio.Lock()
+        return self.upload_locks[key]
+
     async def post(self, server_id=None):
         auth_data = self.authenticate_user()
         if not auth_data:
@@ -195,13 +207,15 @@ class ApiFilesUploadHandler(BaseApiHandler):
         # if it doesn't exist
         if not self.chunked:
             # Write the file directly to the upload dir
-            with open(os.path.join(self.upload_dir, self.filename), "wb") as file:
+            async with await anyio.open_file(
+                os.path.join(self.upload_dir, self.filename), "wb"
+            ) as file:
                 chunk = self.request.body
                 if chunk:
-                    file.write(chunk)
+                    await file.write(chunk)
             # We'll check the file hash against the sent hash once the file is
             # written. We cannot check this buffer.
-            calculated_hash = self.file_helper.calculate_file_hash(
+            calculated_hash = self.file_helper.calculate_file_hash_sha256(
                 os.path.join(self.upload_dir, self.filename)
             )
             logger.info(
@@ -277,62 +291,85 @@ class ApiFilesUploadHandler(BaseApiHandler):
             self.temp_dir, f"{self.filename}.part{self.chunk_index}"
         )
 
-        # Save the chunk
-        with open(chunk_path, "wb") as f:
-            f.write(self.request.body)
+        lock = self.get_lock(self.file_id)  # Capture async lock to avoid race condition
 
-        # Check if all chunks are received
-        received_chunks = [
-            f
-            for f in os.listdir(self.temp_dir)
-            if f.startswith(f"{self.filename}.part")
-        ]
-        # When we've reached the total chunks we'll
-        # Compare the hash and write the file
-        if len(received_chunks) == total_chunks:
-            with open(file_path, "wb") as outfile:
-                for i in range(total_chunks):
-                    chunk_file = os.path.join(self.temp_dir, f"{self.filename}.part{i}")
-                    with open(chunk_file, "rb") as infile:
-                        outfile.write(infile.read())
-                    os.remove(chunk_file)
-            if upload_type == "background":
-                # Strip EXIF data
-                image_path = os.path.join(file_path)
-                logger.debug("Stripping exif data from image")
-                image = Image.open(image_path)
+        async with lock:
+            # Save the chunk
+            async with await anyio.open_file(chunk_path, "wb") as f:
+                await f.write(self.request.body)
 
-                # Get current raw pixel data from image
-                image_data = list(image.getdata())
-                # Create new image
-                image_no_exif = Image.new(image.mode, image.size)
-                # Restore pixel data
-                image_no_exif.putdata(image_data)
+            # Check if all chunks are received
+            received_chunks = [
+                f
+                for f in os.listdir(self.temp_dir)
+                if f.startswith(f"{self.filename}.part")
+            ]
+            # When we've reached the total chunks we'll
+            # Compare the hash and write the file
+            if len(received_chunks) == total_chunks:
+                async with await anyio.open_file(file_path, "wb") as outfile:
+                    for i in range(total_chunks):
+                        WebSocketManager().broadcast_user(
+                            auth_data[4]["user_id"],
+                            "upload_process",
+                            {
+                                "cur_file": i,
+                                "total_files": total_chunks,
+                                "type": u_type,
+                            },
+                        )
+                        chunk_file = os.path.join(
+                            self.temp_dir, f"{self.filename}.part{i}"
+                        )
+                        async with await anyio.open_file(chunk_file, "rb") as infile:
+                            await outfile.write(await infile.read())
+                        try:
+                            await anyio.Path(chunk_file).unlink(missing_ok=True)
+                        except OSError as why:
+                            logger.error(
+                                "Failed to remove chunk file with error: %s", why
+                            )
+                try:
+                    self.file_helper.del_dirs(self.temp_dir)
+                except OSError as why:
+                    logger.error("Failed to import remove temp dir with error: %s", why)
+                if upload_type == "background":
+                    # Strip EXIF data
+                    image_path = os.path.join(file_path)
+                    logger.debug("Stripping exif data from image")
+                    image = Image.open(image_path)
 
-                image_no_exif.save(image_path)
+                    # Get current raw pixel data from image
+                    image_data = list(image.getdata())
+                    # Create new image
+                    image_no_exif = Image.new(image.mode, image.size)
+                    # Restore pixel data
+                    image_no_exif.putdata(image_data)
 
-            logger.info(
-                f"File upload completed. Filename: {self.filename}"
-                f" Path: {file_path} Type: {u_type}"
-            )
-            self.controller.management.add_to_audit_log(
-                auth_data[4]["user_id"],
-                f"Uploaded file {self.filename}",
-                server_id,
-                self.request.remote_ip,
-            )
-            self.finish_json(
-                200,
-                {
-                    "status": "completed",
-                    "data": {"message": "File uploaded successfully"},
-                },
-            )
-        else:
-            self.finish_json(
-                200,
-                {
-                    "status": "partial",
-                    "data": {"message": f"Chunk {self.chunk_index} received"},
-                },
-            )
+                    image_no_exif.save(image_path)
+
+                logger.info(
+                    f"File upload completed. Filename: {self.filename}"
+                    f" Path: {file_path} Type: {u_type}"
+                )
+                self.controller.management.add_to_audit_log(
+                    auth_data[4]["user_id"],
+                    f"Uploaded file {self.filename}",
+                    server_id,
+                    self.request.remote_ip,
+                )
+                self.finish_json(
+                    200,
+                    {
+                        "status": "completed",
+                        "data": {"message": "File uploaded successfully"},
+                    },
+                )
+            else:
+                self.finish_json(
+                    200,
+                    {
+                        "status": "partial",
+                        "data": {"message": f"Chunk {self.chunk_index} received"},
+                    },
+                )

@@ -32,7 +32,8 @@
         "yes": "Ja"
     },
     "base": {
-        "doesNotWorkWithoutJavascript": "<strong>Warnung: </strong>Crafty funktioniert nicht richtig, wenn JavaScript nicht aktiviert ist!"
+        "doesNotWorkWithoutJavascript": "<strong>Warnung: </strong>Crafty funktioniert nicht richtig, wenn JavaScript nicht aktiviert ist!",
+        "createMFA": "Füge eine Zwei-Faktor-Authentifizierung zu deinem Konto hinzu!"
     },
     "credits": {
         "developmentTeam": "Entwicklungsteam",
@@ -195,7 +196,6 @@
         "eulaMsg": "Sie müssen der EULA zustimmen. Eine Kopie der Minecraft EULA ist unter dieser Nachricht verlinkt.",
         "eulaTitle": "Der EULA zustimmen",
         "fileError": "Dateityp muss ein Bild sein.",
-        "fileTooLarge": "Hochladen fehlgeschlagen. Datei ist zu groß. Wenden Sie sich an Ihren Systemadministrator für weitere Unterstütung.",
         "hereIsTheError": "Das ist der Fehler",
         "installerJava": "Fehler beim Installieren von {} : Forge-Server-Installationen erfordern Java. Wir haben festgestellt, dass Java nicht installiert ist. Bitte installieren Sie Java und dann den Server.",
         "internet": "Wir haben festgestellt, dass der Rechner, auf dem Crafty läuft, keine Verbindung zum Internet hat. Client-Verbindungen zum Server können dadurch eingeschränkt sein.",
@@ -219,13 +219,13 @@
     },
     "login": {
         "defaultPath": "Der eingegebene Text ist der Pfad zum Passwort, nicht das Passwort selbst. Das Standartpasswort kann unter diesen Pfad eingesehen werden.",
-        "disabled": "Account gesperrt. Für weitere Informationen den Serveradministrator kontaktieren.",
         "forgotPassword": "Passwort vergessen",
         "incorrect": "Benutzername oder Passwort falsch",
         "login": "Einloggen",
         "password": "Passwort",
         "username": "Nutzername",
-        "viewStatus": "Öffentliche Statusseite anzeigen"
+        "viewStatus": "Öffentliche Statusseite anzeigen",
+        "2fa": "(Wenn MFA aktiviert ist)"
     },
     "notify": {
         "activityLog": "Aktivitätsprotokolle",
@@ -314,7 +314,6 @@
         "compress": "Backup komprimieren",
         "confirm": "Bestätigen",
         "confirmDelete": "Möchten Sie diese Backup-Datei löschen? Dies kann nicht rückgängig gemacht werden.",
-        "confirmRestore": "Sicher, dass dieses Backup wiederherstellgestellt werden soll? Alle aktuellen Serverdateien werden in den Zustand von diesem Backup versetzt und können nicht wiederhergestellt werden.",
         "currentBackups": "Aktuelle Backups",
         "default": "Standard-Backup",
         "defaultExplain": "Das Backup, welches Crafty vor Updates verwendet. Dies kann nicht geändert oder gelöscht werden.",
@@ -672,7 +671,6 @@
         "uses": "Anzahl der erlaubten Verwendungen (-1==Keine Begrenzung)"
     },
     "validators": {
-        "passLength": "Passwort zu kurz. Mindestlänge: 8",
         "typeInteger": "muss eine Zahl sein.",
         "typeList": "muss eine Liste (array) sein ",
         "roleManager": "Rollenmanager muss vom Typ Ganzzahl (Manager ID) oder ohne Wert sein",
@@ -717,5 +715,11 @@
         "url": "Webhook-URL",
         "webhook_body": "Webhook-Inhalt",
         "webhooks": "Webhooks"
+    },
+    "configJson": {
+        "allow_nsfw_profile_pictures": "Erlaube Gravatar™ NSFW Profilbilder",
+        "big_bucket_repo": "Big Bucket™ System URL",
+        "delete_default_json": "Standard-JSON-Datei beim Starten löschen",
+        "enable_user_self_delete": "Erlaube Nutzern ihren eigenen Account zu löschen"
     }
 }

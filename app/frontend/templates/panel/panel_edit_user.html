@@ -52,6 +52,11 @@ data['lang']) }}{% end %}
                 aria-selected="false">
                 <i class="fas fa-key"></i>{{ translate('userConfig', 'apiKey', data['lang']) }}</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/panel/edit_user_otp?id={{ data['user']['user_id'] }}"
+                  role="tab" aria-selected="true">
+                  <i class="fa-solid fa-shield-halved"></i>{{ translate('userConfig', 'totpHeader', data['lang']) }}</a>
+          </li>
             {% end %}
           </ul>
 
@@ -69,6 +74,12 @@ data['lang']) }}{% end %}
                     <div class="card-header header-sm d-flex justify-content-between align-items-center">
                       <h4 class="card-title"><i class="fas fa-user"></i> {{ translate('userConfig', 'userSettings',
                         data['lang']) }}</h4>
+
+                      <span data-translate1="{{translate('userConfig', 'password', data['lang'])}}"
+                        data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}"
+                        data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}"
+                        class="edit_password clickable" data-id="{{data['user']['user_id']}}"><i
+                          class="fa-solid fa-lock"></i></span>
                     </div>
                     <div class="card-body">
                       {% if data['new_user'] %}
@@ -124,7 +135,7 @@ data['lang']) }}{% end %}
                           {% if not 'incomplete' in lang %}
                           <option value="{{lang}}" >{{translate('language', lang, 'humanized_index', False)}}</option>
                           {% else %}
-                          <option value="{{lang}}" disabled>{{lang}}</option>
+                          <option value="{{lang}}" disabled>{{translate('language', lang, 'humanized_index', False)}}</option>
                           {% end %}
                           {% end %}
                         </select>
@@ -286,10 +297,9 @@ data['lang']) }}{% end %}
                     <label for="hints" class="form-check-label ml-4 mb-4">
                       {% if data['user']['hints'] %}
                       <input type="checkbox" class="form-check-input" id="hints" name="hints" checked=""
-                        value="1">Enable Hints?
+                        value="1">{{translate('userConfig', 'hints', data['lang'])}}
                       {% else %}
-                      <input type="checkbox" class="form-check-input" id="hints" name="hints" value="1"> Enable
-                      Hints?
+                      <input type="checkbox" class="form-check-input" id="hints" name="hints" value="1">{{translate('userConfig', 'hints', data['lang'])}}
                       {% end %}
                     </label>
 
@@ -325,6 +335,14 @@ data['lang']) }}{% end %}
                 </div>
               </div>
               <div class="text-center">
+                <button data-translate="{{translate('userConfig', 'userName', data['lang'])}}"
+                data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}"
+                id="username_{{data['user']['user_id']}}" data-name="{{data['user']['username']}}"
+                data-id="{{data['user']['user_id']}}"class="btn btn-outline-info edit_user"><i class="fa-solid fa-user-gear"></i>{{translate('userConfig', 'changeUser', data['lang'])}}</button>
+                <button data-translate1="{{translate('userConfig', 'password', data['lang'])}}"
+                data-translate2="{{translate('userConfig', 'repeat', data['lang'])}}"
+                data-toggle="tooltip" title="{{ translate('userConfig', 'password', data['lang'])}}"
+                data-id="{{data['user']['user_id']}}"class="btn btn-outline-warning edit_password"><i class="fa-solid fa-user-lock"></i>{{translate('userConfig', 'changePass', data['lang'])}}</button><br><br>
                 {% if data['new_user'] %}
                 <a class="btn btn-sm btn-danger disabled"><i class="fas fa-trash"></i>{{ translate('userConfig',
                   'deleteUserB', data['lang']) }}</a><br />
@@ -395,7 +413,11 @@ data['lang']) }}{% end %}
       if (typeof value == "boolean" || key === "email" || key === "permissions" || key === "roles") {
         console.log(key)
         return value
-      } else {
+      } else if (key === "password"){
+        value = value.toString()
+        return value
+      }
+      else {
         console.log(key, value)
         return (isNaN(value) ? value : +value);
       }
@@ -423,9 +445,9 @@ data['lang']) }}{% end %}
         superuser = userData.data["superuser"];
         edit_id = userData.data["user_id"];
       } else {
-        bootbox.alert({
+        return bootbox.alert({
           title: userData.error,
-          message: userData.error
+          message: userData.error_data
         });
       }
 
@@ -512,7 +534,7 @@ data['lang']) }}{% end %}
       }
     });
 
-  
+
   $(".delete-user").click(function () {
     var file_to_del = $(this).data("file");
 
@@ -596,5 +618,6 @@ data['lang']) }}{% end %}
 
 
 </script>
+<script src="../../static/assets/js/shared/userSettings.js"></script>
 
 {% end %}

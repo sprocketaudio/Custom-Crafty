@@ -3,7 +3,7 @@ import logging
 import requests
 from jinja2 import Environment, BaseLoader
 
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 
 logger = logging.getLogger(__name__)
 helper = Helpers()

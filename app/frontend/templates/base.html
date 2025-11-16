@@ -5,6 +5,11 @@
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
+  {% if not data.get("mfa", None) %}
+  <meta name="mfa_warn" content="{{translate('base', 'getMFA', data['lang'])}}">
+  <meta name="mfa_link" content="{{translate('base', 'createMFA', data['lang'])}}">
+  <meta name="userId" content="{{data['user_data']['user_id']}}">
+  {% end %}
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   {% block meta %}{% end %}
   <title>{% block title %}{{ _('Default') }}{% end %}</title>
@@ -15,9 +20,7 @@
   <link rel="stylesheet" href="/static/assets/vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="/static/assets/vendors/typicons/typicons.css">
   <link rel="stylesheet" href="/static/assets/vendors/fontawesome6/css/all.css">
-  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Sarabun" media="screen">
-  <link rel="stylesheet" type="text/css"
-    href="https://cdn.datatables.net/v/bs4/dt-1.10.22/fh-3.1.7/r-2.2.6/sc-2.0.3/sp-1.2.2/datatables.min.css" />
+  <link rel="stylesheet" type="text/css" href="/static/assets/css/vendors/datatables.min.css" />
   <link rel="stylesheet" href="/static/assets/vendors/css/vendor.bundle.base.css">
 
   <link rel="stylesheet" href="/static/assets/css/internal/root.css">
@@ -27,7 +30,7 @@
   <link rel="stylesheet" href="/static/assets/css/crafty.css">
   <link rel="stylesheet" href="/static/assets/css/crafty-toggle-btn.css">
   <link rel="stylesheet" href="/static/assets/css/partial/crafty-notification.css">
-
+  <link rel="stylesheet" href="/static/assets/css/partial/crafty-warn.css">
   <link rel="manifest" href="/static/assets/crafty.webmanifest">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -131,6 +134,12 @@
   <script type="text/javascript" src="/static/assets/js/motd.js"></script>
 
   <script>
+    const MFA_WARN = document.querySelector('meta[name="mfa_warn"]');
+    const MFA_LINK = document.querySelector('meta[name="mfa_link"]');
+    const USER_ID = document.querySelector('meta[name="userId"]');
+    if (MFA_WARN) {
+      warn(MFA_WARN.content, `/panel/edit_user_otp?id=${USER_ID.content}`, `${MFA_LINK.content}`, "clean-link", "#cf0000")
+    }
     /**
       * Returns a random number between min (inclusive) and max (exclusive)
       */
@@ -329,23 +338,6 @@
         if (x) {
           x.remove()
         }
-        bootbox.confirm({
-          title: "{{ translate('notify', 'downloadLogs', data['lang']) }}",
-          message: "{{ translate('notify', 'finishedPreparing', data['lang']) }}",
-          buttons: {
-            confirm: {
-              label: 'Download',
-              className: 'btn-info'
-            }
-          },
-          callback: function (result) {
-            if (result) {
-              location.href = "/panel/download_support_package";
-            } else {
-              return;
-            }
-          }
-        });
       });
       webSocket.on('send_eula_bootbox', function (server_id) {
         var x = document.querySelector('.bootbox');
@@ -534,16 +526,6 @@
           bg_color = '#6887dc'
         )
       }
-      $('#support_logs').click(function () {
-        var dialog = bootbox.dialog({
-          message: "<p class='text- center mb - 0'><i class='fa fa - spin fa - cog'></i>{{ translate('notify', 'preparingLogs', data['lang']) }}</p>",
-          closeButton: false
-        });
-        setTimeout(function () {
-          location.href = "/panel/support_logs";
-        }, 6000);
-
-      });
     });
     $(document).ready(() => {
       if ('serviceWorker' in navigator) {

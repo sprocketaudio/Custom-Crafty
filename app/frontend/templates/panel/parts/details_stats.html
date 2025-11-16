@@ -259,14 +259,8 @@
     let responseData = await res.json();
     if (responseData.status === "ok") {
       console.log(responseData)
-      $("#server-name-nav").html(`${responseData.data['server_name']}`)
-      $("#server-name-nav").show();
-    } else {
-
-      bootbox.alert({
-        title: responseData.error,
-        message: responseData.error_data
-      });
+      $("#server-name-nav").text(`${responseData.data['server_name']}`).html()
+      $("#server-name-nav").toggleClass("d-none");
     }
   }
 </script>

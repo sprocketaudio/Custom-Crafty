@@ -5,14 +5,12 @@ import os
 import typing as t
 import json
 import logging
-import threading
-import urllib.parse
+from pathlib import Path
 from zoneinfo import ZoneInfoNotFoundError
+import httpx
+import aiofiles
 import nh3
-import requests
 import tornado.web
-import tornado.escape
-from tornado import iostream
 
 # TZLocal is set as a hidden import on win pipeline
 from tzlocal import get_localzone
@@ -22,7 +20,7 @@ from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.models.management import HelpersManagement
 from app.classes.controllers.roles_controller import RolesController
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.shared.main_models import DatabaseShortcuts
 from app.classes.web.base_handler import BaseHandler
 from app.classes.web.webhooks.webhook_factory import WebhookFactory
@@ -134,30 +132,6 @@ class PanelHandler(BaseHandler):
                 roles.add(role.role_id)
         return roles
 
-    def download_file(self, name: str, file: str):
-        self.set_header("Content-Type", "application/octet-stream")
-        self.set_header("Content-Disposition", f"attachment; filename={name}")
-        chunk_size = 1024 * 1024 * 4  # 4 MiB
-
-        with open(file, "rb") as f:
-            while True:
-                chunk = f.read(chunk_size)
-                if not chunk:
-                    break
-                try:
-                    self.write(chunk)  # write the chunk to response
-                    self.flush()  # send the chunk to client
-                except iostream.StreamClosedError:
-                    # this means the client has closed the connection
-                    # so break the loop
-                    break
-                finally:
-                    # deleting the chunk is very important because
-                    # if many clients are downloading files at the
-                    # same time, the chunks in memory will keep
-                    # increasing and will eat up the RAM
-                    del chunk
-
     def check_subpage_perms(self, user_perms, subpage):
         if SUBPAGE_PERMS.get(subpage, False) in user_perms:
             return True
@@ -229,6 +203,16 @@ class PanelHandler(BaseHandler):
 
         return page_data
 
+    async def async_fetch_data(self, url: str):
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, follow_redirects=True)
+            return response.json()
+
+    async def async_read_config(self, file_path: Path):
+        async with aiofiles.open(file_path, "r") as file:
+            data = await file.read()
+        return data
+
     @tornado.web.authenticated
     async def get(self, page):
         self.failed_server = False
@@ -243,7 +227,7 @@ class PanelHandler(BaseHandler):
             datetime.datetime.fromtimestamp(now).strftime("%Y-%m-%d %H:%M:%S")
         )
 
-        api_key, _token_data, exec_user = self.current_user
+        api_key, token_data, exec_user = self.current_user
         superuser = exec_user["superuser"]
         if api_key is not None:
             superuser = superuser and api_key.full_access
@@ -315,7 +299,13 @@ class PanelHandler(BaseHandler):
 
         page_data: t.Dict[str, t.Any] = {
             # todo: make this actually pull and compare version data
+            "mfa": token_data.get(
+                "mfa"
+            ),  # set value if the token has MFA set to true or not
+            # for warning banner
             "update_available": self.helper.update_available,
+            "support_perm": self.helper.get_setting("general_user_log_access")
+            or exec_user["superuser"],
             "docker": self.helper.is_env_docker(),
             "background": self.controller.cached_login,
             "login_opacity": self.controller.management.get_login_opacity(),
@@ -376,43 +366,40 @@ class PanelHandler(BaseHandler):
             template = "public/error.html"
 
         elif page == "credits":
-            with open(
-                self.helper.credits_cache, encoding="utf-8"
-            ) as credits_default_local:
-                try:
-                    remote = requests.get(
-                        "https://craftycontrol.com/credits-v2",
-                        allow_redirects=True,
-                        timeout=10,
+            credits_default_local = await self.async_read_config(
+                Path(self.helper.credits_cache)
+            )
+            try:
+                credits_dict: dict = await self.async_fetch_data(
+                    "https://craftycontrol.com/credits-v2"
+                )
+                if not credits_dict["staff"]:
+                    logger.error("Issue with upstream Staff, using local.")
+                    credits_dict: dict = json.loads(credits_default_local)
+            except Exception as e:
+                logger.error("Request to credits bucket failed, using local. %s", e)
+                credits_dict: dict = json.loads(credits_default_local)
+
+            timestamp = credits_dict["lastUpdate"] / 1000.0
+            page_data["patrons"] = credits_dict["patrons"]
+            page_data["staff"] = credits_dict["staff"]
+
+            # Filter Language keys to exclude joke prefix '*'
+            clean_dict = {
+                user.replace("*", ""): translation
+                for user, translation in credits_dict["translations"].items()
+            }
+            page_data["translations"] = clean_dict
+
+            # 0 Defines if we are using local credits file andd displays sadcat.
+            if timestamp == 0:
+                page_data["lastUpdate"] = "😿"
+            else:
+                page_data["lastUpdate"] = str(
+                    datetime.datetime.fromtimestamp(timestamp).strftime(
+                        "%Y-%m-%d %H:%M:%S"
                     )
-                    credits_dict: dict = remote.json()
-                    if not credits_dict["staff"]:
-                        logger.error("Issue with upstream Staff, using local.")
-                        credits_dict: dict = json.load(credits_default_local)
-                except:
-                    logger.error("Request to credits bucket failed, using local.")
-                    credits_dict: dict = json.load(credits_default_local)
-
-                timestamp = credits_dict["lastUpdate"] / 1000.0
-                page_data["patrons"] = credits_dict["patrons"]
-                page_data["staff"] = credits_dict["staff"]
-
-                # Filter Language keys to exclude joke prefix '*'
-                clean_dict = {
-                    user.replace("*", ""): translation
-                    for user, translation in credits_dict["translations"].items()
-                }
-                page_data["translations"] = clean_dict
-
-                # 0 Defines if we are using local credits file andd displays sadcat.
-                if timestamp == 0:
-                    page_data["lastUpdate"] = "😿"
-                else:
-                    page_data["lastUpdate"] = str(
-                        datetime.datetime.fromtimestamp(timestamp).strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        )
-                    )
+                )
             template = "panel/credits.html"
 
         elif page == "contribute":
@@ -605,10 +592,6 @@ class PanelHandler(BaseHandler):
             except Exception as e:
                 logger.error(f"Failed to get server waiting to start: {e}")
                 page_data["waiting_start"] = False
-            if not self.failed_server:
-                page_data["get_players"] = server.get_server_players()
-            else:
-                page_data["get_players"] = []
             page_data["permissions"] = {
                 "Commands": EnumPermissionsServer.COMMANDS,
                 "Terminal": EnumPermissionsServer.TERMINAL,
@@ -735,7 +718,7 @@ class PanelHandler(BaseHandler):
                     html += f"""
                     <li class="playerItem banned">
                         <h3>{player['name']}</h3>
-                        <span>Banned by {player['source']} for reason: {player['reason']}</span>
+                        <span>Banned by {player.get('source', '')} for reason: {player.get('reason', 'None')}</span>
                         <button onclick="send_command_to_server('pardon {player['name']}')" type="button" class="btn btn-danger">Unban</button>
                     </li>
                     """
@@ -766,33 +749,6 @@ class PanelHandler(BaseHandler):
                     player["banned_on"] = (temp_date).strftime("%Y/%m/%d %H:%M:%S")
 
             template = f"panel/server_{subpage}.html"
-
-        elif page == "download_backup":
-            file = self.get_argument("file", "")
-            backup_id = self.get_argument("backup_id", "")
-
-            server_id = self.check_server_id()
-            if server_id is None:
-                return
-            backup_config = self.controller.management.get_backup_config(backup_id)
-            server_info = self.controller.servers.get_server_data_by_id(server_id)
-            backup_location = os.path.join(backup_config["backup_location"], backup_id)
-            backup_file = os.path.abspath(
-                os.path.join(
-                    Helpers.get_os_understandable_path(backup_location),
-                    file,
-                )
-            )
-            if not self.helper.is_subdir(
-                backup_file,
-                Helpers.get_os_understandable_path(backup_location),
-            ) or not os.path.isfile(backup_file):
-                self.redirect("/panel/error?error=Invalid path detected")
-                return
-
-            self.download_file(file, backup_file)
-
-            self.redirect(f"/panel/server_detail?id={server_id}&subpage=backup")
 
         elif page == "panel_config":
             auth_servers = {}
@@ -872,9 +828,9 @@ class PanelHandler(BaseHandler):
 
         elif page == "config_json":
             if exec_user["superuser"]:
-                with open(self.helper.settings_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                page_data["config-json"] = data
+                page_data["config-json"] = self.helper.get_categorized_settings(
+                    self.helper.get_all_settings()
+                )
                 page_data["availables_languages"] = []
                 page_data["all_languages"] = []
                 page_data["all_partitions"] = self.helper.get_all_mounts()
@@ -1298,8 +1254,8 @@ class PanelHandler(BaseHandler):
             ).is_backingup
             self.controller.servers.refresh_server_settings(server_id)
             try:
-                page_data["backup_list"] = server.list_backups(
-                    page_data["backup_config"]
+                page_data["backup_list"] = server.backup_mgr.list_backups(
+                    page_data["backup_config"], server.server_id
                 )
             except:
                 page_data["backup_list"] = []
@@ -1509,6 +1465,31 @@ class PanelHandler(BaseHandler):
 
             template = "panel/panel_edit_user_apikeys.html"
 
+        elif page == "edit_user_otp":
+            user_id = self.get_argument("id", None)
+            user_obj = self.controller.users.get_user_object(user_id)
+            page_data["user"] = self.controller.users.get_user_by_id(user_id)
+
+            codes = []
+            user_totp = list(user_obj.totp_user)
+
+            for totp in user_totp:
+                codes.append({"name": totp.name, "id": totp.id})
+
+            page_data["totp"] = codes
+            # self.controller.crafty_perms.list_defined_crafty_permissions()
+
+            if user_id is None:
+                self.redirect("/panel/error?error=Invalid User ID")
+                return
+            if int(user_id) != exec_user["user_id"] and not exec_user["superuser"]:
+                self.redirect(
+                    "/panel/error?error=You are not authorized to view this page."
+                )
+                return
+
+            template = "panel/panel_edit_user_otp.html"
+
         elif page == "remove_user":
             # pylint: disable=no-member
             user_id = nh3.clean(self.get_argument("id", None))
@@ -1557,6 +1538,7 @@ class PanelHandler(BaseHandler):
             page_data["role"]["role_id"] = -1
             page_data["role"]["created"] = "N/A"
             page_data["role"]["last_update"] = "N/A"
+            page_data["role"]["mfa_required"] = False
             page_data["role"]["servers"] = set()
             page_data["user-roles"] = user_roles
             page_data["users"] = self.controller.users.get_all_users()
@@ -1646,76 +1628,8 @@ class PanelHandler(BaseHandler):
         elif page == "activity_logs":
             template = "panel/activity_logs.html"
 
-        elif page == "download_file":
-            file = Helpers.get_os_understandable_path(
-                urllib.parse.unquote(self.get_argument("path", ""))
-            )
-            name = urllib.parse.unquote(self.get_argument("name", ""))
-            server_id = self.check_server_id()
-            if server_id is None:
-                return
-
-            server_info = self.controller.servers.get_server_data_by_id(server_id)
-
-            if not self.helper.is_subdir(
-                file,
-                Helpers.get_os_understandable_path(server_info["path"]),
-            ) or not os.path.isfile(file):
-                self.redirect("/panel/error?error=Invalid path detected")
-                return
-
-            self.download_file(name, file)
-            self.redirect(f"/panel/server_detail?id={server_id}&subpage=files")
-
         elif page == "wiki":
             template = "panel/wiki.html"
-
-        elif page == "download_support_package":
-            temp_zip_storage = exec_user["support_logs"]
-
-            self.set_header("Content-Type", "application/octet-stream")
-            self.set_header(
-                "Content-Disposition", "attachment; filename=" + "support_logs.zip"
-            )
-            chunk_size = 1024 * 1024 * 4  # 4 MiB
-            if temp_zip_storage != "":
-                with open(temp_zip_storage, "rb") as f:
-                    while True:
-                        chunk = f.read(chunk_size)
-                        if not chunk:
-                            break
-                        try:
-                            self.write(chunk)  # write the chunk to response
-                            self.flush()  # send the chunk to client
-                        except iostream.StreamClosedError:
-                            # this means the client has closed the connection
-                            # so break the loop
-                            break
-                        finally:
-                            # deleting the chunk is very important because
-                            # if many clients are downloading files at the
-                            # same time, the chunks in memory will keep
-                            # increasing and will eat up the RAM
-                            del chunk
-                self.redirect("/panel/dashboard")
-            else:
-                self.redirect("/panel/error?error=No path found for support logs")
-                return
-
-        elif page == "support_logs":
-            logger.info(
-                f"Support logs requested. "
-                f"Packinging logs for user with ID: {exec_user['user_id']}"
-            )
-            logs_thread = threading.Thread(
-                target=self.controller.package_support_logs,
-                daemon=True,
-                args=(exec_user,),
-                name=f"{exec_user['user_id']}_logs_thread",
-            )
-            logs_thread.start()
-            self.redirect("/panel/dashboard")
-            return
         if self.helper.crafty_starting:
             template = "panel/loading.html"
         self.render(

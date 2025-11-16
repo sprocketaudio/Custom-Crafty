@@ -32,7 +32,9 @@
         "yes": "Si"
     },
     "base": {
-        "doesNotWorkWithoutJavascript": "<strong>Aviso: </strong>¡Crafty no funciona correctamente cuando JavaScript no está habilitado!"
+        "doesNotWorkWithoutJavascript": "<strong>Aviso: </strong>¡Crafty no funciona correctamente cuando JavaScript no está habilitado!",
+        "getMFA": "Asegura tus servidores!",
+        "createMFA": "Añade autentificación en dos factores a tu cuenta!"
     },
     "credits": {
         "developmentTeam": "Equipo de desarrollo",
@@ -195,7 +197,6 @@
         "eulaMsg": "Debes aceptar el ",
         "eulaTitle": "Aceptar EULA",
         "fileError": "El tipo de archivo debe ser una imagen.",
-        "fileTooLarge": "Subida fallida. El archivo es demasiado grande. Contacte al administrador del sistema para obtener asistencia.",
         "hereIsTheError": "Aquí está el error.",
         "installerJava": "Fallo al instalar {} : La instalación de Forge requiere Java. Detectamos que Java no está instalado. Por favor instale java e inicie el servidor.",
         "internet": "Hemos detectado que la máquina ejecutando Crafty no tiene acceso a internet. Las conexiones de cliente al servidor podrían ser limitadas.",
@@ -219,13 +220,21 @@
     },
     "login": {
         "defaultPath": "La contraseña introducida es la ruta default de las credenciales, no la contraseña. Busca la contraseña accediendo a la carpeta de la ruta",
-        "disabled": "Cuenta del usuario desactivada. Porfavor contacta al administrador para mas informacion.",
         "forgotPassword": "Olvidé mi contraseña",
-        "incorrect": "El nombre de usuario o contraseña es incorrecto",
+        "incorrect": "El nombre de usuario, la contraseña, o el A2F son incorrectos",
         "login": "Iniciar Sesión",
         "password": "Contraseña",
         "username": "Usuario",
-        "viewStatus": "Ver página de estado público"
+        "viewStatus": "Ver página de estado público",
+        "2fa": "(Si A2F esta habilitado)",
+        "2faRecovery": "Recuperar A2F",
+        "accountDisabled": "Tu cuenta de usuario ha sido desactiva administrativamente. Por favor contacta al administrador de tu sistema para mas detalles.",
+        "backupCodeTitle": "Código de respaldo",
+        "backupCode": "Introduce el código de respaldo",
+        "cancel": "Cancelar",
+        "totpSelect": "Aplicación de autentificación",
+        "passwordRecovery": "Recuperar contraseña",
+        "totp": "Introducir código de autentificación"
     },
     "notify": {
         "activityLog": "Registros de actividad",
@@ -235,7 +244,12 @@
         "finishedPreparing": "Terminamos la preparación de tus registros de soporte. Por favor presione el botón para descargar.",
         "logout": "Cerrar Sesión",
         "preparingLogs": " Por favor espere mientras preparamos los registros. Le enviaremos una notificación cuando estén listos. Esto puede tomar un rato en implementaciones grandes.",
-        "supportLogs": "Registros de soporte"
+        "supportLogs": "Registros de soporte",
+        "schedule_desc": "Hemos detectado que algunas o todas tus tareas programadas no fueron transferidas con éxito durante la actualización. Por favor confirma tus tareas programas en la pestaña de Programar tareas.",
+        "backup_desc": "Hemos detectado que la migración de respaldo puede haber fallado parcial o completamente. Por favor confirma tus registros de respaldo en la pestaña de respaldos.",
+        "backup_title": "Advertencia sobre la migración de respaldo",
+        "accountSettings": "Ajustes de la cuenta",
+        "schedule_title": "Advertencia sobre la transferencia de las tareas programadas"
     },
     "offline": {
         "offline": "Desconectado",
@@ -310,7 +324,6 @@
         "compress": "Comprimir la copia",
         "confirm": "Confirmar",
         "confirmDelete": "¿Quieres eliminar esta copia de seguridad? Esto no se puede deshacer.",
-        "confirmRestore": "¿Seguro que quiere restaurar desde este respaldo?. Todos los archivos del servidor actuales serán cambiados al estado del respaldo y serán irrecuperables.",
         "currentBackups": "Copias de seguridad actuales",
         "default": "Copia de seguridad predeterminada",
         "defaultExplain": "La copia de seguridad que Crafty usará antes de actualizar. No se puede cambiar ni eliminar.",
@@ -667,9 +680,6 @@
         "userTheme": "Tema de Interfaz",
         "uses": "Número de usos permitidos. (Sin límite: -1)"
     },
-    "validators": {
-        "passLength": "Contraseña demasiado corta. Longitud mínima: 8"
-    },
     "webhooks": {
         "areYouSureDel": "¿Estás seguro de que quieres eliminar este webhook?",
         "areYouSureRun": "¿Estás seguro de que quieres probar este webhook?",
@@ -694,5 +704,17 @@
         "url": "URL de Webhook",
         "webhook_body": "Cuerpo del Webhook",
         "webhooks": "Webhooks"
+    },
+    "otp": {
+        "2faCreate": "Añadir nuevo método de autentificación en dos factores",
+        "backupCodes": "Por favor copia tus códigos de respaldo.",
+        "name": "Nombre",
+        "id": "ID (Identificación)",
+        "config": "Configuración",
+        "copyBackupCodes": "Copiar codigos",
+        "delete": "Eliminar",
+        "deleteConfirm": "¿Seguro que quieres eliminar este método de autentificación en dos factores?",
+        "yes": "Si",
+        "no": "No"
     }
 }

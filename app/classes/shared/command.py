@@ -7,7 +7,7 @@ import getpass
 from app.classes.shared.console import Console
 from app.classes.shared.import3 import Import3
 
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.shared.tasks import TasksManager
 from app.classes.shared.migration import MigrationManager
 from app.classes.shared.main_controller import Controller

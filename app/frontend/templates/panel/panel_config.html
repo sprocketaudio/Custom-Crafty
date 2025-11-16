@@ -6,7 +6,7 @@
 {% block title %}Crafty Controller - {{ translate('panelConfig', 'pageTitle', data['lang']) }}{% end %}
 
 {% block content %}
-
+<link href="/static/assets/css/partial/crafty-mfa_page.css" rel="stylesheet">
 <div class="content-wrapper">
   <!-- Page Title Header Starts-->
   <div class="row page-title-header">
@@ -107,7 +107,14 @@
                               {% end %}
                             </ul>
                           </td>
-                          <td><span data-translate="{{translate('userConfig', 'userName', data['lang'])}}"
+                          <td>
+                            {% if len(list(user.totp_user)) != 0 %}
+                            <span data-translate="{{translate('otp', 'backupCodes', data['lang'])}}"
+                              data-toggle="tooltip" title="{{ translate('otp', 'renewRecovery', data['lang'])}}"
+                              class="clickable" data-name="{{user.username}}" data-id="{{user.user_id}}"
+                              id="renewCodes"><i class="fa-solid fa-shield-halved"></i></span>
+                            {% end %}
+                            &nbsp;&nbsp;<span data-translate="{{translate('userConfig', 'userName', data['lang'])}}"
                               data-toggle="tooltip" title="{{ translate('userConfig', 'userName', data['lang'])}}"
                               id="username_{{user.user_id}}" class="edit_user clickable" data-name="{{user.username}}"
                               data-id="{{user.user_id}}"><i class="fa-solid fa-user"></i></span>
@@ -297,6 +304,9 @@
 
 
 </div>
+<div id="createButton" style="visibility: hidden;" data-backup-codes="{{
+  translate('otp', 'backupCodes', data['lang']) }}" data-copy-codes="{{
+    translate('otp', 'copyBackupCodes', data['lang']) }}"></div> <!-- just for translations -->
 
 <style>
   .clickable {
@@ -340,100 +350,8 @@
 
 {% block js %}
 <script>
-  function validateForm() {
-    let password0 = document.getElementById("password0").value;
-    let password1 = document.getElementById("password1").value;
-    if (password0 != password1) {
-      $('.passwords-match').popover('show');
-      $('.popover-body').click(function () {
-        $('.passwords-match').popover("hide");
-      });
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
-      $("#password0").css("outline", "1px solid red");
-      $("#password1").css("outline", "1px solid red");
-      return false;
-    } else {
-      return password1;
-    }
-  }
-  $(".edit_password").on("click", async function () {
-    const token = getCookie("_xsrf");
-    let user_id = $(this).data('id');
-    bootbox.confirm(`<form class="form" id='infos' action=''>\
-      <div class="form-group">
-      <label for="new_password">${$(this).data("translate1")}</label>
-      <input class="form-control" type='password' id="password0" name='new_password' /></br>\
-      </div>
-      <div class="form-group">
-      <label for="confirm_password">${$(this).data("translate2")}</label>
-      <input class="form-control" type='password' id="password1" name='confirm_password' />\
-      </div>
-      </form>`, async function (result) {
-      if (result) {
-        password = validateForm();
-        if (!password) {
-          return;
-        }
-        let res = await fetch(`/api/v2/users/${user_id}`, {
-          method: 'PATCH',
-          headers: {
-            'X-XSRFToken': token
-          },
-          body: JSON.stringify({ "password": password }),
-        });
-        let responseData = await res.json();
-        if (responseData.status === "ok") {
-          console.log(responseData.data)
-        } else {
+  const token = getCookie("_xsrf");
 
-          bootbox.alert({
-            title: responseData.status,
-            message: responseData.error_data
-          });
-        }
-      }
-    });
-  });
-  $(document).on("submit", ".bootbox form", function (e) {
-    e.preventDefault();
-    $(".bootbox .btn-primary").click();
-  });
-
-  $(".edit_user").on("click", function () {
-    const token = getCookie("_xsrf");
-    let username = $(this).data('name');
-    let user_id = $(this).data('id');
-    bootbox.confirm(`<form class="form" id='infos' action=''>\
-      <div class="form-group">
-      <label for="username">${$(this).data("translate")}</label>
-      <input class="form-control" type='text' name='username' id="username_field" value=${username} /><br/>\
-      </div>
-      </form>`, async function (result) {
-      if (result) {
-        let new_username = $("#username_field").val();
-        let res = await fetch(`/api/v2/users/${user_id}`, {
-          method: 'PATCH',
-          headers: {
-            'X-XSRFToken': token
-          },
-          body: JSON.stringify({ "username": new_username }),
-        });
-        let responseData = await res.json();
-        if (responseData.status === "ok") {
-          $(`#user_${user_id}`).html(` ${new_username}`)
-          $(`#username_${user_id}`).data('name', new_username);
-        } else {
-
-          bootbox.alert({
-            title: responseData.error,
-            message: responseData.error_data
-          });
-        }
-      }
-    }
-    )
-  });
   if (webSocket) {
     webSocket.on('move_status', function (message) {
       if (message === "done") {
@@ -442,7 +360,7 @@
         $("#submit-status").html('<i class="fa fa-check"></i>');
       } else {
         $("#submit-status").html('<i class="fa fa-spinner fa-spin"></i>');
-        $("#submit-list").html(message);
+        $("#submit-list").text(message).html();
         $("#submit-list").addClass("loading");
       }
     });
@@ -504,12 +422,12 @@
     } // New width
   });
   $('#file').change(function () {
-    console.log("File changed");
     if ($('#file').val()) {
       $('#upload-button').prop("disabled", false);
-      console.log("File changed good");
     }
   });
 </script>
+<script src="../../static/assets/js/shared/backupCodes.js"></script>
+<script src="../../static/assets/js/shared/userSettings.js"></script>
 
 {% end %}

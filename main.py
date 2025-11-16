@@ -9,10 +9,10 @@ import signal
 import peewee
 from packaging import version as pkg_version
 
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.shared.import3 import Import3
 from app.classes.shared.console import Console
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 from app.classes.models.users import HelperUsers
 from app.classes.models.management import HelpersManagement
 from app.classes.shared.import_helper import ImportHelpers

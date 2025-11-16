@@ -40,10 +40,14 @@ from app.classes.web.routes.api.servers.server.backups.backup.index import (
     ApiServersServerBackupsBackupIndexHandler,
     ApiServersServerBackupsBackupFilesIndexHandler,
 )
+from app.classes.web.routes.api.servers.server.backups.backup.download import (
+    ApiServersServerBackupsBackupDownloadHandler,
+)
 from app.classes.web.routes.api.servers.server.files import (
     ApiServersServerFilesIndexHandler,
     ApiServersServerFilesCreateHandler,
     ApiServersServerFilesZipHandler,
+    ApiServersServerFileDownload,
 )
 from app.classes.web.routes.api.crafty.upload.index import ApiFilesUploadHandler
 from app.classes.web.routes.api.servers.server.tasks.task.children import (
@@ -64,12 +68,19 @@ from app.classes.web.routes.api.users.user.index import ApiUsersUserIndexHandler
 from app.classes.web.routes.api.users.user.permissions import (
     ApiUsersUserPermissionsHandler,
 )
+from app.classes.web.routes.api.users.user.otp import (
+    APIUsersTOTPHandler,
+    APIUsersTOTPIndexHandler,
+    APIUsersTOTPRecovery,
+    APIUsersTOTPVerifyIndexHandler,
+)
 from app.classes.web.routes.api.users.user.api import ApiUsersUserKeyHandler
 from app.classes.web.routes.api.users.user.pfp import ApiUsersUserPfpHandler
 from app.classes.web.routes.api.users.user.public import ApiUsersUserPublicHandler
 from app.classes.web.routes.api.crafty.announcements.index import (
     ApiAnnounceIndexHandler,
 )
+from app.classes.web.routes.api.crafty.check import ApiCraftyCheck
 from app.classes.web.routes.api.crafty.config.index import (
     ApiCraftyConfigIndexHandler,
     ApiCraftyCustomizeIndexHandler,
@@ -79,6 +90,7 @@ from app.classes.web.routes.api.crafty.config.server_dir import (
 )
 from app.classes.web.routes.api.crafty.stats.stats import ApiCraftyHostStatsHandler
 from app.classes.web.routes.api.crafty.clogs.index import ApiCraftyLogIndexHandler
+from app.classes.web.routes.api.crafty.clogs.support import ApiCraftySupportIndexHandler
 from app.classes.web.routes.api.crafty.imports.index import ApiImportFilesIndexHandler
 from app.classes.web.routes.api.crafty.exe_cache import ApiCraftyJarCacheIndexHandler
 from app.classes.web.routes.api.crafty.antilockout.index import ApiCraftyLockoutHandler
@@ -105,6 +117,11 @@ def api_handlers(handler_args):
         (
             r"/api/v2/crafty/announcements/?",
             ApiAnnounceIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/crafty/check/?",
+            ApiCraftyCheck,
             handler_args,
         ),
         (
@@ -169,6 +186,46 @@ def api_handlers(handler_args):
             handler_args,
         ),
         (
+            r"/api/v2/users/([0-9]+)/totp/([a-z0-9-]+)/verify/?",
+            APIUsersTOTPVerifyIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/(@me)/totp/([a-z0-9-]+)/verify/?",
+            APIUsersTOTPVerifyIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/(@me)/totp/recovery/renew/?",
+            APIUsersTOTPRecovery,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/([0-9]+)/totp/recovery/renew/?",
+            APIUsersTOTPRecovery,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/([0-9]+)/totp/?",
+            APIUsersTOTPIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/([0-9]+)/totp/?",
+            APIUsersTOTPIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/([0-9]+)/totp/([a-z0-9-]+)/?",
+            APIUsersTOTPHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/(@me)/totp/([a-z0-9-]+)/?",
+            APIUsersTOTPHandler,
+            handler_args,
+        ),
+        (
             r"/api/v2/users/([0-9]+)/permissions/?",
             ApiUsersUserPermissionsHandler,
             handler_args,
@@ -220,6 +277,11 @@ def api_handlers(handler_args):
             handler_args,
         ),
         (
+            r"/api/v2/servers/([a-z0-9-]+)/backups/backup/([a-z0-9-]+)/download/(.+)/?",
+            ApiServersServerBackupsBackupDownloadHandler,
+            handler_args,
+        ),
+        (
             r"/api/v2/servers/([a-z0-9-]+)/backups/backup/([a-z0-9-]+)/?",
             ApiServersServerBackupsBackupIndexHandler,
             handler_args,
@@ -245,6 +307,11 @@ def api_handlers(handler_args):
             handler_args,
         ),
         (
+            r"/api/v2/crafty/support_logs/?",
+            ApiCraftySupportIndexHandler,
+            handler_args,
+        ),
+        (
             r"/api/v2/servers/import/upload/?",
             ApiFilesUploadHandler,
             handler_args,
@@ -257,6 +324,11 @@ def api_handlers(handler_args):
         (
             r"/api/v2/servers/([a-z0-9-]+)/files(?:/([a-zA-Z0-9-]+))?/?",
             ApiServersServerFilesIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/servers/([a-z0-9-]+)/files/(.+)/?",
+            ApiServersServerFileDownload,
             handler_args,
         ),
         (

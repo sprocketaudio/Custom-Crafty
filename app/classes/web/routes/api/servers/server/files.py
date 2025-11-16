@@ -2,11 +2,13 @@ import os
 import logging
 import json
 import html
+from pathlib import Path
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+
 from app.classes.models.server_permissions import EnumPermissionsServer
-from app.classes.shared.helpers import Helpers
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.helpers import Helpers
+from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.web.base_api_handler import BaseApiHandler
 
 logger = logging.getLogger(__name__)
@@ -317,7 +319,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -403,7 +405,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -483,7 +485,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -576,7 +578,7 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -668,7 +670,7 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -761,7 +763,7 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(
@@ -787,7 +789,7 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                 },
             )
         if Helpers.check_file_exists(folder):
-            folder = self.file_helper.unzip_file(folder, user_id)
+            folder = self.file_helper.unzip_file(folder)
         else:
             if user_id:
                 return self.finish_json(
@@ -799,3 +801,137 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                     },
                 )
         return self.finish_json(200, {"status": "ok"})
+
+
+class ApiServersServerFileDownload(BaseApiHandler):
+    async def get(self, server_id: str, encoded_file_path: str):
+        logger.debug(
+            "Download file request received. server_id: %s, encoded file path: %s",
+            server_id,
+            encoded_file_path,
+        )
+        auth_data = self.authenticate_user()
+        if not auth_data:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators",
+                        "insufficientPerms",
+                        self.helper.get_setting("language"),
+                    ),
+                },
+            )
+
+        filepath = html.unescape(encoded_file_path)
+        file_path = Path(filepath)
+
+        if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
+            # if the user doesn't have access to the server, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
+                auth_data[4]["user_id"], server_id
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.FILES not in server_permissions:
+            # if the user doesn't have Files permission, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
+        try:
+            if not Helpers.validate_traversal(
+                self.controller.servers.get_server_data_by_id(server_id)["path"],
+                file_path,
+            ):
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "TRAVERSAL DETECTED",
+                        "error_data": "TRAVERSAL DETECTED",
+                    },
+                )
+        except ValueError:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "TRAVERSAL DETECTED",
+                    "error_data": "TRAVERSAL DETECTED",
+                },
+            )
+
+        if not file_path.exists():
+            return self.finish_json(
+                404,
+                {
+                    "status": "error",
+                    "error": "File not found",
+                    "error_data": f"Path does not exist: {file_path}",
+                },
+            )
+        directory_download = False
+        download_path = file_path
+        if file_path.is_dir():
+            directory_download = True
+            logger.info("Requested download is a directory. Zipping...%s", file_path)
+            archive_path = Path(
+                self.controller.project_root,
+                "temp",
+                str(auth_data[4]["user_id"]),
+                file_path.name,
+            )
+            archive_path.parent.mkdir(parents=True, exist_ok=True)
+
+            target_total_size = self.file_helper.get_dir_size(Path(download_path))
+            free_drive_storage = self.file_helper.get_drive_free_space(
+                Path(download_path)
+            )
+            if not self.file_helper.has_enough_storage(
+                target_total_size, free_drive_storage
+            ):
+                return self.finish_json(
+                    507,
+                    {
+                        "status": "error",
+                        "error": "Out Of Space",
+                        "error_data": "System Does Not Have enough space for download",
+                    },
+                )
+            self.file_helper.make_archive(archive_path, file_path)
+            download_path = archive_path.with_suffix(".zip")
+
+        self.controller.management.add_to_audit_log(
+            auth_data[4]["user_id"],
+            f"started file download for {download_path} from server {server_id}.",
+            server_id,
+            self.request.remote_ip,
+        )
+        await self.download_file(download_path)  # Make sure to check for permissions
+        # and traversal before calling download. There is no permission checking
+        # in this function
+        if directory_download:
+            os.remove(download_path)
+
+        return None

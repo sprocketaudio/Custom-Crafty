@@ -13,12 +13,6 @@
     </div>
   </li>
 
-  <li class="nav-item dropdown">
-    <a class="nav-link" href="/panel/panel_config">
-      <i class="fas fa-cogs"></i>
-    </a>
-  </li>
-
   <li class="nav-item dropdown user-dropdown">
     <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
       <img class="img-xs rounded-circle profile-picture" onerror="pfpError(this)" src="{{ data['user_data']['pfp'] }}"
@@ -37,6 +31,11 @@
         {% end %}
         <p class="font-weight-light text-muted mb-0">Email: {{ data['user_data']['email'] }}</p>
       </div>
+      <a class="dropdown-item" href="/panel/edit_user?id={{data['user_data']['user_id']}}"><i
+          class="fa-solid fa-user-gear dropdown-item-icon text-primary"></i>{{
+        translate('notify', 'accountSettings',
+        data['lang']) }}</a>
+      {% if data['support_perm'] %}
       {% if data['user_data']['preparing'] %}
       <span class="dropdown-item" id="support_progress"><i
           class="dropdown-item-icon mdi mdi-download-outline text-primary"></i>{{ translate('notify', 'supportLogs',
@@ -48,13 +47,15 @@
         </div>
       </span>
       {% else %}
-      <a class="dropdown-item" id="support_logs"><i
+      <a class="dropdown-item  support_logs" id="support_logs"><i
           class="dropdown-item-icon mdi mdi-download-outline text-primary"></i>{{ translate('notify', 'supportLogs',
         data['lang']) }}</i></a>
       {% end %}
+      {% end %}
       {% if data['superuser'] %}
       <a class="dropdown-item" href="/panel/activity_logs"><i
-          class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i>{{ translate('notify',
+          class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i>{{
+        translate('notify',
         'activityLog', data['lang']) }}</a>
       {% end %}
       <a class="dropdown-item" href="/logout"><i class="dropdown-item-icon mdi mdi-power text-primary"></i>{{
@@ -99,19 +100,62 @@
     image.src = "/static/assets/images/faces-clipart/pic-3.png";
     return true;
   }
+
+
+  function createAnnouncementItem(value) {
+    const li = document.createElement("li");
+    li.className = "card-header header-sm justify-content-between align-items-center annoucement-item";
+    li.id = value.id;
+
+    // Clear button
+    const iconWrapper = document.createElement("p");
+    const icon = document.createElement("i");
+    icon.className = "clear-button fa-regular fa-x";
+    icon.dataset.id = value.id;
+    iconWrapper.appendChild(icon);
+
+    // Link section
+    const a = document.createElement("a");
+    a.href = value.link;
+    a.target = "_blank";
+
+    const title = document.createElement("h6");
+    title.className = "annoucement-title";
+    title.textContent = value.title;
+
+    const dateWrapper = document.createElement("small");
+    const date = document.createElement("p");
+    date.textContent = value.date;
+    dateWrapper.appendChild(date);
+
+    const desc = document.createElement("p");
+    desc.textContent = value.desc;
+
+    // Assemble link
+    a.appendChild(title);
+    a.appendChild(dateWrapper);
+    a.appendChild(desc);
+
+    // Assemble list item
+    li.appendChild(iconWrapper);
+    li.appendChild(a);
+
+    return li;
+  }
+
   function updateAnnouncements(data) {
     console.log(data);
-    let text = "";
+    const container = document.querySelector("#announcements");
     for (let value of data) {
-      text += `<li class="card-header header-sm justify-content-between align-items-center annoucement-item" id="${value.id}"><p><i data-id="${value.id}" class="clear-button fa-regular fa-x"></i></p><a href=${value.link} target="_blank"><h6 class="annoucement-title">${value.title}</h6><small><p>${value.date}</p></small><p>${value.desc}</p></li></a>`
+      let annc_item = createAnnouncementItem(value)
+      container.appendChild(annc_item);
     }
     if (data.length > 0) {
       localStorage.setItem("notif-count", data.length);
       $("#notif-count").show()
-      $("#notif-count").html(data.length);
-      $("#announcements").html(text);
+      $("#notif-count").text(data.length).html();
     } else {
-      $("#announcements").html(`<li><p class='my-3 text-center'><i class="fa fa-bell-slash" aria-hidden="true"></i></p></li>`);
+      $("#announcements").text(`<li><p class='my-3 text-center'><i class="fa fa-bell-slash" aria-hidden="true"></i></p></li>`).html();
       $("#notif-count").hide()
     }
     $(".clear-button").on("click", function (event) {
@@ -123,7 +167,7 @@
       let notif_count = localStorage.getItem("notif-count") - 1;
       if (notif_count > 0) {
         localStorage.setItem("notif-count", notif_count);
-        $("#notif-count").html(notif_count);
+        $("#notif-count").text(notif_count).html();
       } else {
         $("#announcements").html(`<li><p class='my-3 text-center'><i class="fa fa-bell-slash" aria-hidden="true"></i></p></li>`)
         $("#notif-count").html("");
@@ -170,6 +214,10 @@
       bootbox.alert(responseData.error_data)
     }
   }
+
+  $(".support_logs").click(async function () {
+    window.open(`/api/v2/crafty/support_logs`, '_blank');
+  })
 
   /* Open / Close with Button */
   $('li.dropdown.notif-li a').on('click', function (event) {

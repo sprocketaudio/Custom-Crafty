@@ -195,7 +195,6 @@
         "eulaMsg": "Jums ir jāpiekrīt EULA. Kopija no Minecraft EULA ir saitēta zem šī ziņojuma.",
         "eulaTitle": "Piekrist EULA",
         "fileError": "Faila tipam ir jābūt attēlam.",
-        "fileTooLarge": "Augšupielāde neizdevās. Faila augšupielāde ir pārāk liela. Sazinies ar sistēmas administratoru priekš palīdzības.",
         "hereIsTheError": "Rekur ir kļūda",
         "installerJava": "Neizdevās uzstādīt {} : Forge Servera Uzstādīšanai ir vajadzīgs Java. Mēs noteicām ka Java nav instalēts. Lūdzu uzstādiet Java un tad mēģiniet uzstādīt serveri.",
         "internet": "Mēs esam noteikuši ka šai ierīcei, uz kuras iet Crafty nav  internet. Client connections to the server may be limited.",
@@ -219,7 +218,6 @@
     },
     "login": {
         "defaultPath": "Parole ko ievadijāt ir celš uz noklusētās paroles vietu, nevis noklusētā parole. Lūdzu apskatiet noklusēto paroli šajā vietā.",
-        "disabled": "Lietotāja konts atspējots. Lūdzu sazinieties ar savu sistēmas administratoru priekš papildus informācijas.",
         "forgotPassword": "Aizmirsu Paroli",
         "incorrect": "Nepareizs lietotājvārds vai parole",
         "login": "Ieiet",
@@ -314,7 +312,6 @@
         "compress": "Saspiest Dublējumu",
         "confirm": "Piekrist",
         "confirmDelete": "Vai vēlaties izdzēst šo dublējumu? Šo nevar atdarīt.",
-        "confirmRestore": "Vai tiešām vēlieties atjaunot no šī dublējuma. Visas esošās datnes tiks atgrieztas uz dublējuma stāvokli un būs neatgriežamas.",
         "currentBackups": "Pašreizējie Dublējumi",
         "default": "Noklusētais Dublējums",
         "defaultExplain": "Dublējums ko Crafty izmanto pirms atjaunināšanas. To nevar mainīt vai izdzēst.",
@@ -672,7 +669,6 @@
         "uses": "Dauzums, cik reizes lietot (-1==Bez Limita)"
     },
     "validators": {
-        "passLength": "Parole pārāk īsa. Minimālais Garums: 8",
         "backupName": "Dublējuma nosaukumam jābūt tekstam (string) ar minimālo garumu 3.",
         "enumErr": "pārbaude neizdevās. Pieņemamie dati ietver: ",
         "filesPageLen": "garumam jābūt lielākam par 1 priekš vienības",

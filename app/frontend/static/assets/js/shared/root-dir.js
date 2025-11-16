@@ -40,7 +40,6 @@ async function getTreeView(path, unzip = false, upload = false) {
     });
     let responseData = await res.json();
     if (responseData.status === "ok") {
-        console.log(responseData);
         process_tree_response(responseData, unzip);
         let x = document.querySelector('.bootbox');
         if (x) {
@@ -62,9 +61,10 @@ async function getTreeView(path, unzip = false, upload = false) {
 }
 
 function process_tree_response(response, unzip) {
-    const styles = window.getComputedStyle(document.getElementById("lower_half"));
     //If this value is still hidden we know the user is executing a zip import and not an upload
-    if (styles.visibility === "hidden") {
+    console.log(`LOWER HALF: ${$("#lower_half").classList}`)
+    if ($("#lower_half").hasClass("d-none")) {
+        console.log("In IF")
         document.getElementById('zip_submit').disabled = false;
     } else {
         document.getElementById('upload_submit').disabled = false;

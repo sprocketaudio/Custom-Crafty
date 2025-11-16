@@ -1,5 +1,14 @@
+import logging
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 from typing import Awaitable, Callable, Optional
+import aiofiles
+from tornado.iostream import StreamClosedError
 from app.classes.web.base_handler import BaseHandler
+
+
+logger = logging.getLogger(__name__)
+executor = ThreadPoolExecutor(max_workers=4)
 
 
 class BaseApiHandler(BaseHandler):
@@ -35,3 +44,47 @@ class BaseApiHandler(BaseHandler):
         # no body
         self.set_status(204)
         self.finish()
+
+    async def download_file(self, file_path: Path):
+        """THIS METHOD HAS NO TRAVERSAL DETECTION OR PERMISSION CHECKS! MAKE SURE TO
+        CHECK FOR TRAVERSAL AND PERMISSION BEFORE CALLING THIS FUNCTION.
+
+        Downloads file async in chunks
+
+        Args:
+            file_path (Path): pathlib Path object pointing to the intended file to
+            download
+
+        Returns:
+            _type_: _description_
+        """
+        chunk_size = 4 * 1024 * 1024  # 4 MiB
+        try:
+            self.set_header("Content-Type", "application/octet-stream")
+            self.set_header(
+                "Content-Disposition", f'attachment; filename="{file_path.name}"'
+            )
+
+            async with aiofiles.open(file_path, "rb") as f:
+                while True:
+                    chunk = await f.read(chunk_size)
+                    if not chunk:
+                        break
+                    try:
+                        self.write(chunk)
+                        await self.flush()
+                    except StreamClosedError:
+                        break
+                    finally:
+                        del chunk
+
+        except Exception as e:
+            print("Download error:", e)
+            return self.finish_json(
+                500,
+                {
+                    "status": "error",
+                    "error": "Download error",
+                    "error_data": f"ERROR: {e}",
+                },
+            )

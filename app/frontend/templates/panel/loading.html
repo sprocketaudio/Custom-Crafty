@@ -50,9 +50,9 @@
         if (webSocket) {
             webSocket.on('update', function (data) {
                 if ("server" in data) {
-                    $("#status").html(`${$("#status").data(data.section)} ${data.server}...`);
+                    $("#status").text(`${$("#status").data(data.section)} ${data.server}...`).html();
                 } else {
-                    $("#status").html($("#status").data(data.section));
+                    $("#status").text($("#status").data(data.section)).html();
                 }
             });
             webSocket.on('send_start_reload', function () {

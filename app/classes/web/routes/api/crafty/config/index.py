@@ -3,7 +3,7 @@ import json
 from jsonschema import ValidationError, validate
 import orjson
 from playhouse.shortcuts import model_to_dict
-from app.classes.shared.file_helpers import FileHelpers
+from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.web.base_api_handler import BaseApiHandler
 
 config_json_schema = {
@@ -112,6 +112,18 @@ config_json_schema = {
         "big_bucket_repo": {
             "type": "string",
             "error": "typeString",
+            "fill": True,
+        },
+        "enable_otp_skew": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "max_login_attempts": {"type": "integer", "error": "typeInt", "fill": True},
+        "superMFA": {"type": "boolean", "error": "typeBool", "fill": True},
+        "general_user_log_access": {
+            "type": "boolean",
+            "error": "typeBool",
             "fill": True,
         },
     },
@@ -228,7 +240,7 @@ class ApiCraftyConfigIndexHandler(BaseApiHandler):
                 offending_key = why.path[0] if why.path else None
             err = f"""{offending_key} {self.translator.translate(
                 "validators",
-                why.schema.get("error"),
+                why.schema.get("error", "additionalProperties"),
                 self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
             )} {why.schema.get("enum", "")}"""
             return self.finish_json(

@@ -32,7 +32,9 @@
         "yes": "是"
     },
     "base": {
-        "doesNotWorkWithoutJavascript": "<strong>警告：</strong>Crafty 无法在没有 JavaScript 的情况下使用！"
+        "doesNotWorkWithoutJavascript": "<strong>警告：</strong>Crafty 无法在没有 JavaScript 的情况下使用！",
+        "createMFA": "为您的账号添加多因素验证！",
+        "getMFA": "保护您的服务器！"
     },
     "credits": {
         "developmentTeam": "开发团队",
@@ -195,14 +197,13 @@
         "eulaMsg": "你必须同意 ",
         "eulaTitle": "同意最终用户许可协议（EULA）",
         "fileError": "文件类型必须是图片。",
-        "fileTooLarge": "上传失败。上传的文件过大。联系系统管理员以获取协助。",
         "hereIsTheError": "错误如下",
-        "installerJava": "安装 {} 失败：安装 Forge 服务器需要 Java。我们检测到 Java 未安装。请先安装 java 然后再安装服务器。",
+        "installerJava": "安装 {} 失败：安装 Forge 服务器需要 Java。我们检测到 Java 未安装。请先安装 Java 然后再安装服务器。",
         "internet": "我们检测到运行 Crafty 的设备没有网络连接。客户端到服务器的连接可能受限。",
         "migration": "Crafty 的主服务器存储正在被迁移到新位置。期间的所有服务器启动已被暂停。请等待我们完成迁移",
         "no-file": "我们似乎找不到请求的文件。请再次检查路径。Crafty 是否拥有了正确的权限？",
         "noInternet": "Crafty 无法访问网络。服务器创建已被禁用。请检查您的网络连接并刷新此页面。",
-        "noJava": "服务器 {} 启动失败，并输出了如下错误码：我们检测到 Java 未安装。请先安装 java 然后再启动服务器。",
+        "noJava": "服务器 {} 启动失败，并输出了以下错误：我们检测到 Java 未安装。请先安装 Java 然后再启动服务器。",
         "not-downloaded": "我们似乎找不到您的可执行文件。它下载完成了吗？可执行文件的权限设置正确了吗？",
         "portReminder": "我们检测到这是你首次运行 {}。请确保从您的路由器/防火墙转发 {} 端口，以使程序可以从公网远程访问。",
         "privMsg": "以及 ",
@@ -210,7 +211,8 @@
         "selfHost": "如果您自托管此仓库，请检查您的地址或参考我们的故障排除指南。",
         "start-error": "服务器 {} 启动失败，错误代码为：{}",
         "superError": "您必须作为超级用户来完成此操作。",
-        "terribleFailure": "多糟糕的错误！"
+        "terribleFailure": "多糟糕的错误！",
+        "duplicateId": "请求令牌必须仅指定 session_id 或 token_id，而非两者。"
     },
     "footer": {
         "allRightsReserved": "All rights reserved",
@@ -219,13 +221,23 @@
     },
     "login": {
         "defaultPath": "您输入的密码是默认凭据的路径，不是其中的密码。请在此路径中找到默认密码。",
-        "disabled": "用户账号已禁用。请联系您的系统管理员以了解更多信息。",
         "forgotPassword": "忘记密码",
-        "incorrect": "用户名或密码错误",
+        "incorrect": "用户名、密码或 MFA 错误",
         "login": "登录",
         "password": "密码",
         "username": "用户名",
-        "viewStatus": "查看公开状态页面"
+        "viewStatus": "查看公开状态页面",
+        "burnedBackupCode": "您已焚毁您的一个备份代码。请重新生成您的备份代码以避免被封锁",
+        "2fa": "（如果 MFA 已启用）",
+        "2faRecovery": "恢复 MFA",
+        "backupCodeTitle": "备份代码",
+        "backupCode": "输入备份代码",
+        "cancel": "取消",
+        "cooldown": "冷却中。此时间后重试：",
+        "totpSelect": "验证器应用",
+        "passwordRecovery": "恢复密码",
+        "totp": "输入验证器代码",
+        "accountDisabled": "您的用户账号出于管理原因已被禁用。请联系您的系统管理员以了解详情。"
     },
     "notify": {
         "activityLog": "活动日志",
@@ -239,7 +251,8 @@
         "backup_title": "备份迁移警告",
         "schedule_title": "计划迁移警告",
         "backup_desc": "我们检测到备份迁移可能已经部分或完全失败。请在备份选项卡中确认您的备份记录。",
-        "schedule_desc": "我们检测到您的一些或全部计划任务在升级时未成功转移。请在计划选项卡中确认您的计划。"
+        "schedule_desc": "我们检测到您的一些或全部计划任务在升级时未成功转移。请在计划选项卡中确认您的计划。",
+        "accountSettings": "账号设置"
     },
     "offline": {
         "offline": "离线",
@@ -299,7 +312,8 @@
         "selectManager": "选择此角色的管理员",
         "serverAccess": "访问？",
         "serverName": "服务器名称",
-        "serversDesc": "此角色允许访问的服务器"
+        "serversDesc": "此角色允许访问的服务器",
+        "requireMFA": "要求角色用户启用 MFA（多因素验证）"
     },
     "serverBackups": {
         "actions": "操作",
@@ -314,7 +328,6 @@
         "compress": "压缩备份",
         "confirm": "确认",
         "confirmDelete": "您想要删除这个备份吗？此操作不能撤销。",
-        "confirmRestore": "你确定要从此备份恢复吗？所有现存的服务器文件将更改到备份时的状态，并且无法撤销。",
         "currentBackups": "现有备份",
         "default": "默认备份",
         "defaultExplain": "Crafty 在更新前会使用的备份。此项目不能被更改或删除。",
@@ -345,7 +358,11 @@
         "status": "状态",
         "storage": "存储位置",
         "storageLocation": "存储位置",
-        "storageLocationDesc": "您想要在哪里存储备份？"
+        "storageLocationDesc": "您想要在哪里存储备份？",
+        "inplace": "在原位置恢复备份 - 备份 zip 中不存在的文件将保留在服务器目录中",
+        "radioRequired": "您必须选择一个选项来恢复您的备份",
+        "replace": " 恢复备份文件并将服务器目录重置为备份中的结构",
+        "snapshotDisclaimer": "快照备份当前处于 beta 阶段。快照备份只存储文件的一份副本，占用的磁盘空间更少。备份与恢复在测试中的确运行良好，但您可能遇到未预见的问题。您不应该在任何关键任务备份中仅依赖此备份方式。请报告您遇到的任何问题。"
     },
     "serverConfig": {
         "bePatientDelete": "请耐心等待，我们正在从 Crafty 面板中移除服务器。稍后此页面会关闭。",
@@ -370,7 +387,7 @@
         "noDelete": "否，返回",
         "noDeleteFiles": "否，只从面板中移除",
         "removeOldLogsAfter": "此时间后删除旧日志",
-        "removeOldLogsAfterDesc": "日志文件要在多少天后视为旧文件被删除（0 为关闭）",
+        "removeOldLogsAfterDesc": "我们要保留日志文件多少天？（0 为关闭）",
         "save": "保存",
         "sendingDelete": "正在删除服务器",
         "sendingRequest": "正在发送您的请求……",
@@ -411,7 +428,7 @@
             "我们<code>不推荐</code>更改由 Crafty 管理的服务器的路径。",
             "更改路径<code>可能会</code>破坏一些东西，尤其是在 Linux 这类文件权限锁定得更加严格的操作系统上。",
             "<br /><br/>",
-            "如果您认为您必须更改服务器存放的位置，你可能需要给予 \"crafty\" 用户对服务器路径的读取/写入权限。",
+            "如果您认为您必须更改服务器存放的位置，你可能需要给予“crafty”用户对服务器路径的读取/写入权限。",
             "<br />",
             "<br />",
             "在 Linux 上，最好通过执行如下命令来完成：<br />",
@@ -508,7 +525,7 @@
     },
     "serverSchedules": {
         "action": "操作",
-        "actionId": "选择子操作",
+        "actionId": "子操作",
         "areYouSure": "删除计划任务？",
         "cancel": "取消",
         "cannotSee": "什么都看不到？",
@@ -532,7 +549,8 @@
         "no": "否",
         "no-schedule": "此服务器当前没有计划。要开始使用计划，点击",
         "scheduledTasks": "计划任务",
-        "yes": "是"
+        "yes": "是",
+        "backupPol": "备份策略"
     },
     "serverStats": {
         "cpuUsage": "CPU 使用率",
@@ -619,7 +637,8 @@
         "documentation": "文档",
         "inApp": "内置文档",
         "newServer": "创建新服务器",
-        "servers": "服务器"
+        "servers": "服务器",
+        "panelSettings": "面板设置"
     },
     "startup": {
         "almost": "即将完成。请稍候……",
@@ -669,10 +688,16 @@
         "userRolesDesc": "此用户充当成员的角色。",
         "userSettings": "用户设置",
         "userTheme": "UI 主题",
-        "uses": "使用次数限制（-1==无限制）"
+        "uses": "使用次数限制（-1==无限制）",
+        "totpIdReq": "请求需要 MFA ID",
+        "changePass": "更改密码",
+        "changeUser": "更改用户名",
+        "editTOTP": "编辑用户 MFA",
+        "hints": "启用提示？",
+        "totpHeader": "多因素验证",
+        "selfDisable": "您不能禁用您自己的账号"
     },
     "validators": {
-        "passLength": "密码过短。最短长度：8",
         "backupName": "备份名称必须为字符串，且最短长度为 3。",
         "filesPageLen": "属性的长度必须大于 1",
         "typeList": "必须为列表/数组类型 ",
@@ -691,7 +716,12 @@
         "typeEmail": "必须为邮箱类型。",
         "typeIntMinVal0": "必须为最小值为 0 的整数。",
         "typeInteger": "必须为数字。",
-        "typeString": "必须为字符串类型。"
+        "typeString": "必须为字符串类型。",
+        "2FAerror": "多因素代码必须为 6 位（例如：000000）或一个 16 字符的备份代码，以 - 分隔为每 4 个字符一段（例如：ABCD-EFGH-IJKL-MNOP）",
+        "totp": "MFA 代码必须为 6 个数字",
+        "additionalProperties": "不允许传递额外属性",
+        "mfaName": "输入的属性必须为字符串类型，且最短为 3 个字符",
+        "passProp": "密码必须为最短 8 个字符的字符串。"
     },
     "webhooks": {
         "areYouSureDel": "您确定要删除此 webhook 吗？",
@@ -717,5 +747,63 @@
         "url": "Webhook 地址",
         "webhook_body": "Webhook 消息体（Body）",
         "webhooks": "Webhook"
+    },
+    "otp": {
+        "backupOtp": "需要一个新的 MFA 方式以请求备份代码",
+        "mfaWarn": "您必须启用 MFA 来与此系统交互。请创建一个 MFA 密钥。如果您已经创建了一个密钥，但仍看见此消息，请注销，并使用 MFA 重新登录。",
+        "deleteConfirm": "您确定要删除此 MFA 方式吗？",
+        "verifyTitle": "使用验证器验证 MFA 方式",
+        "name": "名称",
+        "id": "ID",
+        "config": "配置",
+        "copyBackupCodes": "复制代码",
+        "delete": "删除",
+        "yes": "是",
+        "no": "否",
+        "2faCreate": "添加新的 MFA 方式",
+        "backupCodes": "请复制您的备份代码。",
+        "backupCodesMax": "已达到 6 个备份代码的上限。",
+        "saveWarn": "请确保您保存了这些备份代码，否则您可能失去访问",
+        "confirm2FA": "请确认验证器代码",
+        "newName": "为此 MFA 方式输入一个易于辨认的名称",
+        "otpTitle": "MFA 方式",
+        "renewRecovery": "更新恢复代码",
+        "newOTP": "添加新的多因素验证",
+        "verify": "验证 MFA 失败。输入了错误的代码。",
+        "goToPage": "前往 MFA 页面",
+        "otpReq": "此用户必须启用 MFA。您不能移除你的唯一 MFA 方式。"
+    },
+    "configJson": {
+        "history_max_age": "Crafty 应该保存您的服务器统计多久（天）",
+        "allow_nsfw_profile_pictures": "允许 Gravatar™ NSFW 个人资料图片",
+        "crafty_logs_delete_after_days": "Crafty 应该保存应用日志多久（天）",
+        "dir_size_poll_freq_minutes": "Crafty 应该多久拉取一次您的服务器目录以获取大小（分钟）",
+        "stats_update_frequency_seconds": "我们应该多久拉取一次您的服务器以获取统计（秒）",
+        "big_bucket_repo": "系统 Big Bucket™ 远端 URL",
+        "cookie_expire": "会话 cookie 过期时间（天）",
+        "delete_default_json": "启动时删除默认 JSON 文件",
+        "disabled_language_files": "全局禁用的语言文件",
+        "enable_user_self_delete": "允许用户删除自己的账号",
+        "enable_otp_skew": "启用 MFA 偏移（+-1）",
+        "False": "否",
+        "https_port": "Crafty 的端口",
+        "keywords": "Crafty 应该在您的服务器终端中高亮的关键词",
+        "language": "全局系统语言。（用于公开页面和翻译回落）",
+        "max_audit_entries": "Crafty 的活动日志中允许的最大条目数量",
+        "max_log_lines": "每文件的最大日志行数",
+        "max_login_attempts": "远程 IP 在被我们置于冷却前的最大失败登录次数",
+        "monitored_mounts": "仪表板上可见的存储挂载",
+        "reset_secrets_on_next_boot": "下次启动时重置密钥",
+        "show_contribute_link": "在面板中显示贡献链接",
+        "show_errors": "显示 web 服务器的调试错误",
+        "submit": "提交",
+        "True": "是",
+        "virtual_terminal_lines": "我们应该允许您的服务器终端缓冲中有多少行",
+        "general": "通用",
+        "security": "安全",
+        "logs": "日志",
+        "miscellaneous": "其他",
+        "superMFA": "要求超级用户启用 MFA",
+        "monitoring": "监控"
     }
 }

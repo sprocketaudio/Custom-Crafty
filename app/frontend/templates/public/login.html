@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/static/assets/vendors/flag-icon-css/css/flag-icon.min.css">
   <link rel="stylesheet" href="/static/assets/vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="/static/assets/vendors/typicons/typicons.css">
+  <link rel="stylesheet" href="/static/assets/css/login.css">
   <link rel="stylesheet" href="/static/assets/vendors/css/vendor.bundle.base.css">
   <link rel="manifest" href="/static/assets/crafty.webmanifest">
 
@@ -53,52 +54,79 @@
               <div class="text-center auto-form-logo">
                 <img src="/static/assets/images/logo_long.svg">
               </div>
-              <form id="login-form" data-query="{{ data.get('query', None) }}">
+              <form id="login-form">
                 {% raw xsrf_form_html() %}
+                <div id="login-inputs"></div>
                 <div class="form-group">
                   <label class="label">{{ translate('login', 'username', data['lang']) }}</label>
                   <div class="input-group">
-                    <input type="text" class="form-control login-text-input login-input" placeholder="{{ translate('login', 'username', data['lang']) }}" name="username" id="username" required="true">
+                    <input type="text" class="form-control login-text-input login-input"
+                      placeholder="{{ translate('login', 'username', data['lang']) }}" name="username" id="username"
+                      required="true">
                   </div>
                 </div>
                 <div class="form-group">
                   <label class="label">{{ translate('login', 'password', data['lang']) }}</label>
                   <div class="input-group">
-                    <input type="password" class="form-control login-text-input login-input" placeholder="{{ translate('login', 'password', data['lang']) }}" name="password" id="password" required="true">
+                    <input type="password" class="form-control login-text-input login-input"
+                      placeholder="{{ translate('login', 'password', data['lang']) }}" name="password" id="password"
+                      required="true">
                   </div>
                 </div>
                 <div class="form-group">
-                  <button class="login-input btn btn-primary submit-btn btn-block">{{ translate('login', 'login',
-                    data['lang']) }}</button>
+                  <label class="label full-width" data-backupcode="{{ translate('login', 'backupCode', data['lang']) }}"
+                    data-2fa="{{ translate('login', 'totp', data['lang']) }}" id="multi-label"><span
+                      id="auth-code-label">{{
+                      translate('login', 'totp', data['lang']) }}</span>&nbsp;<span
+                      class="badge badge-pill badge-info">{{
+                      translate('login', '2fa', data['lang'])
+                      }}</span>
+                    <div class="input-group flex-container">
+                      <div id="totp_container">
+                        <input type="text" class="form-control login-text-input login-input" placeholder="000000"
+                          name="totp" id="totp">
+                      </div>
+                  </label>
+                  <select required class="form-control form-control-lg select-css" id="2fa-type" name="type">
+                    <option value="totp">{{ translate('login', 'totpSelect', data['lang']) }}</option>
+                    <option value="backup_code">{{ translate('login', 'backupCodeTitle', data['lang']) }}</option>
+                  </select>
                 </div>
-                <fieldset id="error-field" class="loginError">
-                </fieldset>
-                <div class="form-group d-flex justify-content-between">
-                  <div class="form-check form-check-flat mt-0">
-                    &nbsp;
-                  </div>
-                  <button onclick="resetPass()" id="#resetPass" form="" class="btn btn-outline-primary btn-sm forgot-password ">{{ translate('login', 'forgotPassword',
-                    data['lang']) }}</button>
-                </div>
-
-                <div class="text-block text-center my-3">
-                  <span class="text-small font-weight-semibold"><a href="https://craftycontrol.com/">Crafty Control</a> </span>
-                </div>
-
-                <div class="text-block text-center my-3">
-                  <a href="/status" class="text-small forgot-password">{{ translate('login', 'viewStatus',
-                    data['lang']) }}</a>
-                </div>
-              </form>
-
+            </div>
+            <div class="form-group">
+              <button class="login-input btn btn-primary submit-btn btn-block">{{ translate('login', 'login',
+                data['lang']) }}</button>
+            </div>
+            <fieldset id="error-field" class="loginError">
+            </fieldset>
+            <div class="form-group d-flex justify-content-between">
+              <div class="form-check form-check-flat mt-0">
+                &nbsp;
+              </div>
+              <button onclick="resetPass()" id="#resetPass" form=""
+                class="btn btn-outline-primary btn-sm forgot-password ">{{ translate('login', 'forgotPassword',
+                data['lang']) }}</button>
             </div>
 
+            <div class="text-block text-center my-3">
+              <span class="text-small font-weight-semibold"><a href="https://craftycontrol.com/">Crafty Control</a>
+              </span>
+            </div>
+
+            <div class="text-block text-center my-3">
+              <a href="/status" class="text-small forgot-password">{{ translate('login', 'viewStatus',
+                data['lang']) }}</a>
+            </div>
+            </form>
+
           </div>
+
         </div>
       </div>
-      <!-- content-wrapper ends -->
     </div>
-    <!-- page-body-wrapper ends -->
+    <!-- content-wrapper ends -->
+  </div>
+  <!-- page-body-wrapper ends -->
   </div>
   <!-- container-scroller -->
   <!-- plugins:js -->
@@ -113,6 +141,7 @@
   <script src="../static/assets/vendors/js/bootbox.min.js"></script>
   <!-- endinject -->
   <script>
+
     $(document).ready(function () {
       let login_opacity_div = document.getElementById('login_opacity');
       let opacity = login_opacity_div.getAttribute('data-value');
@@ -134,6 +163,15 @@
       bootbox.alert(responseData.data)
 
     }
+    $("#2fa-type").on("change", function () {
+      if ($("#2fa-type").val() === "backup_code") {
+        $("#auth-code-label").html($("#multi-label").data("backupcode"))
+        $("#totp").attr("placeholder", "ABCD-EFGH-IJKL-MNOP")
+      } else {
+        $("#totp").attr("placeholder", "000000")
+        $("#auth-code-label").html($("#multi-label").data("2fa"))
+      }
+    })
     $("#login-form").on("submit", async function (e) {
       e.preventDefault();
       let loginForm = document.getElementById("login-form");
@@ -142,29 +180,66 @@
 
       //Create an object from the form data entries
       let formDataObject = Object.fromEntries(formData.entries());
-      let res = await fetch(`/login`, {
+      let body = {
+        "username": formDataObject.username,
+        "password": (formDataObject.password).toString(),
+      }
+      if (formDataObject.totp != "") {
+        let key = $("#2fa-type").val();
+        body = {
+          "username": formDataObject.username,
+          "password": (formDataObject.password).toString(),
+          [key]: formDataObject.totp,
+        }
+      }
+      let res = await fetch(`/api/v2/auth/login/`, {
         method: 'POST',
         headers: {
           'X-XSRFToken': formDataObject._xsrf,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          "username": formDataObject.username,
-          "password": formDataObject.password
-        }),
+        body: JSON.stringify(body),
       });
       let responseData = await res.json();
       if (responseData.status === "ok") {
-        console.log("OK")
-        if ($("#login-form").data("query")) {
-          location.href = `${$("#login-form").data("query")}`;
+        if (responseData.data.warning) {
+          bootbox.alert({
+            message: responseData.data.warning,
+            callback: function () {
+              console.log("message answered");
+              // Redirect after the alert is acknowledged
+              location.href = responseData.data.page;
+            }
+          });
         } else {
-          location.href = `/panel/dashboard`
+          // Redirect immediately if no warning
+          location.href = responseData.data.page;
         }
+      } else if (responseData.cooldown_time) {
+        $("#error-field").html(`${responseData.error_data}&nbsp;<span id="cooldown">${responseData.cooldown_time || ""}</span>`);
+        let time_array = String(responseData.cooldown_time).split(":")
+        startCountdown(time_array[0], time_array[1]);
       } else {
-        $("#error-field").html(responseData.error);
+        $("#error-field").html(`${responseData.error_data}`);
       }
     });
+    function startCountdown(minutes, seconds) {
+      let totalSeconds = parseInt(minutes) * 60 + parseInt(seconds);
+      const interval = setInterval(() => {
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        const formattedTime = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        $("#cooldown").html(formattedTime);
+
+        // Stop timer at 0
+        if (totalSeconds === 0) {
+          clearInterval(interval);
+          $("#error-field").html("")
+        }
+
+        totalSeconds--;
+      }, 1000);
+    }
   </script>
   <style>
     .modal-content {

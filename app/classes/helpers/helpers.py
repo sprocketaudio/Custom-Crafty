@@ -1,31 +1,37 @@
+import base64
 import contextlib
-import os
-import re
-import sys
+import ctypes
+import html
+import itertools
 import json
+import logging
+import os
+import pathlib
+import re
+import secrets
+import shlex
+import shutil
+import socket
+import string
+import subprocess
+import sys
 import time
 import uuid
-import string
-import base64
-import socket
-import secrets
-import logging
-import html
-import pathlib
-import ctypes
-import shutil
-import shlex
-import subprocess
-import itertools
-from datetime import datetime, timezone
-from socket import gethostname
 from contextlib import redirect_stderr, suppress
+from datetime import datetime, timedelta, timezone
+from socket import gethostname
+
 import libgravatar
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.x509.oid import NameOID
 from packaging import version as pkg_version
 
-from app.classes.shared.null_writer import NullWriter
+from app.classes.helpers.cryptography_helper import CryptoHelper
 from app.classes.shared.console import Console
 from app.classes.shared.installer import installer
+from app.classes.shared.null_writer import NullWriter
 from app.classes.shared.translation import Translation
 
 with redirect_stderr(NullWriter()):
@@ -39,11 +45,71 @@ if os.name == "nt":
 
 logger = logging.getLogger(__name__)
 
+MASTER_CONFIG = {
+    "https_port": 8443,
+    "language": "en_EN",
+    "cookie_expire": 30,
+    "show_errors": True,
+    "history_max_age": 7,
+    "stats_update_frequency_seconds": 30,
+    "delete_default_json": False,
+    "show_contribute_link": True,
+    "virtual_terminal_lines": 70,
+    "max_log_lines": 700,
+    "max_audit_entries": 300,
+    "disabled_language_files": [],
+    "keywords": ["help", "chunk"],
+    "allow_nsfw_profile_pictures": False,
+    "enable_user_self_delete": False,
+    "reset_secrets_on_next_boot": False,
+    "dir_size_poll_freq_minutes": 5,
+    "crafty_logs_delete_after_days": 0,
+    "big_bucket_repo": "https://jars.arcadiatech.org",
+    "enable_otp_skew": False,
+    "max_login_attempts": 3,
+    "superMFA": False,
+    "general_user_log_access": False,
+}
+
+CONFIG_CATEGORIES = {
+    "general": [
+        "https_port",
+        "language",
+        "show_errors",
+        "show_contribute_link",
+        "disabled_language_files",
+        "big_bucket_repo",
+        "enable_user_self_delete",
+    ],
+    "security": [
+        "allow_nsfw_profile_pictures",
+        "cookie_expire",
+        "reset_secrets_on_next_boot",
+        "enable_otp_skew",
+        "superMFA",
+        "max_login_attempts",
+    ],
+    "logs": [
+        "max_log_lines",
+        "max_audit_entries",
+        "history_max_age",
+        "crafty_logs_delete_after_days",
+        "virtual_terminal_lines",
+        "keywords",
+        "general_user_log_access",
+    ],
+    "monitoring": [
+        "monitored_mounts",
+        "dir_size_poll_freq_minutes",
+        "stats_update_frequency_seconds",
+    ],
+    "miscellaneous": ["delete_default_json"],
+}
+
 try:
     import requests
-    from requests import get
-    from OpenSSL import crypto
     from argon2 import PasswordHasher
+    from requests import get
 
 except ModuleNotFoundError as err:
     logger.critical(f"Import Error: Unable to load {err.name} module", exc_info=True)
@@ -79,9 +145,10 @@ class Helpers:
         self.translation = Translation(self)
         self.update_available = False
         self.migration_notifications = []
-        self.ignored_names = ["crafty_managed.txt", "db_stats"]
+        self.ignored_names = ["crafty_managed.txt"]
         self.crafty_starting = False
         self.minimum_password_length = 8
+        self.crypto_helper = CryptoHelper(self)
 
         self.theme_list = self.load_themes()
 
@@ -104,11 +171,11 @@ class Helpers:
             if response.status_code == 200:
                 remote_version = pkg_version.parse(json.loads(response.text)[0]["name"])
 
-            # Get local version data from the file and parse the semver
-            local_version = pkg_version.parse(self.get_version_string())
+                # Get local version data from the file and parse the semver
+                local_version = pkg_version.parse(self.get_version_string())
 
-            if remote_version > local_version:
-                return remote_version
+                if remote_version > local_version:
+                    return remote_version
 
         except Exception as e:
             logger.error(f"Unable to check for new crafty version! \n{e}")
@@ -120,7 +187,7 @@ class Helpers:
         Get latest bedrock executable url \n\n
         returns url if successful, False if not
         """
-        url = "https://www.minecraft.net/en-us/download/server/bedrock/"
+        url = "https://net-secondary.web.minecraft-services.net/api/v1.0/download/links"
         headers = {
             "Accept-Encoding": "identity",
             "Accept-Language": "en",
@@ -130,34 +197,32 @@ class Helpers:
                 "Chrome/104.0.0.0 Safari/537.36"
             ),
         }
-        target_win = 'https://www.minecraft.net/bedrockdedicatedserver/bin-win/[^"]*'
-        target_linux = (
-            'https://www.minecraft.net/bedrockdedicatedserver/bin-linux/[^"]*'
-        )
         try:
             # Get minecraft server download page
             # (hopefully the don't change the structure)
-            download_page = get(url, headers=headers, timeout=1)
-            download_page.raise_for_status()
-            # Search for our string targets
-            win_search_result = re.search(target_win, download_page.text)
-            linux_search_result = re.search(target_linux, download_page.text)
-            if win_search_result is None or linux_search_result is None:
-                raise RuntimeError(
-                    "Could not determine download URL from minecraft.net."
-                )
+            response = get(url, headers=headers, timeout=1)
 
-            win_download_url = win_search_result.group(0)
-            linux_download_url = linux_search_result.group(0)
-            print(win_download_url, linux_download_url)
+            response_data = response.json()["result"]
+
+            if "links" not in response_data:
+                raise KeyError("Unable to find links key in Bedrock response payload")
+            bedrock_data = {}
+            for link in response_data["links"]:
+                dtype = link["downloadType"]
+                url = link["downloadUrl"]
+                match = re.match(r"serverBedrock(Preview)?(Windows|Linux)", dtype)
+                if match:
+                    preview = "preview" if match.group(1) else "stable"
+                    operating_system = match.group(2).lower()
+                    bedrock_data[f"{operating_system}_{preview}"] = url
             if os.name == "nt":
-                return win_download_url
+                return bedrock_data["windows_stable"]
 
-            return linux_download_url
+            return bedrock_data["linux_stable"]
+
         except Exception as e:
             logger.error(f"Unable to resolve remote bedrock download url! \n{e}")
             raise e
-        return False
 
     def get_execution_java(self, value, execution_command):
         if self.is_os_windows():
@@ -268,8 +333,7 @@ class Helpers:
     def check_file_perms(path):
         try:
             with open(path, "r", encoding="utf-8"):
-                pass
-            logger.info(f"{path} is readable")
+                logger.info(f"{path} is readable")
             return True
         except PermissionError:
             return False
@@ -350,7 +414,11 @@ class Helpers:
     def check_port(server_port):
         try:
             ip = get("https://api.ipify.org", timeout=1).content.decode("utf8")
-        except:
+        except Exception as e:
+            logger.info(
+                f"Unable to connect to api.ipify.org, \
+                        falling back to google.com: {e}"
+            )
             ip = "google.com"
         a_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         a_socket.settimeout(20.0)
@@ -498,6 +566,30 @@ class Helpers:
         return True
 
     @staticmethod
+    def get_categorized_settings(all_settings):
+        # Start with empty dicts for each defined category
+        categorized = {cat: {} for cat in CONFIG_CATEGORIES}
+
+        miscellaneous = {}
+
+        for key, value in all_settings.items():
+            added = False
+            for category, keys in CONFIG_CATEGORIES.items():
+                if key in keys:
+                    categorized[category][key] = value
+                    added = True
+                    break
+            if not added:
+                miscellaneous[key] = value
+
+        # Add miscellaneous last
+        if miscellaneous:
+            for key, value in miscellaneous.items():
+                categorized["miscellaneous"][key] = value
+
+        return categorized
+
+    @staticmethod
     def get_master_config():
         # Let's get the mounts and only show the first one by default
         mounts = Helpers.get_all_mounts()
@@ -506,28 +598,8 @@ class Helpers:
         # Make changes for users' local config.json files here. As of 4.0.20
         # Config.json was removed from the repo to make it easier for users
         # To make non-breaking changes to the file.
-        return {
-            "https_port": 8443,
-            "language": "en_EN",
-            "cookie_expire": 30,
-            "show_errors": True,
-            "history_max_age": 7,
-            "stats_update_frequency_seconds": 30,
-            "delete_default_json": False,
-            "show_contribute_link": True,
-            "virtual_terminal_lines": 70,
-            "max_log_lines": 700,
-            "max_audit_entries": 300,
-            "disabled_language_files": [],
-            "keywords": ["help", "chunk"],
-            "allow_nsfw_profile_pictures": False,
-            "enable_user_self_delete": False,
-            "reset_secrets_on_next_boot": False,
-            "monitored_mounts": mounts,
-            "dir_size_poll_freq_minutes": 5,
-            "crafty_logs_delete_after_days": 0,
-            "big_bucket_repo": "https://jars.arcadiatech.org",
-        }
+        MASTER_CONFIG["monitored_mounts"] = mounts
+        return MASTER_CONFIG
 
     def get_all_settings(self):
         try:
@@ -553,23 +625,35 @@ class Helpers:
 
         return mounts
 
-    def is_subdir(self, child_path, parent_path):
+    @staticmethod
+    def is_subdir(child_path: str, parent_path: str) -> bool:
+        """
+        Checks if given child_path is a subdirectory of given parent_path. Returns True
+        or False.
+
+        Args:
+            child_path: Child path to check.
+            parent_path: Possible parent path of child path.
+
+        Returns:
+            True if child_path is a subdirectory of parent_path. Otherwise, False.
+
+        """
         server_path = os.path.realpath(child_path)
         root_dir = os.path.realpath(parent_path)
 
-        if self.is_os_windows():
-            try:
-                relative = os.path.relpath(server_path, root_dir)
-            except:
-                # Windows will crash out if two paths are on different
-                # Drives We can happily return false if this is the case.
-                # Since two different drives will not be relative to eachother.
-                return False
-        else:
+        try:
             relative = os.path.relpath(server_path, root_dir)
+            if relative.startswith(os.pardir):
+                return False
 
-        if relative.startswith(os.pardir):
+        except ValueError:
+            # Windows will crash out if two paths are on different Drives We can happily
+            # return false if this is the case. Since two different drives will not be
+            # relative to each-other.
             return False
+
+        # If all checks pass, child path must be a child of parent.
         return True
 
     def set_setting(self, key, new_value):
@@ -996,18 +1080,6 @@ class Helpers:
         with open(self.session_file, "w", encoding="utf-8") as f:
             json.dump(session_data, f, indent=4)
 
-    # because this is a recursive function, we will return bytes,
-    # and set human readable later
-    @staticmethod
-    def get_dir_size(path: str):
-        total = 0
-        for entry in os.scandir(path):
-            if entry.is_dir(follow_symlinks=False):
-                total += Helpers.get_dir_size(entry.path)
-            else:
-                total += entry.stat(follow_symlinks=False).st_size
-        return total
-
     @staticmethod
     def list_dir_by_date(path: str, reverse=False):
         return [
@@ -1076,10 +1148,33 @@ class Helpers:
             return False
 
     def create_self_signed_cert(self, cert_dir=None):
+        """
+        Creates a self-signed SSL certificate and private key, writing them to disk.
+
+        Parameters:
+            - cert_dir (str, optional): The directory where the certificate and key
+            files will be created.
+                If not provided, a default path under the config_dir is used.
+
+        Returns:
+            - bool: True if the certificate and key are created,
+              False otherwise.
+
+        Raises:
+            - OSError: If there are issues creating files or directories.
+
+        Exception:
+            Any unexpected error that occurs during certificate or key generation.
+
+        Note:
+        This function generates an RSA key pair and an X.509 certificate using
+        the cryptography library.
+        The resulting files are saved in PEM format.
+        """
         if cert_dir is None:
             cert_dir = os.path.join(self.config_dir, "web", "certs")
 
-        # create a directory if needed
+        # Ensure directory exists
         Helpers.ensure_dir_exists(cert_dir)
 
         cert_file = os.path.join(cert_dir, "commander.cert.pem")
@@ -1088,61 +1183,84 @@ class Helpers:
         logger.info(f"SSL Cert File is set to: {cert_file}")
         logger.info(f"SSL Key File is set to: {key_file}")
 
-        # don't create new files if we already have them.
+        # Don't create new files if we already have them.
         if Helpers.check_file_exists(cert_file) and Helpers.check_file_exists(key_file):
             logger.info("Cert and Key files already exists, not creating them.")
-            return True
+            return False
 
         Console.info("Generating a self signed SSL")
         logger.info("Generating a self signed SSL")
 
-        # create a key pair
+        # Generate private key
         logger.info("Generating a key pair. This might take a moment.")
         Console.info("Generating a key pair. This might take a moment.")
-        k = crypto.PKey()
-        k.generate_key(crypto.TYPE_RSA, 4096)
+        private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=4096,
+        )
 
-        # create a self-signed cert
-        cert = crypto.X509()
-        cert.get_subject().C = "US"
-        cert.get_subject().ST = "Michigan"
-        cert.get_subject().L = "Kent County"
-        cert.get_subject().O = "Crafty Controller"
-        cert.get_subject().OU = "Server Ops"
-        cert.get_subject().CN = gethostname()
-        alt_names = ",".join(
+        # Build certificate subject/issuer meta
+        subject = issuer = x509.Name(
             [
-                f"DNS:{socket.gethostname()}",
-                f"DNS:*.{socket.gethostname()}",
-                "DNS:localhost",
-                "DNS:*.localhost",
-                "DNS:127.0.0.1",
+                x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
+                x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Indiana"),
+                x509.NameAttribute(
+                    NameOID.ORGANIZATION_NAME, "Arcadia Technology, LLC"
+                ),
+                x509.NameAttribute(
+                    NameOID.ORGANIZATIONAL_UNIT_NAME, "Crafty Controller"
+                ),
+                x509.NameAttribute(NameOID.COMMON_NAME, gethostname()),
+                x509.NameAttribute(NameOID.EMAIL_ADDRESS, "info@arcadiatech.org"),
             ]
-        ).encode()
-        subject_alt_names_ext = crypto.X509Extension(
-            b"subjectAltName", False, alt_names
         )
-        basic_constraints_ext = crypto.X509Extension(
-            b"basicConstraints", True, b"CA:false"
-        )
-        cert.add_extensions([subject_alt_names_ext, basic_constraints_ext])
-        cert.set_serial_number(secrets.randbelow(254) + 1)
-        cert.gmtime_adj_notBefore(0)
-        cert.gmtime_adj_notAfter(365 * 24 * 60 * 60)
-        cert.set_issuer(cert.get_subject())
-        cert.set_pubkey(k)
-        cert.set_version(2)
-        cert.sign(k, "sha256")
 
-        with open(cert_file, "w", encoding="utf-8") as cert_file_handle:
-            cert_file_handle.write(
-                crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode()
+        # Build subject Alternative Names
+        alt_names = [
+            socket.gethostname(),
+            f"*.{socket.gethostname()}",
+            "localhost",
+            "*.localhost",
+            "*.local",
+            "127.0.0.1",
+        ]
+        san = x509.SubjectAlternativeName([x509.DNSName(name) for name in alt_names])
+
+        # Construct certificate
+        cert_builder = (
+            x509.CertificateBuilder()
+            .subject_name(subject)
+            .issuer_name(issuer)
+            .public_key(private_key.public_key())
+            .serial_number(secrets.randbelow(254) + 1)  # rand serial
+            .not_valid_before(datetime.now(timezone.utc))
+            .not_valid_after(datetime.now(timezone.utc) + timedelta(days=365))  # 1 yr
+            .add_extension(san, critical=False)
+            .add_extension(
+                x509.BasicConstraints(ca=False, path_length=None), critical=True
             )
+        )
 
-        with open(key_file, "w", encoding="utf-8") as key_file_handle:
+        # Sign certificate
+        certificate = cert_builder.sign(
+            private_key=private_key, algorithm=hashes.SHA256()
+        )
+
+        # Write cert and priv key to disk
+        with open(cert_file, "wb") as cert_file_handle:
+            cert_file_handle.write(certificate.public_bytes(serialization.Encoding.PEM))
+        with open(key_file, "wb") as key_file_handle:
             key_file_handle.write(
-                crypto.dump_privatekey(crypto.FILETYPE_PEM, k).decode()
+                private_key.private_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PrivateFormat.TraditionalOpenSSL,
+                    encryption_algorithm=serialization.NoEncryption(),
+                )
             )
+
+        logger.info("Self-signed certificate and key generation completed.")
+        Console.info("Self-signed certificate and key generation completed.")
+        return True
 
     @staticmethod
     def random_string_generator(size=6, chars=string.ascii_uppercase + string.digits):
@@ -1151,7 +1269,7 @@ class Helpers:
         random_generator() = G8sjO2
         random_generator(3, abcdef) = adf
         """
-        return "".join(secrets.choice(chars) for x in range(size))
+        return "".join(secrets.choice(chars) for _ in range(size))
 
     @staticmethod
     def is_os_windows():
@@ -1205,16 +1323,19 @@ class Helpers:
             rel = os.path.join(folder, raw_filename)
             dpath = os.path.join(folder, filename)
             if os.path.isdir(rel):
-                output += f"""<li class="tree-item" data-path="{dpath}">
-                    \n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">
-                    <input type="radio" name="root_path" value="{dpath}">
-                    <span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">
-                      <i class="text-info far fa-folder"></i>
-                      <i class="text-info far fa-folder-open"></i>
-                      {filename}
-                      </span>
-                    </input></div><li>
-                    \n"""
+                # lines below had too long warnings disabled for readability
+                output += (
+                    f"""<li class="tree-item" data-path="{dpath}">"""
+                    + """\n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">"""  # pylint: disable=line-too-long
+                    + """<input type="radio" name="root_path" value="{dpath}">"""
+                    + """<span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">"""  # pylint: disable=line-too-long
+                    + """  <i class="text-info far fa-folder"></i>"""
+                    + """  <i class="text-info far fa-folder-open"></i>"""
+                    + """  {filename}"""
+                    + """  </span>"""
+                    + """</input></div><li>"""
+                    + """\n"""
+                )
         return output
 
     @staticmethod
@@ -1227,15 +1348,18 @@ class Helpers:
             rel = os.path.join(folder, raw_filename)
             dpath = os.path.join(folder, filename)
             if os.path.isdir(rel):
-                output += f"""<li class="tree-item" data-path="{dpath}">
-                    \n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">
-                    <input type="radio" name="root_path" value="{dpath}">
-                    <span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">
-                      <i class="text-info far fa-folder"></i>
-                      <i class="text-info far fa-folder-open"></i>
-                      {filename}
-                      </span>
-                    </input></div><li>"""
+                # lines below had too long warnings disabled for readability
+                output += (
+                    f"""<li class="tree-item" data-path="{dpath}">"""
+                    + """\n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">"""  # pylint: disable=line-too-long
+                    + """<input type="radio" name="root_path" value="{dpath}">"""
+                    + """<span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">"""  # pylint: disable=line-too-long
+                    + """  <i class="text-info far fa-folder"></i>"""
+                    + """  <i class="text-info far fa-folder-open"></i>"""
+                    + """  {filename}"""
+                    + """  </span>"""
+                    + """</input></div><li>"""
+                )
         return output
 
     @staticmethod
@@ -1268,9 +1392,9 @@ class Helpers:
                     decoded_bytes = base64.b64decode(prop["value"])
                     decoded_str = decoded_bytes.decode("utf-8")
                     texture_json = json.loads(decoded_str)
-            skin_url = texture_json["textures"]["SKIN"]["url"]
-            skin_response = requests.get(skin_url, stream=True, timeout=10)
-            if skin_response.status_code == 200:
-                return base64.b64encode(skin_response.content)
+                    skin_url = texture_json["textures"]["SKIN"]["url"]
+                    skin_response = requests.get(skin_url, stream=True, timeout=10)
+                    if skin_response.status_code == 200:
+                        return base64.b64encode(skin_response.content)
         else:
             return

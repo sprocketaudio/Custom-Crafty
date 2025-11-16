@@ -40,7 +40,14 @@
             {% include "parts/m_server_controls_list.html %}
           </span>
           <div class="row">
-            <div class="col-md-6 col-sm-12">
+            <div class="col-md-6 col-sm-12 parent">
+              {% if data["backup_config"].get("backup_type") != "snapshot" %}
+              <span id="beta-ribbon" class="d-none">
+                {% else %}
+                <span id="beta-ribbon"></span>
+                {% end %}
+                <h4 class="ribbon">BETA</h4>
+              </span>
               <br>
               <br>
               <div id="{{data['backup_config'].get('backup_id', None)}}_status" class="progress"
@@ -59,6 +66,21 @@
               </div>
               {% end %}
               <form id="backup-form" class="forms-sample">
+                {% if not data["backup_config"].get("backup_id", None) %}
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                  <label class="btn btn-secondary active">
+                    <input type="radio" class="btn-check" name="backup_type" id="zip_vault" value="zip_vault"
+                      autocomplete="off" checked> Full Zip Vault
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" class="btn-check" name="backup_type" id="snapshot" value="snapshot"
+                      data-disclaimer="{{ translate('serverBackups', 'snapshotDisclaimer', data['lang']) }}"
+                      autocomplete="off"> Snapshot
+                  </label>
+                </div>
+                <br>
+                <br>
+                {% end %}
                 <div class="form-group">
                   <label for="backup_name">{{ translate('serverBackups', 'name', data['lang']) }}
                     {% if data["backup_config"].get("default", None) %}
@@ -74,9 +96,9 @@
                   {% else %}
                   <input type="text" class="form-control" name="backup_name" id="backup_name"
                     placeholder="{{ translate('serverBackups', 'myBackup', data['lang']) }}">
+                  <br>
+                  <br>
                   {% end %}
-                  <br>
-                  <br>
                   {% if data['super_user'] %}
                   <label for="server_name">{{ translate('serverBackups', 'storageLocation', data['lang']) }} <small
                       class="text-muted ml-1"> - {{ translate('serverBackups', 'storageLocationDesc', data['lang'])
@@ -213,11 +235,10 @@
                     {% for backup in data['backup_list'] %}
                     <tr>
                       <td>
-                        <a href="/panel/download_backup?file={{ backup['path'] }}&id={{ data['server_stats']['server_id']['server_id'] }}&backup_id={{ data['backup_config']['backup_id']}}"
-                          class="btn btn-primary">
+                        <button class="btn btn-primary download" data-file="{{backup['path']}}">
                           <i class="fas fa-download" aria-hidden="true"></i>
                           {{ translate('serverBackups', 'download', data['lang']) }}
-                        </a>
+                        </button>
                         <br>
                         <br>
                         <button data-file="{{ backup['path'] }}"
@@ -226,7 +247,8 @@
                           <i class="fas fa-trash" aria-hidden="true"></i>
                           {{ translate('serverBackups', 'delete', data['lang']) }}
                         </button>
-                        <button data-file="{{ backup['path'] }}" class="btn btn-warning restore_button">
+                        <button data-file="{{ backup['path'] }}" data-type="{{data['backup_config']['backup_type']}}"
+                          class="btn btn-warning restore_button">
                           <i class="fas fa-undo-alt" aria-hidden="true"></i>
                           {{ translate('serverBackups', 'restore', data['lang']) }}
                         </button>
@@ -387,6 +409,21 @@
     }
   }
 
+  $("#snapshot").on("change", function () {
+    if ($("#snapshot").is(':checked')) {
+      $("#beta-ribbon").removeClass("d-none")
+      console.log($("#snapshot").data("disclaimer"))
+      bootbox.alert($("#snapshot").data("disclaimer"))
+    } else {
+      console.log("In else")
+      $("#beta-ribbon").addClass("d-none")
+    }
+  })
+  $("#zip_vault").on("change", function () {
+    console.log("In else")
+    $("#beta-ribbon").addClass("d-none")
+  })
+
   $(document).ready(function () {
     $(".backup-explain").on("click", function (e) {
       e.preventDefault();
@@ -528,11 +565,19 @@
       });
     });
 
+    $(".download").click(async function () {
+      let file = $(".download").data("file");
+      window.open(`/api/v2/servers/${serverId}/backups/backup/${backup_id}/download/${encodeURIComponent(file)}`, '_blank');
+    });
+
     $(".restore_button").click(function () {
       var file_to_restore = $(this).data("file");
-      bootbox.dialog({
-        title: "{{ translate('serverBackups', 'restore', data['lang']) }} " + file_to_restore,
-        message: `
+      if ($(this).data("type") === "snapshot") {
+        restore_backup(file_to_restore, serverId, 1)
+      } else {
+        bootbox.dialog({
+          title: "{{ translate('serverBackups', 'restore', data['lang']) }} " + file_to_restore,
+          message: `
       <div id="restore-box">
         <div class="custom-control custom-switch">
           <input class="custom-control-input" type="radio" name="restoreOption" id="optionInPlace" value=1>
@@ -550,24 +595,25 @@
         </div>
       </div>
     `,
-        buttons: {
-          cancel: {
-            label: '<i class="fas fa-times"></i> {{ translate("serverBackups", "cancel", data['lang']) }}'
+          buttons: {
+            cancel: {
+              label: '<i class="fas fa-times"></i> {{ translate("serverBackups", "cancel", data['lang']) }}'
       },
-          confirm: {
-            label: '<i class="fas fa-check"></i> {{ translate("serverBackups", "restore", data['lang']) }}',
-            className: 'btn-outline-danger',
-            callback: function () {
-              var selectedOption = $('input[name="restoreOption"]:checked').val();
-              if (!selectedOption || typeof (selectedOption) == "undefined") {
-                bootbox.alert(`{{ translate("serverBackups", "radioRequired", data['lang']) }}`)
-              } else {
-                restore_backup(file_to_restore, serverId, selectedOption)
+            confirm: {
+              label: '<i class="fas fa-check"></i> {{ translate("serverBackups", "restore", data['lang']) }}',
+              className: 'btn-outline-danger',
+              callback: function () {
+                var selectedOption = $('input[name="restoreOption"]:checked').val();
+                if (!selectedOption || typeof (selectedOption) == "undefined") {
+                  bootbox.alert(`{{ translate("serverBackups", "radioRequired", data['lang']) }}`)
+                } else {
+                  restore_backup(file_to_restore, serverId, selectedOption)
+                }
               }
             }
           }
-        }
-      });
+        });
+      }
     });
 
     $("#backup_now_button").click(function () {

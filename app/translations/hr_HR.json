@@ -253,7 +253,6 @@
         "compress": "Sažimanje sigurnosne kopije",
         "confirm": "Potvrdi",
         "confirmDelete": "Želite li izbrisati ovu sigurnosnu kopiju? Ovo se ne može poništiti.",
-        "confirmRestore": "Jeste li sigurni da želite obnoviti ovu sigurnosnu kopiju. Sve trenutne datoteke poslužitelja će se promijeniti u stanje sigurnosne kopije i neće se moći vratiti.",
         "currentBackups": "Trenutne sigurnosne kopije",
         "delete": "Izbriši",
         "destroyBackup": "Izbrisati sigurnosnu kopiju \" + file_to_del + \"?",

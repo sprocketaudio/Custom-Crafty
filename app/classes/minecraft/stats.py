@@ -10,7 +10,7 @@ from app.classes.minecraft.mc_ping import ping
 from app.classes.models.management import HostStats
 from app.classes.models.servers import HelperServers
 from app.classes.shared.null_writer import NullWriter
-from app.classes.shared.helpers import Helpers
+from app.classes.helpers.helpers import Helpers
 
 with redirect_stderr(NullWriter()):
     import psutil
@@ -213,16 +213,6 @@ class Stats:
 
         return disk_data
 
-    @staticmethod
-    def get_server_dir_size(server_path):
-        total_size = 0
-
-        total_size = Helpers.get_dir_size(server_path)
-
-        level_total_size = Helpers.human_readable_file_size(total_size)
-
-        return level_total_size
-
     def get_server_players(self, server_id):
         server = HelperServers.get_server_data_by_id(server_id)
 
@@ -299,16 +289,14 @@ class Stats:
     def parse_server_raknet_ping(ping_obj: object):
         try:
             server_icon = base64.encodebytes(ping_obj["icon"])
-        except Exception as e:
+        except KeyError:
             server_icon = False
-            logger.debug(
-                "Unable to read the server icon due to the following error:", exc_info=e
-            )
+            logger.debug("Could not find icon in RakNet ping response")
         ping_data = {
             "online": ping_obj["server_player_count"],
             "max": ping_obj["server_player_max"],
             "players": [],
-            "server_description": ping_obj["server_edition"],
+            "server_description": ping_obj["server_motd"],
             "server_version": ping_obj["server_version_name"],
             "server_icon": server_icon,
         }

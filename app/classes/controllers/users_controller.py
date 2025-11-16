@@ -52,7 +52,7 @@ class UsersController:
             "username": {
                 "type": "string",
                 "maxLength": 20,
-                "minLength": 4,
+                "minLength": 3,
                 "pattern": "^[a-z0-9_]+$",
                 "examples": ["admin"],
                 "title": "Username",
@@ -62,9 +62,10 @@ class UsersController:
             "password": {
                 "type": "string",
                 "minLength": self.helper.minimum_password_length,
+                "pattern": "^.{8,}$",
                 "examples": ["crafty"],
                 "title": "Password",
-                "error": "passLength",
+                "error": "passProp",
             },
             "email": {
                 "type": "string",
@@ -168,6 +169,10 @@ class UsersController:
         return HelperUsers.get_user(user_id)
 
     @staticmethod
+    def get_user_object(user_id) -> object:
+        return HelperUsers.get_by_id(user_id)
+
+    @staticmethod
     def update_server_order(user_id, user_server_order):
         HelperUsers.update_server_order(user_id, user_server_order)
 
@@ -178,10 +183,6 @@ class UsersController:
     @staticmethod
     def user_query(user_id):
         return HelperUsers.user_query(user_id)
-
-    @staticmethod
-    def set_support_path(user_id, support_path):
-        HelperUsers.set_support_path(user_id, support_path)
 
     @staticmethod
     def get_managed_users(exec_user_id):
