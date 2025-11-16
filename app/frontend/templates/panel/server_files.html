@@ -84,23 +84,27 @@ end %} {% block content %}
                                 </tbody>
                             </table>
                         </div>
-                        <div id="file-status"><span class="d-none d-sm-inline align-items-center">
-                                &nbsp;{{ translate('serverFiles', 'operationStatus', data['lang'])
-                                }}</span>&nbsp;<i class="fa-solid fa-chart-simple d-sm-none"></i>&nbsp;<span
-                                id="operation-total"></span><span id="status-caret"><i
-                                    class="fa-solid fa-caret-up"></i></span>
-                            <div id="file-status-content" class="d-none">
-                                <br>
-                                <div id="upload-progress-bar-parent">
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div> <!--table div-->
                 </div> <!--card-body-->
             </div> <!--card-->
         </div> <!--col-sm-12-->
     </div> <!--row-->
 </div> <!--content-wrapper-->
+<div id="file-status">
+<span class="d-none d-sm-inline align-items-center">
+    &nbsp;{{ translate('serverFiles', 'operationStatus', data['lang'])
+    }}</span>&nbsp;<i class="fa-solid fa-chart-simple d-sm-none"></i>&nbsp;<span
+    id="operation-total"></span><span id="status-caret"><i
+        class="fa-solid fa-caret-up"></i></span>
+<div id="file-status-content" class="d-none">
+    <br>
+    <div id="upload-progress-bar-parent">
+    </div>
+</div>
+</div>
+
+
 {% include parts/context_menu.html %}
 {% end %} {% block js %}
 <script>
