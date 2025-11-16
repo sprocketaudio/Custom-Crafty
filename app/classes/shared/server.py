@@ -88,6 +88,9 @@ def callback(called_func):
                             ),
                         }
 
+                        # Add time variables to event_data
+                        event_data = webhook_provider.add_time_variables(event_data)
+
                         if res is not False and swebhook.enabled:
                             webhook_provider.send(
                                 server_name=args[0].name,
