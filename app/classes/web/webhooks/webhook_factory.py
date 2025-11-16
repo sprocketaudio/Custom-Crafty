@@ -79,7 +79,7 @@ class WebhookFactory:
         """
         # Common variables for all events
         common_vars = [
-            "server_name", "server_id", "user", "user_id",
+            "server_name", "server_id", "user", "user_id", "event_type",
             "time_iso", "time_unix", "time_day", "time_month", "time_year", "time_formatted"
         ]
         return {

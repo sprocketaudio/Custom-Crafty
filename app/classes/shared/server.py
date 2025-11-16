@@ -83,6 +83,7 @@ def callback(called_func):
                             "user": "",
                             "user_id": "",
                             "command": command,
+                            "event_type": event_type,
                         }
 
                         # Add time variables to event_data
