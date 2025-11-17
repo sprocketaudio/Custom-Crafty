@@ -204,8 +204,6 @@ body {
     position: sticky;
     bottom: 1px;
     left: calc(100% - var(--width) - 1.75em);
-    /* right: 0; */
-    /* margin-right: 90%; */
     background-color: var(--deep-bg);
     width: var(--width);
     z-index: 100;

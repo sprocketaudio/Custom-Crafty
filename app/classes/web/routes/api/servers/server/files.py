@@ -15,6 +15,7 @@ from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.web.base_api_handler import BaseApiHandler
 
 logger = logging.getLogger(__name__)
+HUMAN_TIME_FORMAT = "%Y/%m/%d %H:%M"
 
 files_get_schema = {
     "type": "object",
@@ -310,7 +311,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                             ),
                             "dir": True,
                             "excluded": False,
-                            "modified": modified_time.strftime("%Y/%m/%d %H:%M"),
+                            "modified": modified_time.strftime(HUMAN_TIME_FORMAT),
                         }
                     else:
                         try:
@@ -327,7 +328,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                             "excluded": False,
                             "can_open": can_open,
                             "mime": mime,
-                            "modified": modified_time.strftime("%Y/%m/%d %H:%M"),
+                            "modified": modified_time.strftime(HUMAN_TIME_FORMAT),
                             "size": Helpers.human_readable_file_size(file_size),
                         }
             self.finish_json(200, {"status": "ok", "data": return_json})
@@ -346,7 +347,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                         file_size = 0
                     attributes = {
                         "mime": mime,
-                        "modified": modified_time.strftime("%Y/%m/%d %H:%M"),
+                        "modified": modified_time.strftime(HUMAN_TIME_FORMAT),
                         "size": Helpers.human_readable_file_size(file_size),
                     }
                     with open(data["path"], encoding="utf-8") as file:
