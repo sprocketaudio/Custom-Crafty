@@ -197,37 +197,40 @@ function setup_table_body(response) {
             .attr("data-path", value.path)
             .attr("data-can_open", value.can_open);
 
+        const $td1 = $("<td>").append($("<div>").append($("<input>").attr("type", "checkbox").addClass("row-select").attr("data-name", key)).addClass("custom-check").addClass("checkbox-lg")).addClass("justify-content-center");
+
         // Column 1: icon + filename
-        const $td1 = $("<td>")
+        const $td2 = $("<td>")
             .addClass("column-1")
             .attr("data-name", key)
             .append($("<span>").html(fileIcon(value)))
             .append("\u00A0\u00A0\u00A0")
             .append(document.createTextNode(key));
 
-        $tr.append($td1);
+        // Column 2: MIME or "Dir"
+        const $td3 = $("<td>");
+        if (value.mime || value.dir) {
+            $td3.text(value.mime ? value.mime : "Dir");
+        } else {
+            $td3.html('<i class="fa fa-question-circle" aria-hidden="true"></i>');
+        }
+
+        // Column 3: modified date
+        const $td4 = $("<td>").text(value.modified);
+
+        // Column 4: size
+        const $td5 = $("<td>").text(value.size || "-");
+
+        // Column 5: context button
+        const $td6 = $("<td>")
+            .addClass("context-button")
+            .text("...");
         if ($("#files_table thead tr:first th:visible").length > 1) {
-            // Column 2: MIME or "Dir"
-            const $td2 = $("<td>");
-            if (value.mime || value.dir) {
-                $td2.text(value.mime ? value.mime : "Dir");
-            } else {
-                $td2.html('<i class="fa fa-question-circle" aria-hidden="true"></i>');
-            }
-
-            // Column 3: modified date
-            const $td3 = $("<td>").text(value.modified);
-
-            // Column 4: size
-            const $td4 = $("<td>").text(value.size || "-");
-
-            // Column 5: context button
-            const $td5 = $("<td>")
-                .addClass("context-button")
-                .text("...");
 
             // Append all columns to the row
-            $tr.append($td2, $td3, $td4, $td5);
+            $tr.append($td1, $td2, $td3, $td4, $td5, $td6);
+        } else {
+            $tr.append($td2)
         }
 
         // Append row to tbody (also as jQuery object)
@@ -244,12 +247,14 @@ function process_tree_response(response) {
     $(".directory").click(function (e) {
         // Prevent the click from firing if it’s on the context menu button
         if ($(e.target).closest(".context-button").length) return;
+        if ($(e.target).closest(".row-select").length) return;
         if ($(this).children(".column-1").hasClass("editing")) return;
         getTreeView($(this).attr("data-path"))
     });
     $(".file").click(function (e) {
         // Prevent the click from firing if it’s on the context menu button
         if ($(e.target).closest(".context-button").length) return;
+        if ($(e.target).closest(".row-select").length) return;
         if (!$(this).data("can_open")) return;
         if ($(this).children(".column-1").hasClass("editing")) return;
         window.open(`/panel/edit_file?server_id=${serverId}&file=${encodeURI($(this).attr("data-path"))}`, "_blank")
@@ -259,6 +264,7 @@ function process_tree_response(response) {
         if ($(e.target).closest(".context-button").length) return;
         getTreeView($(this).attr("data-path"))
     });
+    setup_row_select_listener();
 }
 
 function loadMenuContent(tr) {
@@ -778,3 +784,11 @@ $(document).ready(function () {
         });
     }
 });
+
+function setup_row_select_listener() {
+    console.log('listener setup')
+    $(".row-select").on("change", function (e) {
+        $(e.target).closest("tr").toggleClass("highlight-row");
+        console.log("changed")
+    })
+}

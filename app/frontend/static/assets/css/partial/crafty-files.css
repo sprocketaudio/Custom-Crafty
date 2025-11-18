@@ -230,3 +230,7 @@ body {
 .files-progress {
     margin-top: 7px;
 }
+
+.highlight-row {
+    background-color: var(--deep-bg) !important;
+}

@@ -65,6 +65,8 @@ end %} {% block content %}
                                     data["lang"])}}'>
                                 <thead class="thead">
                                     <tr>
+                                        <th scope="col" class="d-none d-sm-table-cell"><input class="root-select"
+                                                type="checkbox"></th>
                                         <th scope="col">{{translate("serverFiles", "name" , data["lang"])}}</th>
                                         <th class="d-none d-sm-table-cell" scope="col">{{translate("serverFiles", "type"
                                             ,
@@ -84,7 +86,7 @@ end %} {% block content %}
                                 </tbody>
                             </table>
                         </div>
-                        
+
                     </div> <!--table div-->
                 </div> <!--card-body-->
             </div> <!--card-->
@@ -92,16 +94,15 @@ end %} {% block content %}
     </div> <!--row-->
 </div> <!--content-wrapper-->
 <div id="file-status">
-<span class="d-none d-sm-inline align-items-center">
-    &nbsp;{{ translate('serverFiles', 'operationStatus', data['lang'])
-    }}</span>&nbsp;<i class="fa-solid fa-chart-simple d-sm-none"></i>&nbsp;<span
-    id="operation-total"></span><span id="status-caret"><i
-        class="fa-solid fa-caret-up"></i></span>
-<div id="file-status-content" class="d-none">
-    <br>
-    <div id="upload-progress-bar-parent">
+    <span class="d-none d-sm-inline align-items-center">
+        &nbsp;{{ translate('serverFiles', 'operationStatus', data['lang'])
+        }}</span>&nbsp;<i class="fa-solid fa-chart-simple d-sm-none"></i>&nbsp;<span id="operation-total"></span><span
+        id="status-caret"><i class="fa-solid fa-caret-up"></i></span>
+    <div id="file-status-content" class="d-none">
+        <br>
+        <div id="upload-progress-bar-parent">
+        </div>
     </div>
-</div>
 </div>
 
 
