@@ -1,4 +1,5 @@
 let activeUploads = 0;
+let last_tree_view = "";
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -39,7 +40,6 @@ async function uploadChunk(file, url, chunk, start, end, chunk_hash, totalChunks
 }
 
 async function uploadFile(type, file = null, path = null, file_num = 0, fileId = null, _onProgress = null) {
-    activeUploads++;
     if (file == null) {
         try {
             file = $("#file")[0].files[0];
@@ -99,6 +99,17 @@ async function uploadFile(type, file = null, path = null, file_num = 0, fileId =
             throw new Error(JSON.stringify(responseData));
         }
 
+        const upload_ready_promise = new Promise(resolve => {
+            const interval = setInterval(() => {
+                if (activeUploads < 2) { // Do not overload browser
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 100);
+        });
+
+        await upload_ready_promise;
+        activeUploads++;
         for (let i = 0; i < totalChunks; i += batchSize) {
             const batchPromises = [];
 
@@ -154,7 +165,9 @@ async function uploadFile(type, file = null, path = null, file_num = 0, fileId =
         $(`#upload-progress-bar-${fileId}`).html('<i style="color: black;" class="fas fa-box-check"></i>');
         removeProgressItem(fileId);
 
-        getTreeView(path);
+        if (activeUploads == 1) {
+            getTreeView($("#table-nav").attr("data-cur-path"));
+        }
     }
     activeUploads--;
 }
@@ -194,7 +207,7 @@ function removeProgressItem(item_id) {
     $(`#upload-progress-bar-${item_id}-container`).remove();
     const total_items = $("#upload-progress-bar-parent").children().length
     if (total_items > 0) {
-        $("#operation-total").html(`<span id="notif-count" class="badge bg-primary">${total_items}}</span>`);
+        $("#operation-total").html(`<span id="notif-count" class="badge bg-primary">${total_items}</span>`);
     } else {
         $("#operation-total").html(``); //remove badge if no items
     }
