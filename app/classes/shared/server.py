@@ -54,7 +54,7 @@ def callback(called_func):
         res = None
         logger.debug("Checking for callbacks")
         try:
-            res = called_func(*args, **kwargs)
+            res = called_func(*args, **kwargs)  # Calls and runs the function
         finally:
             event_type = called_func.__name__
 
@@ -81,6 +81,18 @@ def callback(called_func):
                         source_type = kwargs.get("source_type", "unknown")
                         source_id = kwargs.get("source_id", "")
                         source_name = kwargs.get("source_name", "")
+                        backup_name = ""
+                        backup_size = ""
+                        backup_link = ""
+                        backup_status = ""
+                        backup_error = ""
+
+                        if isinstance(res, dict):
+                            backup_name = res.get("backup_name")
+                            backup_size = str(res.get("backup_size"))
+                            backup_link = res.get("backup_link")
+                            backup_status = res.get("backup_status")
+                            backup_error = res.get("backup_error")
 
                         event_data = {
                             "server_name": args[0].name,
@@ -90,6 +102,11 @@ def callback(called_func):
                             "source_type": source_type,
                             "source_id": source_id,
                             "source_name": source_name,
+                            "backup_name": backup_name,
+                            "backup_size": backup_size,
+                            "backup_link": backup_link,
+                            "backup_status": backup_status,
+                            "backup_error": backup_error,
                         }
 
                         # Add time variables to event_data
@@ -1230,7 +1247,7 @@ class ServerInstance:
         logger.info(f"Backup Thread started for server {self.settings['server_name']}.")
 
     @callback
-    def backup_server(self, backup_id):
+    def backup_server(self, backup_id) -> dict | bool:
         logger.info(f"Starting server {self.name} (ID {self.server_id}) backup")
         server_users = PermissionsServers.get_server_user_list(self.server_id)
         # Alert the start of the backup to the authorized users.
@@ -1246,7 +1263,15 @@ class ServerInstance:
 
         # Get the backup config
         if not backup_id:
-            return logger.error("No backup ID provided. Exiting backup")
+            logger.error("No backup ID provided. Exiting backup")
+            last_failed = self.last_backup_status()
+            if last_failed:
+                last_backup_status = "❌"
+                reason = "No backup ID provided"
+                return {
+                    "backup_status": last_backup_status,
+                    "backup_error": reason,
+                }
         conf = HelpersManagement.get_backup_config(backup_id)
         # Adjust the location to include the backup ID for destination.
         backup_location = os.path.join(conf["backup_location"], conf["backup_id"])
@@ -1254,7 +1279,16 @@ class ServerInstance:
         # Check if the backup location even exists.
         if not backup_location:
             Console.critical("No backup path found. Canceling")
-            return None
+            backup_status = json.loads(
+                HelpersManagement.get_backup_config(backup_id)["status"]
+            )
+            if backup_status["status"] == "Failed":
+                last_backup_status = "❌"
+                reason = backup_status["message"]
+                return {
+                    "backup_status": last_backup_status,
+                    "backup_error": reason,
+                }
         if conf["before"]:
             logger.debug(
                 "Found running server and send command option. Sending command"
@@ -1262,7 +1296,7 @@ class ServerInstance:
             self.send_command(conf["before"])
             # Pause to let command run
             time.sleep(5)
-        self.backup_mgr.backup_starter(conf, self)
+        backup_name, backup_size = self.backup_mgr.backup_starter(conf, self)
         if conf["after"]:
             self.send_command(conf["after"])
         if conf["shutdown"] and self.was_running:
@@ -1271,6 +1305,46 @@ class ServerInstance:
             )
             self.run_threaded_server(HelperUsers.get_user_id_by_name("system"))
         self.set_backup_status()
+
+        # Return data for webhooks callback
+        base_url = f"{self.helper.get_setting('base_url')}"
+        size = backup_size
+        backup_status = json.loads(
+            HelpersManagement.get_backup_config(backup_id)["status"]
+        )
+        reason = backup_status["message"]
+        if not backup_name:
+            return {
+                "backup_status": "❌",
+                "backup_error": reason,
+            }
+        if backup_size:
+            size = self.helper.human_readable_file_size(backup_size)
+        url = (
+            f"https://{base_url}/api/v2/servers/{self.server_id}"
+            f"/backups/backup/{backup_id}/download/{html.escape(backup_name)}"
+        )
+        if conf["backup_type"] == "snapshot":
+            size = 0
+            url = (
+                f"https://{base_url}/panel/edit_backup?"
+                f"id={self.server_id}&backup_id={backup_id}"
+            )
+        backup_status = json.loads(
+            HelpersManagement.get_backup_config(backup_id)["status"]
+        )
+        last_backup_status = "✅"
+        reason = ""
+        if backup_status["status"] == "Failed":
+            last_backup_status = "❌"
+            reason = backup_status["message"]
+        return {
+            "backup_name": backup_name,
+            "backup_size": size,
+            "backup_link": url,
+            "backup_status": last_backup_status,
+            "backup_error": reason,
+        }
 
     def set_backup_status(self):
         backups = HelpersManagement.get_backups_by_server(self.server_id, True)
