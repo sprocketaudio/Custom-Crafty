@@ -112,6 +112,7 @@ const LOADING_TABLE = `<tr class="skeleton-row">
 ///////////////////////////////////////////////////////////////////////////////////////
 async function getTreeView(path) {
     const token = getCookie("_xsrf");
+    const cur_body = $("#files-table-body").html();
     $("#files-table-body").html(LOADING_TABLE);
     let res = await fetch(`/api/v2/servers/${serverId}/files`, {
         method: "POST",
