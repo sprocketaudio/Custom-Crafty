@@ -2,7 +2,7 @@
 let selected_row = null;
 let move = false;
 let copy = false;
-let move_copy_source = "";
+let move_copy_source = [];
 let move_copy_target = "";
 let modified_time = 1.5;
 let recent_response = {}
@@ -714,7 +714,8 @@ function add_move_listener() {
     $("#move").on("click", function () {
         move = true;
         copy = false;
-        move_copy_source = $(selected_row).attr("data-path");
+        move_copy_source = []
+        move_copy_source.push($(selected_row).attr("data-path"));
         setup_copy_move_table_nav();
     });
 }
@@ -722,7 +723,7 @@ function add_copy_listener() {
     $("#copy").on("click", function () {
         move = false;
         copy = true;
-        move_copy_source = $(selected_row).attr("data-path");
+        move_copy_source.push($(selected_row).attr("data-path"));
         setup_copy_move_table_nav();
     });
 }
@@ -735,7 +736,10 @@ function setup_copy_move_table_nav() {
     if (copy) {
         move_button = $("<button>").attr("id", "copy-op").addClass("btn").addClass("btn-info").text($("#files_table").attr("data-copy"));
     }
-    const move_source = $("<span>").attr("id", "copy-move-source").text(move_copy_source.replace(serverId, "/"));
+    let move_source = $("<span>").attr("id", "copy-move-source").html(`${move_copy_source.length} <i class="fa-solid fa-file"></i>`);
+    if (move_copy_source.length <= 1) {
+        move_source = $("<span>").attr("id", "copy-move-source").text(move_copy_source[0].replace(serverId, "/"));
+    }
     const move_target = $("<span>").attr("id", "copy-move-target");
     const move_arrow = $("<span>").attr("id", "copy-move-arrow").html(`<i class="fa-solid fa-arrow-right"></i>`);
     const cancel = $("<button>").attr("id", "copy-move-cancel").addClass("btn").addClass("btn-secondary").text($("#files_table").attr("data-cancel"));
@@ -785,12 +789,16 @@ function setup_move_listener() {
     if (copy) {
         $("#copy-op").on("click", async function () {
             const cur_dir = $("#table-nav").attr("data-cur-path");
+            let send_items = []
+            for (let item of move_copy_source) {
+                send_items.push({ "source_path": item, "target_path": move_copy_target })
+            }
             let res = await fetch(`/api/v2/servers/${serverId}/files/copy/`, {
                 method: "POST",
                 headers: {
                     "X-XSRFToken": token,
                 },
-                body: JSON.stringify({ "file_system_objects": [{ "source_path": move_copy_source, "target_path": move_copy_target }] }),
+                body: JSON.stringify({ "file_system_objects": send_items }),
             });
             let responseData = await res.json();
             if (responseData.status === "ok") {
@@ -806,12 +814,16 @@ function setup_move_listener() {
     } else {
         $("#move-op").on("click", async function () {
             const cur_dir = $("#table-nav").attr("data-cur-path");
+            let send_items = []
+            for (let item of move_copy_source) {
+                send_items.push({ "source_path": item, "target_path": move_copy_target })
+            }
             let res = await fetch(`/api/v2/servers/${serverId}/files/move/`, {
                 method: "POST",
                 headers: {
                     "X-XSRFToken": token,
                 },
-                body: JSON.stringify({ "file_system_objects": [{ "source_path": move_copy_source, "target_path": move_copy_target }] }),
+                body: JSON.stringify({ "file_system_objects": send_items }),
             });
             let responseData = await res.json();
             if (responseData.status === "ok") {
