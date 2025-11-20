@@ -116,13 +116,18 @@ async function getTreeView(path) {
     if (!move && !copy) {
         default_nav();
     }
+    let body = { page: "files", path: path }
+    if ($("#table-nav").attr("data-cur-path") === path) {
+        body = { page: "files", path: path, modified_epoch: modified_time }
+        // Only send epoch if we're requesting the same dir
+    }
     $("#files-table-body").html(LOADING_TABLE);
     let res = await fetch(`/api/v2/servers/${serverId}/files`, {
         method: "POST",
         headers: {
             "X-XSRFToken": token,
         },
-        body: JSON.stringify({ page: "files", path: path, modified_epoch: modified_time }),
+        body: JSON.stringify(body),
     });
     if (res.status === 304) {
         console.log("Already up to date!")
@@ -132,7 +137,6 @@ async function getTreeView(path) {
     let responseData = await res.json();
     if (responseData.status === "ok") {
         modified_time = responseData.data.root_path.modified;
-        console.log(modified_time)
         process_tree_response(responseData);
         location.hash = "";
         location.hash = "context-container"

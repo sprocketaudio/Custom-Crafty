@@ -36,6 +36,7 @@ files_get_schema = {
             "error": "typeEpoch",
             "fill": True,
         },
+        "required": ["path"],
     },
     "additionalProperties": False,
     "minProperties": 1,
