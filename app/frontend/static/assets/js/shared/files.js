@@ -314,6 +314,7 @@ function loadMenuContent(tr) {
 //RENAME FILES/DIRECTORIES FUNCTIONS
 ///////////////////////////////////////////////////////////////////////////////////////
 async function renameItem(path, name) {
+    console.log("rename")
     const token = getCookie("_xsrf");
     let res = await fetch(`/api/v2/servers/${serverId}/files/create/`, {
         method: "PATCH",
@@ -325,11 +326,13 @@ async function renameItem(path, name) {
     let responseData = await res.json();
     if (responseData.status === "ok") {
         console.log("sent ok")
+        return true;
     } else {
         bootbox.alert({
             title: responseData.error,
             message: responseData.error_data
         });
+        return false;
     }
 }
 
@@ -340,20 +343,22 @@ function add_rename_listener() {
             title:
                 "{% raw translate('serverFiles', 'renameItemQuestion', data['lang']) %}",
             value: name,
-            callback: function (result) {
+            callback: async function (result) {
                 if (!result) return;
                 if ($(selected_row).children(".column-1").attr("data-name") != result) {
-                    renameItem($(selected_row).attr("data-path"), result)
-                    $(selected_row).attr("data-path", $(selected_row).attr("data-path").replace($(selected_row).children(".column-1").attr("data-name"), result))
+                    let rename = await renameItem($(selected_row).attr("data-path"), result);
+                    if (rename === true) {
+                        $(selected_row).attr("data-path", $(selected_row).attr("data-path").replace($(selected_row).children(".column-1").attr("data-name"), result))
 
-                    $(selected_row).children(".column-1").empty()
-                    let icon = '<i class="fa-regular fa-file-excel text-danger"></i>'
-                    if ($(selected_row).hasClass("directory")) icon = '<i class="fa-regular fa-folder text-info"></i>';
-                    if ($(selected_row).hasClass("file")) icon = '<i class="fa-regular fa-file text-success"></i>';
-                    $(selected_row).children(".column-1").append($("<span>").html(icon))
-                        .append("\u00A0\u00A0\u00A0")
-                        .append(document.createTextNode(result));
-                    $(selected_row).children(".column-1").attr("data-name", result)
+                        $(selected_row).children(".column-1").empty()
+                        let icon = '<i class="fa-regular fa-file-excel text-danger"></i>'
+                        if ($(selected_row).hasClass("directory")) icon = '<i class="fa-regular fa-folder text-info"></i>';
+                        if ($(selected_row).hasClass("file") && $(selected_row).data("can_open")) icon = '<i class="fa-regular fa-file text-success"></i>';
+                        $(selected_row).children(".column-1").append($("<span>").html(icon))
+                            .append("\u00A0\u00A0\u00A0")
+                            .append(document.createTextNode(result));
+                        $(selected_row).children(".column-1").attr("data-name", result)
+                    }
                 }
             },
         });

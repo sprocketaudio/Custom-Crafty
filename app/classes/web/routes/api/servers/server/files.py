@@ -769,8 +769,12 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
                     "error_data": {},
                 },
             )
-
-        os.rename(path, new_item_path)
+        try:
+            os.rename(path, new_item_path)
+        except OSError as why:
+            self.finish_json(
+                500, {"status": "error", "error": "OSERROR", "error_data": str(why)}
+            )
         return self.finish_json(200, {"status": "ok"})
 
     def put(self, server_id: str):
