@@ -424,7 +424,38 @@ function setup_select_nav() {
         container.append(delete_button);
 
         $("#delete-files").on("click", function () {
-            console.log("deleting files")
+            let selected_rows = $(".row-select:checked");
+            bootbox.confirm({
+                size: "",
+                title:
+                    "{% raw translate('serverFiles', 'deleteItemQuestion', data['lang']) %}",
+                closeButton: false,
+                message:
+                    "{% raw translate('serverFiles', 'deleteItemQuestionMessage', data['lang']) %}",
+                buttons: {
+                    confirm: {
+                        label: "{{ translate('serverFiles', 'yesDelete', data['lang']) }}",
+                        className: "btn-danger",
+                    },
+                    cancel: {
+                        label: "{{ translate('serverFiles', 'noDelete', data['lang']) }}",
+                        className: "btn-link",
+                    },
+                },
+                callback: function (result) {
+                    if (!result) return;
+                    const items_to_delete = selected_rows.map(function () {
+                        const $row = $(this).closest("tr");
+                        const path = $row.data("path");
+                        return {
+                            element: $row[0],
+                            path: path
+                        };
+                    }).get();
+                    deleteItem(items_to_delete);
+                    default_nav();
+                },
+            });
         });
     } else {
         default_nav();
@@ -476,25 +507,31 @@ function add_delete_listener() {
             },
             callback: function (result) {
                 if (!result) return;
-                deleteItem(path);
+                deleteItem([{ "element": selected_row, "path": path }]);
             },
         });
     });
 }
 
 
-async function deleteItem(path) {
+async function deleteItem(items) {
     const token = getCookie("_xsrf");
+    let items_to_delete = []
+    for (let item of items) {
+        items_to_delete.push({ "filename": String(item["path"]) })
+    }
     let res = await fetch(`/api/v2/servers/${serverId}/files`, {
         method: "DELETE",
         headers: {
             "X-XSRFToken": token,
         },
-        body: JSON.stringify({ filename: String(path) }),
+        body: JSON.stringify({ "file_system_objects": items_to_delete }),
     });
     let responseData = await res.json();
-    if (responseData.status === "ok") {
-        $(selected_row).remove()
+    if (responseData.status === "ok") { // Delete the row dom objects
+        for (let item of items) {
+            $(item["element"]).remove()
+        }
     } else {
         bootbox.alert({
             title: responseData.error,

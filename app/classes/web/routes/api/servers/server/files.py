@@ -79,21 +79,25 @@ files_unzip_schema = {
 }
 
 files_operation_schema = {
-    "type": "object",
-    "properties": {
-        "source_path": {
-            "type": "string",
-            "error": "typeString",
-            "fill": True,
+    "type": "array",
+    "file_system_objects": {
+        "type": "object",
+        "properties": {
+            "source_path": {
+                "type": "string",
+                "error": "typeString",
+                "fill": True,
+            },
+            "target_path": {
+                "type": "string",
+                "error": "typeString",
+                "fill": True,
+            },
         },
-        "target_path": {
-            "type": "string",
-            "error": "typeString",
-            "fill": True,
-        },
+        "required": ["source_path", "target_path"],  # ensure both are present
+        "additionalProperties": False,
     },
-    "additionalProperties": False,
-    "minProperties": 1,
+    "minItems": 1,  # at least one file in the list
 }
 
 files_create_schema = {
@@ -140,14 +144,24 @@ files_rename_schema = {
 file_delete_schema = {
     "type": "object",
     "properties": {
-        "filename": {
-            "type": "string",
-            "error": "typeString",
-            "fill": True,
-        },
+        "file_system_objects": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "filename": {
+                        "type": "string",
+                        "error": "typeString",
+                        "fill": True,
+                    },
+                },
+                "required": ["filename"],
+                "additionalProperties": False,
+            },
+        }
     },
+    "required": ["file_system_objects"],
     "additionalProperties": False,
-    "minProperties": 1,
 }
 
 
@@ -433,37 +447,38 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             )
         # Check for absolute or relative path. Absolute paths should be deprecated
         server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
-        data["filename"] = self.file_helper.get_absolute_path(
-            server_path, server_id, data["filename"]
-        )
-        if (
-            not Helpers.validate_traversal(
-                self.controller.servers.get_server_data_by_id(server_id)["path"],
-                data["filename"],
+        for item in data["file_system_objects"]:
+            filename = self.file_helper.get_absolute_path(
+                server_path, server_id, item["filename"]
             )
-            or data["filename"] == server_path
-        ):
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "TRAVERSAL DETECTED",
-                    "error_data": str("Traversal"),
-                },
-            )
-        if os.path.isdir(data["filename"]):
-            proc = FileHelpers.del_dirs(data["filename"])
-        else:
-            proc = FileHelpers.del_file(data["filename"])
-        # disabling pylint because return value could be truthy
-        # but not a true boolean value
-        if proc == True:  # pylint: disable=singleton-comparison
+            if (
+                not Helpers.validate_traversal(
+                    self.controller.servers.get_server_data_by_id(server_id)["path"],
+                    filename,
+                )
+                or filename == server_path
+            ):
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "TRAVERSAL DETECTED",
+                        "error_data": str("Traversal"),
+                    },
+                )
+            if os.path.isdir(filename):
+                proc = FileHelpers.del_dirs(filename)
+            else:
+                proc = FileHelpers.del_file(filename)
             self.controller.management.add_to_audit_log(
                 auth_data[4]["user_id"],
-                f"Deleted item {data['filename']}",
+                f"Deleted item {item['filename']}",
                 server_id,
                 self.request.remote_ip,
             )
+        # disabling pylint because return value could be truthy
+        # but not a true boolean value
+        if proc == True:  # pylint: disable=singleton-comparison
             return self.finish_json(200, {"status": "ok"})
         return self.finish_json(
             500, {"status": "error", "error": "SERVER RUNNING", "error_data": str(proc)}
@@ -1091,7 +1106,7 @@ class ApiServersServerFileDownload(BaseApiHandler):
 
 
 class ApiServersServerFilesOperationHandler(BaseApiHandler):
-    def move_or_copy(self, operation: str, target_file: Path, source_path: Path):
+    def do_operation(self, operation: str, source_path: Path, target_file: Path):
         if operation == "move":
             if Path(source_path).is_dir():
                 try:
@@ -1105,21 +1120,9 @@ class ApiServersServerFilesOperationHandler(BaseApiHandler):
                     raise shutilError from why
         elif operation == "copy":
             if Path(source_path).is_dir():
-                print(target_file)
                 FileHelpers.copy_dir(source_path, target_file)
             else:
                 FileHelpers.copy_file(source_path, target_file)
-
-    def can_move_or_copy(self, target_path: Path, source_path: Path) -> tuple:
-        if source_path == target_path:
-            # Check if user is trying to copy to exactly where the file already is
-            return (False, "sourceMatchTarget")
-
-        if source_path in target_path.parents:
-            # Check if user is trying  to copy directory into itself
-            return (False, "targetInSource")
-
-        return (True, "success")
 
     def post(self, server_id: str, operation: str):
         auth_data = self.authenticate_user()
@@ -1185,26 +1188,24 @@ class ApiServersServerFilesOperationHandler(BaseApiHandler):
 
         # Check for absolute or relative path. Absolute paths should be deprecated
         server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
-        target_path = Path(
-            self.file_helper.get_absolute_path(
-                server_path, server_id, data["target_path"]
+        for item in data["file_system_objects"]:
+            target_path = Path(
+                self.file_helper.get_absolute_path(
+                    server_path, server_id, item["target_path"]
+                )
             )
-        )
-        source_path = Path(
-            self.file_helper.get_absolute_path(
-                server_path, server_id, data["source_path"]
+            source_path = Path(
+                self.file_helper.get_absolute_path(
+                    server_path, server_id, item["source_path"]
+                )
             )
-        )
-
-        self.helper.validate_traversal(server_path, source_path)
-        self.helper.validate_traversal(server_path, target_path)
         try:
-            self.move_or_copy(operation, target_path, source_path)
+            self.do_operation(operation, source_path, target_path)
         except shutilError as why:
             return self.finish_json(500, {"status": "error", "error_data": why})
         self.controller.management.add_to_audit_log(
             auth_data[4]["user_id"],
-            f"Moved item from {source_path} to {target_path}.",
+            f"{operation} item from {source_path} to {target_path}.",
             server_id,
             self.request.remote_ip,
         )
