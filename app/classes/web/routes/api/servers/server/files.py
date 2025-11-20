@@ -36,8 +36,8 @@ files_get_schema = {
             "error": "typeEpoch",
             "fill": True,
         },
-        "required": ["path"],
     },
+    "required": ["path"],
     "additionalProperties": False,
     "minProperties": 1,
 }
@@ -391,6 +391,40 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     {"status": "error", "error": "DECODE_ERROR", "error_data": str(ex)},
                 )
 
+    def do_delete(self, data, auth_data, server_id):
+        # Check for absolute or relative path. Absolute paths should be deprecated
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        for item in data["file_system_objects"]:
+            filename = self.file_helper.get_absolute_path(
+                server_path, server_id, item["filename"]
+            )
+            if (
+                not Helpers.validate_traversal(
+                    self.controller.servers.get_server_data_by_id(server_id)["path"],
+                    filename,
+                )
+                or filename == server_path
+            ):
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "TRAVERSAL DETECTED",
+                        "error_data": str("Traversal"),
+                    },
+                )
+            if os.path.isdir(filename):
+                proc = FileHelpers.del_dirs(filename)
+            else:
+                proc = FileHelpers.del_file(filename)
+            self.controller.management.add_to_audit_log(
+                auth_data[4]["user_id"],
+                f"Deleted item {item['filename']}",
+                server_id,
+                self.request.remote_ip,
+            )
+            return proc
+
     def delete(self, server_id: str, _backup_id=None):
         auth_data = self.authenticate_user()
         if not auth_data:
@@ -452,37 +486,8 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
-        # Check for absolute or relative path. Absolute paths should be deprecated
-        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
-        for item in data["file_system_objects"]:
-            filename = self.file_helper.get_absolute_path(
-                server_path, server_id, item["filename"]
-            )
-            if (
-                not Helpers.validate_traversal(
-                    self.controller.servers.get_server_data_by_id(server_id)["path"],
-                    filename,
-                )
-                or filename == server_path
-            ):
-                return self.finish_json(
-                    400,
-                    {
-                        "status": "error",
-                        "error": "TRAVERSAL DETECTED",
-                        "error_data": str("Traversal"),
-                    },
-                )
-            if os.path.isdir(filename):
-                proc = FileHelpers.del_dirs(filename)
-            else:
-                proc = FileHelpers.del_file(filename)
-            self.controller.management.add_to_audit_log(
-                auth_data[4]["user_id"],
-                f"Deleted item {item['filename']}",
-                server_id,
-                self.request.remote_ip,
-            )
+
+        proc = self.do_delete(data, auth_data, server_id)
         # disabling pylint because return value could be truthy
         # but not a true boolean value
         if proc == True:  # pylint: disable=singleton-comparison
