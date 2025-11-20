@@ -834,9 +834,11 @@ function setup_move_listener() {
             $(".row-select").prop("disabled", false).prop("checked", false);
             $(".root-select").prop("disabled", false).prop("checked", false);
             const cur_dir = $("#table-nav").attr("data-cur-path");
+            const copy_of_move_copy_source = move_copy_source //copy this off just in case someone is too quick
+            const copy_of_move_copy_target = move_copy_target
             let send_items = []
-            for (let item of move_copy_source) {
-                send_items.push({ "source_path": item, "target_path": move_copy_target })
+            for (let item of copy_of_move_copy_source) {
+                send_items.push({ "source_path": item, "target_path": copy_of_move_copy_target })
             }
             let res = await fetch(`/api/v2/servers/${serverId}/files/copy/`, {
                 method: "POST",
@@ -861,9 +863,11 @@ function setup_move_listener() {
             $(".row-select").prop("disabled", false).prop("checked", false);
             $(".root-select").prop("disabled", false).prop("checked", false);
             const cur_dir = $("#table-nav").attr("data-cur-path");
+            const copy_of_move_copy_source = move_copy_source //copy this off just in case someone is too quick
+            const copy_of_move_copy_target = move_copy_target
             let send_items = []
-            for (let item of move_copy_source) {
-                send_items.push({ "source_path": item, "target_path": move_copy_target })
+            for (let item of copy_of_move_copy_source) {
+                send_items.push({ "source_path": item, "target_path": copy_of_move_copy_target })
             }
             console.log(send_items)
             let res = await fetch(`/api/v2/servers/${serverId}/files/move/`, {
