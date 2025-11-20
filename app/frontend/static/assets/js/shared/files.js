@@ -232,8 +232,7 @@ function setup_table_body(response) {
 
         // Column 5: context button
         const $td6 = $("<td>")
-            .addClass("context-button")
-            .text("...");
+            .addClass("context-button").append($("<span>").addClass("options").html(`<i class="fa-solid fa-ellipsis options"></i>`)).addClass("text-align-center");
         if ($("#files_table thead tr:first th:visible").length > 1) {
 
             // Append all columns to the row
@@ -286,6 +285,7 @@ function loadMenuContent(tr) {
     const menu = $("#context-menu");
     menu.empty(); // clear previous content
     const path = $(tr).attr("data-path")
+    console.log(path)
     selected_row = tr
     let zipFile = false;
     if (path) {

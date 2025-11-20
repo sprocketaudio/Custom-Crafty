@@ -62,10 +62,24 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch {
         console.log("Could not find context area to set")
     }
+    // Right-click anywhere
+    try {
+        document.addEventListener("click", (event) => {
+            const ellipse = event.target.closest(".options");
+            if (!ellipse) return;
+            event.stopPropagation();
+
+            const tr = ellipse.closest("tr");
+            loadMenuContent(tr);
+            showMenu(event.clientX, event.clientY);
+        });
+    } catch {
+        console.log("Could not find context area to set")
+    }
 
     // Click outside closes menu
     document.addEventListener("click", (event) => {
-        if (!event.target.classList.contains("edit-configure")) {
+        if (!event.target.classList.contains("edit-configure") && !event.target.classList.contains("options")) {
             menu.classList.remove("show");
             menu.style.display = "none";
         }
