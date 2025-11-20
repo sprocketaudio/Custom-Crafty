@@ -52,6 +52,10 @@ let extensionChanges = [
         replaceWith: "ace/mode/html",
     },
     {
+        regex: /^conf$/,
+        replaceWith: "ace/mode/yaml",
+    },
+    {
         regex: /^yml$/,
         replaceWith: "ace/mode/yaml",
     },
