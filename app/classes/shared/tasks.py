@@ -823,9 +823,9 @@ class TasksManager:
                 logger.error(
                     "Traversal detected while deleting import file %s", file_path
                 )
-            if self.helper.is_file_older_than_x_days(Path(import_path, file)):
+            if self.helper.is_file_older_than_x_days(file_path):
                 try:
-                    os.remove(Path(import_path, file))
+                    os.remove(file_path)
                 except FileNotFoundError:
                     logger.debug("Could not clear out file from import directory")
 
