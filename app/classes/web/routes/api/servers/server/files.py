@@ -392,6 +392,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
     def do_delete(self, data, auth_data, server_id):
         # Check for absolute or relative path. Absolute paths should be deprecated
         server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        proc = False
         for item in data["file_system_objects"]:
             filename = self.file_helper.get_absolute_path(server_path, item["filename"])
             if (
@@ -419,7 +420,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 server_id,
                 self.request.remote_ip,
             )
-            return proc
+        return proc
 
     def delete(self, server_id: str, _backup_id=None):
         auth_data = self.authenticate_user()
