@@ -27,6 +27,8 @@ logger = logging.getLogger(__name__)
 class BackupManager:
 
     SNAPSHOT_BACKUP_DATE_FORMAT_STRING = "%Y-%m-%d-%H-%M-%S"
+    SNAPSHOT_SUFFIX = ".manifest"
+    ARCHIVE_SUFFIX = ".zip"
 
     def __init__(self, helper, file_helper, management_helper):
         self.helper = helper
@@ -70,6 +72,7 @@ class BackupManager:
             backup_config (_type_): _description_
             server (_type_): Server object to backup
         """
+
         # Notify users of backup starting
         logger.info(f"Starting server {server.name} (ID {server.server_id}) backup")
         server_users = PermissionsServers.get_server_user_list(server.server_id)
@@ -88,8 +91,8 @@ class BackupManager:
         if backup_config.get("backup_type", "zip_vault") == "zip_vault":
             backup_file_name = self.zip_vault(backup_config, server)
             if backup_file_name:
-                if Path(backup_file_name).suffix != ".zip":
-                    backup_file_name += ".zip"
+                if Path(backup_file_name).suffix != self.ARCHIVE_SUFFIX:
+                    backup_file_name += self.ARCHIVE_SUFFIX
                 size = (
                     Path(
                         backup_config["backup_location"],
@@ -102,8 +105,8 @@ class BackupManager:
         else:
             backup_file_name = self.snapshot_backup(backup_config, server)
             if backup_file_name:
-                if Path(backup_file_name).suffix != ".manifest":
-                    backup_file_name += ".manifest"
+                if Path(backup_file_name).suffix != self.SNAPSHOT_SUFFIX:
+                    backup_file_name += self.SNAPSHOT_SUFFIX
         if backup_file_name:
             return (
                 backup_file_name,
@@ -226,8 +229,7 @@ class BackupManager:
             {"status": json.dumps({"status": "Failed", "message": f"{why}"})},
         )
 
-    @staticmethod
-    def list_backups(backup_config: dict, server_id) -> list:
+    def list_backups(self, backup_config: dict, server_id) -> list:
         if not backup_config:
             logger.info(
                 f"Error putting backup file list for server with ID: {server_id}"
@@ -260,7 +262,7 @@ class BackupManager:
                     "size": "",
                 }
                 for f in files
-                if f["path"].endswith(".manifest")
+                if f["path"].endswith(self.SNAPSHOT_SUFFIX)
             ]
         return [
             {
@@ -271,7 +273,7 @@ class BackupManager:
                 "size": f["size"],
             }
             for f in files
-            if f["path"].endswith(".zip")
+            if f["path"].endswith(self.ARCHIVE_SUFFIX)
         ]
 
     def remove_old_backups(self, backup_config, server):
