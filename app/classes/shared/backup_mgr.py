@@ -47,6 +47,7 @@ class BackupManager:
         self, backup_config, backup_location, backup_file, svr_obj, in_place
     ):
         server_path = svr_obj.settings["path"]
+        error = False
         if Helpers.validate_traversal(backup_location, backup_file):
             if svr_obj.check_running():
                 svr_obj.stop_server()
@@ -60,10 +61,40 @@ class BackupManager:
                             os.path.isdir(os.path.join(server_path, item))
                             and item != "db_stats"
                         ):
-                            self.file_helper.del_dirs(os.path.join(server_path, item))
+                            result = self.file_helper.del_dirs(
+                                os.path.join(server_path, item)
+                            )
+                            if not result:
+                                error = True
                         else:
-                            self.file_helper.del_file(os.path.join(server_path, item))
+                            result = self.file_helper.del_file(
+                                os.path.join(server_path, item)
+                            )
+                            if not result:
+                                error = True
                 self.file_helper.restore_archive(backup_location, server_path)
+        server_users = PermissionsServers.get_server_user_list(svr_obj.server_id)
+        time.sleep(3)
+        if error:
+            for user in server_users:
+                WebSocketManager().broadcast_user(
+                    user,
+                    "send_start_error",
+                    self.helper.translation.translate(
+                        "notify", "restoreFailed", HelperUsers.get_user_lang_by_id(user)
+                    ),
+                )
+        else:
+            for user in server_users:
+                WebSocketManager().broadcast_user(
+                    user,
+                    "notification",
+                    self.helper.translation.translate(
+                        "notify",
+                        "restoreSuccess",
+                        HelperUsers.get_user_lang_by_id(user),
+                    ),
+                )
 
     def backup_starter(self, backup_config, server) -> tuple:
         """Notify users of backup starting, and start the backup.

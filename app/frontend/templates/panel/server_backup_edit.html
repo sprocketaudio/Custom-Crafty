@@ -235,12 +235,14 @@
                     {% for backup in data['backup_list'] %}
                     <tr>
                       <td>
+                        {% if data["backup_config"]["backup_type"] != "snapshot" %}
                         <button class="btn btn-primary download" data-file="{{backup['path']}}">
                           <i class="fas fa-download" aria-hidden="true"></i>
                           {{ translate('serverBackups', 'download', data['lang']) }}
                         </button>
                         <br>
                         <br>
+                        {% end %}
                         <button data-file="{{ backup['path'] }}"
                           data-backup_location="{{ data['backup_config']['backup_location'] }}"
                           class="btn btn-danger del_button">
@@ -566,7 +568,7 @@
     });
 
     $(".download").click(async function () {
-      let file = $(".download").data("file");
+      let file = $(this).data("file");
       window.open(`/api/v2/servers/${serverId}/backups/backup/${backup_id}/download/${encodeURIComponent(file)}`, '_blank');
     });
 
