@@ -11,7 +11,7 @@ TBD
 - Fix failue deleting server's DB files on server delete ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/916))
 - Fix server.properties overwritten in bedrock update ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/915))
 ### Tweaks
-TBD
+- Provide better feedback on restore failures ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/914))
 ### Lang
 TBD
 <br><br>
