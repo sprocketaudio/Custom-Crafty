@@ -6,6 +6,8 @@ TBD
 - Change hour and minute intervals in APScheudler to fix incorrect triggers ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/910))
 - Use asyncio locks to limit upload handler race condition ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/907))
 - Fix static fonts not working on some browsers ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/906))
+- Fix import directory cleanup was not pointing to the proper directory ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/918))
+- Fix survey not appearing on first login ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/917))
 ### Tweaks
 TBD
 ### Lang
