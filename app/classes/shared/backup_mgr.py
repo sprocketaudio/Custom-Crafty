@@ -90,9 +90,12 @@ class BackupManager:
         # Start the backup
         if backup_config.get("backup_type", "zip_vault") == "zip_vault":
             backup_file_name = self.zip_vault(backup_config, server)
+            if (
+                backup_file_name
+                and Path(backup_file_name).suffix != self.ARCHIVE_SUFFIX
+            ):
+                backup_file_name += self.ARCHIVE_SUFFIX
             if backup_file_name:
-                if Path(backup_file_name).suffix != self.ARCHIVE_SUFFIX:
-                    backup_file_name += self.ARCHIVE_SUFFIX
                 size = (
                     Path(
                         backup_config["backup_location"],
@@ -104,14 +107,13 @@ class BackupManager:
                 )
         else:
             backup_file_name = self.snapshot_backup(backup_config, server)
-            if backup_file_name:
-                if Path(backup_file_name).suffix != self.SNAPSHOT_SUFFIX:
-                    backup_file_name += self.SNAPSHOT_SUFFIX
+            if (
+                backup_file_name
+                and Path(backup_file_name).suffix != self.SNAPSHOT_SUFFIX
+            ):
+                backup_file_name += self.SNAPSHOT_SUFFIX
         if backup_file_name:
-            return (
-                backup_file_name,
-                size,
-            )
+            return (backup_file_name, size)
         return (False, "error")
 
     def zip_vault(self, backup_config, server) -> str | bool:
