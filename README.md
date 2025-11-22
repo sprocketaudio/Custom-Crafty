@@ -66,8 +66,6 @@ The image is located at: `registry.gitlab.com/crafty-controller/crafty-4:latest`
 $ vim docker-compose.yml
 ```
 ```yml
-version: '3'
-
 services:
   crafty:
     container_name: crafty_container
