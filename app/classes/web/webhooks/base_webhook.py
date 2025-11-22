@@ -20,7 +20,10 @@ class WebhookProvider(ABC):
     """
 
     def __init__(self):
-        self.jinja_env = Environment(loader=BaseLoader())
+        self.jinja_env = Environment(
+            loader=BaseLoader(),
+            autoescape=True,
+        )
 
     WEBHOOK_USERNAME = "Crafty Webhooks"
     WEBHOOK_PFP_URL = (
