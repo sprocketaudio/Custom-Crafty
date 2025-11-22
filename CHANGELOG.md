@@ -9,6 +9,7 @@ TBD
 - Fix import directory cleanup was not pointing to the proper directory ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/918))
 - Fix survey not appearing on first login ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/917))
 - Fix failue deleting server's DB files on server delete ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/916))
+- Fix server.properties overwritten in bedrock update ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/915))
 ### Tweaks
 TBD
 ### Lang
