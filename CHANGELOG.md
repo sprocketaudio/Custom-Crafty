@@ -1,7 +1,7 @@
 # Changelog
-## --- [4.5.6] - 2025/TBD
+## --- [4.6.1] - 2025/TBD
 ### New features
-TBD
+- Jinja2 Dynamic Variables for Webhook Notifications ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/757))
 ### Bug fixes
 - Change hour and minute intervals in APScheudler to fix incorrect triggers ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/910))
 - Use asyncio locks to limit upload handler race condition ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/907))

@@ -51,7 +51,7 @@ class DiscordWebhook(WebhookProvider):
 
         return payload, headers
 
-    def send(self, server_name, title, url, message, **kwargs):
+    def send(self, server_name, title, url, message_template, event_data, **kwargs):
         """
         Sends a Discord webhook notification using the given details.
 
@@ -74,6 +74,7 @@ class DiscordWebhook(WebhookProvider):
         Raises:
         Exception: If there's an error in dispatching the webhook.
         """
+        message = self.render_template(message_template, event_data)
         color = kwargs.get("color", "#005cd1")  # Default to a color if not provided.
         bot_name = kwargs.get("bot_name", self.WEBHOOK_USERNAME)
         payload, headers = self._construct_discord_payload(

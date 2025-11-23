@@ -119,6 +119,13 @@ config_json_schema = {
             "error": "typeBool",
             "fill": True,
         },
+        "base_url": {
+            "type": "string",
+            "pattern": (
+                r"^(?:(?:\d{1,3}\.){3}\d{1,3}"
+                r"|(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(?::\d{1,5})?$"
+            ),
+        },
         "max_login_attempts": {"type": "integer", "error": "typeInt", "fill": True},
         "superMFA": {"type": "boolean", "error": "typeBool", "fill": True},
         "general_user_log_access": {

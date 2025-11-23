@@ -69,6 +69,7 @@ MASTER_CONFIG = {
     "max_login_attempts": 3,
     "superMFA": False,
     "general_user_log_access": False,
+    "base_url": "127.0.0.1:8443",
 }
 
 CONFIG_CATEGORIES = {
@@ -80,6 +81,7 @@ CONFIG_CATEGORIES = {
         "disabled_language_files",
         "big_bucket_repo",
         "enable_user_self_delete",
+        "base_url",
     ],
     "security": [
         "allow_nsfw_profile_pictures",

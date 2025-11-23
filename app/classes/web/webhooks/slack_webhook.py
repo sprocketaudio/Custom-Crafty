@@ -67,7 +67,7 @@ class SlackWebhook(WebhookProvider):
 
         return payload, headers
 
-    def send(self, server_name, title, url, message, **kwargs):
+    def send(self, server_name, title, url, message_template, event_data, **kwargs):
         """
         Sends a Slack webhook notification using the given details.
 
@@ -78,7 +78,8 @@ class SlackWebhook(WebhookProvider):
         server_name (str): The name of the server triggering the notification.
         title (str): The title for the notification message.
         url (str): The webhook URL to send the notification to.
-        message (str): The main content or body of the notification message.
+        message_template (str): The Jinja2 template for the message body.
+        event_data (dict): A dictionary containing variables for template rendering.
         color (str, optional): The color code for the blocks's colour accent.
         Defaults to a pretty blue if not provided.
         bot_name (str): Override for the Webhook's name set on creation, (not working).
@@ -90,6 +91,7 @@ class SlackWebhook(WebhookProvider):
         Raises:
         Exception: If there's an error in dispatching the webhook.
         """
+        message = self.render_template(message_template, event_data)
         color = kwargs.get("color", "#005cd1")  # Default to a color if not provided.
         bot_name = kwargs.get("bot_name", self.WEBHOOK_USERNAME)
         payload, headers = self._construct_slack_payload(
