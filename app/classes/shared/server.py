@@ -1499,7 +1499,7 @@ class ServerInstance:
                 if bedrock_url:
                     # Use the new method for secure download
                     self.import_helper.download_threaded_bedrock_server(
-                        self.settings["path"], self.server_id, bedrock_url
+                        self.settings["path"], self.server_id, bedrock_url, True
                     )
                     downloaded = True
             except Exception as e:

@@ -222,7 +222,9 @@ class ImportHelpers:
         )
         download_thread.start()
 
-    def download_threaded_bedrock_server(self, path, new_id, bedrock_url):
+    def download_threaded_bedrock_server(
+        self, path, new_id, bedrock_url, server_update=False
+    ):
         """
         Downloads the latest Bedrock server, unzips it, sets necessary permissions.
 
@@ -244,7 +246,7 @@ class ImportHelpers:
 
                 unzip_path = self.helper.wtol_path(file_path)
                 # unzips archive that was downloaded.
-                self.file_helper.unzip_file(unzip_path, True)
+                self.file_helper.unzip_file(unzip_path, server_update)
                 # adjusts permissions for execution if os is not windows
 
                 if not self.helper.is_os_windows():
