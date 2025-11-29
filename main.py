@@ -21,6 +21,7 @@ from app.classes.logging.log_formatter import JsonFormatter
 
 console = Console()
 helper = Helpers()
+first_login = False
 # Get the path our application is running on.
 if getattr(sys, "frozen", False):
     APPLICATION_PATH = os.path.dirname(sys.executable)
@@ -388,6 +389,7 @@ if __name__ == "__main__":
             f"through your router/firewall if you would like to be able "
             f"to access Crafty remotely."
         )
+        first_login = True
         PASSWORD = helper.create_pass()
         installer.default_settings(PASSWORD)
         with open(
@@ -426,6 +428,7 @@ if __name__ == "__main__":
     import_helper = ImportHelpers(helper, file_helper)
     controller = Controller(database, helper, file_helper, import_helper)
     controller.set_project_root(APPLICATION_PATH)
+    controller.first_login = first_login
     tasks_manager = TasksManager(helper, controller, file_helper)
     import3 = Import3(helper, controller)
     helper.migration_notifications = get_migration_notifications()
