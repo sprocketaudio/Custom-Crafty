@@ -6,7 +6,7 @@ let move_copy_source = [];
 let move_copy_target = "";
 let modified_time = 1.5;
 let recent_response = {}
-let start_index = 0;
+let start_index;
 const LOADING_TABLE = `<tr class="skeleton-row">
                                     <td>
                                         <div class="skeleton-line" style="width: 60%;"></div>
@@ -114,6 +114,7 @@ const LOADING_TABLE = `<tr class="skeleton-row">
 ///////////////////////////////////////////////////////////////////////////////////////
 async function getTreeView(path) {
     const token = getCookie("_xsrf");
+    start_index = 0;
     if (!move && !copy) {
         default_nav();
     }
@@ -195,11 +196,21 @@ function setup_table_nav(response) {
     }
 }
 
+function get_more_files() {
+    $("#get_more_container").remove();
+    setup_table_body(recent_response);
+}
+
 function setup_table_body(response) {
     const tbody = document.querySelector("tbody");
     const response_entries = Object.entries(response.data)
-    for (let [key, value] of response_entries) {
-        if (key === "root_path" || key === "db_stats") continue;
+    let end_index = start_index + 500;
+    if (response_entries.length < end_index) {
+        end_index = response_entries.length
+    }
+    for (let i = start_index; i < end_index; i++) {
+        let [key, value] = response_entries[i];
+        if (key === "root_path") continue;
 
         const $tr = $("<tr>")
             .addClass(value.dir ? "directory" : "file")
@@ -244,6 +255,16 @@ function setup_table_body(response) {
         // Append row to tbody (also as jQuery object)
         $(tbody).append($tr);
     };
+    start_index = end_index
+    if (response_entries.length > end_index) {
+        const $tr = $("<tr>").attr("id", "get_more_container").addClass("text-align-center").append($("<td>").attr("colspan", 6).text($("#table-nav-container").attr("data-load-more")).attr("id", "get_more"));
+        $(tbody).append($tr);
+
+        $("#get_more").on("click", function () {
+            get_more_files();
+        });
+
+    }
 }
 
 function setup_table_listeners() {
