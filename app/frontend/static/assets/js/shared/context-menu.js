@@ -62,6 +62,38 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch {
         console.log("Could not find context area to set")
     }
+    // long touch anywhere
+    try {
+        let longPressTimer;
+
+        contextArea.addEventListener("touchstart", (event) => {
+            const touch = event.touches[0];
+
+            longPressTimer = setTimeout(() => {
+                const th = touch.target.closest("th");
+                const tr = touch.target.closest("tr");
+
+                if (!th && tr) {
+                    loadMenuContent(tr);
+                    showMenu(touch.clientX, touch.clientY);
+                }
+            }, 500);
+        });
+
+        contextArea.addEventListener("touchend", () => {
+            clearTimeout(longPressTimer);
+        });
+
+        contextArea.addEventListener("touchmove", () => {
+            clearTimeout(longPressTimer);
+        });
+
+        contextArea.addEventListener("touchcancel", () => {
+            clearTimeout(longPressTimer);
+        });
+    } catch {
+        console.log("Could not find context area to set")
+    }
     // Right-click anywhere
     try {
         document.addEventListener("click", (event) => {
