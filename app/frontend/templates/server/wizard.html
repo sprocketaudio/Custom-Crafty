@@ -5,7 +5,10 @@
 {% block content %}
 
 <link rel="stylesheet" href="../../static/assets/css/vendors/bootstrap-select-1.13.18.css">
-<div class="content-wrapper">
+<div class="content-wrapper" id="creation-wrapper"
+  data-importing="{{translate('serverWizard', 'importing', data['lang'])}}"
+  data-downloading="{{translate('serverWizard', 'downloading', data['lang'])}}"
+  data-bePatient="{{translate('serverWizard', 'bePatient', data['lang'])}}">
   <ul class="nav nav-pills tab-simple-styled">
     <li class="nav-item term-nav-item">
       <a class="nav-link active" href="/server/step1" role="tab" aria-selected="false">
@@ -647,6 +650,7 @@
   }
   async function send_server(data) {
     let token = getCookie("_xsrf")
+    console.log(data)
     let res = await fetch(`/api/v2/servers/`, {
       method: 'POST',
       headers: {
@@ -702,7 +706,7 @@
           }
         }
       }
-      console.log(send_data);
+      console.log("SEND DATA" + send_data);
       // Format the plain form data as JSON
       let formDataJsonString = JSON.stringify(send_data, replacer);
 
@@ -859,8 +863,8 @@
 
   function wait_msg(importing) {
     bootbox.alert({
-      title: importing ? '{% raw translate("serverWizard", "importing", data["lang"]) %}' : '{% raw translate("serverWizard", "downloading", data["lang"]) %}',
-      message: importing ? '<i class="fas fa-cloud-download"></i> {% raw translate("serverWizard", "bePatient", data["lang"]) %}' : '<i class="fas fa-cloud-download"></i> {% raw translate("serverWizard", "bePatient", data["lang"]) %}',
+      title: importing ? `${$("#creation-wrapper").attr("data-importing")}` : `${$("#creation-wrapper").attr("data-downloading")}`,
+      message: `<i class="fas fa-cloud-download"></i> ${$("#creation-wrapper").attr("data-bePatient")}`,
       className: "waitMsg",
     });
   }
