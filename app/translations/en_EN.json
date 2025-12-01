@@ -648,7 +648,7 @@
         "absoluteZipPath": "Absolute path to your server",
         "addRole": "Add Server to Existing Role(s)",
         "autoCreate": "If none are selected Crafty will make one!",
-        "bePatient": "Please be patient as we ' + (importing ? 'import' :  'download') + ' the server",
+        "bePatient": "Please be patient as we create your server",
         "buildServer": "Build Server!",
         "clickRoot": "Click here to select Root Dir",
         "close": "Close",
