@@ -177,7 +177,9 @@ class ServersController(metaclass=Singleton):
             server_id,
         )
         self.file_helper.del_dirs(
-            self.helper.root_dir, "app", "config", "db", "servers", str(server_id)
+            pathlib.Path(
+                self.helper.root_dir, "app", "config", "db", "servers", str(server_id)
+            )
         )
 
     @staticmethod

@@ -7,6 +7,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.10/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="/static/assets/css/partial/crafty-webhooks.css">
 <div class="content-wrapper">
 
   <!-- Page Title Header Starts-->
@@ -83,10 +84,11 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <label for="body">{{ translate('webhooks', 'webhook_body', data['lang']) }}</label>
-                    <textarea id="body-input" name="body" rows="4" cols="50">
-                      {{ data["webhook"]["body"] }}
-                    </textarea>
+                      <label for="body">{{ translate('webhooks', 'webhook_body', data['lang']) }} <br><div class="jinja2"><small>{{translate("webhooks", "jinja2", data['lang'])}} <br>
+                          <a href="https://docs.craftycontrol.com/pages/user-guide/webhooks/#jinja2-dynamic-variables-461" target="_blank">{{translate("webhooks", "documentation", data['lang'])}}</a></small></div></label>
+                      <textarea id="body-input" name="body" rows="4" cols="50">
+                        {{ data["webhook"]["body"] }}
+                      </textarea>
                 </div>
                 <div class="form-group">
                   <label for="bot_name">{{ translate('webhooks', 'color' , data['lang']) }}</label>

@@ -1,6 +1,7 @@
 ## Quick Information
 - **Operating System:** Windows / Linux / MacOS / UnRAID
 - **Install Type:** Git Cloned(Manual) / Installer / WinPackage / Docker
+- **Crafty Version:** v4.x.x
 
 ## What Happened?
 <!-- A brief description of what happened when you tried to perform an action -->

@@ -720,7 +720,8 @@
         "typeString": "dize türünde olmalıdır.",
         "userName": " dize türünde, tümü KÜÇÜK HARF, en az 4 karakter ve en fazla 20 karakter olmalıdır",
         "additionalProperties": "Ek Özelliklerin geçirilmesine izin verilmez",
-        "mfaName": "Özellik için girdi, dize türünde olmalı ve en az 3 karakter içermelidir"
+        "mfaName": "Özellik için girdi, dize türünde olmalı ve en az 3 karakter içermelidir",
+        "passProp": "Şifre en az 8 karakterden oluşan bir dize olmalıdır."
     },
     "webhooks": {
         "areYouSureDel": "Bu webhooku silmek istediğinizden emin misiniz?",

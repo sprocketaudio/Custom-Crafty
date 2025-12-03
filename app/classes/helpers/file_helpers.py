@@ -124,6 +124,7 @@ class FileHelpers:
     @staticmethod
     def del_dirs(path):
         path = pathlib.Path(path)
+        clean = True
         for sub in path.iterdir():
             if sub.is_dir():
                 # Delete folder if it is a folder
@@ -133,26 +134,29 @@ class FileHelpers:
                 try:
                     sub.unlink()
                 except Exception as e:
+                    clean = False
                     logger.error(f"Unable to delete file {sub}: {e}")
         try:
             # This removes the top-level folder:
             path.rmdir()
-        except Exception as e:
+        except Exception:
             logger.error("Unable to remove top level")
-            return e
-        return True
+            return False
+        return clean
 
     @staticmethod
     def del_file(path):
         path = pathlib.Path(path)
+        clean = True
         try:
             logger.debug(f"Deleting file: {path}")
             # Remove the file
             os.remove(path)
-            return True
-        except (FileNotFoundError, PermissionError) as e:
+            return clean
+        except (FileNotFoundError, PermissionError):
             logger.error(f"Path specified is not a file or does not exist. {path}")
-            return e
+            clean = False
+            return clean
 
     def check_mime_types(self, file_path):
         m_type, _value = self.mime_types.guess_type(file_path)

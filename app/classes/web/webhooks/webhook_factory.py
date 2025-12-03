@@ -13,7 +13,7 @@ class WebhookFactory:
     to manage the available providers.
 
     Attributes:
-    - _registry (dict): A dictionary mapping provider names to their classes.
+        - _registry (dict): A dictionary mapping provider names to their classes.
     """
 
     _registry = {
@@ -32,18 +32,18 @@ class WebhookFactory:
         provided arguments. If the provider is not recognized, a ValueError is raised.
 
         Arguments:
-        - provider_name (str): The name of the desired webhook provider.
+            - provider_name (str): The name of the desired webhook provider.
 
         Additional arguments supported that we may use for if a provider
         requires initialization:
-        - *args: Positional arguments to pass to the provider's constructor.
-        - **kwargs: Keyword arguments to pass to the provider's constructor.
+            - *args: Positional arguments to pass to the provider's constructor.
+            - **kwargs: Keyword arguments to pass to the provider's constructor.
 
         Returns:
-        WebhookProvider: An instance of the desired webhook provider.
+            WebhookProvider: An instance of the desired webhook provider.
 
         Raises:
-        ValueError: If the specified provider name is not recognized.
+            ValueError: If the specified provider name is not recognized.
         """
         if provider_name not in cls._registry:
             raise ValueError(f"Provider {provider_name} is not supported.")
@@ -58,7 +58,7 @@ class WebhookFactory:
         currently registered in the factory's registry.
 
         Returns:
-        List[str]: A list of supported provider names.
+            List[str]: A list of supported provider names.
         """
         return list(cls._registry.keys())
 
@@ -68,17 +68,45 @@ class WebhookFactory:
         Retrieves the list of supported events for monitoring.
 
         This method provides a list of common server events that the webhook system can
-        monitor and notify about.
+        monitor and notify about. Along with the available `event_data` vars for use
+        on the frontend.
 
         Returns:
-        List[str]: A list of supported monitored actions.
+            dict: A dictionary where each key is an event name and the value is a
+            dictionary containing a list of `variables` for that event.
+            These variables are intended for use in the frontend to show whats
+            available.
         """
-        return [
-            "start_server",
-            "stop_server",
-            "crash_detected",
-            "backup_server",
-            "jar_update",
-            "send_command",
-            "kill",
+        # Common variables for all events
+        common_vars = [
+            "server_name",
+            "server_id",
+            "event_type",
+            "source_type",
+            "source_id",
+            "source_name",
+            "time_iso",
+            "time_unix",
+            "time_day",
+            "time_month",
+            "time_year",
+            "time_formatted",
         ]
+        return {
+            "start_server": {"variables": common_vars},
+            "stop_server": {"variables": common_vars},
+            "crash_detected": {"variables": common_vars},
+            "backup_server": {
+                "variables": common_vars
+                + [
+                    "backup_name",
+                    "backup_link",
+                    "backup_size",
+                    "backup_status",
+                    "backup_error",
+                ]
+            },
+            "jar_update": {"variables": common_vars},
+            "send_command": {"variables": common_vars + ["command"]},
+            "kill": {"variables": common_vars + ["reason"]},
+        }

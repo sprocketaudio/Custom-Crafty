@@ -721,7 +721,7 @@
         "filesPageLen": "La longueur doit être supérieure à 1 pour cette propriété",
         "insufficientPerms": "Erreur de permission : permissions manquantes pour cette ressource",
         "mfaName": "La saisie doit être une chaîne de caractères d'au moins 3 caractères pour ce champ",
-        "passProp": "Le mot de passe doit être une chaîne comportant au minimum 8 caractères."
+        "passProp": "Le mot de passe doit être une chaîne d'au moins 8 caractères."
     },
     "webhooks": {
         "areYouSureDel": "Êtes-vous sûr de vouloir supprimer ce webhook ?",
