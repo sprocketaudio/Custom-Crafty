@@ -219,23 +219,25 @@
             if ($("#ba").val() === "0") {
                 let payload = { "category": $("#server_jar").val(), "type": $("#server_type").val(), "version": $("#server").val() }
                 let formDataJsonString = JSON.stringify(payload);
-                let res = await fetch(`/api/v2/servers/${serverId}/update/config/`, {
-                    method: 'PATCH',
-                    body: formDataJsonString,
-                    headers: {
-                        'X-XSRFToken': token
-                    },
-                });
-                let responseData = await res.json()
-                if (responseData.status === "ok") {
-                    $("#update-url").text(responseData.data["executable_update_url"])
-
-                } else {
-
-                    bootbox.alert({
-                        title: responseData.error,
-                        message: responseData.error_data
+                if ($("server_jar").val() && $("#server_type").va() && $("#server").val()) { //Only send the first payload if it exists
+                    let res = await fetch(`/api/v2/servers/${serverId}/update/config/`, {
+                        method: 'PATCH',
+                        body: formDataJsonString,
+                        headers: {
+                            'X-XSRFToken': token
+                        },
                     });
+                    let responseData = await res.json()
+                    if (responseData.status === "ok") {
+                        $("#update-url").text(responseData.data["executable_update_url"])
+
+                    } else {
+
+                        bootbox.alert({
+                            title: responseData.error,
+                            message: responseData.error_data
+                        });
+                    }
                 }
                 payload = { "executable": $("#executable").val() };
                 formDataJsonString = JSON.stringify(payload);
