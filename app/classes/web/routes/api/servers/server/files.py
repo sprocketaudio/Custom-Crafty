@@ -185,6 +185,21 @@ file_delete_schema = {
 
 class ApiServersServerFilesIndexHandler(BaseApiHandler):
     def post(self, server_id: str, backup_id=None):
+        """API getter method to get a directory or file. This is a post due to the
+        get methods not accepting any input.
+
+        Will accept a directory or a file in the request schema.
+
+        Args:
+            server_id (str): server id from request
+            backup_id (_type_, optional): _description_. Defaults to None.
+
+        Raises:
+            OSError: _description_
+
+        Returns:
+            _type_: _description_
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -401,6 +416,16 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 )
 
     def do_delete(self, data, auth_data, server_id):
+        """Deletes a file. Called by API request handler
+
+        Args:
+            data (_type_): API request data (already validated)
+            auth_data (_type_): API auth data (already checked)
+            server_id (_type_): API requested server ID.
+
+        Returns:
+            _type_: Error if there is one.
+        """
         # Check for absolute or relative path. Absolute paths should be deprecated
         server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
         proc = False
@@ -429,11 +454,17 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 auth_data[4]["user_id"],
                 f"Deleted item {item['filename']}",
                 server_id,
-                self.request.remote_ip,
+                self.get_remote_ip(),
             )
         return proc
 
     def delete(self, server_id: str, _backup_id=None):
+        """API request handler to delete a file or directory.
+
+        Args:
+            server_id (str): Requested server UUID.
+
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -505,6 +536,13 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         )
 
     def patch(self, server_id: str, _backup_id):
+        """Replaces content of file with request content. Usually called when editing/
+        modifying the content of a file.
+
+        Args:
+            server_id (str): Requested server UUID.
+
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -604,107 +642,26 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             "size": Helpers.human_readable_file_size(file_size),
             "modified_epoch": modified_epoch,
         }
+
+        self.controller.management.add_to_audit_log(
+            auth_data[4]["user_id"],
+            f"Edited file {data['path']}",
+            server_id,
+            self.get_remote_ip(),
+        )
         return self.finish_json(
             200, {"status": "ok", "data": {"attributes": attributes}}
         )
 
-    def put(self, server_id: str, _backup_id):
-        auth_data = self.authenticate_user()
-        if not auth_data:
-            return
-
-        if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
-            # if the user doesn't have access to the server, return an error
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "NOT_AUTHORIZED",
-                    "error_data": self.helper.translation.translate(
-                        "validators", "insufficientPerms", auth_data[4]["lang"]
-                    ),
-                },
-            )
-        mask = self.controller.server_perms.get_lowest_api_perm_mask(
-            self.controller.server_perms.get_user_permissions_mask(
-                auth_data[4]["user_id"], server_id
-            ),
-            auth_data[5],
-        )
-        server_permissions = self.controller.server_perms.get_permissions(mask)
-        if EnumPermissionsServer.FILES not in server_permissions:
-            # if the user doesn't have Files permission, return an error
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "NOT_AUTHORIZED",
-                    "error_data": self.helper.translation.translate(
-                        "validators", "insufficientPerms", auth_data[4]["lang"]
-                    ),
-                },
-            )
-        try:
-            data = json.loads(self.request.body)
-        except json.decoder.JSONDecodeError as e:
-            return self.finish_json(
-                400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
-            )
-        try:
-            validate(data, files_create_schema)
-        except ValidationError as why:
-            offending_key = ""
-            if why.schema.get("fill", None):
-                offending_key = why.path[0] if why.path else None
-            err = f"""{offending_key} {self.translator.translate(
-                "validators",
-                why.schema.get("error", "additionalProperties"),
-                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
-            )} {why.schema.get("enum", "")}"""
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "INVALID_JSON_SCHEMA",
-                    "error_data": f"{str(err)}",
-                },
-            )
-        # Check for absolute or relative path. Absolute paths should be deprecated
-        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
-        data["parent"] = self.file_helper.get_absolute_path(server_path, data["parent"])
-        path = os.path.join(data["parent"], data["name"])
-        if not Helpers.validate_traversal(
-            self.controller.servers.get_server_data_by_id(server_id)["path"],
-            path,
-        ):
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "TRAVERSAL DETECTED",
-                    "error_data": str(e),
-                },
-            )
-        if Helpers.check_path_exists(os.path.abspath(path)):
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "FILE EXISTS",
-                    "error_data": str(e),
-                },
-            )
-        if data["directory"]:
-            os.mkdir(path)
-        else:
-            # Create the file by opening it
-            with open(path, "w", encoding="utf-8") as file_object:
-                file_object.close()
-        return self.finish_json(200, {"status": "ok"})
-
 
 class ApiServersServerFilesCreateHandler(BaseApiHandler):
     def patch(self, server_id: str):
+        """Renames a file or directory.
+
+        Args:
+            server_id (str): Requested server UUID.
+
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -800,9 +757,20 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
             self.finish_json(
                 500, {"status": "error", "error": "OSERROR", "error_data": str(why)}
             )
+        self.controller.management.add_to_audit_log(
+            auth_data[4]["user_id"],
+            f"Renamed item {data['path']} to {new_item_name}",
+            server_id,
+            self.get_remote_ip(),
+        )
         return self.finish_json(200, {"status": "ok"})
 
     def put(self, server_id: str):
+        """Creates requested file or directory.
+
+        Args:
+            server_id (str): Requested server UUID.
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -894,11 +862,26 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
             # Create the file by opening it
             with open(path, "w", encoding="utf-8") as file_object:
                 file_object.close()
+        self.controller.management.add_to_audit_log(
+            auth_data[4]["user_id"],
+            f"Created item {path}",
+            server_id,
+            self.get_remote_ip(),
+        )
         return self.finish_json(200, {"status": "ok"})
 
 
 class ApiServersServerFilesZipHandler(BaseApiHandler):
     def post(self, server_id: str):
+        """Unzips a requested file.
+
+        This process will send progress updates to the user on registered webhooks under
+        the "zip_status" key.
+
+        Args:
+            server_id (str): Requested server UUID.
+
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -989,7 +972,7 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                 auth_data[4]["user_id"],
                 f"Unzipped file {target_file} in {data['folder']}",
                 server_id,
-                self.request.remote_ip,
+                self.get_remote_ip(),
             )
             return self.finish_json(200, {"status": "ok"})
 
@@ -1006,6 +989,14 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
 
 class ApiServersServerFileDownload(BaseApiHandler):
     async def get(self, server_id: str, encoded_file_path: str):
+        """Async downloads the requested file or directory.
+        If file is a directory storage is checked then it is zipped and downloaded.
+        The zip file is deleted after the download completes.
+
+        Args:
+            server_id (str): Requested server UUID.
+
+        """
         logger.debug(
             "Download file request received. server_id: %s, encoded file path: %s",
             server_id,
@@ -1129,7 +1120,7 @@ class ApiServersServerFileDownload(BaseApiHandler):
             auth_data[4]["user_id"],
             f"started file download for {download_path} from server {server_id}.",
             server_id,
-            self.request.remote_ip,
+            self.get_remote_ip(),
         )
         await self.download_file(download_path)  # Make sure to check for permissions
         # and traversal before calling download. There is no permission checking
@@ -1237,6 +1228,6 @@ class ApiServersServerFilesOperationHandler(BaseApiHandler):
                 auth_data[4]["user_id"],
                 f"{operation} item from {source_path} to {target_path}.",
                 server_id,
-                self.request.remote_ip,
+                self.get_remote_ip(),
             )
         return self.finish_json(200, {"status": "ok"})

@@ -361,7 +361,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                     auth_data[4]["user_id"],
                     f"Uploaded file {self.filename}",
                     server_id,
-                    self.request.remote_ip,
+                    self.get_remote_ip(),
                 )
                 self.finish_json(
                     200,
