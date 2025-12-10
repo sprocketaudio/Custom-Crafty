@@ -9,6 +9,46 @@
     cursor: pointer;
 }
 
+.row-select, .root-select {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--outline);
+    border-radius: 6px;
+    background: var(--deep-bg);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    margin: 0;
+}
+
+.row-select:hover, .root-select:hover {
+    border-color: var(--info);
+    background: var(--card-banner-bg);
+}
+
+.row-select:checked, .root-select:checked {
+    background: var(--info);
+    border-color: var(--info);
+}
+
+.row-select:checked::after, .root-select:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 4px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.row-select:focus, .root-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(136, 98, 224, 0.2);
+}
+
 .animated-table tbody tr {
     background: var(--ram-bg);
     border-radius: 10px;
@@ -173,6 +213,38 @@
     border-top-right-radius: 8px;
     padding: 8px 12px;
     width: 100%;
+}
+
+#table-nav-buttons .btn {
+    background: transparent;
+    border: 2px solid var(--info);
+    color: var(--info);
+    opacity: 0.85;
+    transition: all 0.2s ease;
+    font-weight: 600;
+}
+
+#table-nav-buttons .btn:hover {
+    background: var(--info);
+    color: white;
+    opacity: 1;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(136, 98, 224, 0.3);
+}
+
+#table-nav-buttons .btn:active {
+    transform: translateY(0);
+}
+
+#table-nav-buttons .btn-danger {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+#table-nav-buttons .btn-danger:hover {
+    background: var(--danger);
+    color: white;
+    box-shadow: 0 2px 6px rgba(255, 98, 88, 0.3);
 }
 
 .tree-nav {
