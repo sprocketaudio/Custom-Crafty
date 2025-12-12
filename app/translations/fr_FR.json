@@ -252,7 +252,9 @@
         "schedule_desc": "Nous avons détecté que certaines ou toutes vos tâches planifiées n’ont pas été transférées avec succès lors de la mise à jour. Veuillez vérifier vos plannings dans l’onglet tâches planifiées.",
         "accountSettings": "Paramètres du compte",
         "backup_title": "Avertissement de migration des sauvegardes",
-        "schedule_title": "Avertissement de migration des tâches planifiées"
+        "schedule_title": "Avertissement de migration des tâches planifiées",
+        "restoreFailed": "Échec de la restauration de la sauvegarde. Impossible de supprimer les fichiers du répertoire du serveur.",
+        "restoreSuccess": "Fichiers serveur restaurés avec succès."
     },
     "offline": {
         "offline": "Hors ligne",
@@ -746,7 +748,9 @@
         "type": "Type de Webhook",
         "url": "Lien URL du Webhook",
         "webhook_body": "Corps du Webhook",
-        "webhooks": "Webhooks"
+        "webhooks": "Webhooks",
+        "documentation": "Veuillez vous reporter à cette documentation pour obtenir des informations sur les variables dynamiques.",
+        "jinja2": "Le moteur webhook de Crafty utilise Jinja2 pour le rendu dynamique des messages."
     },
     "otp": {
         "mfaWarn": "Vous devez avoir l’authentification multifacteur activée pour utiliser ce système. Veuillez créer une clé MFA. Si vous voyez ce message alors que vous avez déjà créé une clé, veuillez vous déconnecter puis vous reconnecter avec MFA.",
