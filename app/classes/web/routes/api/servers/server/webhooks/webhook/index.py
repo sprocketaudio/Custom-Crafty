@@ -276,15 +276,37 @@ class ApiServersServerWebhooksManagementIndexHandler(BaseApiHandler):
                 },
             )
         webhook = self.controller.management.get_webhook_by_id(webhook_id)
+        webhook_provider = WebhookFactory.create_provider(webhook["webhook_type"])
+        server_base_url = f"{self.helper.get_setting('base_url')}"
+        dummy_backup_url = (
+            f"https://{server_base_url}/api/v2/servers/{server_id}"
+            "/backups/backup/0683f7fb-09a2-432f-9dd6-775019f75fae/"
+            "download/2000-01-01_00-00-00.zip"
+        )
+        event_data = {
+            "server_name": self.controller.servers.get_server_data_by_id(server_id)[
+                "server_name"
+            ],
+            "server_id": server_id,
+            "command": "/say This is a test command!",
+            "event_type": "test_webhook",
+            "backup_name": "2000-01-01_00-00-00.zip",
+            "backup_size": "0MB",
+            "backup_link": dummy_backup_url,
+            "backup_status": "✅",
+            "backup_error": "[Errno 2] This Backup is not real!",
+        }
+
         try:
-            webhook_provider = WebhookFactory.create_provider(webhook["webhook_type"])
+
             webhook_provider.send(
                 server_name=self.controller.servers.get_server_data_by_id(server_id)[
                     "server_name"
                 ],
                 title=f"Test Webhook: {webhook['name']}",
                 url=webhook["url"],
-                message=webhook["body"],
+                message_template=webhook["body"],
+                event_data=event_data,
                 color=webhook["color"],  # Prestigious purple!
                 bot_name="Crafty Webhooks Tester",
             )
