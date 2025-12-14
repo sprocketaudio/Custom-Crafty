@@ -7,6 +7,7 @@ TBD
 ### Bug fixes
 - Refactor translation parsing on creation pages ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/925))
 - [`CVE-2025-14700`] Security: Prevent users being able to access unsafe builtin attributes w/ jinja expressions ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/927))
+- Fix functionality of the webhook test button ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/930))
 ### Tweaks
 - Update documentation reference url in API index ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/921))
 - Bump Orjson to 3.11.4 to resolve support for Python 3.14 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/922))
