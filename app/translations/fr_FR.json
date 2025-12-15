@@ -590,7 +590,7 @@
         "absoluteZipPath": "Chemin absolu de votre serveur",
         "addRole": "Ajouter le serveur au(x) rôle(s) existant(s)",
         "autoCreate": "Si aucun n'est sélectionné, Crafty en créera un !",
-        "bePatient": "Merci de patienter pendant que nous ' + (importing ? 'importons' :  'téléchargeons') + ' le serveur",
+        "bePatient": "Merci de patienter pendant que nous créons votre serveur",
         "buildServer": "Créer un serveur !",
         "clickRoot": "Cliquer ici pour sélectionner le dossier racine",
         "close": "Fermer",
