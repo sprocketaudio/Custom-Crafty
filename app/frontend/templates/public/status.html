@@ -210,12 +210,17 @@
           m_motd = `<img class="w-25 mr-3" src="/static/assets/images/pack.png" alt="icon" /> `;
         }
 
-        var desc_motd = `<span id="input_motd_` + server.id + `" class="input_motd align-middle">` + server.desc + `</span> <br />`;
-        m_motd = m_motd + `<div class="media-body"><span id="m_input_motd_` + server.id + `" class="input_motd align-middle">` + server.desc + `</span></div>`;
+        var desc_motd = `<span id="input_motd_` + server.id + `" class="input_motd align-middle">` + `{{ translate('serverStats', 'loadingMotd', data['lang']) }}` + `</span> <br />`;
+        m_motd = m_motd + `<div class="media-body"><span id="m_input_motd_` + server.id + `" class="input_motd align-middle">` + `{{ translate('serverStats', 'loadingMotd', data['lang']) }}` + `</span></div>`;
 
         motd = `<div class="row"><div class="col-auto">` + img_motd + `</div><div class="col-auto text-left align-items-center align-content-center">` + desc_motd + `</div></div>`;
         server_motd.innerHTML = motd;
         m_server_motd.innerHTML = m_motd;
+
+        var server_input_motd = document.getElementById('input_motd_' + server.id);
+        var m_server_input_motd = document.getElementById('m_input_motd_' + server.id);
+        server_input_motd.innerText = server.desc;
+        m_server_input_motd.innerText = server.desc;
       }
 
       /* Version */

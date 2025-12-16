@@ -24,11 +24,11 @@ var styleMap = {
 function obfuscate(string, elem) {
     var magicSpan;
     if (string.indexOf('<br>') > -1) {
-        elem.innerHTML = string;
+        elem.innerText = string;
         elem.childNodes.array.forEach(currNode => {
             if (currNode.nodeType === 3) {
                 magicSpan = document.createElement('span');
-                magicSpan.innerHTML = currNode.nodeValue;
+                magicSpan.innerText = currNode.nodeValue;
                 elem.replaceChild(magicSpan, currNode);
                 init(magicSpan);
             }
@@ -43,7 +43,7 @@ function obfuscate(string, elem) {
         obfuscators.push(window.setInterval(function () {
             if (i >= len) i = 0;
             obsStr = replaceRand(obsStr, i);
-            el.innerHTML = obsStr;
+            el.innerText = obsStr;
             i++;
         }, 0));
     }
@@ -65,7 +65,7 @@ function applyCode(string, codes) {
             obfuscated = true;
         }
     });
-    if (!obfuscated) elem.innerHTML = string;
+    if (!obfuscated) elem.innerText = string;
     return elem;
 }
 function parseStyle(string) {
