@@ -5,7 +5,7 @@ TBD
 ### Bug fixes
 TBD
 ### Tweaks
-TBD
+- Bump tornado for CVE-2025-67725 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/934))
 ### Lang
 TBD
 <br><br>
