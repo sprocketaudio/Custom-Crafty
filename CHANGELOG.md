@@ -1,4 +1,15 @@
 # Changelog
+## --- [4.7.0] - 2025/TBD
+### New features
+TBD
+### Bug fixes
+TBD
+### Tweaks
+TBD
+### Lang
+TBD
+<br><br>
+
 ## --- [4.6.2] - 2025/12/15
 ## NOTE From this version onwards, Python 3.9 will no longer work with Crafty
 
