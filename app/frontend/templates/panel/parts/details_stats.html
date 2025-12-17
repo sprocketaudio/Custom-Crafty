@@ -200,7 +200,7 @@
 
     if (server.version) {
       server_version.innerHTML = server.version;
-      server_input_motd.innerHTML = server.desc;
+      server_input_motd.innerText = server.desc;
     }
     else {
       server_version.innerHTML = `{{ translate('serverStats', 'unableToConnect', data['lang']) }}`;
