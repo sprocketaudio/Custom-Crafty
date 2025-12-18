@@ -1630,6 +1630,8 @@ class PanelHandler(BaseHandler):
 
         elif page == "wiki":
             template = "panel/wiki.html"
+        elif page == "edit_file":
+            template = "panel/server_file_edit.html"
         if self.helper.crafty_starting:
             template = "panel/loading.html"
         self.render(

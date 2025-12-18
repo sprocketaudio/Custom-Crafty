@@ -143,15 +143,19 @@ class ApiFilesUploadHandler(BaseApiHandler):
                 400, {"status": "error", "error": "TYPE ERROR", "error_data": {why}}
             )
         self.chunk_index = self.request.headers.get("chunkId")
-        if u_type == "server_upload":
-            self.upload_dir = self.request.headers.get("location", None)
         self.temp_dir = os.path.join(self.controller.project_root, "temp", self.file_id)
 
         if u_type == "server_upload":
-            # If this is an upload from a server the path will be what
-            # Is requested
+            # Check for absolute or relative path. Absolute paths should be deprecated
+            self.upload_dir = self.request.headers.get("location", None)
+            # Check for absolute or relative path. Absolute paths should be deprecated
+            server_path = self.controller.servers.get_server_data_by_id(server_id)[
+                "path"
+            ]
+            self.upload_dir = self.file_helper.get_absolute_path(
+                server_path, self.upload_dir
+            )
             full_path = os.path.join(self.upload_dir, self.filename)
-
             # Check to make sure the requested path is inside the server's directory
             if not self.helper.is_subdir(
                 full_path,
@@ -316,6 +320,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                                 "cur_file": i,
                                 "total_files": total_chunks,
                                 "type": u_type,
+                                "file_id": self.file_id,
                             },
                         )
                         chunk_file = os.path.join(
@@ -356,7 +361,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                     auth_data[4]["user_id"],
                     f"Uploaded file {self.filename}",
                     server_id,
-                    self.request.remote_ip,
+                    self.get_remote_ip(),
                 )
                 self.finish_json(
                     200,

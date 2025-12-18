@@ -18,12 +18,15 @@ from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile
 
 import certifi
 
+from app.classes.models.server_permissions import PermissionsServers
 from app.classes.helpers.cryptography_helper import CryptoHelper
 from app.classes.helpers.helpers import Helpers
 from app.classes.shared.console import Console
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
+
+PLAIN_TEXT = "text/plain"
 
 
 class FileHelpers:
@@ -35,6 +38,40 @@ class FileHelpers:
     def __init__(self, helper):
         self.helper: Helpers = helper
         self.mime_types = mimetypes.MimeTypes()
+        self.add_mime_types()  # Add to account for yml, conf, properties, etc
+        self.text_mime_prefixes = [
+            "text/",
+            "application/json",
+            "application/xml",
+            "application/javascript",
+            "text/x-shellscript",
+            "application/x-shellscript",
+            "text/x-sh",
+            "application/x-sh",
+            "text/x-bat",
+            "application/x-bat",
+            "text/x-log",
+        ]
+
+    def add_mime_types(self):
+        # Extend the default list
+        mimetypes.add_type("text/yaml", ".yml")
+        mimetypes.add_type("text/yaml", ".yaml")
+        mimetypes.add_type("text/toml", ".toml")
+        mimetypes.add_type(PLAIN_TEXT, ".ini")
+        mimetypes.add_type(PLAIN_TEXT, ".conf")
+        mimetypes.add_type(PLAIN_TEXT, ".properties")
+        mimetypes.add_type(PLAIN_TEXT, ".env")
+        mimetypes.add_type("application/x-bat", ".ps1")
+        mimetypes.add_type("text/x-log", ".log")
+
+    def probably_can_open_file(self, path: str) -> tuple:
+        mime = mimetypes.guess_type(path)
+        if str(mime[0]).startswith("text/"):
+            return (True, mime[0])
+        if mime[0] in self.text_mime_prefixes:
+            return (True, mime[0])
+        return (False, mime[0])
 
     @staticmethod
     def ssl_get_file(  # pylint: disable=too-many-positional-arguments
@@ -422,7 +459,27 @@ class FileHelpers:
         with zipfile.ZipFile(archive_location, "r") as zip_ref:
             zip_ref.extractall(destination)
 
-    def unzip_file(self, zip_path, server_update: bool = False) -> None:
+    def cleanup_unzip(self, temp_dir: Path, server_update: bool, new_dir: Path):
+        ignored_names = [
+            "server.properties",
+            "permissions.json",
+            "allowlist.json",
+        ]
+        # we'll iterate through the top level directory moving everything
+        # out of the temp directory and into it's final home.
+        for item in os.listdir(temp_dir):
+            # if the file is one of our ignored names we'll skip it
+            if item in ignored_names and server_update:
+                continue
+            # we handle files and dirs differently or we'll crash out.
+            try:
+                self.move_item_file_or_dir(temp_dir, new_dir, item)
+            except shutil.Error as ex:
+                logger.error(f"ERROR IN ZIP IMPORT: {ex}")
+
+    def unzip_file(
+        self, zip_path, server_id, server_update: bool = False, proc_id=None
+    ) -> None:
         """
         Unzips zip file at zip_path to location generated at new_dir based on zip
         contents.
@@ -435,11 +492,7 @@ class FileHelpers:
         Returns: None
 
         """
-        ignored_names = [
-            "server.properties",
-            "permissions.json",
-            "allowlist.json",
-        ]
+        server_users = PermissionsServers.get_server_user_list(server_id)
         # Get directory without zipfile name
         new_dir = pathlib.Path(zip_path).parents[0]
         # make sure we're able to access the zip file
@@ -451,20 +504,43 @@ class FileHelpers:
             try:
                 with zipfile.ZipFile(zip_path, "r") as zip_ref:
                     # we'll extract this to the temp dir using zipfile module
-                    zip_ref.extractall(temp_dir)
-                # we'll iterate through the top level directory moving everything
-                # out of the temp directory and into it's final home.
-                for item in os.listdir(temp_dir):
-                    # if the file is one of our ignored names we'll skip it
-                    if item in ignored_names and server_update:
-                        continue
-                    # we handle files and dirs differently or we'll crash out.
-                    try:
-                        self.move_item_file_or_dir(temp_dir, new_dir, item)
-                    except shutil.Error as ex:
-                        logger.error(f"ERROR IN ZIP IMPORT: {ex}")
+                    files_list = zip_ref.namelist()
+                    for idx, file in enumerate(files_list):
+                        percent = round((idx / len(files_list)) * 100)
+                        zip_ref.extract(file, temp_dir)
+                        for user in server_users:
+                            WebSocketManager().broadcast_user(
+                                user,
+                                "zip_status",
+                                {"id": proc_id, "percent": percent, "complete": False},
+                            )
+                self.cleanup_unzip(Path(temp_dir), server_update, new_dir)
+                for user in server_users:
+                    WebSocketManager().broadcast_user(
+                        user,
+                        "zip_status",
+                        {"id": proc_id, "percent": 100, "complete": True},
+                    )
             except Exception as ex:
                 Console.error(ex)
+
+    @staticmethod
+    def get_absolute_path(server_path, path) -> str:
+        """Takes requested path and returns absolute path
+
+        Args:
+            server_id (str): requested server's ID
+            server_path (str): requested server's root path
+            path (str | path): requested file path
+
+        Returns:
+            _type_: Path
+        """
+        request_path = path
+        if not Path(path).is_absolute():
+            path = str(Path(server_path, request_path))
+
+        return str(path)
 
     @staticmethod
     def unzip_server(zip_path, user_id):

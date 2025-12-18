@@ -2,7 +2,10 @@ import os
 import logging
 import json
 import html
-from pathlib import Path
+import threading
+from shutil import Error as shutilError
+from datetime import datetime
+from pathlib import Path, PurePath
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
@@ -12,6 +15,7 @@ from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.web.base_api_handler import BaseApiHandler
 
 logger = logging.getLogger(__name__)
+HUMAN_TIME_FORMAT = "%Y/%m/%d %H:%M"
 
 files_get_schema = {
     "type": "object",
@@ -27,7 +31,13 @@ files_get_schema = {
             "error": "typeString",
             "fill": True,
         },
+        "modified_epoch": {
+            "type": "number",
+            "error": "typeEpoch",
+            "fill": True,
+        },
     },
+    "required": ["path"],
     "additionalProperties": False,
     "minProperties": 1,
 }
@@ -45,7 +55,18 @@ files_patch_schema = {
             "error": "typeString",
             "fill": True,
         },
+        "modified_epoch": {
+            "type": "number",
+            "error": "typeEpoch",
+            "fill": True,
+        },
+        "overwrite": {
+            "type": "boolean",
+            "error": "typeBoolean",
+            "fill": True,
+        },
     },
+    "required": ["path", "contents"],
     "additionalProperties": False,
     "minProperties": 1,
 }
@@ -58,9 +79,43 @@ files_unzip_schema = {
             "error": "typeString",
             "fill": True,
         },
+        "proc_id": {
+            "type": "string",
+            "desc": "uuid",
+            "error": "typeString",
+            "fill": True,
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,
+}
+
+files_operation_schema = {
+    "type": "object",
+    "properties": {
+        "file_system_objects": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "source_path": {
+                        "type": "string",
+                        "error": "typeString",
+                        "fill": True,
+                    },
+                    "target_path": {
+                        "type": "string",
+                        "error": "typeString",
+                        "fill": True,
+                    },
+                },
+                "required": ["source_path", "target_path"],
+                "additionalProperties": False,
+            },
+        }
+    },
+    "required": ["file_system_objects"],
+    "additionalProperties": False,
 }
 
 files_create_schema = {
@@ -107,20 +162,44 @@ files_rename_schema = {
 file_delete_schema = {
     "type": "object",
     "properties": {
-        "filename": {
-            "type": "string",
-            "minLength": 5,
-            "error": "typeString",
-            "fill": True,
-        },
+        "file_system_objects": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "filename": {
+                        "type": "string",
+                        "error": "typeString",
+                        "fill": True,
+                    },
+                },
+                "required": ["filename"],
+                "additionalProperties": False,
+            },
+        }
     },
+    "required": ["file_system_objects"],
     "additionalProperties": False,
-    "minProperties": 1,
 }
 
 
 class ApiServersServerFilesIndexHandler(BaseApiHandler):
     def post(self, server_id: str, backup_id=None):
+        """API getter method to get a directory or file. This is a post due to the
+        get methods not accepting any input.
+
+        Will accept a directory or a file in the request schema.
+
+        Args:
+            server_id (str): server id from request
+            backup_id (_type_, optional): _description_. Defaults to None.
+
+        Raises:
+            OSError: _description_
+
+        Returns:
+            _type_: _description_
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -177,8 +256,12 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     "error_data": str(e),
                 },
             )
+        # Check for absolute or relative path. Absolute paths should be deprecated
+        request_path = data["path"]
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        data["path"] = self.file_helper.get_absolute_path(server_path, data["path"])
         if not Helpers.validate_traversal(
-            self.controller.servers.get_server_data_by_id(server_id)["path"],
+            server_path,
             data["path"],
         ):
             return self.finish_json(
@@ -189,14 +272,21 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     "error_data": str(e),
                 },
             )
+        parent_modified = Path(data["path"]).stat().st_mtime
+        if data.get("modified_epoch", 0.0) == parent_modified:
+            # If the requested directory has not changed we'll just return a http 304
+            self.set_status(304)
+            return self.finish()
         if os.path.isdir(data["path"]):
             # TODO: limit some columns for specific permissions?
             folder = data["path"]
             return_json = {
                 "root_path": {
+                    "local_path": request_path,
                     "path": folder,
                     "top": data["path"]
                     == self.controller.servers.get_server_data_by_id(server_id)["path"],
+                    "modified": parent_modified,
                 }
             }
 
@@ -215,6 +305,8 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 filename = html.escape(raw_filename)
                 rel = os.path.join(folder, raw_filename)
                 dpath = os.path.join(folder, filename)
+                can_open, mime = self.file_helper.probably_can_open_file(dpath)
+                modified_time = datetime.fromtimestamp(Path(dpath).stat().st_mtime)
                 if backup_id:
                     if str(
                         dpath
@@ -226,10 +318,15 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                                 "excluded": True,
                             }
                         else:
+                            try:
+                                file_size = os.path.getsize(rel)
+                            except (OSError, IOError):
+                                file_size = 0
                             return_json[filename] = {
                                 "path": dpath,
                                 "dir": False,
                                 "excluded": True,
+                                "size": Helpers.human_readable_file_size(file_size),
                             }
                     else:
                         if os.path.isdir(rel):
@@ -239,37 +336,135 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                                 "excluded": False,
                             }
                         else:
+                            try:
+                                file_size = os.path.getsize(rel)
+                            except (OSError, IOError):
+                                file_size = 0
                             return_json[filename] = {
                                 "path": dpath,
                                 "dir": False,
                                 "excluded": False,
+                                "size": Helpers.human_readable_file_size(file_size),
                             }
                 else:
                     if os.path.isdir(rel):
                         return_json[filename] = {
-                            "path": dpath,
+                            "path": str(
+                                PurePath.relative_to(
+                                    PurePath(dpath), PurePath(server_path)
+                                )
+                            ),
                             "dir": True,
                             "excluded": False,
+                            "modified": modified_time.strftime(HUMAN_TIME_FORMAT),
                         }
                     else:
+                        try:
+                            file_size = os.path.getsize(rel)
+                        except (OSError, IOError):
+                            file_size = 0
                         return_json[filename] = {
-                            "path": dpath,
+                            "path": str(
+                                PurePath.relative_to(
+                                    PurePath(dpath), PurePath(server_path)
+                                )
+                            ),
                             "dir": False,
                             "excluded": False,
+                            "can_open": can_open,
+                            "mime": mime,
+                            "modified": modified_time.strftime(HUMAN_TIME_FORMAT),
+                            "size": Helpers.human_readable_file_size(file_size),
                         }
             self.finish_json(200, {"status": "ok", "data": return_json})
         else:
             try:
-                with open(data["path"], encoding="utf-8") as file:
-                    file_contents = file.read()
-            except UnicodeDecodeError as ex:
+                if Path(data["path"]).is_file():
+                    can_open, mime = self.file_helper.probably_can_open_file(
+                        data["path"]
+                    )
+                    modified_epoch = Path(data["path"]).stat().st_mtime
+                    modified_time = datetime.fromtimestamp(modified_epoch)
+                    try:
+                        file_size = os.path.getsize(data["path"])
+                    except (OSError, IOError):
+                        file_size = 0
+                    attributes = {
+                        "mime": mime,
+                        "modified": modified_time.strftime(HUMAN_TIME_FORMAT),
+                        "size": Helpers.human_readable_file_size(file_size),
+                        "modified_epoch": modified_epoch,
+                    }
+                    with open(data["path"], encoding="utf-8") as file:
+                        file_contents = file.read()
+                    self.finish_json(
+                        200,
+                        {
+                            "status": "ok",
+                            "data": {
+                                "content": file_contents,
+                                "attributes": attributes,
+                            },
+                        },
+                    )
+                else:
+                    raise OSError("Item is not a valid File")
+            except (UnicodeDecodeError, OSError) as ex:
                 self.finish_json(
                     400,
                     {"status": "error", "error": "DECODE_ERROR", "error_data": str(ex)},
                 )
-            self.finish_json(200, {"status": "ok", "data": file_contents})
+
+    def do_delete(self, data, auth_data, server_id):
+        """Deletes a file. Called by API request handler
+
+        Args:
+            data (_type_): API request data (already validated)
+            auth_data (_type_): API auth data (already checked)
+            server_id (_type_): API requested server ID.
+
+        Returns:
+            _type_: Error if there is one.
+        """
+        # Check for absolute or relative path. Absolute paths should be deprecated
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        proc = False
+        for item in data["file_system_objects"]:
+            filename = self.file_helper.get_absolute_path(server_path, item["filename"])
+            if (
+                not Helpers.validate_traversal(
+                    self.controller.servers.get_server_data_by_id(server_id)["path"],
+                    filename,
+                )
+                or filename == server_path
+            ):
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "TRAVERSAL DETECTED",
+                        "error_data": str("Traversal"),
+                    },
+                )
+            if os.path.isdir(filename):
+                proc = FileHelpers.del_dirs(filename)
+            else:
+                proc = FileHelpers.del_file(filename)
+            self.controller.management.add_to_audit_log(
+                auth_data[4]["user_id"],
+                f"Deleted item {item['filename']}",
+                server_id,
+                self.get_remote_ip(),
+            )
+        return proc
 
     def delete(self, server_id: str, _backup_id=None):
+        """API request handler to delete a file or directory.
+
+        Args:
+            server_id (str): Requested server UUID.
+
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -330,23 +525,8 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
-        if not Helpers.validate_traversal(
-            self.controller.servers.get_server_data_by_id(server_id)["path"],
-            data["filename"],
-        ):
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "TRAVERSAL DETECTED",
-                    "error_data": str(e),
-                },
-            )
 
-        if os.path.isdir(data["filename"]):
-            proc = FileHelpers.del_dirs(data["filename"])
-        else:
-            proc = FileHelpers.del_file(data["filename"])
+        proc = self.do_delete(data, auth_data, server_id)
         # disabling pylint because return value could be truthy
         # but not a true boolean value
         if proc == True:  # pylint: disable=singleton-comparison
@@ -356,6 +536,13 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         )
 
     def patch(self, server_id: str, _backup_id):
+        """Replaces content of file with request content. Usually called when editing/
+        modifying the content of a file.
+
+        Args:
+            server_id (str): Requested server UUID.
+
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -416,6 +603,9 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
+        # Check for absolute or relative path. Absolute paths should be deprecated
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        data["path"] = self.file_helper.get_absolute_path(server_path, data["path"])
         if not Helpers.validate_traversal(
             self.controller.servers.get_server_data_by_id(server_id)["path"],
             data["path"],
@@ -430,105 +620,48 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             )
         file_path = Helpers.get_os_understandable_path(data["path"])
         file_contents = data["contents"]
+        if Path(data["path"]).stat().st_mtime > data.get(
+            "modified_epoch", 1.5
+        ) and not data.get("overwrite"):
+            self.set_status(409)
+            return self.finish()
         # Open the file in write mode and store the content in file_object
         with open(file_path, "w", encoding="utf-8") as file_object:
             file_object.write(file_contents)
-        return self.finish_json(200, {"status": "ok"})
 
-    def put(self, server_id: str, _backup_id):
-        auth_data = self.authenticate_user()
-        if not auth_data:
-            return
+        # Update file details
+        modified_epoch = Path(data["path"]).stat().st_mtime
+        modified_time = datetime.fromtimestamp(modified_epoch)
+        try:
+            file_size = os.path.getsize(data["path"])
+        except (OSError, IOError):
+            file_size = 0
+        attributes = {
+            "mime": self.file_helper.check_mime_types(data["path"]),
+            "modified": modified_time.strftime(HUMAN_TIME_FORMAT),
+            "size": Helpers.human_readable_file_size(file_size),
+            "modified_epoch": modified_epoch,
+        }
 
-        if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
-            # if the user doesn't have access to the server, return an error
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "NOT_AUTHORIZED",
-                    "error_data": self.helper.translation.translate(
-                        "validators", "insufficientPerms", auth_data[4]["lang"]
-                    ),
-                },
-            )
-        mask = self.controller.server_perms.get_lowest_api_perm_mask(
-            self.controller.server_perms.get_user_permissions_mask(
-                auth_data[4]["user_id"], server_id
-            ),
-            auth_data[5],
+        self.controller.management.add_to_audit_log(
+            auth_data[4]["user_id"],
+            f"Edited file {data['path']}",
+            server_id,
+            self.get_remote_ip(),
         )
-        server_permissions = self.controller.server_perms.get_permissions(mask)
-        if EnumPermissionsServer.FILES not in server_permissions:
-            # if the user doesn't have Files permission, return an error
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "NOT_AUTHORIZED",
-                    "error_data": self.helper.translation.translate(
-                        "validators", "insufficientPerms", auth_data[4]["lang"]
-                    ),
-                },
-            )
-        try:
-            data = json.loads(self.request.body)
-        except json.decoder.JSONDecodeError as e:
-            return self.finish_json(
-                400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
-            )
-        try:
-            validate(data, files_create_schema)
-        except ValidationError as why:
-            offending_key = ""
-            if why.schema.get("fill", None):
-                offending_key = why.path[0] if why.path else None
-            err = f"""{offending_key} {self.translator.translate(
-                "validators",
-                why.schema.get("error", "additionalProperties"),
-                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
-            )} {why.schema.get("enum", "")}"""
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "INVALID_JSON_SCHEMA",
-                    "error_data": f"{str(err)}",
-                },
-            )
-        path = os.path.join(data["parent"], data["name"])
-        if not Helpers.validate_traversal(
-            self.controller.servers.get_server_data_by_id(server_id)["path"],
-            path,
-        ):
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "TRAVERSAL DETECTED",
-                    "error_data": str(e),
-                },
-            )
-        if Helpers.check_path_exists(os.path.abspath(path)):
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "FILE EXISTS",
-                    "error_data": str(e),
-                },
-            )
-        if data["directory"]:
-            os.mkdir(path)
-        else:
-            # Create the file by opening it
-            with open(path, "w", encoding="utf-8") as file_object:
-                file_object.close()
-        return self.finish_json(200, {"status": "ok"})
+        return self.finish_json(
+            200, {"status": "ok", "data": {"attributes": attributes}}
+        )
 
 
 class ApiServersServerFilesCreateHandler(BaseApiHandler):
     def patch(self, server_id: str):
+        """Renames a file or directory.
+
+        Args:
+            server_id (str): Requested server UUID.
+
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -589,7 +722,9 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
-        path = data["path"]
+        # Check for absolute or relative path. Absolute paths should be deprecated
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        path = self.file_helper.get_absolute_path(server_path, data["path"])
         new_item_name = data["new_name"]
         new_item_path = os.path.join(os.path.split(path)[0], new_item_name)
         if not Helpers.validate_traversal(
@@ -616,11 +751,26 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
                     "error_data": {},
                 },
             )
-
-        os.rename(path, new_item_path)
+        try:
+            os.rename(path, new_item_path)
+        except OSError as why:
+            self.finish_json(
+                500, {"status": "error", "error": "OSERROR", "error_data": str(why)}
+            )
+        self.controller.management.add_to_audit_log(
+            auth_data[4]["user_id"],
+            f"Renamed item {data['path']} to {new_item_name}",
+            server_id,
+            self.get_remote_ip(),
+        )
         return self.finish_json(200, {"status": "ok"})
 
     def put(self, server_id: str):
+        """Creates requested file or directory.
+
+        Args:
+            server_id (str): Requested server UUID.
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -681,7 +831,10 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
-        path = os.path.join(data["parent"], data["name"])
+        # Check for absolute or relative path. Absolute paths should be deprecated
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        file_path = self.file_helper.get_absolute_path(server_path, data["parent"])
+        path = os.path.join(file_path, data["name"])
         if not Helpers.validate_traversal(
             self.controller.servers.get_server_data_by_id(server_id)["path"],
             path,
@@ -700,7 +853,7 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
                 {
                     "status": "error",
                     "error": "FILE EXISTS",
-                    "error_data": str(e),
+                    "error_data": "Item already exists in file tree",
                 },
             )
         if data["directory"]:
@@ -709,11 +862,26 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
             # Create the file by opening it
             with open(path, "w", encoding="utf-8") as file_object:
                 file_object.close()
+        self.controller.management.add_to_audit_log(
+            auth_data[4]["user_id"],
+            f"Created item {path}",
+            server_id,
+            self.get_remote_ip(),
+        )
         return self.finish_json(200, {"status": "ok"})
 
 
 class ApiServersServerFilesZipHandler(BaseApiHandler):
     def post(self, server_id: str):
+        """Unzips a requested file.
+
+        This process will send progress updates to the user on registered webhooks under
+        the "zip_status" key.
+
+        Args:
+            server_id (str): Requested server UUID.
+
+        """
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -774,11 +942,14 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
-        folder = data["folder"]
+
+        # Check for absolute or relative path. Absolute paths should be deprecated
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        target_file = self.file_helper.get_absolute_path(server_path, data["folder"])
         user_id = auth_data[4]["user_id"]
         if not Helpers.validate_traversal(
             self.controller.servers.get_server_data_by_id(server_id)["path"],
-            folder,
+            target_file,
         ):
             return self.finish_json(
                 400,
@@ -788,23 +959,44 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                     "error_data": str(e),
                 },
             )
-        if Helpers.check_file_exists(folder):
-            folder = self.file_helper.unzip_file(folder)
-        else:
-            if user_id:
-                return self.finish_json(
-                    400,
-                    {
-                        "status": "error",
-                        "error": "FILE_DOES_NOT_EXIST",
-                        "error_data": str(e),
-                    },
-                )
-        return self.finish_json(200, {"status": "ok"})
+        if Helpers.check_file_exists(target_file):
+            unzip_thread = threading.Thread(
+                target=self.file_helper.unzip_file,
+                daemon=True,
+                args=(target_file, server_id),
+                kwargs={"proc_id": data.get("proc_id")},
+                name=f"{target_file}_unzip",
+            )
+            unzip_thread.start()
+            self.controller.management.add_to_audit_log(
+                auth_data[4]["user_id"],
+                f"Unzipped file {target_file} in {data['folder']}",
+                server_id,
+                self.get_remote_ip(),
+            )
+            return self.finish_json(200, {"status": "ok"})
+
+        if user_id:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "FILE_DOES_NOT_EXIST",
+                    "error_data": str(e),
+                },
+            )
 
 
 class ApiServersServerFileDownload(BaseApiHandler):
     async def get(self, server_id: str, encoded_file_path: str):
+        """Async downloads the requested file or directory.
+        If file is a directory storage is checked then it is zipped and downloaded.
+        The zip file is deleted after the download completes.
+
+        Args:
+            server_id (str): Requested server UUID.
+
+        """
         logger.debug(
             "Download file request received. server_id: %s, encoded file path: %s",
             server_id,
@@ -826,7 +1018,9 @@ class ApiServersServerFileDownload(BaseApiHandler):
             )
 
         filepath = html.unescape(encoded_file_path)
-        file_path = Path(filepath)
+        # Check for absolute or relative path. Absolute paths should be deprecated
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        file_path = Path(self.file_helper.get_absolute_path(server_path, filepath))
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
@@ -926,7 +1120,7 @@ class ApiServersServerFileDownload(BaseApiHandler):
             auth_data[4]["user_id"],
             f"started file download for {download_path} from server {server_id}.",
             server_id,
-            self.request.remote_ip,
+            self.get_remote_ip(),
         )
         await self.download_file(download_path)  # Make sure to check for permissions
         # and traversal before calling download. There is no permission checking
@@ -935,3 +1129,105 @@ class ApiServersServerFileDownload(BaseApiHandler):
             os.remove(download_path)
 
         return None
+
+
+class ApiServersServerFilesOperationHandler(BaseApiHandler):
+    def do_operation(self, operation: str, source_path: Path, target_file: Path):
+        if operation == "move":
+            if Path(source_path).is_dir():
+                FileHelpers.move_dir(source_path, target_file)
+            else:
+                FileHelpers.move_file(source_path, target_file)
+        elif operation == "copy":
+            if Path(source_path).is_dir():
+                FileHelpers.copy_dir(source_path, target_file)
+            else:
+                FileHelpers.copy_file(source_path, target_file)
+
+    def post(self, server_id: str, operation: str):
+        auth_data = self.authenticate_user()
+        if not auth_data:
+            return
+
+        if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
+            # if the user doesn't have access to the server, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
+                auth_data[4]["user_id"], server_id
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.FILES not in server_permissions:
+            # if the user doesn't have Files permission, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
+        try:
+            data = json.loads(self.request.body)
+        except json.decoder.JSONDecodeError as e:
+            return self.finish_json(
+                400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
+            )
+        try:
+            validate(data, files_operation_schema)
+        except ValidationError as why:
+            offending_key = ""
+            if why.schema.get("fill", None):
+                offending_key = why.path[0] if why.path else None
+            err = f"""{offending_key} {self.translator.translate(
+                "validators",
+                why.schema.get("error", "additionalProperties"),
+                self.controller.users.get_user_lang_by_id(auth_data[4]["user_id"]),
+            )} {why.schema.get("enum", "")}"""
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "INVALID_JSON_SCHEMA",
+                    "error_data": f"{str(err)}",
+                },
+            )
+
+        # Check for absolute or relative path. Absolute paths should be deprecated
+        server_path = self.controller.servers.get_server_data_by_id(server_id)["path"]
+        for item in data["file_system_objects"]:
+            source_path = Path(
+                self.file_helper.get_absolute_path(server_path, item["source_path"])
+            )
+            target_path = Path(
+                self.file_helper.get_absolute_path(
+                    server_path,
+                    Path(item["target_path"], Path(source_path).name),
+                )
+            )
+            try:
+                self.do_operation(operation, source_path, target_path)
+            except shutilError as why:
+                return self.finish_json(
+                    500, {"status": "error", "error": "OSERROR", "error_data": str(why)}
+                )
+            self.controller.management.add_to_audit_log(
+                auth_data[4]["user_id"],
+                f"{operation} item from {source_path} to {target_path}.",
+                server_id,
+                self.get_remote_ip(),
+            )
+        return self.finish_json(200, {"status": "ok"})
