@@ -543,14 +543,13 @@ class FileHelpers:
         return str(path)
 
     @staticmethod
-    def unzip_server(zip_path, user_id):
+    def unzip_server(zip_path: Path, target_path: Path, user_id):
         if Helpers.check_file_perms(zip_path):
-            temp_dir = tempfile.mkdtemp()
             with zipfile.ZipFile(zip_path, "r") as zip_ref:
                 # extracts archive to temp directory
-                zip_ref.extractall(temp_dir)
+                zip_ref.extractall(target_path)
             if user_id:
-                return temp_dir
+                return target_path
 
     @staticmethod
     def get_chunk_path_from_hash(chunk_hash: bytes, repository_location: Path) -> Path:
