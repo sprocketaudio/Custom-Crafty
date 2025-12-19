@@ -4,7 +4,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 {% block content %}
 <link rel="stylesheet" href="../../static/assets/css/vendors/bootstrap-select-1.13.18.css">
-<div class="content-wrapper" id="creation-wrapper" 
+<div class="content-wrapper" id="creation-wrapper"
   data-importing="{{translate('serverWizard', 'importing', data['lang'])}}"
   data-downloading="{{translate('serverWizard', 'downloading', data['lang'])}}"
   data-bePatient="{{translate('serverWizard', 'bePatient', data['lang'])}}"
@@ -41,14 +41,20 @@
                 {% end %}
                 <div class="form-group">
                   <label for="server_name">{{ translate('serverWizard', 'serverName', data['lang']) }}</label>
-                  <input type="text" class="form-control" id="server_name" name="name" placeholder="{{ translate('serverWizard', 'myNewServer', data['lang']) }}" required>
+                  <input type="text" class="form-control" id="server_name" name="name"
+                    placeholder="{{ translate('serverWizard', 'myNewServer', data['lang']) }}" required>
                 </div>
 
                 <div class="form-group">
                   <p class="mb-0 p-0" aria-expanded="true">{{ translate('serverWizard', 'addRole', data['lang']) }}
                     <small class="text-none"> - {{ translate('serverWizard', 'autoCreate', data['lang']) }}</small>
                   </p>
-                  <select data-container="body" data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}" data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}" class="selectpicker form-control form-control-lg select-css roles_select" data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles" multiple>
+                  <select data-container="body"
+                    data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
+                    data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
+                    class="selectpicker form-control form-control-lg select-css roles_select"
+                    data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles"
+                    multiple>
                     {% for r in data['roles'] %}
                     <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
                       &nbsp; {{ r['role_name'].capitalize() }}
@@ -64,13 +70,16 @@
               </fieldset>
               {% if not data["server_api"] and data["online"] %}
               <div class="api-alert">
-                <p><i class="fas fa-exclamation-triangle"></i>&nbsp;{{ translate('error', 'bedrockError', data['lang']) }}<a href="https://status.craftycontrol.com/status/craftycontrol" target="_blank" rel="noopener noreferrer">&nbsp;{{ translate('error', 'craftyStatus', data['lang']) }}</a>
+                <p><i class="fas fa-exclamation-triangle"></i>&nbsp;{{ translate('error', 'bedrockError', data['lang'])
+                  }}<a href="https://status.craftycontrol.com/status/craftycontrol" target="_blank"
+                    rel="noopener noreferrer">&nbsp;{{ translate('error', 'craftyStatus', data['lang']) }}</a>
                   &nbsp;{{ translate('error', 'serverJars2', data['lang']) }}</p>
               </div>
               {% end %}
               {% if not data["online"] %}
               <div class="api-alert">
-                <p><i class="fas fa-exclamation-triangle"></i>&nbsp;{{ translate('error', 'noInternet', data['lang']) }}</p>
+                <p><i class="fas fa-exclamation-triangle"></i>&nbsp;{{ translate('error', 'noInternet', data['lang']) }}
+                </p>
               </div>
               {% end %}
         </div>
@@ -89,7 +98,8 @@
 
             <div class="form-group">
               <label for="server_name">{{ translate('serverWizard', 'serverName', data['lang']) }}</label>
-              <input type="text" class="form-control" id="server_name" name="name" value="" placeholder="{{ translate('serverWizard', 'myNewServer', data['lang']) }}" required>
+              <input type="text" class="form-control" id="server_name" name="name" value=""
+                placeholder="{{ translate('serverWizard', 'myNewServer', data['lang']) }}" required>
             </div>
 
             <div class="form-group">
@@ -101,7 +111,8 @@
                     'labelZipFile', data['lang']) }}</label>
                 </div>
                 <div class="input-group-append">
-                  <button type="button" class="btn btn-info upload-button" id="upload-button" onclick="uploadFile('import')" disabled>{{ translate('serverWizard',
+                  <button type="button" class="btn btn-info upload-button" id="upload-button"
+                    onclick="uploadFile('import')" disabled>{{ translate('serverWizard',
                     'uploadButton', data['lang']) }}</button>
                 </div>
               </div>
@@ -118,17 +129,20 @@
 
               <div class="form-group">
                 <label for="server_jar">{{ translate('serverWizard', 'serverJar', data['lang']) }}</label>
-                <input type="text" class="form-control" id="server_jar" name="server_jar" value="" placeholder="paper.jar" required>
+                <input type="text" class="form-control" id="server_jar" name="server_jar" value=""
+                  placeholder="paper.jar" required>
               </div>
 
-              <h4 class="card-title">{{ translate('serverWizard', 'quickSettings', data['lang']) }} <small class="text-none"> - {{ translate('serverWizard', 'quickSettingsDescription',
+              <h4 class="card-title">{{ translate('serverWizard', 'quickSettings', data['lang']) }} <small
+                  class="text-none"> - {{ translate('serverWizard', 'quickSettingsDescription',
                   data['lang']) }}</small></h4>
               <hr>
 
               <div class="form-group">
                 <label for="port3">{{ translate('serverWizard', 'serverPort', data['lang']) }} <small> - {{
                     translate('serverWizard', 'defaultPort', data['lang']) }}</small></label>
-                <input type="number" class="form-control" id="port4" name="port" value="19132" step="1" min="1" max="65535" required>
+                <input type="number" class="form-control" id="port4" name="port" value="19132" step="1" min="1"
+                  max="65535" required>
               </div>
 
               <div class="form-group">
@@ -137,7 +151,12 @@
                   <small class="text-none"> - {{ translate('serverWizard', 'autoCreate',
                     data['lang']) }}</small>
                 </p>
-                <select data-container="body" data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}" data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}" class="selectpicker form-control form-control-lg select-css roles_select" data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles" multiple>
+                <select data-container="body"
+                  data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
+                  data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
+                  class="selectpicker form-control form-control-lg select-css roles_select"
+                  data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles"
+                  multiple>
                   {% for r in data['roles'] %}
                   <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
                     &nbsp; {{ r['role_name'].capitalize()
@@ -146,7 +165,8 @@
                   {% end %}
                 </select>
               </div>
-              <div class="modal fade" id="dir_upload_select" tabindex="-1" role="dialog" aria-labelledby="dir_select" aria-hidden="true">
+              <div class="modal fade" id="dir_upload_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
+                aria-hidden="true">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
                     <div class="modal-header">
@@ -158,7 +178,8 @@
                     </div>
                     <div class="modal-body">
                       <div class="tree-ctx-item overflow-scroll mh-75" id="main-tree-div-upload" data-path="">
-                        <input type="radio" class="root-input" id="main-tree-input-upload" name="root_path" value="" checked>
+                        <input type="radio" class="root-input" id="main-tree-input-upload" name="root_path" value=""
+                          checked>
                         <span id="main-tree" class="files-tree-title tree-caret-down root-dir" data-path="">
                           <i class="far fa-folder"></i>
                           <i class="far fa-folder-open"></i>
@@ -176,7 +197,8 @@
                   </div>
                 </div>
               </div>
-              <button id="upload_submit" type="submit" title="You must select server root dir first" disabled class="btn btn-primary mr-2">{{ translate('serverWizard', 'importServerButton', data['lang'])
+              <button id="upload_submit" type="submit" title="You must select server root dir first" disabled
+                class="btn btn-primary mr-2">{{ translate('serverWizard', 'importServerButton', data['lang'])
                 }}</button>
               <button type="button" class="btn btn-danger mr-2 tree-reset">{{ translate('serverWizard', 'resetForm',
                 data['lang'])
@@ -239,25 +261,6 @@
 <script>
   $(".tree-reset").on("click", function () {
     location.href = "/server/bedrock_step1";
-  });
-  document.getElementById("root_files_button").addEventListener("click", function (event) {
-    if (document.forms["zip"]["server_path"].value != "") {
-      if (document.getElementById('root_files_button').classList.contains('clicked')) {
-        show_file_tree();
-        return;
-      } else {
-        document.getElementById('root_files_button').classList.add('clicked')
-      }
-      var dialog = bootbox.dialog({
-        message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
-        closeButton: false
-      });
-      setTimeout(function () {
-        getDirView();
-      }, 2000);
-    } else {
-      bootbox.alert("You must input a path before selecting this button");
-    }
   });
 </script>
 

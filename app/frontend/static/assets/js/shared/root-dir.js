@@ -19,8 +19,6 @@ function getDirView(event = false) {
         } catch {
             console.log("Well that failed");
         }
-    } else if ($("#root_files_button").hasClass("clicked")) {
-        getTreeView($("#zip_server_path").val(), true);
     } else {
         getTreeView($("#file-uploaded").val(), true, true);
     }
