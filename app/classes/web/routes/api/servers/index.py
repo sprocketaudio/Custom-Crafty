@@ -152,7 +152,7 @@ new_server_schema = {
                     "title": "Creation type",
                     "type": "string",
                     "default": "download_jar",
-                    "enum": ["download_jar", "import_server", "import_zip"],
+                    "enum": ["download_jar", "import_server"],
                     "error": "enumErr",
                     "fill": True,
                 },
@@ -244,7 +244,7 @@ new_server_schema = {
                     "properties": {
                         "existing_server_path": {
                             "title": "Server path",
-                            "description": "Absolute path to the old server",
+                            "description": "Relative path to the old in import mount",
                             "type": "string",
                             "examples": ["/var/opt/server"],
                             "minLength": 1,
@@ -254,83 +254,6 @@ new_server_schema = {
                         "jarfile": {
                             "title": "JAR file",
                             "description": "The JAR file relative to the previous path",
-                            "type": "string",
-                            "examples": ["paper.jar", "jars/vanilla-1.12.jar"],
-                            "minLength": 1,
-                            "error": "typeString",
-                            "fill": True,
-                        },
-                        "mem_min": {
-                            "title": "Minimum JVM memory (in GiBs)",
-                            "type": "number",
-                            "examples": [1],
-                            "default": 1,
-                            "exclusiveMinimum": 0,
-                            "error": "typeInteger",
-                            "fill": True,
-                        },
-                        "mem_max": {
-                            "title": "Maximum JVM memory (in GiBs)",
-                            "type": "number",
-                            "examples": [2],
-                            "default": 2,
-                            "exclusiveMinimum": 0,
-                            "error": "typeInteger",
-                            "fill": True,
-                        },
-                        "server_properties_port": {
-                            "title": "Port",
-                            "type": "integer",
-                            "examples": [25565],
-                            "default": 25565,
-                            "minimum": 0,
-                            "error": "typeInteger",
-                            "fill": True,
-                        },
-                        "agree_to_eula": {
-                            "title": "Agree to the EULA",
-                            "type": "boolean",
-                            "default": False,
-                            "error": "typeBool",
-                            "fill": True,
-                        },
-                    },
-                },
-                "import_zip_create_data": {
-                    "title": "Import ZIP server data",
-                    "type": "object",
-                    "error": "enumErr",
-                    "fill": True,
-                    "required": [
-                        "zip_path",
-                        "zip_root",
-                        "jarfile",
-                        "mem_min",
-                        "mem_max",
-                        "server_properties_port",
-                    ],
-                    "properties": {
-                        "zip_path": {
-                            "title": "ZIP path",
-                            "description": "Absolute path to the ZIP archive",
-                            "type": "string",
-                            "examples": ["/var/opt/server.zip"],
-                            "minLength": 1,
-                            "error": "typeString",
-                            "fill": True,
-                        },
-                        "zip_root": {
-                            "title": "Server root directory",
-                            "description": "The server root in the ZIP archive",
-                            "type": "string",
-                            "examples": ["/", "/paper-server/", "server-1"],
-                            "minLength": 1,
-                            "error": "typeString",
-                            "fill": True,
-                        },
-                        "jarfile": {
-                            "title": "JAR file",
-                            "description": "The JAR relative to the configured root",
                             "type": "string",
                             "examples": ["paper.jar", "jars/vanilla-1.12.jar"],
                             "minLength": 1,
@@ -390,12 +313,6 @@ new_server_schema = {
                             },
                             "then": {"required": ["import_server_create_data"]},
                         },
-                        {
-                            "if": {
-                                "properties": {"create_type": {"const": "import_zip"}}
-                            },
-                            "then": {"required": ["import_zip_create_data"]},
-                        },
                     ],
                 },
                 {
@@ -403,7 +320,6 @@ new_server_schema = {
                     "oneOf": [
                         {"required": ["download_jar_create_data"]},
                         {"required": ["import_server_create_data"]},
-                        {"required": ["import_zip_create_data"]},
                     ],
                 },
             ],
@@ -417,7 +333,7 @@ new_server_schema = {
                     "title": "Creation type",
                     "type": "string",
                     "default": "import_server",
-                    "enum": ["download_exe", "import_server", "import_zip"],
+                    "enum": ["download_exe", "import_server"],
                     "error": "enumErr",
                     "fill": True,
                 },
@@ -444,7 +360,7 @@ new_server_schema = {
                     "properties": {
                         "existing_server_path": {
                             "title": "Server path",
-                            "description": "Absolute path to the old server",
+                            "description": "Relative path to import directory",
                             "type": "string",
                             "examples": ["/var/opt/server"],
                             "minLength": 1,
@@ -458,52 +374,6 @@ new_server_schema = {
                             "type": "string",
                             "examples": ["bedrock_server.exe"],
                             "minlength": 1,
-                            "error": "typeString",
-                            "fill": True,
-                        },
-                        "command": {
-                            "title": "Command",
-                            "type": "string",
-                            "default": "echo foo bar baz",
-                            "examples": ["LD_LIBRARY_PATH=. ./bedrock_server"],
-                            "minLength": 1,
-                            "error": "typeString",
-                            "fill": True,
-                        },
-                    },
-                },
-                "import_zip_create_data": {
-                    "title": "Import ZIP server data",
-                    "type": "object",
-                    "error": "enumErr",
-                    "fill": True,
-                    "required": ["zip_path", "zip_root", "command"],
-                    "properties": {
-                        "zip_path": {
-                            "title": "ZIP path",
-                            "description": "Absolute path to the ZIP archive",
-                            "type": "string",
-                            "examples": ["/var/opt/server.zip"],
-                            "minLength": 1,
-                            "error": "typeString",
-                            "fill": True,
-                        },
-                        "executable": {
-                            "title": "Executable File",
-                            "description": "File Crafty should execute"
-                            "on server launch",
-                            "type": "string",
-                            "examples": ["bedrock_server.exe"],
-                            "minlength": 1,
-                            "error": "typeString",
-                            "fill": True,
-                        },
-                        "zip_root": {
-                            "title": "Server root directory",
-                            "description": "The server root in the ZIP archive",
-                            "type": "string",
-                            "examples": ["/", "/paper-server/", "server-1"],
-                            "minLength": 1,
                             "error": "typeString",
                             "fill": True,
                         },
@@ -533,12 +403,6 @@ new_server_schema = {
                         },
                         {
                             "if": {
-                                "properties": {"create_type": {"const": "import_zip"}}
-                            },
-                            "then": {"required": ["import_zip_create_data"]},
-                        },
-                        {
-                            "if": {
                                 "properties": {"create_type": {"const": "download_exe"}}
                             },
                             "then": {
@@ -553,7 +417,6 @@ new_server_schema = {
                     "title": "Only one creation data",
                     "oneOf": [
                         {"required": ["import_server_create_data"]},
-                        {"required": ["import_zip_create_data"]},
                         {"required": ["download_exe_create_data"]},
                     ],
                 },
@@ -615,7 +478,7 @@ new_server_schema = {
                     "title": "Creation type",
                     "type": "string",
                     "default": "raw_exec",
-                    "enum": ["raw_exec", "import_server", "import_zip"],
+                    "enum": ["raw_exec", "import_server"],
                     "error": "enumErr",
                     "fill": True,
                 },
@@ -644,45 +507,9 @@ new_server_schema = {
                     "properties": {
                         "existing_server_path": {
                             "title": "Server path",
-                            "description": "Absolute path to the old server",
+                            "description": "Relative path to import directory",
                             "type": "string",
                             "examples": ["/var/opt/server"],
-                            "minLength": 1,
-                            "error": "typeString",
-                            "fill": True,
-                        },
-                        "command": {
-                            "title": "Command",
-                            "type": "string",
-                            "default": "echo foo bar baz",
-                            "examples": ["caddy start"],
-                            "minLength": 1,
-                            "error": "typeString",
-                            "fill": True,
-                        },
-                    },
-                },
-                "import_zip_create_data": {
-                    "title": "Import ZIP server data",
-                    "type": "object",
-                    "error": "enumErr",
-                    "fill": True,
-                    "required": ["zip_path", "zip_root", "command"],
-                    "properties": {
-                        "zip_path": {
-                            "title": "ZIP path",
-                            "description": "Absolute path to the ZIP archive",
-                            "type": "string",
-                            "examples": ["/var/opt/server.zip"],
-                            "minLength": 1,
-                            "error": "typeString",
-                            "fill": True,
-                        },
-                        "zip_root": {
-                            "title": "Server root directory",
-                            "description": "The server root in the ZIP archive",
-                            "type": "string",
-                            "examples": ["/", "/paper-server/", "server-1"],
                             "minLength": 1,
                             "error": "typeString",
                             "fill": True,
@@ -717,12 +544,6 @@ new_server_schema = {
                             },
                             "then": {"required": ["import_server_create_data"]},
                         },
-                        {
-                            "if": {
-                                "properties": {"create_type": {"const": "import_zip"}}
-                            },
-                            "then": {"required": ["import_zip_create_data"]},
-                        },
                     ],
                 },
                 {
@@ -730,7 +551,6 @@ new_server_schema = {
                     "oneOf": [
                         {"required": ["raw_exec_create_data"]},
                         {"required": ["import_server_create_data"]},
-                        {"required": ["import_zip_create_data"]},
                     ],
                 },
             ],
