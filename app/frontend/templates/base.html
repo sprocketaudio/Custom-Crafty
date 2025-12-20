@@ -167,7 +167,7 @@
 
     //used to get cookies from browser - this is part of tornados xsrf protection - it's for extra security
     function getCookie(name) {
-      var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+      var r = document.cookie.match(String.raw`\b` + name + String.raw`=([^;]*)\b`);
       return r ? r[1] : undefined;
     }
 

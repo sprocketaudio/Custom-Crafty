@@ -136,7 +136,8 @@
         "2FAerror": "다중 인증 코드는 6자리 숫자(예: 000000)이거나, 16자 문자열을 4글자씩 하이픈(-)으로 구분한 백업 코드(예: ABCD-EFGH-IJKL-MNOP)여야 합니다.",
         "totp": "MFA 코드는 6자리 숫자여야 합니다.",
         "additionalProperties": "추가 속성을 전달할 수 없습니다",
-        "mfaName": "속성 입력은 문자열 유형과 3자 이상이어야 합니다"
+        "mfaName": "속성 입력은 문자열 유형과 3자 이상이어야 합니다",
+        "passProp": "비밀번호는 최소 길이가 8자인 문자열이어야 합니다."
     },
     "webhooks": {
         "trigger": "트리거",
@@ -161,7 +162,9 @@
         "run": "웹후크 테스트 실행",
         "send_command": "서버 명령이 수신되었습니다",
         "start_server": "서버가 시작되었습니다",
-        "stop_server": "서버가 정지되었습니다"
+        "stop_server": "서버가 정지되었습니다",
+        "documentation": "동적 변수에 대한 정보는 이 문서를 참조하시기 바랍니다.",
+        "jinja2": "Crafty의 웹훅 엔진은 동적 메시지 렌더링을 위해 Jinja2를 활용합니다."
     },
     "404": {
         "contact": "디스코드를 통해 Crafty Control 지원팀에 문의하세요",
@@ -416,7 +419,9 @@
         "schedule_desc": "업그레이드 중에 예약된 작업의 일부 또는 전부가 성공적으로 전송되지 않은 것을 발견했습니다. 스케줄 탭에서 일정을 확인하세요.",
         "schedule_title": "스케줄 마이그레이션 경고",
         "supportLogs": "지원 로그",
-        "accountSettings": "계정 설정"
+        "accountSettings": "계정 설정",
+        "restoreFailed": "백업 복원에 실패했습니다. 서버 디렉토리에서 파일을 삭제할 수 없습니다.",
+        "restoreSuccess": "서버 파일이 성공적으로 복원되었습니다."
     },
     "offline": {
         "offline": "오프라인",

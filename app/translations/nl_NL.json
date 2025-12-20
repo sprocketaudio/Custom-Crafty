@@ -238,7 +238,9 @@
         "backup_title": "Back-upmigratie Waarschuwing",
         "schedule_desc": "We hebben gedetecteerd dat sommige of alle geplande taken niet succesvol overgezet zijn tijdens de upgrade. Bevestig uw roosters in het tabblad 'Roosters'.",
         "schedule_title": "Roosters Migratiewaarschuwing",
-        "accountSettings": "Accountinstellingen"
+        "accountSettings": "Accountinstellingen",
+        "restoreFailed": "Backupherstel mislukt. Kon geen bestanden verwijderen van servermap.",
+        "restoreSuccess": "Serverbestanden succesvol hersteld."
     },
     "panelConfig": {
         "adminControls": "Admin Bediening",
@@ -565,7 +567,7 @@
         "absoluteZipPath": "Absoluut pad naar de server",
         "addRole": "Server toevoegen aan bestaande rol(len)",
         "autoCreate": "Als er niks is geselecteerd, maakt Crafty er zelf een!",
-        "bePatient": "Wees geduldig, we ' + (importing ? 'importeren' :  'downloaden') + ' de server",
+        "bePatient": "Wees geduldig terwijl we jouw server maken",
         "buildServer": "Maak server!",
         "clickRoot": "Klik hier om je root-map te selecteren",
         "close": "Sluiten",
@@ -746,7 +748,9 @@
         "type": "Webhook-type",
         "url": "Webhook-URL",
         "webhook_body": "Webhook-body",
-        "webhooks": "Webhooks"
+        "webhooks": "Webhooks",
+        "documentation": "Gelieve te refereren naar deze documentatie voor informatie betreffende dynamische variabelen.",
+        "jinja2": "De Webhook-engine van Crafty maakt gebruik van Jinja2 voor dynamische berichtrendering."
     },
     "otp": {
         "saveWarn": "Zorg ervoor dat je deze back-upcodes opslaat, anders kan je toegang verliezen",

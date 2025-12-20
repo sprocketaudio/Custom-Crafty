@@ -1,6 +1,6 @@
 from app.classes.web.base_api_handler import BaseApiHandler
 
-WIKI_API_LINK = "https://wiki.craftycontrol.com/en/4/docs/API V2"
+DOCS_API_LINK = "https://docs.craftycontrol.com/pages/developer-guide/api-reference/v2/"
 
 
 class ApiIndexHandler(BaseApiHandler):
@@ -11,7 +11,7 @@ class ApiIndexHandler(BaseApiHandler):
                 "status": "ok",
                 "data": {
                     "version": self.controller.helper.get_version_string(),
-                    "message": f"Please see the API documentation at {WIKI_API_LINK}",
+                    "message": f"Please see the API documentation at {DOCS_API_LINK}",
                 },
             },
         )

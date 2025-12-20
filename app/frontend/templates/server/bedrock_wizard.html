@@ -4,7 +4,15 @@
 <meta http-equiv="Pragma" content="no-cache">
 {% block content %}
 <link rel="stylesheet" href="../../static/assets/css/vendors/bootstrap-select-1.13.18.css">
-<div class="content-wrapper">
+<div class="content-wrapper" id="creation-wrapper" 
+  data-importing="{{translate('serverWizard', 'importing', data['lang'])}}"
+  data-downloading="{{translate('serverWizard', 'downloading', data['lang'])}}"
+  data-bePatient="{{translate('serverWizard', 'bePatient', data['lang'])}}"
+  data-eulaTitle="{{translate('error', 'eulaTitle', data['lang'])}}"
+  data-eulaMsg="{{translate('error', 'eulaMsg', data['lang'])}}"
+  data-privMsg="{{translate('error', 'privMsg', data['lang'])}}"
+  data-agree="{{translate('error', 'agree', data['lang'])}}"
+  data-cancel="{{translate('error', 'cancel', data['lang'])}}">
   <ul class="nav nav-pills tab-simple-styled " role="tablist">
     <li class="nav-item term-nav-item">
       <a class="nav-link" href="/server/step1" role="tab" aria-selected="false">
@@ -351,15 +359,15 @@
 
   function eula_confirm() {
     bootbox.confirm({
-      title: "{% raw translate('error', 'eulaTitle', data['lang']) %}",
-      message: "{% raw translate('error', 'eulaMsg', data['lang']) %}<a href='https://www.minecraft.net/en-us/eula' target='_blank'>Minecraft EULA</a>&nbsp; {% raw translate('error', 'privMsg', data['lang']) %}<a target='_blank' href='https://privacy.microsoft.com/en-us/privacystatement'>Microsoft Privacy Policy</a>",
+      title: `${$("#creation-wrapper").attr("data-eulaTitle")}`,
+      message: `${$("#creation-wrapper").attr("data-eulaMsg")}<a href='https://www.minecraft.net/en-us/eula' target='_blank'>Minecraft EULA</a>&nbsp; ${$("#creation-wrapper").attr("data-privMsg")}<a target='_blank' href='https://privacy.microsoft.com/en-us/privacystatement'>Microsoft Privacy Policy</a>`,
       buttons: {
         confirm: {
-          label: "{% raw translate('error', 'agree', data['lang']) %}",
+          label: `${$("#creation-wrapper").attr("data-agree")}`,
           className: 'btn-info'
         },
         cancel: {
-          label: "{% raw translate('error', 'cancel', data['lang']) %}",
+          label: `${$("#creation-wrapper").attr("data-cancel")}`,
           className: 'btn-secondary'
         }
       },
@@ -403,11 +411,11 @@
 
   function wait_msg(importing) {
     bootbox.alert({
-      title: importing ? '{% raw translate("serverWizard", "importing", data['lang']) %}': '{% raw translate("serverWizard", "downloading", data['lang']) %}',
-      message: '<i class="fas fa-cloud-download"></i> {% raw translate("serverWizard", "bePatient", data['lang']) %}',
+      title: importing ? `${$("#creation-wrapper").attr("data-importing")}` : `${$("#creation-wrapper").attr("data-downloading")}`,
+      message: `<i class="fas fa-cloud-download"></i> ${$("#creation-wrapper").attr("data-bePatient")}`,
+      className: "waitMsg",
     });
   }
-
   $('#file').change(function () {
     console.log("File changed");
     if ($('#file').val()) {

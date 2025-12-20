@@ -3,12 +3,20 @@ import logging
 import datetime
 import time
 import requests
-from jinja2 import Environment, BaseLoader
+from jinja2 import BaseLoader
+from jinja2.sandbox import ImmutableSandboxedEnvironment
 
 from app.classes.helpers.helpers import Helpers
 
 logger = logging.getLogger(__name__)
 helper = Helpers()
+
+
+class CraftyRestrictedEnvironment(ImmutableSandboxedEnvironment):
+    def is_safe_attribute(self, obj, attr, value):
+        if attr.startswith("_"):
+            return False
+        return super().is_safe_attribute(obj, attr, value)
 
 
 class WebhookProvider(ABC):
@@ -20,7 +28,7 @@ class WebhookProvider(ABC):
     """
 
     def __init__(self):
-        self.jinja_env = Environment(
+        self.jinja_env = CraftyRestrictedEnvironment(
             loader=BaseLoader(),
             autoescape=True,
         )

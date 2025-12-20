@@ -252,7 +252,9 @@
         "schedule_title": "计划迁移警告",
         "backup_desc": "我们检测到备份迁移可能已经部分或完全失败。请在备份选项卡中确认您的备份记录。",
         "schedule_desc": "我们检测到您的一些或全部计划任务在升级时未成功转移。请在计划选项卡中确认您的计划。",
-        "accountSettings": "账号设置"
+        "accountSettings": "账号设置",
+        "restoreFailed": "备份恢复失败。无法从服务器目录删除文件。",
+        "restoreSuccess": "服务器文件恢复成功。"
     },
     "offline": {
         "offline": "离线",
@@ -588,7 +590,7 @@
         "absoluteZipPath": "您的服务器的绝对路径",
         "addRole": "将服务器添加到现有角色",
         "autoCreate": "如果没有选择任何角色，Crafty 将会为您创建一个！",
-        "bePatient": "请耐心等待，我们正在 ' + (importing ? '导入' :  '下载') + ' 服务器",
+        "bePatient": "请耐心等待，我们正在创建您的服务器",
         "buildServer": "建立服务器！",
         "clickRoot": "点击此处来选择根目录",
         "close": "关闭",
@@ -746,7 +748,9 @@
         "type": "Webhook 类型",
         "url": "Webhook 地址",
         "webhook_body": "Webhook 消息体（Body）",
-        "webhooks": "Webhook"
+        "webhooks": "Webhook",
+        "documentation": "关于动态变量的信息，请参考此文档。",
+        "jinja2": "Crafty 的 webhook 引擎利用 Jinja2 进行动态消息渲染。"
     },
     "otp": {
         "backupOtp": "需要一个新的 MFA 方式以请求备份代码",
