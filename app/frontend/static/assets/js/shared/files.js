@@ -929,17 +929,6 @@ $(document).ready(function () {
             $("#status-caret").html(`<i class="fa-solid fa-caret-down"></i>`)
         }
     });
-    if (webSocket) {
-        webSocket.on('zip_status', function (data) {
-            if (data.complete) {
-                const cur_dir = $("#table-nav").attr("data-cur-path");
-                removeProgressItem(data.id);
-                getTreeView(cur_dir);
-            } else {
-                updateProgressBar(data.percent, "server_upload", 1, data.id);
-            }
-        });
-    }
 });
 
 function setup_row_select_listener() {
