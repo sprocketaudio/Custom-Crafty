@@ -464,8 +464,8 @@
         "createFileQuestion": "Quel nom souhaitez-vous donner au nouveau fichier ?",
         "default": "Défaut",
         "delete": "Supprimer",
-        "deleteItemQuestion": "Êtes-vous sûr de vouloir supprimer \" + name + \" ?",
-        "deleteItemQuestionMessage": "Vous êtes sur le point de supprimer \\\"\" + path + \"\\\"!<br/><br/> Cette action est irréversible et le fichier sera perdu à jamais !",
+        "deleteItemQuestion": "Vous supprimez ",
+        "deleteItemQuestionMessage": "Cette action sera irréversible et sera définitive !",
         "download": "Télécharger",
         "editingFile": "Édition du fichier",
         "error": "Erreur lors de la récupération des fichiers",
@@ -478,14 +478,28 @@
         "rename": "Renommer",
         "renameItemQuestion": "Quel devrait être le nouveau nom ?",
         "save": "Sauvegarder",
-        "size": "Changer la taille de l'éditeur",
-        "stayHere": "NE FERMEZ PAS CETTE PAGE !",
+        "size": "Taille",
         "unsupportedLanguage": "Attention : Ce n'est pas un type de fichier supporté",
         "unzip": "Décompresser",
         "upload": "Téléverser",
         "uploadTitle": "Téléverser les fichiers vers : ",
         "waitUpload": "Merci de patienter pendant que nous téléversons vos fichiers... Cela peut prendre un certain temps.",
-        "yesDelete": "Oui, je comprends les conséquences"
+        "yesDelete": "Oui, je comprends les conséquences",
+        "cancel": "Annuler",
+        "changeConflict": "Conflit d'état du serveur",
+        "copy": "Copier",
+        "copying": "Copie",
+        "modified": "Modifié",
+        "more": "Charger plus",
+        "move": "Déplacer",
+        "moving": "Déplacement",
+        "name": "Nom",
+        "operationStatus": "État des opérations sur les fichiers",
+        "options": "Options",
+        "overwrite": "Remplacer les modifications sur le serveur",
+        "repull": "Importer le fichier depuis le serveur (toutes les modifications locales seront perdues)",
+        "serverModified": "L'état de ce fichier a changé sur le serveur depuis que vous avez chargé cette page. Veuillez choisir une option.",
+        "type": "Type"
     },
     "serverMetrics": {
         "resetZoom": "Réinitialiser le zoom",
@@ -723,7 +737,8 @@
         "filesPageLen": "La longueur doit être supérieure à 1 pour cette propriété",
         "insufficientPerms": "Erreur de permission : permissions manquantes pour cette ressource",
         "mfaName": "La saisie doit être une chaîne de caractères d'au moins 3 caractères pour ce champ",
-        "passProp": "Le mot de passe doit être une chaîne d'au moins 8 caractères."
+        "passProp": "Le mot de passe doit être une chaîne d'au moins 8 caractères.",
+        "typeEpoch": "doit être une valeur temporelle"
     },
     "webhooks": {
         "areYouSureDel": "Êtes-vous sûr de vouloir supprimer ce webhook ?",
@@ -809,5 +824,10 @@
         "show_errors": "Afficher les erreurs de débogage du serveur web",
         "submit": "Envoyer",
         "superMFA": "Exiger des super-utilisateurs qu'ils activent l'authentification multi-facteurs (MFA)"
+    },
+    "serverFilesEditor": {
+        "saved": "Enregistré",
+        "save": "Enregistrer les modifications",
+        "unsavedChanges": "Êtes-vous sûr de vouloir quitter ? Vous avez des modifications non enregistrées."
     }
 }
