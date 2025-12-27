@@ -2,11 +2,10 @@ import os
 import logging
 import shutil
 import asyncio
-import anyio
 import pathlib
+import anyio
 from PIL import Image
 from app.classes.models.server_permissions import EnumPermissionsServer
-from app.classes.helpers.helpers import Helpers
 from app.classes.web.base_api_handler import BaseApiHandler
 from app.classes.web.websocket_handler import WebSocketManager
 
@@ -167,7 +166,10 @@ class ApiFilesUploadHandler(BaseApiHandler):
                     {
                         "status": "error",
                         "error": "TRAVERSAL_DETECTED",
-                        "error_data": "Attempted traversal detected. Requested upload must go to server directory",
+                        "error_data": (
+                            "Attempted traversal detected. "
+                            "Requested upload must go to server directory"
+                        ),
                     },
                 )
         # Check to make sure the file type we're being sent is what we're expecting
