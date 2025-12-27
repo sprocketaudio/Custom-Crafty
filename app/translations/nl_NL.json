@@ -446,8 +446,8 @@
         "createFileQuestion": "Hoe wil je het nieuwe bestand noemen?",
         "default": "Standaard",
         "delete": "Verwijderen",
-        "deleteItemQuestion": "Weet je zeker dat je \" + name + \" wil verwijderen?",
-        "deleteItemQuestionMessage": "Je bent \\\"\" + path + \"\\\" aan het verwijderen!<br/><br/>Deze actie is onomkeerbaar!",
+        "deleteItemQuestion": "Je verwijdert ",
+        "deleteItemQuestionMessage": "Deze actie is onomkeerbaar en het zal voor altijd verloren zijn!",
         "download": "Downloaden",
         "editingFile": "Bestand bewerken",
         "error": "Error bij verkrijgen van bestanden",
@@ -460,14 +460,28 @@
         "rename": "Hernoemen",
         "renameItemQuestion": "Hoe wil je dit noemen?",
         "save": "Opslaan",
-        "stayHere": "VERLAAT DEZE PAGINA NIET!",
         "unsupportedLanguage": "Waarschuwing: dit bestandstype wordt niet ondersteund",
         "unzip": "Uitpakken",
         "upload": "Uploaden",
         "uploadTitle": "Bestanden uploaden naar: ",
         "waitUpload": "Wees geduldig terwijl wij de bestanden uploaden... Dit kan even duren.",
         "yesDelete": "Ja, ik begrijp de gevolgen",
-        "size": "Verander Editor Grootte"
+        "size": "Formaat",
+        "cancel": "Annuleren",
+        "changeConflict": "Conflict met serverstaat",
+        "copy": "Kopiëren",
+        "copying": "Aan het kopiëren",
+        "modified": "Aangepast",
+        "more": "Meer laden",
+        "move": "Verplaatsen",
+        "moving": "Aan het verplaatsen",
+        "name": "Naam",
+        "operationStatus": "Bestand Operatie Status",
+        "options": "Opties",
+        "overwrite": "Overschrijf veranderingen op de server",
+        "repull": "Actuele bestand van server laden (Alle lokale wijzigingen zullen verloren gaan)",
+        "serverModified": "De staat van dit bestand is veranderd op de server sinds je deze pagina hebt geladen. Gelieve een optie te kiezen.",
+        "type": "Type"
     },
     "serverPlayerManagement": {
         "bannedPlayers": "Verbannen spelers",
@@ -708,7 +722,8 @@
         "totp": "MFA-code moet 6 nummers zijn",
         "mfaName": "Invoer moet van type String zijn van minstens 3 karakters voor deze eigenschap",
         "additionalProperties": "Aanvullende Eigenschappen mogen niet meegestuurd worden",
-        "passProp": "Wachtwoord moet tekst zijn met een minimale lengte van 8 karakters."
+        "passProp": "Wachtwoord moet tekst zijn met een minimale lengte van 8 karakters.",
+        "typeEpoch": "moet een epoch-waarde zijn"
     },
     "serverMetrics": {
         "zoomHint1": "Om in te zoomen op de grafiek, houdt je de shift-toets ingedrukt en gebruik je vervolgens je scrollwiel.",
@@ -809,5 +824,10 @@
         "monitoring": "Toezicht",
         "miscellaneous": "Overig",
         "superMFA": "Supergebruikers moeten MFA aanzetten"
+    },
+    "serverFilesEditor": {
+        "saved": "Opgeslagen",
+        "save": "Wijzigingen Opslaan",
+        "unsavedChanges": "Weet je zeker dat je weg wilt gaan? Je hebt niet-opgeslagen wijzigingen."
     }
 }
