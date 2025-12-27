@@ -1,3 +1,5 @@
+let activeUploads = 0;
+let last_tree_view = "";
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -33,11 +35,11 @@ async function uploadChunk(file, url, chunk, start, end, chunk_hash, totalChunks
             }
             // Update progress bar
             const progress = (i + 1) / totalChunks * 100;
-            updateProgressBar(Math.round(progress), type, file_num);
+            updateProgressBar(Math.round(progress), type, file_num, fileId);
         });
 }
 
-async function uploadFile(type, file = null, path = null, file_num = 0, _onProgress = null) {
+async function uploadFile(type, file = null, path = null, file_num = 0, fileId = null, _onProgress = null) {
     if (file == null) {
         try {
             file = $("#file")[0].files[0];
@@ -46,8 +48,9 @@ async function uploadFile(type, file = null, path = null, file_num = 0, _onProgr
             return;
         }
     }
-
-    const fileId = uuidv4();
+    if (!fileId) {
+        fileId = uuidv4();
+    }
     const token = getCookie("_xsrf");
     if (type !== "server_upload") {
         document.getElementById("upload_input").innerHTML = '<div class="progress" style="width: 100%;"><div id="upload-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">&nbsp;<i class="fa-solid fa-spinner"></i></div></div>';
@@ -96,6 +99,17 @@ async function uploadFile(type, file = null, path = null, file_num = 0, _onProgr
             throw new Error(JSON.stringify(responseData));
         }
 
+        const upload_ready_promise = new Promise(resolve => {
+            const interval = setInterval(() => {
+                if (activeUploads < 2) { // Do not overload browser
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 100);
+        });
+
+        await upload_ready_promise;
+        activeUploads++;
         for (let i = 0; i < totalChunks; i += batchSize) {
             const batchPromises = [];
 
@@ -145,47 +159,17 @@ async function uploadFile(type, file = null, path = null, file_num = 0, _onProgr
             }, 2000);
         }
     } else {
-        let caught = false;
-        let expanded = false;
-        try {
-            expanded = document.getElementById(path).classList.contains("clicked");
-        } catch { }
 
-        let par_el;
-        let items;
-        try {
-            par_el = document.getElementById(path + "ul");
-            items = par_el.children;
-        } catch (err) {
-            console.log(err);
-            caught = true;
-            par_el = document.getElementById("files-tree");
-            items = par_el.children;
+        $(`#upload-progress-bar-${fileId}`).removeClass("progress-bar-striped");
+        $(`#upload-progress-bar-${fileId}`).addClass("bg-success");
+        $(`#upload-progress-bar-${fileId}`).html('<i style="color: black;" class="fas fa-box-check"></i>');
+        removeProgressItem(fileId);
+
+        if (activeUploads == 1) {
+            getTreeView($("#table-nav").attr("data-cur-path"));
         }
-
-        let name = file.name;
-        let full_path = path + '/' + name;
-        let flag = false;
-
-        for (let item of items) {
-            if ($(item).attr("data-name") === name) {
-                flag = true;
-            }
-        }
-
-        if (!flag) {
-            if (caught && !expanded) {
-                $(par_el).append(`<li id="${full_path}li" class="d-block tree-ctx-item tree-file tree-item" data-path="${full_path}" data-name="${name}" onclick="clickOnFile(event)"><span style="margin-right: 6px;"><i class="far fa-file"></i></span>${name}</li>`);
-            } else if (expanded) {
-                $(par_el).append(`<li id="${full_path}li" class="tree-ctx-item tree-file tree-item" data-path="${full_path}" data-name="${name}" onclick="clickOnFile(event)"><span style="margin-right: 6px;"><i class="far fa-file"></i></span>${name}</li>`);
-            }
-            setTreeViewContext();
-        }
-
-        $(`#upload-progress-bar-${file_num + 1}`).removeClass("progress-bar-striped");
-        $(`#upload-progress-bar-${file_num + 1}`).addClass("bg-success");
-        $(`#upload-progress-bar-${file_num + 1}`).html('<i style="color: black;" class="fas fa-box-check"></i>');
     }
+    activeUploads--;
 }
 
 async function calculateFileHash(file) {
@@ -197,7 +181,7 @@ async function calculateFileHash(file) {
     return hashHex;
 }
 
-function updateProgressBar(progress, type, i) {
+function updateProgressBar(progress, type, _i, file_id) {
     if (type !== "server_upload") {
         if (progress === 100) {
             $(`#upload-progress-bar`).removeClass("progress-bar-striped")
@@ -208,18 +192,30 @@ function updateProgressBar(progress, type, i) {
         $(`#upload-progress-bar`).html(progress + '%');
     } else {
         if (progress === 100) {
-            $(`#upload-progress-bar-${i + 1}`).removeClass("progress-bar-striped")
+            $(`#upload-progress-bar-${file_id}`).removeClass("progress-bar-striped")
 
-            $(`#upload-progress-bar-${i + 1}`).removeClass("progress-bar-animated")
+            $(`#upload-progress-bar-${file_id}`).removeClass("progress-bar-animated")
         }
-        $(`#upload-progress-bar-${i + 1}`).css('width', progress + '%');
-        $(`#upload-progress-bar-${i + 1}`).html(progress + '%');
+        $(`#upload-progress-bar-${file_id}`).css('width', progress + '%');
+        $(`#upload-percent-${file_id}`).html(progress + '%');
+        $("#operation-total").html(`<span id="notif-count" class="badge bg-primary">${$("#upload-progress-bar-parent").children().length}</span>`);
+    }
+}
+
+
+function removeProgressItem(item_id) {
+    $(`#upload-progress-bar-${item_id}-container`).remove();
+    const total_items = $("#upload-progress-bar-parent").children().length
+    if (total_items > 0) {
+        $("#operation-total").html(`<span id="notif-count" class="badge bg-primary">${total_items}</span>`);
+    } else {
+        $("#operation-total").html(``); //remove badge if no items
     }
 }
 
 function uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        const r = Math.random() * 16 | 0,
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replaceAll(/[xy]/g, function (c) {
+        const r = Math.trunc(Math.random() * 16),
             v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
@@ -229,10 +225,17 @@ function uuidv4() {
 if (webSocket) {
     webSocket.on('upload_process', function (data) {
         if (data.total_files === data.cur_file) {
-            updateProgressBar(100, data.type, data.cur_file)
+            updateProgressBar(100, data.type, data.cur_file, data.file_id)
         } else {
             let progress = Math.round((data.cur_file / data.total_files) * 100, 1);
-            updateProgressBar(progress, data.type, data.cur_file)
+            updateProgressBar(progress, data.type, data.cur_file, data.file_id)
         }
     });
 }
+globalThis.addEventListener('beforeunload', (e) => {
+    console.log(activeUploads)
+    if (activeUploads > 0) {
+        e.preventDefault();
+        globalThis.alert('Uploads active. Are you sure you want to leave?');
+    }
+});

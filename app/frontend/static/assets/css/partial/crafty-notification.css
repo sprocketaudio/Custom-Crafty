@@ -6,6 +6,7 @@
     width: 200px;
     top: 70px;
     right: 0px;
+    z-index: 999;
 }
 
 .notification {
