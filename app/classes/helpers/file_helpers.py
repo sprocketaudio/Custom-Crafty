@@ -529,7 +529,6 @@ class FileHelpers:
         """Takes requested path and returns absolute path
 
         Args:
-            server_id (str): requested server's ID
             server_path (str): requested server's root path
             path (str | path): requested file path
 
