@@ -464,8 +464,8 @@
         "createFileQuestion": "您希望新文件叫什么名字？",
         "default": "默认",
         "delete": "删除",
-        "deleteItemQuestion": "您确定要删除 \" + name + \" 吗？",
-        "deleteItemQuestionMessage": "您正在删除 \\\"\" + path + \"\\\"！<br/><br/>此操作不可逆转，文件将永远遗失！",
+        "deleteItemQuestion": "您正在删除 ",
+        "deleteItemQuestionMessage": "此操作不可逆转，文件将永远丢失！",
         "download": "下载",
         "editingFile": "正在编辑文件",
         "error": "获取文件时发生错误",
@@ -484,7 +484,11 @@
         "upload": "上传",
         "uploadTitle": "上传文件到： ",
         "waitUpload": "请等待，我们正在上传您的文件……这需要一点时间。",
-        "yesDelete": "是，我知道结果"
+        "yesDelete": "是，我知道结果",
+        "cancel": "取消",
+        "changeConflict": "服务器状态冲突",
+        "copy": "复制",
+        "copying": "复制中"
     },
     "serverMetrics": {
         "resetZoom": "重置缩放",
