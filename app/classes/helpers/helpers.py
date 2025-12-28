@@ -45,6 +45,9 @@ if os.name == "nt":
 
 logger = logging.getLogger(__name__)
 
+PLAIN_TEXT = "text/plain"
+BAT_TEXT = "application/x-bat"
+
 MASTER_CONFIG = {
     "https_port": 8443,
     "language": "en_EN",
@@ -70,12 +73,31 @@ MASTER_CONFIG = {
     "superMFA": False,
     "general_user_log_access": False,
     "base_url": "127.0.0.1:8443",
-    "additional_file_types": {
-        "text/yaml": [".yml", ".yaml"],
-        "text/toml": [".toml"],
-        "text/plain": [".ini", ".conf", ".properties", ".env"],
-        "application/x-bat": [".ps1", ".bat"],
-    },
+    "custom_extension_map": [
+        ("text/yaml", ".yml"),
+        ("text/yaml", ".yaml"),
+        ("text/toml", ".toml"),
+        (PLAIN_TEXT, ".ini"),
+        (PLAIN_TEXT, ".conf"),
+        (PLAIN_TEXT, ".properties"),
+        (PLAIN_TEXT, ".env"),
+        (BAT_TEXT, ".ps1"),
+        (BAT_TEXT, ".bat"),
+    ],
+    "crafty_accepted_mime_types": [
+        "text/",
+        "application/json",
+        "application/xml",
+        "application/javascript",
+        "text/x-shellscript",
+        "application/x-shellscript",
+        "text/x-sh",
+        "application/x-sh",
+        "text/x-bat",
+        BAT_TEXT,
+        "text/x-log",
+        "application/x-python-code",
+    ],
 }
 
 CONFIG_CATEGORIES = {
@@ -97,6 +119,7 @@ CONFIG_CATEGORIES = {
         "superMFA",
         "max_login_attempts",
     ],
+    "files": ["crafty_accepted_mime_types", "custom_extension_map"],
     "logs": [
         "max_log_lines",
         "max_audit_entries",
