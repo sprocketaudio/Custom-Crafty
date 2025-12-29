@@ -73,31 +73,6 @@ MASTER_CONFIG = {
     "superMFA": False,
     "general_user_log_access": False,
     "base_url": "127.0.0.1:8443",
-    "custom_extension_map": [
-        ("text/yaml", ".yml"),
-        ("text/yaml", ".yaml"),
-        ("text/toml", ".toml"),
-        (PLAIN_TEXT, ".ini"),
-        (PLAIN_TEXT, ".conf"),
-        (PLAIN_TEXT, ".properties"),
-        (PLAIN_TEXT, ".env"),
-        (BAT_TEXT, ".ps1"),
-        (BAT_TEXT, ".bat"),
-    ],
-    "crafty_accepted_mime_types": [
-        "text/",
-        "application/json",
-        "application/xml",
-        "application/javascript",
-        "text/x-shellscript",
-        "application/x-shellscript",
-        "text/x-sh",
-        "application/x-sh",
-        "text/x-bat",
-        BAT_TEXT,
-        "text/x-log",
-        "application/x-python-code",
-    ],
 }
 
 CONFIG_CATEGORIES = {
@@ -119,7 +94,6 @@ CONFIG_CATEGORIES = {
         "superMFA",
         "max_login_attempts",
     ],
-    "files": ["crafty_accepted_mime_types", "custom_extension_map"],
     "logs": [
         "max_log_lines",
         "max_audit_entries",

@@ -120,29 +120,6 @@
                       rows="{{ len(data['all_partitions']) }}" value="{{','.join(item[1])}}"
                       hidden>{{','.join(item[1])}}</textarea>
                   </div>
-                  {% elif item[0] == 'custom_extension_map' %}
-                  <div id="extension-mapping">
-                    {% for entry in item[1] %}
-                    <div>
-                      <input type="text" class="form-control half" value="{{entry[1]}}"></input>
-                      <select value="{{entry[0]}}" class="form-control half">
-                        {% for m_type in data['all_mime_types'] %}
-                        <option {% if m_type==entry[0] %}selected{% end %} value="{{m_type}}">{{m_type}}</option>
-                        {% end %}
-                      </select>
-                    </div>
-                    <br>
-                    {% end %}
-                  </div>
-                  <div>
-                    <input id="last_input" type="text" class="form-control half" value=""></input>
-                    <select value="{{entry[0]}}" class="form-control half" id="last_select">
-                      {% for m_type in data['all_mime_types'] %}
-                      <option {% if m_type==entry[0] %}selected{% end %} value="{{m_type}}">{{m_type}}</option>
-                      {% end %}
-                    </select>
-                  </div>
-                  <br>
                   {% elif isinstance(item[1], list) %}
                   <textarea id="{{item[0]}}" value="{{','.join(item[1])}}" type="text" name="{{item[0]}}"
                     class="form-control list">{{','.join(item[1])}}</textarea>
