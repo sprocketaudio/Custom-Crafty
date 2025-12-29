@@ -268,11 +268,22 @@ function setup_table_body(response) {
 }
 
 function setup_table_listeners() {
-    $(".directory").click(function (e) {
+    $(".directory").on("mousedown", function (e) {
+        if (e.button == 1) {
+            e.preventDefault();
+            window.open(`/panel/server_detail?id=${serverId}&dir=${encodeURIComponent($(this).attr("data-path"))}&subpage=files#context-container`, "_blank");
+        }
+    });
+    $(".directory").on("click", function (e) {
+        e.preventDefault();
         // Prevent the click from firing if it’s on the context menu button
         if ($(e.target).closest(".context-button").length) return;
         if ($(e.target).closest(".row-select").length) return;
-        if ($(this).children(".column-1").hasClass("editing")) return;
+        if ($(this).children(" .column-1").hasClass("editing")) return;
+        if (e.ctrlKey) {
+            window.open(`/panel/server_detail?id=${serverId}&dir=${encodeURIComponent($(this).attr("data-path"))}&subpage=files#context-container`, "_blank");
+            return;
+        }
         getTreeView($(this).attr("data-path"))
     });
     $(".file").click(function (e) {

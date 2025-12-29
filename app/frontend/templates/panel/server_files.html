@@ -123,7 +123,12 @@ end %} {% block content %}
     const serverId = new URLSearchParams(document.location.search).get("id");
 
     $(document).ready(function () {
-        getTreeView(""); //Get server ID as path. We should get root server dir back
+        let rawDir = new URLSearchParams(document.location.search).get("dir"); //try to get dir from url
+        let dir = rawDir ? decodeURIComponent(rawDir) : ""; // if dir doesn't exist it's not requested thy get server root
+        const url = new URL(globalThis.location.href);
+        url.searchParams.delete("dir"); // clean up URL and remove DIR key in case they refresh
+        history.replaceState({}, "", url);
+        getTreeView(dir); //Get server ID as path. We should get root server dir back
     })
 </script>
 <script src="/static/assets/js/shared/files.js"></script>
