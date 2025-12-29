@@ -5,7 +5,6 @@ import os
 import typing as t
 import json
 import logging
-import mimetypes
 from pathlib import Path
 from zoneinfo import ZoneInfoNotFoundError
 import httpx
