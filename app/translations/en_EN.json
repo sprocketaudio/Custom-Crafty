@@ -40,8 +40,6 @@
         "False": "False",
         "True": "True",
         "allow_nsfw_profile_pictures": "Allow Gravatar™ NSFW profile pictures",
-        "crafty_accepted_mime_types": "Additional file types Crafty can open in file browser (Separated by commas)",
-        "custom_extension_map": "Map unrecognized extensions with mime types",
         "big_bucket_repo": "System Big Bucket™ remote URL",
         "cookie_expire": "Session cookies expire after (days)",
         "crafty_logs_delete_after_days": "How long Crafty should hold onto app logs (days)",

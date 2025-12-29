@@ -835,9 +835,6 @@ class PanelHandler(BaseHandler):
                 page_data["availables_languages"] = []
                 page_data["all_languages"] = []
                 page_data["all_partitions"] = self.helper.get_all_mounts()
-                page_data["all_mime_types"] = self.helper.get_setting(
-                    "crafty_accepted_mime_types"
-                )
 
                 for file in sorted(
                     os.listdir(
