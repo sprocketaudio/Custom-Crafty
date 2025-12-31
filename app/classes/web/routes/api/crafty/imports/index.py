@@ -117,10 +117,10 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
                     self.controller.project_root, "import", "upload", folder
                 )
             if Helpers.check_file_exists(folder):
-                folder = self.file_helper.unzip_server(
+                folder = self.file_helper.unzip_file(
                     Path(folder),
                     Path(IMPORT_PATH, self.helper.create_uuid(), "unpacked"),
-                    user_id,
+                    user_id=user_id,
                 )
                 self.helper.ensure_dir_exists(folder)
                 root_path = True

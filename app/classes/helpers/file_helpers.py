@@ -459,26 +459,29 @@ class FileHelpers:
         with zipfile.ZipFile(archive_location, "r") as zip_ref:
             zip_ref.extractall(destination)
 
-    def cleanup_unzip(self, temp_dir: Path, server_update: bool, new_dir: Path):
-        ignored_names = [
-            "server.properties",
-            "permissions.json",
-            "allowlist.json",
-        ]
-        # we'll iterate through the top level directory moving everything
-        # out of the temp directory and into it's final home.
-        for item in os.listdir(temp_dir):
-            # if the file is one of our ignored names we'll skip it
-            if item in ignored_names and server_update:
-                continue
-            # we handle files and dirs differently or we'll crash out.
-            try:
-                self.move_item_file_or_dir(temp_dir, new_dir, item)
-            except shutil.Error as ex:
-                logger.error(f"ERROR IN ZIP IMPORT: {ex}")
+    def send_percentage(self, user, percent, proc_id, complete):
+        if isinstance(user, str):
+            WebSocketManager().broadcast_user(
+                user,
+                "zip_status",
+                {"id": None, "percent": percent, "complete": complete},
+            )
+        else:
+            for usr in user:
+                WebSocketManager().broadcast_user(
+                    usr,
+                    "zip_status",
+                    {"id": proc_id, "percent": percent, "complete": complete},
+                )
 
     def unzip_file(
-        self, zip_path, server_id, server_update: bool = False, proc_id=None
+        self,
+        zip_path,
+        destination_path,
+        server_id=None,
+        server_update: bool = False,
+        proc_id=None,
+        user_id=None,
     ) -> None:
         """
         Unzips zip file at zip_path to location generated at new_dir based on zip
@@ -492,35 +495,31 @@ class FileHelpers:
         Returns: None
 
         """
-        server_users = PermissionsServers.get_server_user_list(server_id)
-        # Get directory without zipfile name
-        new_dir = pathlib.Path(zip_path).parents[0]
+        ignored_names = [
+            "server.properties",
+            "permissions.json",
+            "allowlist.json",
+        ]
+        server_users = user_id
+        if not server_users:
+            server_users = PermissionsServers.get_server_user_list(server_id)
+
         # make sure we're able to access the zip file
         if Helpers.check_file_perms(zip_path) and os.path.isfile(zip_path):
             # make sure the directory we're unzipping this to exists
-            Helpers.ensure_dir_exists(new_dir)
-            # we'll make a temporary directory to unzip this to.
-            temp_dir = tempfile.mkdtemp()
+            Helpers.ensure_dir_exists(destination_path)
             try:
                 with zipfile.ZipFile(zip_path, "r") as zip_ref:
                     # we'll extract this to the temp dir using zipfile module
                     files_list = zip_ref.namelist()
                     for idx, file in enumerate(files_list):
+                        # if the file is one of our ignored names we'll skip it
+                        if Path(file).name in ignored_names and server_update:
+                            continue
                         percent = round((idx / len(files_list)) * 100)
-                        zip_ref.extract(file, temp_dir)
-                        for user in server_users:
-                            WebSocketManager().broadcast_user(
-                                user,
-                                "zip_status",
-                                {"id": proc_id, "percent": percent, "complete": False},
-                            )
-                self.cleanup_unzip(Path(temp_dir), server_update, new_dir)
-                for user in server_users:
-                    WebSocketManager().broadcast_user(
-                        user,
-                        "zip_status",
-                        {"id": proc_id, "percent": 100, "complete": True},
-                    )
+                        zip_ref.extract(file, destination_path)
+                        self.send_percentage(server_users, percent, proc_id, False)
+                self.send_percentage(server_users, 100, proc_id, True)
             except Exception as ex:
                 Console.error(ex)
 
@@ -546,8 +545,17 @@ class FileHelpers:
     def unzip_server(zip_path: Path, target_path: Path, user_id):
         if Helpers.check_file_perms(zip_path):
             with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                # extracts archive to temp directory
-                zip_ref.extractall(target_path)
+                # we'll extract this to the temp dir using zipfile module
+                files_list = zip_ref.namelist()
+                for idx, file in enumerate(files_list):
+                    percent = round((idx / len(files_list)) * 100)
+                    zip_ref.extract(file, target_path)
+                    print(file)
+                    WebSocketManager().broadcast_user(
+                        user_id,
+                        "zip_status",
+                        {"id": None, "percent": percent, "complete": False},
+                    )
             if user_id:
                 return target_path
 

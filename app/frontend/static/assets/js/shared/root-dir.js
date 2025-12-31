@@ -27,7 +27,6 @@ function getDirView(event = false) {
 
 async function getTreeView(path, unzip = false, upload = false) {
     const token = getCookie("_xsrf");
-    console.log("IN TREE VIEW")
     console.log({ "page": "import", "folder": path, "upload": upload, "unzip": unzip });
     let res = await fetch(`/api/v2/import/file/unzip/`, {
         method: 'POST',
@@ -58,19 +57,11 @@ async function getTreeView(path, unzip = false, upload = false) {
     }
 }
 
-function process_tree_response(response, unzip) {
-    //If this value is still hidden we know the user is executing a zip import and not an upload
-    console.log(`LOWER HALF: ${$("#lower_half").classList}`)
-    if ($("#lower_half").hasClass("d-none")) {
-        console.log("In IF")
-        document.getElementById('zip_submit').disabled = false;
-    } else {
-        document.getElementById('upload_submit').disabled = false;
-    }
+function process_tree_response(response) {
+    document.getElementById('upload_submit').disabled = false;
+
     let path = response.data.root_path.path;
-    if (unzip) {
-        $(".root-input").val(response.data.root_path.path);
-    }
+    $(".root-input").val(response.data.root_path.path);
     let text = `<ul class="tree-nested d-block" id="${path}ul">`;
     Object.entries(response.data).forEach(([key, value]) => {
         if (key === "root_path" || key === "db_stats") {

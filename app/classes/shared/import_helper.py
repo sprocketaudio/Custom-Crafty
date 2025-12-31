@@ -1,6 +1,7 @@
 import os
 import time
 import shutil
+import pathlib
 import logging
 import threading
 
@@ -149,8 +150,11 @@ class ImportHelpers:
                     return
 
                 unzip_path = self.helper.wtol_path(file_path)
+                destination_path = pathlib.Path(unzip_path).parents[0]
                 # unzips archive that was downloaded.
-                self.file_helper.unzip_file(unzip_path, new_id, server_update)
+                self.file_helper.unzip_file(
+                    unzip_path, destination_path, new_id, server_update=server_update
+                )
                 # adjusts permissions for execution if os is not windows
 
                 if not self.helper.is_os_windows():
