@@ -129,7 +129,7 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
                     user_lang = self.controller.users.get_user_lang_by_id(user_id)
                     WebSocketManager().broadcast_user(
                         user_id,
-                        "send_start_error",
+                        "send_error",
                         {
                             "error": self.helper.translation.translate(
                                 "error", "no-file", user_lang
@@ -141,7 +141,7 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
                 user_lang = self.controller.users.get_user_lang_by_id(user_id)
                 WebSocketManager().broadcast_user(
                     user_id,
-                    "send_start_error",
+                    "send_error",
                     {
                         "error": self.helper.translation.translate(
                             "error", "no-file", user_lang

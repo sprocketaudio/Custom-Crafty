@@ -304,7 +304,7 @@
     });
 
     if (webSocket) {
-      webSocket.on('send_start_error', function (start_error) {
+      webSocket.on('send_error', function (start_error) {
         var x = document.querySelector('.bootbox');
         if (x) {
           x.remove()
@@ -545,7 +545,7 @@
               $('.bootbox-close-button').click();
             }
           } else {
-            updateProgressBar(data.percent, "server_upload", 1, data.id);
+            updateProgressBar(data.percent, data.id ? "server_upload" : "", 1, data.id);
           }
         });
       }
