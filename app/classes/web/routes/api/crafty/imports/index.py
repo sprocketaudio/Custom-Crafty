@@ -2,6 +2,7 @@ import os
 import logging
 import json
 import html
+import zipfile
 from pathlib import PurePath, Path
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
@@ -14,25 +15,8 @@ logger = logging.getLogger(__name__)
 files_get_schema = {
     "type": "object",
     "properties": {
-        "page": {
-            "type": "string",
-            "minLength": 1,
-            "error": "filesPageLen",
-            "fill": True,
-        },
-        "folder": {"type": "string", "error": "typeString", "fill": True},
-        "upload": {
-            "type": "boolean",
-            "default": "False",
-            "error": "typeBool",
-            "fill": True,
-        },
-        "unzip": {
-            "type": "boolean",
-            "default": "True",
-            "error": "typeBool",
-            "fill": True,
-        },
+        "file_name": {"type": "string", "error": "typeString", "fill": True},
+        "local_path": {"type": "string", "error": "typeString", "fill": True},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -92,99 +76,30 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
-        # TODO: limit some columns for specific permissions?
-        folder = data["folder"]
-        user_id = auth_data[4]["user_id"]
-        folder = self.file_helper.get_absolute_path(IMPORT_PATH, folder)
-        if not Helpers.validate_traversal(
-            IMPORT_PATH,
-            Path(folder).resolve(),
-        ):
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "TRAVERSAL DETECTED",
-                    "error_data": str(e),
-                },
-            )
-        if data["unzip"]:
-            # This is awful. Once uploads go to return
-            # JSON we need to remove this and just send
-            # the path.
-            if data["upload"]:
-                folder = os.path.join(
-                    self.controller.project_root, "import", "upload", folder
-                )
-            if Helpers.check_file_exists(folder):
-                folder = self.file_helper.unzip_file(
-                    Path(folder),
-                    Path(IMPORT_PATH, self.helper.create_uuid(), "unpacked"),
-                    user_id=user_id,
-                )
-                self.helper.ensure_dir_exists(folder)
-                root_path = True
-            else:
-                if user_id:
-                    user_lang = self.controller.users.get_user_lang_by_id(user_id)
-                    WebSocketManager().broadcast_user(
-                        user_id,
-                        "send_error",
-                        {
-                            "error": self.helper.translation.translate(
-                                "error", "no-file", user_lang
-                            )
-                        },
-                    )
-        else:
-            if not self.helper.check_path_exists(folder) and user_id:
-                user_lang = self.controller.users.get_user_lang_by_id(user_id)
-                WebSocketManager().broadcast_user(
-                    user_id,
-                    "send_error",
-                    {
-                        "error": self.helper.translation.translate(
-                            "error", "no-file", user_lang
-                        )
-                    },
-                )
         return_json = {
-            "root_path": {
-                "path": str(
-                    PurePath.relative_to(PurePath(folder), PurePath(IMPORT_PATH))
-                ),
-                "top": root_path,
-            }
+            "top": data["local_path"] == "",
+            "request_path": data["local_path"],
         }
-
-        dir_list = []
-        unsorted_files = []
-        file_list = os.listdir(folder)
-        for item in file_list:
-            if os.path.isdir(os.path.join(folder, item)):
-                dir_list.append(item)
-            else:
-                unsorted_files.append(item)
-        file_list = sorted(dir_list, key=str.casefold) + sorted(
-            unsorted_files, key=str.casefold
+        if data["local_path"] != "":
+            data["local_path"] += "/"
+        path = zipfile.Path(
+            Path(IMPORT_PATH, data["file_name"]), at=str(data["local_path"])
         )
-        for raw_filename in file_list:
-            filename = html.escape(raw_filename)
-            rel = os.path.join(folder, raw_filename)
-            dpath = os.path.join(folder, filename)
-            dpath = self.helper.wtol_path(dpath)
-            if os.path.isdir(rel):
-                return_json[filename] = {
+        print(path.iterdir())
+        for file in path.iterdir():
+            if file.is_dir():
+                return_json[file.name] = {
                     "path": str(
-                        PurePath.relative_to(PurePath(dpath), PurePath(IMPORT_PATH))
+                        file.relative_to(Path(IMPORT_PATH, data.get("file_name")))
                     ),
                     "dir": True,
                 }
             else:
-                return_json[filename] = {
+                return_json[file.name] = {
                     "path": str(
-                        PurePath.relative_to(PurePath(dpath), PurePath(IMPORT_PATH))
+                        file.relative_to(Path(IMPORT_PATH, data.get("file_name")))
                     ),
                     "dir": False,
                 }
-        self.finish_json(200, {"status": "ok", "data": return_json})
+        print(json.dumps(return_json, indent=4))
+        return self.finish_json(200, {"status": "ok", "data": return_json})

@@ -6,6 +6,7 @@ function getDirView(event = false) {
     if (event) {
         try {
             let path = event.target.parentElement.getAttribute('data-path');
+            console.log("path")
             if (event.target.parentElement.classList.contains('clicked')) {
 
                 if ($(`#${path}span`).hasClass('files-tree-title')) {
@@ -20,24 +21,24 @@ function getDirView(event = false) {
             console.log("Well that failed");
         }
     } else {
-        getTreeView($("#file-uploaded").val(), true, true);
+        getTreeView();
     }
 }
 
 
-async function getTreeView(path, unzip = false, upload = false) {
+async function getTreeView(path = "") {
     const token = getCookie("_xsrf");
-    console.log({ "page": "import", "folder": path, "upload": upload, "unzip": unzip });
-    let res = await fetch(`/api/v2/import/file/unzip/`, {
+
+    let res = await fetch(`/api/v2/import/archive/select`, {
         method: 'POST',
         headers: {
             'X-XSRFToken': token
         },
-        body: JSON.stringify({ "page": "import", "folder": path, "upload": upload, "unzip": unzip }),
+        body: JSON.stringify({ "file_name": $("#file-uploaded").val(), "local_path": path, }),
     });
     let responseData = await res.json();
     if (responseData.status === "ok") {
-        process_tree_response(responseData, unzip);
+        process_tree_response(responseData);
         let x = document.querySelector('.bootbox');
         if (x) {
             x.remove()
@@ -60,11 +61,10 @@ async function getTreeView(path, unzip = false, upload = false) {
 function process_tree_response(response) {
     document.getElementById('upload_submit').disabled = false;
 
-    let path = response.data.root_path.path;
-    $(".root-input").val(response.data.root_path.path);
+    let path = response.data.request_path
     let text = `<ul class="tree-nested d-block" id="${path}ul">`;
     Object.entries(response.data).forEach(([key, value]) => {
-        if (key === "root_path" || key === "db_stats") {
+        if (key === "top" || key === "request_path") {
             //continue is not valid in for each. Return acts as a continue.
             return;
         }
@@ -93,7 +93,7 @@ function process_tree_response(response) {
     });
     text += `</ul>`;
 
-    if (response.data.root_path.top) {
+    if (response.data.top) {
         try {
             document.getElementById('main-tree-div').innerHTML += text;
             document.getElementById('main-tree').parentElement.classList.add("clicked");
