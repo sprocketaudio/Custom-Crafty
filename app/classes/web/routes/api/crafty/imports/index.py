@@ -85,7 +85,13 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
         path = zipfile.Path(
             Path(IMPORT_PATH, data["file_name"]), at=str(data["local_path"])
         )
-        print(path.iterdir())
+        try:
+            self.helper.validate_traversal(IMPORT_PATH, path)
+        except ValueError:
+            return self.finish_json(
+                403,
+                {"status": "error", "error": "TRAVERSAL_DETECTED", "error_data": ""},
+            )
         for file in path.iterdir():
             if file.is_dir():
                 return_json[file.name] = {
@@ -101,5 +107,4 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
                     ),
                     "dir": False,
                 }
-        print(json.dumps(return_json, indent=4))
         return self.finish_json(200, {"status": "ok", "data": return_json})
