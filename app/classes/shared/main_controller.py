@@ -614,6 +614,7 @@ class Controller:
                     create_data["archive_internal_path"],
                     monitoring_port,
                     new_server_id,
+                    full_exe_path,
                 )
 
         exec_user = self.users.get_user_by_id(int(user_id))

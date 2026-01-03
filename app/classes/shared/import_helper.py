@@ -22,18 +22,37 @@ class ImportHelpers:
         self.helper: Helpers = helper
 
     def import_zipped_server(
-        self, archive_path, new_server_dir, base_include_path, port, new_id
+        self,
+        archive_path,
+        new_server_dir,
+        base_include_path,
+        port,
+        new_id,
+        full_exe_path=None,
     ):
         import_thread = threading.Thread(
             target=self.import_threaded_zipped_server,
             daemon=True,
-            args=(archive_path, new_server_dir, base_include_path, port, new_id),
+            args=(
+                archive_path,
+                new_server_dir,
+                base_include_path,
+                port,
+                new_id,
+                full_exe_path,
+            ),
             name=f"{new_id}_import",
         )
         import_thread.start()
 
     def import_threaded_zipped_server(
-        self, archive_path, new_server_dir, base_include_path, port, new_id
+        self,
+        archive_path,
+        new_server_dir,
+        base_include_path,
+        port,
+        new_id,
+        full_exe_path,
     ):
         self.file_helper.unzip_file(
             archive_path,
@@ -42,6 +61,12 @@ class ImportHelpers:
             False,
             base_include_path=base_include_path,
         )
+
+        if (
+            not self.helper.is_os_windows() and full_exe_path
+        ):  # we only expect full jar path for bedrock
+            if Helpers.check_file_exists(full_exe_path):
+                os.chmod(full_exe_path, 0o2760)  # apply execute permissions
 
         self.file_helper.del_file(archive_path)
 
