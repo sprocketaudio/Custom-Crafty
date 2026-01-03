@@ -633,7 +633,6 @@ class Controller:
                     new_server_path,
                     create_data["archive_internal_path"],
                     monitoring_port,
-                    full_exe_path,
                     new_server_id,
                 )
 

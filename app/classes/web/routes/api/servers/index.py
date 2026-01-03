@@ -236,6 +236,7 @@ new_server_schema = {
                     "fill": True,
                     "required": [
                         "archive_name",
+                        "archive_internal_path",
                         "jarfile",
                         "mem_min",
                         "mem_max",
@@ -365,7 +366,7 @@ new_server_schema = {
                     "type": "object",
                     "error": "enumErr",
                     "fill": True,
-                    "required": ["existing_server_path", "executable"],
+                    "required": ["archive_name", "archive_internal_path", "executable"],
                     "properties": {
                         "archive_name": {
                             "title": "Zip name",
@@ -521,7 +522,7 @@ new_server_schema = {
                     "type": "object",
                     "error": "enumErr",
                     "fill": True,
-                    "required": ["existing_server_path", "command"],
+                    "required": ["archive_name", "archive_internal_path", "command"],
                     "properties": {
                         "archive_name": {
                             "title": "Zip name",
