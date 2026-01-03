@@ -7,6 +7,14 @@ from app.classes.web.base_api_handler import BaseApiHandler
 
 logger = logging.getLogger(__name__)
 
+
+IMPORT_DESCRIPTION = "Zip file in import mount"
+IMPORT_TITLE = "Zip name"
+ZIP_NAME_EXAMPLE = "Server.zip"
+ARCHIVE_PATH_TITLE = "Internal zip path"
+ARCHIVE_PATH_DESCRIPTION = "Path to internal zip folder"
+ARCHIVE_PATH_EXAMPLE = "server_files/my_server/"
+
 new_server_schema = {
     "definitions": {},
     "$schema": "https://json-schema.org/draft-07/schema#",
@@ -244,19 +252,19 @@ new_server_schema = {
                     ],
                     "properties": {
                         "archive_name": {
-                            "title": "Zip name",
-                            "description": "Zip file in import mount",
+                            "title": IMPORT_TITLE,
+                            "description": IMPORT_DESCRIPTION,
                             "type": "string",
-                            "examples": ["Server.zip"],
+                            "examples": [ZIP_NAME_EXAMPLE],
                             "minLength": 1,
                             "error": "typeString",
                             "fill": True,
                         },
                         "archive_internal_path": {
-                            "title": "Internal zip path",
-                            "description": "Path to internal zip folder",
+                            "title": ARCHIVE_PATH_TITLE,
+                            "description": ARCHIVE_PATH_DESCRIPTION,
                             "type": "string",
-                            "examples": ["", "server_files/my_server/"],
+                            "examples": ["", ARCHIVE_PATH_EXAMPLE],
                             "minLength": 0,
                             "error": "typeString",
                             "fill": True,
@@ -369,19 +377,19 @@ new_server_schema = {
                     "required": ["archive_name", "archive_internal_path", "executable"],
                     "properties": {
                         "archive_name": {
-                            "title": "Zip name",
-                            "description": "Zip file in import mount",
+                            "title": IMPORT_TITLE,
+                            "description": IMPORT_DESCRIPTION,
                             "type": "string",
-                            "examples": ["Server.zip"],
+                            "examples": [ZIP_NAME_EXAMPLE],
                             "minLength": 1,
                             "error": "typeString",
                             "fill": True,
                         },
                         "archive_internal_path": {
-                            "title": "Internal zip path",
-                            "description": "Path to internal zip folder",
+                            "title": ARCHIVE_PATH_TITLE,
+                            "description": ARCHIVE_PATH_DESCRIPTION,
                             "type": "string",
-                            "examples": ["", "server_files/my_server/"],
+                            "examples": ["", ARCHIVE_PATH_EXAMPLE],
                             "minLength": 0,
                             "error": "typeString",
                             "fill": True,
@@ -525,19 +533,19 @@ new_server_schema = {
                     "required": ["archive_name", "archive_internal_path", "command"],
                     "properties": {
                         "archive_name": {
-                            "title": "Zip name",
-                            "description": "Zip file in import mount",
+                            "title": IMPORT_TITLE,
+                            "description": IMPORT_DESCRIPTION,
                             "type": "string",
-                            "examples": ["Server.zip"],
+                            "examples": [ZIP_NAME_EXAMPLE],
                             "minLength": 1,
                             "error": "typeString",
                             "fill": True,
                         },
                         "archive_internal_path": {
-                            "title": "Internal zip path",
-                            "description": "Path to internal zip folder",
+                            "title": ARCHIVE_PATH_TITLE,
+                            "description": ARCHIVE_PATH_DESCRIPTION,
                             "type": "string",
-                            "examples": ["", "server_files/my_server/"],
+                            "examples": ["", ARCHIVE_PATH_EXAMPLE],
                             "minLength": 0,
                             "error": "typeString",
                             "fill": True,
