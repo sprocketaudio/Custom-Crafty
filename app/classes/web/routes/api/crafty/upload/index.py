@@ -2,11 +2,11 @@ import os
 import logging
 import shutil
 import asyncio
+import pathlib
 import anyio
 from pathlib import Path
 from PIL import Image
 from app.classes.models.server_permissions import EnumPermissionsServer
-from app.classes.helpers.helpers import Helpers
 from app.classes.web.base_api_handler import BaseApiHandler
 from app.classes.web.websocket_handler import WebSocketManager
 
@@ -151,23 +151,24 @@ class ApiFilesUploadHandler(BaseApiHandler):
             server_path = self.controller.servers.get_server_data_by_id(server_id)[
                 "path"
             ]
-            self.upload_dir = self.file_helper.get_absolute_path(
-                server_path, self.upload_dir
-            )
-            full_path = os.path.join(self.upload_dir, self.filename)
+            self.upload_dir = pathlib.Path(
+                self.file_helper.get_absolute_path(server_path, self.upload_dir)
+            ).resolve()
             # Check to make sure the requested path is inside the server's directory
-            if not self.helper.is_subdir(
-                full_path,
-                Helpers.get_os_understandable_path(
-                    self.controller.servers.get_server_data_by_id(server_id)["path"]
-                ),
-            ):
+            try:
+                self.helper.validate_traversal(
+                    server_path, pathlib.Path(self.upload_dir, self.filename).resolve()
+                )
+            except ValueError:
                 return self.finish_json(
-                    400,
+                    500,
                     {
                         "status": "error",
-                        "error": "NOT AUTHORIZED",
-                        "data": {"message": "Traversal detected"},
+                        "error": "TRAVERSAL_DETECTED",
+                        "error_data": (
+                            "Attempted traversal detected. "
+                            "Requested upload must go to server directory"
+                        ),
                     },
                 )
         # Check to make sure the file type we're being sent is what we're expecting
