@@ -511,28 +511,8 @@ class Controller:
 
             server_command = create_data.get("command", server_command)
         elif data["create_type"] == "custom":
-            # TODO: working_directory, executable_update
+            # This is not implemented yet. Raise a key error
             raise KeyError
-            if root_create_data["create_type"] == "raw_exec":
-                pass
-            elif root_create_data["create_type"] == "import_server":
-                existing_archive_path = Path(
-                    IMPORT_PATH, create_data["archive_name"]
-                ).resolve()
-                # TODO Add traversal checking even though this is no implemented
-                try:
-                    FileHelpers.copy_dir(existing_archive_path, new_server_path, True)
-                except shutil.Error as ex:
-                    logger.error(f"Server import failed with error: {ex}")
-
-            _create_server_properties_if_needed(0, True)
-
-            server_command = create_data["command"]
-
-            server_file_new = root_create_data["executable_update"].get("file", "")
-            if server_file_new != "":
-                # HACK: Horrible hack to make the server start
-                server_file = server_file_new
 
         stop_command = data.get("stop_command", "")
         if stop_command == "":
