@@ -135,4 +135,3 @@ document.getElementById("root_upload_button").addEventListener("click", function
         getDirView();
     }, 2000);
 });
-var file;
