@@ -102,16 +102,12 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
         for file in path.iterdir():
             if file.is_dir():
                 return_json[file.name] = {
-                    "path": str(
-                        file.relative_to(Path(IMPORT_PATH, data.get("file_name")))
-                    ),
+                    "path": str(file.at),
                     "dir": True,
                 }
             else:
                 return_json[file.name] = {
-                    "path": str(
-                        file.relative_to(Path(IMPORT_PATH, data.get("file_name")))
-                    ),
+                    "path": str(file.at),
                     "dir": False,
                 }
         return self.finish_json(200, {"status": "ok", "data": return_json})
