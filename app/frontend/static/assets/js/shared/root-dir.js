@@ -30,23 +30,26 @@ async function getTreeView(path = "") {
         body: JSON.stringify({ "file_name": $("#file-uploaded").val(), "local_path": path, }),
     });
     let responseData = await res.json();
+    let x = document.querySelector('.bootbox');
+    if (x) {
+        x.remove()
+    }
+    x = document.querySelector('.modal-backdrop');
+    if (x) {
+        x.remove()
+    }
     if (responseData.status === "ok") {
         process_tree_response(responseData);
-        let x = document.querySelector('.bootbox');
-        if (x) {
-            x.remove()
-        }
-        x = document.querySelector('.modal-backdrop');
-        if (x) {
-            x.remove()
-        }
         show_file_tree();
 
     } else {
 
         bootbox.alert({
             title: responseData.error,
-            message: responseData.error_data
+            message: responseData.error_data,
+            callback: function () {
+                location.reload();
+            }
         });
     }
 }

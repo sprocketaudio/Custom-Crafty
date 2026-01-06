@@ -77,9 +77,21 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
         }
         if data["local_path"] != "":
             data["local_path"] += "/"
-        path = zipfile.Path(
-            Path(IMPORT_PATH, data["file_name"]), at=str(data["local_path"])
-        )
+        try:
+            path = zipfile.Path(
+                Path(IMPORT_PATH, data["file_name"]), at=str(data["local_path"])
+            )
+        except zipfile.BadZipFile:
+            return self.finish_json(
+                500,
+                {
+                    "status": "error",
+                    "error": "Invalid Or Corrupt File",
+                    "error_data": self.helper.translation.translate(
+                        "serverWizard", "zipError", auth_data[4]["lang"]
+                    ),
+                },
+            )
         try:
             self.helper.validate_traversal(str(IMPORT_PATH), str(path))
         except ValueError:
