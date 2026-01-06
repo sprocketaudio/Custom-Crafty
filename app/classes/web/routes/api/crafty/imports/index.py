@@ -36,7 +36,7 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
             )
             and not auth_data[4]["superuser"]
         ):
-            # if the user doesn't have Files or Backup permission, return an error
+            # if the user doesn't have server creation, return an error
             return self.finish_json(
                 400,
                 {
