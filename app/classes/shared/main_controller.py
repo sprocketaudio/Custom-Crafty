@@ -481,20 +481,13 @@ class Controller:
 
         elif data["create_type"] == "minecraft_bedrock":
             if root_create_data["create_type"] == "import_server":
-                existing_archive_path = Helpers.get_os_understandable_path(
-                    create_data["archive_name"]
-                )
                 if Helpers.is_os_windows():
                     server_command = (
                         f'"{os.path.join(new_server_path, create_data["executable"])}"'
                     )
                 else:
                     server_command = f"./{create_data['executable']}"
-                logger.debug("command: " + server_command)
                 server_file = create_data["executable"]
-            elif root_create_data["create_type"] == "import_zip":
-                # TODO: Copy files from the zip file to the new server directory
-                raise NotImplementedError("Not yet implemented")
             else:
                 server_file = "bedrock_server"
                 if Helpers.is_os_windows():
