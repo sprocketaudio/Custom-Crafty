@@ -1218,6 +1218,21 @@ class ApiServersServerFilesOperationHandler(BaseApiHandler):
                     Path(item["target_path"], Path(source_path).name),
                 )
             )
+
+            # Check for any path traversals out of server_path
+            try:
+                Helpers.validate_traversal(server_path, source_path)
+                Helpers.validate_traversal(server_path, target_path)
+            except ValueError:
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "TRAVERSAL DETECTED",
+                        "error_data": "TRAVERSAL DETECTED",
+                    },
+                )
+
             try:
                 self.do_operation(operation, source_path, target_path)
             except shutilError as why:
