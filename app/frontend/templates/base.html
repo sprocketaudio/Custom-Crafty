@@ -5,7 +5,7 @@
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8">
-  {% if not data.get("mfa", None) %}
+  {% if not data.get("mfa", None) and not data.get("password_auth_disabled", False) %}
   <meta name="mfa_warn" content="{{translate('base', 'getMFA', data['lang'])}}">
   <meta name="mfa_link" content="{{translate('base', 'createMFA', data['lang'])}}">
   <meta name="userId" content="{{data['user_data']['user_id']}}">

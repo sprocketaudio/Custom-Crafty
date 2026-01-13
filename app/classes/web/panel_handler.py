@@ -303,6 +303,7 @@ class PanelHandler(BaseHandler):
                 "mfa"
             ),  # set value if the token has MFA set to true or not
             # for warning banner
+            "password_auth_disabled": exec_user.get("disable_password_auth", False),
             "update_available": self.helper.update_available,
             "support_perm": self.helper.get_setting("general_user_log_access")
             or exec_user["superuser"],
@@ -1437,6 +1438,7 @@ class PanelHandler(BaseHandler):
 
             if exec_user["email"] == "default@example.com":
                 page_data["user"]["email"] = ""
+            page_data["passkey_enabled"] = self.controller.passkey.is_enabled()
             template = "panel/panel_edit_user.html"
 
         elif page == "edit_user_apikeys":
@@ -1463,6 +1465,7 @@ class PanelHandler(BaseHandler):
                 )
                 return
 
+            page_data["passkey_enabled"] = self.controller.passkey.is_enabled()
             template = "panel/panel_edit_user_apikeys.html"
 
         elif page == "edit_user_otp":
@@ -1517,6 +1520,8 @@ class PanelHandler(BaseHandler):
                 )
 
             page_data["passkeys"] = passkeys
+            page_data["disable_password_auth"] = user_obj.disable_password_auth
+            page_data["has_passkeys"] = len(passkeys) > 0
 
             if user_id is None:
                 self.redirect("/panel/error?error=Invalid User ID")
