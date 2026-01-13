@@ -133,6 +133,16 @@ config_json_schema = {
             "error": "typeBool",
             "fill": True,
         },
+        "enable_passkey_auth": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
+        "passkey_rp_name": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,
