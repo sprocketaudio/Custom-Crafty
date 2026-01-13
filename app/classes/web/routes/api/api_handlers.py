@@ -8,6 +8,10 @@ from app.classes.web.routes.api.auth.invalidate_tokens import (
     ApiAuthInvalidateTokensHandler,
 )
 from app.classes.web.routes.api.auth.login import ApiAuthLoginHandler
+from app.classes.web.routes.api.auth.passkey import (
+    ApiAuthPasskeyLoginOptionsHandler,
+    ApiAuthPasskeyLoginVerifyHandler,
+)
 from app.classes.web.routes.api.roles.index import ApiRolesIndexHandler
 from app.classes.web.routes.api.roles.role.index import ApiRolesRoleIndexHandler
 from app.classes.web.routes.api.roles.role.servers import ApiRolesRoleServersHandler
@@ -108,6 +112,16 @@ def api_handlers(handler_args):
         (
             r"/api/v2/auth/invalidate_tokens/?",
             ApiAuthInvalidateTokensHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/auth/passkey/login/options/?",
+            ApiAuthPasskeyLoginOptionsHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/auth/passkey/login/verify/?",
+            ApiAuthPasskeyLoginVerifyHandler,
             handler_args,
         ),
         (
