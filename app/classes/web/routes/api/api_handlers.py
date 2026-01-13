@@ -79,6 +79,11 @@ from app.classes.web.routes.api.users.user.otp import (
     APIUsersTOTPRecovery,
     APIUsersTOTPVerifyIndexHandler,
 )
+from app.classes.web.routes.api.users.user.passkey import (
+    ApiUsersPasskeyIndexHandler,
+    ApiUsersPasskeyVerifyHandler,
+    ApiUsersPasskeyHandler,
+)
 from app.classes.web.routes.api.users.user.api import ApiUsersUserKeyHandler
 from app.classes.web.routes.api.users.user.pfp import ApiUsersUserPfpHandler
 from app.classes.web.routes.api.users.user.public import ApiUsersUserPublicHandler
@@ -238,6 +243,36 @@ def api_handlers(handler_args):
         (
             r"/api/v2/users/(@me)/totp/([a-z0-9-]+)/?",
             APIUsersTOTPHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/([0-9]+)/passkeys/?",
+            ApiUsersPasskeyIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/(@me)/passkeys/?",
+            ApiUsersPasskeyIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/([0-9]+)/passkeys/([a-z0-9-]+)/verify/?",
+            ApiUsersPasskeyVerifyHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/(@me)/passkeys/([a-z0-9-]+)/verify/?",
+            ApiUsersPasskeyVerifyHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/([0-9]+)/passkeys/([a-z0-9-]+)/?",
+            ApiUsersPasskeyHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/users/(@me)/passkeys/([a-z0-9-]+)/?",
+            ApiUsersPasskeyHandler,
             handler_args,
         ),
         (
