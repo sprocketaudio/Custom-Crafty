@@ -1374,10 +1374,21 @@ class ServerInstance:
             f.write(json.dumps(write_json, indent=4))
             logger.info("Cache file refreshed")
 
+    def get_formatted_server_players(self) -> list:
+        server_players = self.get_server_players()
+        if len(server_players) == 0:
+            return []
+        if isinstance(server_players[0], dict):
+            sp = server_players.copy()
+            server_players = []
+            for player in sp:
+                server_players.append(player["Name"])
+        return server_players
+
     def cache_players(self):
         if not self.check_running():
             return
-        server_players = self.get_server_players()
+        server_players = self.get_formatted_server_players()
         for p in self.player_cache[:]:
             if p["status"] == "Online" and p["name"] not in server_players:
                 p["status"] = "Offline"
