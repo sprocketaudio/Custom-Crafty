@@ -32,9 +32,8 @@
         "yes": "Yes"
     },
     "base": {
-        "createMFA": "Add Multi-Factor Authentication to your account!",
         "doesNotWorkWithoutJavascript": "<strong>Warning: </strong>Crafty doesn't work properly when JavaScript isn't enabled!",
-        "getMFA": "Secure your servers!"
+        "getMFA": "Enable multi-factor authentication (MFA) to better protect your account. Without MFA, your account is more vulnerable to unauthorized access."
     },
     "configJson": {
         "False": "False",
