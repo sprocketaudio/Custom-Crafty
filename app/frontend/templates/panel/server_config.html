@@ -75,7 +75,7 @@
                   <input type="text" class="form-control" name="executable" id="executable" value="{{ data['server_stats']['server_id']['executable']  }}" placeholder="{{ translate('serverConfig', 'serverExecutable', data['lang']) }}" required>
                 </div>
                 {% end %}
-                {% if data['server_stats']['server_type'] == "minecraft-java" %}
+                {% if data['server_stats']['server_type'] == "minecraft-java" or  data['server_stats']['server_type'] == "hytale" %}
                 <div class="form-group">
                   <label for="java_selection">{{ translate('serverConfig', 'javaVersion', data['lang']) }}
                     <small class="text-muted ml-1">{{ translate('serverConfig', 'javaVersionDesc', data['lang'])
