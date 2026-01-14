@@ -1745,14 +1745,14 @@ class ServerInstance:
 
     def get_server_players(self):
         server = HelperServers.get_server_data_by_id(self.server_id)
-
+        server_type = HelperServers.get_server_type_by_id(self.server_id)
         logger.debug(f"Getting players for server {server['server_name']}")
 
         internal_ip = server["server_ip"]
         server_port = server["server_port"]
 
         logger.debug(f"Pinging {internal_ip} on port {server_port}")
-        if HelperServers.get_server_type_by_id(self.server_id) != "minecraft-bedrock":
+        if server_type == "minecraft-java":
             int_mc_ping = ping(internal_ip, int(server_port))
 
             ping_data = {}
@@ -1761,9 +1761,18 @@ class ServerInstance:
             if int_mc_ping:
                 ping_data = Stats.parse_server_ping(int_mc_ping)
                 return ping_data["players"]
+        elif server_type == "hytale":
+            return NitradoPing.parse_ping_response(
+                NitradoPing.ping(internal_ip, server_port)
+            ).get("players", [])
+
         return []
 
     def get_raw_server_stats(self, server_id):
+        server_type = HelperServers.get_server_type_by_id(server_id)
+        int_data = False
+        ping_data = {}
+
         try:
             server = HelperServers.get_server_obj(server_id)
         except:
@@ -1808,86 +1817,40 @@ class ServerInstance:
         logger.debug(f"Pinging server '{self.name}' on {internal_ip}:{server_port}")
         if HelperServers.get_server_type_by_id(server_id) == "minecraft-bedrock":
             int_mc_ping = ping_bedrock(internal_ip, int(server_port))
+            if int_mc_ping:
+                ping_data = Stats.parse_server_raknet_ping(int_mc_ping)
+                int_data = True
+        elif server_type == "hytale":
+            int_mc_ping = NitradoPing.ping(internal_ip, server_port)
+            if int_mc_ping:
+                int_data = True
+            ping_data = NitradoPing.parse_ping_response(int_mc_ping)
         else:
             int_mc_ping = ping(internal_ip, int(server_port))
-
-        int_data = False
-        ping_data = {}
+            if int_mc_ping:
+                ping_data = Stats.parse_server_ping(int_mc_ping)
+                int_data = True
         # Makes sure we only show stats when a server is online
         # otherwise people have gotten confused.
         if self.check_running():
-            # if we got a good ping return, let's parse it
-            if HelperServers.get_server_type_by_id(server_id) != "minecraft-bedrock":
-                if int_mc_ping:
-                    int_data = True
-                    ping_data = Stats.parse_server_ping(int_mc_ping)
-
-                server_stats = {
-                    "id": server_id,
-                    "started": self.get_start_time(),
-                    "running": self.check_running(),
-                    "cpu": p_stats.get("cpu_usage", 0),
-                    "mem": p_stats.get("memory_usage", 0),
-                    "mem_percent": p_stats.get("mem_percentage", 0),
-                    "world_name": server_name,
-                    "world_size": self.server_size,
-                    "server_port": server_port,
-                    "int_ping_results": int_data,
-                    "online": ping_data.get("online", False),
-                    "max": ping_data.get("max", False),
-                    "players": ping_data.get("players", False),
-                    "desc": ping_data.get("server_description", False),
-                    "version": ping_data.get("server_version", False),
-                    "icon": ping_data.get("server_icon", False),
-                }
-
-            else:
-                if int_mc_ping:
-                    int_data = True
-                    ping_data = Stats.parse_server_raknet_ping(int_mc_ping)
-                    try:
-                        server_icon = base64.encodebytes(ping_data["icon"])
-                    except Exception as ex:
-                        server_icon = False
-                        logger.info(f"Unable to read the server icon : {ex}")
-
-                    server_stats = {
-                        "id": server_id,
-                        "started": self.get_start_time(),
-                        "running": self.check_running(),
-                        "cpu": p_stats.get("cpu_usage", 0),
-                        "mem": p_stats.get("memory_usage", 0),
-                        "mem_percent": p_stats.get("mem_percentage", 0),
-                        "world_name": server_name,
-                        "world_size": self.server_size,
-                        "server_port": server_port,
-                        "int_ping_results": int_data,
-                        "online": ping_data["online"],
-                        "max": ping_data["max"],
-                        "players": [],
-                        "desc": ping_data["server_description"],
-                        "version": ping_data["server_version"],
-                        "icon": server_icon,
-                    }
-                else:
-                    server_stats = {
-                        "id": server_id,
-                        "started": self.get_start_time(),
-                        "running": self.check_running(),
-                        "cpu": p_stats.get("cpu_usage", 0),
-                        "mem": p_stats.get("memory_usage", 0),
-                        "mem_percent": p_stats.get("mem_percentage", 0),
-                        "world_name": server_name,
-                        "world_size": self.server_size,
-                        "server_port": server_port,
-                        "int_ping_results": int_data,
-                        "online": False,
-                        "max": False,
-                        "players": False,
-                        "desc": False,
-                        "version": False,
-                        "icon": False,
-                    }
+            server_stats = {
+                "id": server_id,
+                "started": self.get_start_time(),
+                "running": self.check_running(),
+                "cpu": p_stats.get("cpu_usage", 0),
+                "mem": p_stats.get("memory_usage", 0),
+                "mem_percent": p_stats.get("mem_percentage", 0),
+                "world_name": server_name,
+                "world_size": self.server_size,
+                "server_port": server_port,
+                "int_ping_results": int_data,
+                "online": ping_data.get("online", False),
+                "max": ping_data.get("max", False),
+                "players": ping_data.get("players", False),
+                "desc": ping_data.get("server_description", False),
+                "version": ping_data.get("server_version", False),
+                "icon": ping_data.get("server_icon", False),
+            }
         else:
             server_stats = {
                 "id": server_id,
