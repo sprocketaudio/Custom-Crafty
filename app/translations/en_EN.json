@@ -552,7 +552,7 @@
         "serverModified": "The state of this file has changed on the server since you loaded this page. Please choose an option.",
         "size": "Size",
         "type": "Type",
-        "unsupportedLanguage": "Warning: This is not a supported file type",
+        "unsupportedLanguage": "This is not a recognized file type. Reading and editing functionality may be degraded.",
         "unzip": "Unzip",
         "upload": "Upload",
         "uploadTitle": "Upload Files to: ",

@@ -26,6 +26,8 @@ from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
 
+mimetypes.init(files=[])
+
 PLAIN_TEXT = "text/plain"
 
 
@@ -37,7 +39,6 @@ class FileHelpers:
 
     def __init__(self, helper):
         self.helper: Helpers = helper
-        self.mime_types = mimetypes.MimeTypes()
         self.add_mime_types()  # Add to account for yml, conf, properties, etc
         self.text_mime_prefixes = [
             "text/",
@@ -61,17 +62,44 @@ class FileHelpers:
         mimetypes.add_type(PLAIN_TEXT, ".ini")
         mimetypes.add_type(PLAIN_TEXT, ".conf")
         mimetypes.add_type(PLAIN_TEXT, ".properties")
+        mimetypes.add_type(PLAIN_TEXT, ".prop")
         mimetypes.add_type(PLAIN_TEXT, ".env")
         mimetypes.add_type("application/x-bat", ".ps1")
         mimetypes.add_type("text/x-log", ".log")
 
+    def can_unicode_decode(
+        self, path: str, encoding: str = "utf-8", sample_size: int = 4096
+    ) -> bool:
+        """Check to see if file can be unicode decoded. Check for binary files
+
+        Args:
+            path (str): path to file to check
+            encoding (str, optional): encoding profile. Defaults to "utf-8".
+            sample_size (int, optional): size of sample to take. Defaults to 4096.
+
+        Returns:
+            bool: Returns true if file can be opened, false if not
+        """
+        try:
+            with open(
+                path,
+                "rb",
+            ) as sample:
+                chunk = sample.read(sample_size)
+            chunk.decode(encoding)
+            if (
+                b"\x00" in chunk
+            ):  # check for empty bytes (binary files) this will also capture utf-16
+                return False
+            return True
+        except UnicodeDecodeError:
+            return False
+
     def probably_can_open_file(self, path: str) -> tuple:
+        if Path(path).is_dir():
+            return (False, None)
         mime = mimetypes.guess_type(path)
-        if str(mime[0]).startswith("text/"):
-            return (True, mime[0])
-        if mime[0] in self.text_mime_prefixes:
-            return (True, mime[0])
-        return (False, mime[0])
+        return (self.can_unicode_decode(path), mime[0])
 
     @staticmethod
     def ssl_get_file(  # pylint: disable=too-many-positional-arguments
@@ -198,7 +226,7 @@ class FileHelpers:
             return clean
 
     def check_mime_types(self, file_path):
-        m_type, _value = self.mime_types.guess_type(file_path)
+        m_type, _value = mimetypes.guess_type(file_path)
         return m_type
 
     @staticmethod
