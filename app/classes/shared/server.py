@@ -25,6 +25,7 @@ from apscheduler.jobstores.base import JobLookupError, ConflictingIdError
 from prometheus_client import CollectorRegistry, Gauge, Info
 
 from app.classes.remote_stats.stats import Stats
+from app.classes.remote_stats.nitrado_ping import NitradoPing
 from app.classes.remote_stats.mc_ping import ping, ping_bedrock
 from app.classes.models.servers import HelperServers, Servers
 from app.classes.models.server_stats import HelperServerStats
@@ -1665,6 +1666,7 @@ class ServerInstance:
         return False
 
     def get_servers_stats(self):
+        server_type = HelperServers.get_server_type_by_id(server["server_id"])
         server_stats = {}
 
         server_id = self.server_id
@@ -1681,8 +1683,10 @@ class ServerInstance:
         server_name = server.get("server_name", f"ID#{server_id}")
 
         logger.debug(f"Pinging server '{server}' on {internal_ip}:{server_port}")
-        if HelperServers.get_server_type_by_id(server_id) == "minecraft-bedrock":
+        if server_type == "minecraft-bedrock":
             int_mc_ping = ping_bedrock(internal_ip, int(server_port))
+        elif server_type == "hytale":
+            int_mc_ping = NitradoPing.ping(internal_ip, server_port)
         else:
             try:
                 int_mc_ping = ping(internal_ip, int(server_port))
@@ -1695,11 +1699,10 @@ class ServerInstance:
         # if we got a good ping return, let's parse it
         if int_mc_ping:
             int_data = True
-            if (
-                HelperServers.get_server_type_by_id(server["server_id"])
-                == "minecraft-bedrock"
-            ):
+            if server_type == "minecraft-bedrock":
                 ping_data = Stats.parse_server_raknet_ping(int_mc_ping)
+            elif server_type == "hytale":
+                ping_data = NitradoPing.parse_ping_response(int_mc_ping)
             else:
                 ping_data = Stats.parse_server_ping(int_mc_ping)
         # Makes sure we only show stats when a server is online
