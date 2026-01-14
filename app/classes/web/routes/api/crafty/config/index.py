@@ -123,8 +123,11 @@ config_json_schema = {
             "type": "string",
             "pattern": (
                 r"^(?:(?:\d{1,3}\.){3}\d{1,3}"
-                r"|(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(?::\d{1,5})?$"
+                r"|(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}"
+                r"|localhost)(?::\d{1,5})?$"
             ),
+            "error": "typeString",
+            "fill": True,
         },
         "max_login_attempts": {"type": "integer", "error": "typeInt", "fill": True},
         "superMFA": {"type": "boolean", "error": "typeBool", "fill": True},
