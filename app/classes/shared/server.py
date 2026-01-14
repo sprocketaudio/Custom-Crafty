@@ -132,24 +132,19 @@ class ServerOutBuf:
         self.max_lines = self.helper.get_setting("virtual_terminal_lines")
         self.line_buffer = ""
         ServerOutBuf.lines[self.server_id] = []
-        self.lsi = 0
 
     def process_byte(self, char):
-        if char == os.linesep[self.lsi]:
-            self.lsi += 1
-        else:
-            self.lsi = 0
-            self.line_buffer += char
+        if char == "\n":
+            line = self.line_buffer.rstrip("\r")
+            ServerOutBuf.lines[self.server_id].append(line)
 
-        if self.lsi >= len(os.linesep):
-            self.lsi = 0
-            ServerOutBuf.lines[self.server_id].append(self.line_buffer)
-
-            self.new_line_handler(self.line_buffer)
+            self.new_line_handler(line)
             self.line_buffer = ""
             # Limit list length to self.max_lines:
             if len(ServerOutBuf.lines[self.server_id]) > self.max_lines:
                 ServerOutBuf.lines[self.server_id].pop(0)
+        else:
+            self.line_buffer += char
 
     def check(self):
         text_wrapper = io.TextIOWrapper(
@@ -1666,7 +1661,7 @@ class ServerInstance:
         return False
 
     def get_servers_stats(self):
-        server_type = HelperServers.get_server_type_by_id(server["server_id"])
+        server_type = HelperServers.get_server_type_by_id(self.server_id)
         server_stats = {}
 
         server_id = self.server_id
