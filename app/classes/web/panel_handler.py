@@ -1477,6 +1477,7 @@ class PanelHandler(BaseHandler):
                 codes.append({"name": totp.name, "id": totp.id})
 
             page_data["totp"] = codes
+            page_data["passkey_enabled"] = self.controller.passkey.is_enabled()
             # self.controller.crafty_perms.list_defined_crafty_permissions()
 
             if user_id is None:
@@ -1489,6 +1490,44 @@ class PanelHandler(BaseHandler):
                 return
 
             template = "panel/panel_edit_user_otp.html"
+
+        elif page == "edit_user_passkey":
+            user_id = self.get_argument("id", None)
+            user_obj = self.controller.users.get_user_object(user_id)
+            page_data["user"] = self.controller.users.get_user_by_id(user_id)
+            page_data["passkey_enabled"] = self.controller.passkey.is_enabled()
+
+            if not page_data["passkey_enabled"]:
+                self.redirect("/panel/error?error=Passkey authentication is disabled")
+                return
+
+            passkeys = []
+            for pk in user_obj.passkey_user:
+                passkeys.append(
+                    {
+                        "id": pk.id,
+                        "name": pk.name,
+                        "device_type": pk.device_type,
+                        "backed_up": pk.backed_up,
+                        "created_at": str(pk.created_at),
+                        "last_used_at": (
+                            str(pk.last_used_at) if pk.last_used_at else None
+                        ),
+                    }
+                )
+
+            page_data["passkeys"] = passkeys
+
+            if user_id is None:
+                self.redirect("/panel/error?error=Invalid User ID")
+                return
+            if int(user_id) != exec_user["user_id"] and not exec_user["superuser"]:
+                self.redirect(
+                    "/panel/error?error=You are not authorized to view this page."
+                )
+                return
+
+            template = "panel/panel_edit_user_passkey.html"
 
         elif page == "remove_user":
             # pylint: disable=no-member
