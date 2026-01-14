@@ -1,5 +1,8 @@
 import json
 import httpx
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class NitradoPing:
@@ -17,7 +20,11 @@ class NitradoPing:
             dict: returns dict response with structure defined in nitrado query docs
         """
         url = f"https://{ip}:{port}"
-        response = httpx.get(url, timeout=1)
+        try:
+            response = httpx.get(url, timeout=1)
+        except (httpx.ConnectTimeout, httpx.ConnectError):
+            logger.debug("Failed to get stats from Hytale server")
+            return {}
         return json.loads(response.json())
 
     @staticmethod
@@ -37,7 +44,7 @@ class NitradoPing:
             "online": universe.get("CurrentPlayers", 0),
             "max": server.get("MaxPlayers", 0),
             "players": players,
-            "server_description": server.get("Name"),
-            "server_version": server.get("Version"),
+            "server_description": server.get("Name", False),
+            "server_version": server.get("Version", False),
             "server_icon": None,
         }
