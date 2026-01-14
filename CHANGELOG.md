@@ -5,6 +5,7 @@ TBD
 ### Bug fixes
 - Fix crash on startup due to big bucket cache refresh ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/941))
 - Fix issue where files would incorrectly be classified as not able to be opened by missing mimetypes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/944))
+- Fix issue where filter list size would change during iteration causing the program to halt silently ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/944))
 ### Tweaks
 TBD
 ### Lang
