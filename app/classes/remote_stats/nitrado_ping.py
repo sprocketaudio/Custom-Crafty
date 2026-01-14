@@ -19,13 +19,21 @@ class NitradoPing:
         Returns:
             dict: returns dict response with structure defined in nitrado query docs
         """
-        url = f"https://{ip}:{port}"
+        url = f"https://{ip}:{port}/Nitrado/Query"
         try:
-            response = httpx.get(url, timeout=1)
-        except (httpx.ConnectTimeout, httpx.ConnectError):
-            logger.debug("Failed to get stats from Hytale server")
+            response = httpx.get(url, verify=False, timeout=1)  # Local query to server
+            if response.status_code == 200:
+                return response.json()
+            raise httpx.ConnectError(
+                f"Invalid response status code of {response.status_code}"
+            )
+        except (
+            httpx.ConnectTimeout,
+            httpx.ConnectError,
+            json.decoder.JSONDecodeError,
+        ) as why:
+            logger.debug("Failed to get stats from Hytale server with error %s", why)
             return {}
-        return json.loads(response.json())
 
     @staticmethod
     def parse_ping_response(response: dict) -> dict:
