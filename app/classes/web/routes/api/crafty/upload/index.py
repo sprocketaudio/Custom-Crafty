@@ -3,8 +3,8 @@ import logging
 import shutil
 import asyncio
 import pathlib
-import anyio
 from pathlib import Path
+import anyio
 from PIL import Image
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.web.base_api_handler import BaseApiHandler

@@ -1,6 +1,5 @@
 import os
 import time
-import shutil
 import pathlib
 import logging
 import threading

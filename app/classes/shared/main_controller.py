@@ -4,7 +4,6 @@ import pathlib
 from pathlib import Path
 from datetime import datetime
 import platform
-import shutil
 import time
 import json
 import logging
