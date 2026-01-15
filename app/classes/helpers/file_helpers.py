@@ -598,6 +598,12 @@ class FileHelpers:
                 files_list = zip_ref.namelist()
                 for idx, file in enumerate(files_list):
                     info = zip_ref.getinfo(file)
+                    target = Path(destination_path, file).resolve()
+                    try:
+                        self.helper.validate_traversal(destination_path, target)
+                    except ValueError:
+                        self.send_percentage(server_users, 100, proc_id, True)
+                        return logger.error("Traversal detected. Dumping out.")
                     # if the file is one of our ignored names we'll skip it
                     if self.should_extract(
                         file, base_include_path, ignored_names, server_update
