@@ -45,6 +45,9 @@ if os.name == "nt":
 
 logger = logging.getLogger(__name__)
 
+PLAIN_TEXT = "text/plain"
+BAT_TEXT = "application/x-bat"
+
 MASTER_CONFIG = {
     "https_port": 8443,
     "language": "en_EN",

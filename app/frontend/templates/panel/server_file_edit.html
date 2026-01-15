@@ -9,7 +9,8 @@ end %} {% block content %}
     data-serverModified='{{translate("serverFiles", "serverModified", data["lang"])}}'
     data-cancel='{{translate("serverFiles", "cancel", data["lang"])}}'
     data-overwrite='{{translate("serverFiles", "overwrite", data["lang"])}}'
-    data-repull='{{translate("serverFiles", "repull", data["lang"])}}'>
+    data-repull='{{translate("serverFiles", "repull", data["lang"])}}'
+    data-unsupported="{{translate('serverFiles', 'unsupportedLanguage', data['lang'])}}">
     <!-- Page Title Header Starts-->
     <div class="row page-title-header centered">
         <div id="server-name" class="info-flex">
@@ -33,6 +34,11 @@ end %} {% block content %}
                 "modified",
                 data["lang"])}}: <span id="file_modified_sm"></span> </small>
         </div>
+    </div>
+    <div id="warning" class="d-none row centered">
+        <h5><i class="fa-solid fa-triangle-exclamation"></i>&nbsp;{{
+            translate('serverFiles', 'unsupportedLanguage',
+            data['lang'])}}</h5>
     </div>
     <!-- Page Title Header Ends-->
     <div id="editor_container" class="col-sm-12">

@@ -32,9 +32,8 @@
         "yes": "Yes"
     },
     "base": {
-        "createMFA": "Add Multi-Factor Authentication to your account!",
         "doesNotWorkWithoutJavascript": "<strong>Warning: </strong>Crafty doesn't work properly when JavaScript isn't enabled!",
-        "getMFA": "Secure your servers!"
+        "getMFA": "Enable multi-factor authentication (MFA) to better protect your account. Without MFA, your account is more vulnerable to unauthorized access."
     },
     "configJson": {
         "False": "False",
@@ -552,7 +551,7 @@
         "serverModified": "The state of this file has changed on the server since you loaded this page. Please choose an option.",
         "size": "Size",
         "type": "Type",
-        "unsupportedLanguage": "Warning: This is not a supported file type",
+        "unsupportedLanguage": "This is not a recognized file type. Reading and editing functionality may be degraded.",
         "unzip": "Unzip",
         "upload": "Upload",
         "uploadTitle": "Upload Files to: ",

@@ -195,7 +195,7 @@ function setMode(extension) {
         console.log(aceMode || "ace/mode/text");
         editor.session.setMode(aceMode || "ace/mode/text");
     } else {
-        bootbox.alert("{% raw translate('serverFiles', 'unsupportedLanguage', data['lang']) %}")
+        $("#warning").removeClass("d-none");
     }
 }
 function setFileName(fileName = "default.txt") {
