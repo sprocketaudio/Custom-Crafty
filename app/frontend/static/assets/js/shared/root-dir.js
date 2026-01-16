@@ -116,7 +116,7 @@ function process_tree_response(response) {
         if (mainTreeDiv) {
             mainTreeDiv.appendChild(ul);
             const mainTree = document.getElementById('main-tree');
-            if (mainTree && mainTree.parentElement) {
+            if (mainTree?.parentElement) {
                 mainTree.parentElement.classList.add("clicked");
             }
         } else if (filesTree) {
