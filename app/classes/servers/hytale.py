@@ -12,9 +12,16 @@ class Hytale:
         bb_cache = self.server.big_bucket.get_bucket_data()
         unix_exe = PurePosixPath(bb_cache["linux_installer"]).name
         windows_exe = PurePosixPath(bb_cache["windows_installer"]).name
-        install_command = f"./{unix_exe}"
+        install_command = f"./{unix_exe} {bb_cache["download_path_command"]} hytale.zip"
         if self.server.helper.is_os_windows():
-            install_command = f"{self.server.server_path}/{windows_exe}"
+            install_command = (
+                f"{self.server.server_path}/{windows_exe} "
+                f"{bb_cache["download_path_command"]} hytale.zip"
+            )
+
+        self.server.file_helper.unzip_file(
+            Path(self.server.server_path, "hytale.zip"), self.server.server_path
+        )
 
     def install_or_update_monitoring_plugins(self):
         bb_cache = self.server.big_bucket.get_bucket_data()
