@@ -74,6 +74,7 @@ class Controller:
             self.management_helper,
             self.file_helper,
             self.import_helper,
+            self.big_bucket,
         )
         self.users: UsersController = UsersController(
             self.helper, self.users_helper, self.authentication

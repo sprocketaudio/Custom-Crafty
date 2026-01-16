@@ -32,7 +32,13 @@ class ServersController(metaclass=Singleton):
     servers_list: ServerInstance
 
     def __init__(
-        self, helper, servers_helper, management_helper, file_helper, import_helper
+        self,
+        helper,
+        servers_helper,
+        management_helper,
+        file_helper,
+        import_helper,
+        big_bucket,
     ):
         self.helper: Helpers = helper
         self.file_helper: FileHelpers = file_helper
@@ -46,6 +52,7 @@ class ServersController(metaclass=Singleton):
             self.helper, self.file_helper, self.management_helper
         )
         self.import_helper = import_helper
+        self.big_bucket = big_bucket
 
     # **********************************************************************************
     #                                   Generic Servers Methods
@@ -246,6 +253,7 @@ class ServersController(metaclass=Singleton):
                     self.file_helper,
                     self.backups_mgr,
                     self.import_helper,
+                    self.big_bucket,
                 ),
             }
 
