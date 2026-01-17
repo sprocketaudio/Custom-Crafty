@@ -1,5 +1,8 @@
+import subprocess
 import logging
 from pathlib import PurePosixPath, Path
+from app.classes.web.websocket_handler import WebSocketManager
+from app.classes.models.server_permissions import PermissionsServers
 
 logger = logging.Logger(__name__)
 
@@ -22,7 +25,40 @@ class Hytale:
                 f"{self.server.server_path}/{windows_exe} "
                 f"{bb_cache["download_path_command"]} {OUTPUT_FILE_NAME}"
             )
+        self.process = subprocess.Popen(
+            install_command,
+            cwd=self.server.server_path,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+        url_line = ""
+        auth_code_line = ""
+        while self.process.poll() is None:
+            line = self.process.stdout.readline()
+            if not line:
+                continue
 
+            line = line.strip()
+            print(line)
+
+            if (
+                line.startswith(bb_cache["parsing_lines"]["verify_url_line_start"])
+                and url_line == ""
+            ):
+                server_users = PermissionsServers.get_server_user_list(
+                    self.server.server_id
+                )
+                url_line = line
+                for user in server_users:
+                    WebSocketManager().broadcast_user(
+                        user,
+                        "hytale_auth",
+                        {"link": line},
+                    )
+
+            else:
+                auth_code_line = line
         # Unzip downloaded archive.
         self.server.file_helper.unzip_file(
             Path(self.server.server_path, OUTPUT_FILE_NAME),

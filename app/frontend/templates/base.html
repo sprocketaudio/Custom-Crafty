@@ -8,6 +8,8 @@
   {% if not data.get("mfa", None) %}
   <meta name="mfa_warn" content="{{translate('base', 'getMFA', data['lang'])}}">
   <meta name="userId" content="{{data['user_data']['user_id']}}">
+  <meta name="auth_translation" content="{{translate('serverWizard', 'authenticate', data['lang'])}}">
+  <meta name="auth_away_translation" content="{{translate('serverWizard', 'authenticateAway', data['lang'])}}">
   {% end %}
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   {% block meta %}{% end %}
@@ -313,6 +315,30 @@
         }
         bootbox.alert({
           message: start_error.error,
+          callback: function () {
+            location.reload();
+          }
+        })
+      });
+      webSocket.on('hytale_auth', function (data) {
+        const HYTALE_AUTH_MSG = document.querySelector('meta[name="auth_translation"]');
+        const HYTALE_AUTH_AWAY = document.querySelector('meta[name="auth_away_translation"]');
+        var x = document.querySelector('.bootbox');
+        if (x) {
+          x.remove()
+        }
+        var x = document.querySelector('.modal-backdrop');
+        if (x) {
+          x.remove()
+        }
+        const container = $("<div>");
+        const link = $("<a>").attr("href", data.link).text(HYTALE_AUTH_MSG)
+        const warning = $("span").html(`<i class="fa-solid fa-triangle-exclamation"></i>`)
+        warning.append($("<p>").text(HYTALE_AUTH_AWAY))
+        container.append(link)
+        container.append(warning)
+        bootbox.alert({
+          message: container,
           callback: function () {
             location.reload();
           }
