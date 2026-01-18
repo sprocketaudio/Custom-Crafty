@@ -200,7 +200,6 @@ class ServerInstance:
         file_helper,
         backup_mgr,
         import_helper,
-        big_bucket,
     ):
         self.helper = helper
         self.file_helper = file_helper
@@ -226,7 +225,6 @@ class ServerInstance:
         self.stats_helper = HelperServerStats(self.server_id)
         self.last_backup_failed = False
         self.server_registry = CollectorRegistry()
-        self.big_bucket = big_bucket
         self.hytale = Hytale(self)
 
         try:
@@ -280,16 +278,6 @@ class ServerInstance:
     def reload_server_settings(self):
         server_data = HelperServers.get_server_data_by_id(self.server_id)
         self.settings = server_data
-
-    def send_server_alert(self, line):
-        server_users = PermissionsServers.get_server_user_list(self.server_id)
-
-        for user in server_users:
-            WebSocketManager().broadcast_user(
-                user,
-                "hytale_auth",
-                {"link": line},
-            )
 
     def do_server_setup(self, server_data_obj):
         server_id = server_data_obj["server_id"]
