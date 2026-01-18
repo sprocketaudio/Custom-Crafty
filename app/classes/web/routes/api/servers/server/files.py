@@ -301,57 +301,55 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             file_list = sorted(dir_list, key=str.casefold) + sorted(
                 unsorted_files, key=str.casefold
             )
-            for raw_filename in file_list:
-                filename = html.escape(raw_filename)
-                rel = os.path.join(folder, raw_filename)
-                dpath = os.path.join(folder, filename)
-                can_open, mime = self.file_helper.probably_can_open_file(dpath)
-                modified_time = datetime.fromtimestamp(Path(dpath).stat().st_mtime)
+            for filename in file_list:
+                raw_path = Path(folder, filename).resolve()
+                can_open, mime = self.file_helper.probably_can_open_file(str(raw_path))
+                modified_time = datetime.fromtimestamp(Path(raw_path).stat().st_mtime)
                 if backup_id:
                     if str(
-                        dpath
+                        raw_path
                     ) in self.controller.management.get_excluded_backup_dirs(backup_id):
-                        if os.path.isdir(rel):
+                        if os.path.isdir(raw_path):
                             return_json[filename] = {
-                                "path": dpath,
+                                "path": raw_path,
                                 "dir": True,
                                 "excluded": True,
                             }
                         else:
                             try:
-                                file_size = os.path.getsize(rel)
+                                file_size = os.path.getsize(raw_path)
                             except (OSError, IOError):
                                 file_size = 0
                             return_json[filename] = {
-                                "path": dpath,
+                                "path": raw_path,
                                 "dir": False,
                                 "excluded": True,
                                 "size": Helpers.human_readable_file_size(file_size),
                             }
                     else:
-                        if os.path.isdir(rel):
+                        if os.path.isdir(raw_path):
                             return_json[filename] = {
-                                "path": dpath,
+                                "path": raw_path,
                                 "dir": True,
                                 "excluded": False,
                             }
                         else:
                             try:
-                                file_size = os.path.getsize(rel)
+                                file_size = os.path.getsize(raw_path)
                             except (OSError, IOError):
                                 file_size = 0
                             return_json[filename] = {
-                                "path": dpath,
+                                "path": raw_path,
                                 "dir": False,
                                 "excluded": False,
                                 "size": Helpers.human_readable_file_size(file_size),
                             }
                 else:
-                    if os.path.isdir(rel):
+                    if os.path.isdir(raw_path):
                         return_json[filename] = {
                             "path": str(
                                 PurePath.relative_to(
-                                    PurePath(dpath), PurePath(server_path)
+                                    PurePath(raw_path), PurePath(server_path)
                                 )
                             ),
                             "dir": True,
@@ -360,13 +358,13 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                         }
                     else:
                         try:
-                            file_size = os.path.getsize(rel)
+                            file_size = os.path.getsize(raw_path)
                         except (OSError, IOError):
                             file_size = 0
                         return_json[filename] = {
                             "path": str(
                                 PurePath.relative_to(
-                                    PurePath(dpath), PurePath(server_path)
+                                    PurePath(raw_path), PurePath(server_path)
                                 )
                             ),
                             "dir": False,
