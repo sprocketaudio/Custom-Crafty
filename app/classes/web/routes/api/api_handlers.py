@@ -156,7 +156,7 @@ def api_handlers(handler_args):
             handler_args,
         ),
         (
-            r"/api/v2/import/file/unzip/?",
+            r"/api/v2/import/archive/select?",
             ApiImportFilesIndexHandler,
             handler_args,
         ),

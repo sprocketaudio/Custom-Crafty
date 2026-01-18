@@ -958,10 +958,11 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                 },
             )
         if Helpers.check_file_exists(target_file):
+            destination_path = Path(target_file).parents[0]
             unzip_thread = threading.Thread(
                 target=self.file_helper.unzip_file,
                 daemon=True,
-                args=(target_file, server_id),
+                args=(target_file, destination_path, server_id),
                 kwargs={"proc_id": data.get("proc_id")},
                 name=f"{target_file}_unzip",
             )

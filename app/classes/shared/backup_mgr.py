@@ -79,7 +79,7 @@ class BackupManager:
             for user in server_users:
                 WebSocketManager().broadcast_user(
                     user,
-                    "send_start_error",
+                    "send_error",
                     self.helper.translation.translate(
                         "notify", "restoreFailed", HelperUsers.get_user_lang_by_id(user)
                     ),

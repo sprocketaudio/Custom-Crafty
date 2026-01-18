@@ -302,7 +302,7 @@
     });
 
     if (webSocket) {
-      webSocket.on('send_start_error', function (start_error) {
+      webSocket.on('send_error', function (start_error) {
         var x = document.querySelector('.bootbox');
         if (x) {
           x.remove()
@@ -531,6 +531,21 @@
           .then(function (registration) {
             console.log('Service Worker Registered');
           });
+      }
+      if (webSocket) {
+        webSocket.on('zip_status', function (data) {
+          if (data.complete) {
+            try {
+              const cur_dir = $("#table-nav").attr("data-cur-path");
+              removeProgressItem(data.id);
+              getTreeView(cur_dir);
+            } catch {
+              $('.bootbox-close-button').click();
+            }
+          } else {
+            updateProgressBar(data.percent, data.id ? "server_upload" : "", 1, data.id);
+          }
+        });
       }
     });
   </script>

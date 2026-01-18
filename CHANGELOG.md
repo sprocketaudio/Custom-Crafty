@@ -10,6 +10,7 @@ TBD
 - Remove HTML encoding on files return ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/943))
 ### Tweaks
 - Change the way MFA warning is displayed on front end ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/953))
+- Remove local file imports ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/936))
 ### Lang
 TBD
 <br><br>

@@ -825,7 +825,10 @@ class TasksManager:
                 )
             if self.helper.is_file_older_than_x_days(file_path):
                 try:
-                    os.remove(file_path)
+                    if Path(file_path).is_dir():
+                        FileHelpers.del_dirs(file_path)
+                    else:
+                        FileHelpers.del_file(file_path)
                 except FileNotFoundError:
                     logger.debug("Could not clear out file from import directory")
 
