@@ -664,7 +664,7 @@
     "serverWizard": {
         "absoluteServerPath": "Absolute path to your server",
         "absoluteZipPath": "Absolute path to your server",
-        "authenitcate": "Click here to finish install and authenitcate your Hytale account.",
+        "authenticate": "Click here to finish install and authenticate your Hytale account.",
         "authenticateAway": "Crafty will not store your credentials. This will navigate you away from Crafty.",
         "addRole": "Add Server to Existing Role(s)",
         "autoCreate": "If none are selected Crafty will make one!",
