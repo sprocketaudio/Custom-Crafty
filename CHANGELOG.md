@@ -9,6 +9,7 @@ TBD
 - [`CVE-2026-0963`] Security: Add `validate_traversal` calls to `ServerFilesOperationHandler` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/951))
 - Remove HTML encoding on files return ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/943))
 - [`CVE-2026-0805`] Security: Snapshot Backup Traversal ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/937))
+- Catch backup dispatch errors crashing command_watcher ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/955))
 ### Tweaks
 - Change the way MFA warning is displayed on front end ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/953))
 - Remove local file imports ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/936))
