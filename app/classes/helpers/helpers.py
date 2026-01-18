@@ -142,7 +142,10 @@ class Helpers:
         self.db_path = os.path.join(
             self.root_dir, "app", "config", "db", "crafty.sqlite"
         )
-        self.big_bucket_cache = os.path.join(self.config_dir, "bigbucket.json")
+        self.big_bucket_minecraft_cache = os.path.join(
+            self.config_dir, "bigbucket.json"
+        )
+        self.big_bucket_hytale_cache = os.path.join(self.config_dir, "hytale.json")
         self.credits_cache = os.path.join(self.config_dir, "credits.json")
         self.passhasher = PasswordHasher()
         self.exiting = False
