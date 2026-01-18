@@ -12,6 +12,7 @@ import subprocess
 import html
 import glob
 import json
+from pathlib import Path
 
 from zoneinfo import ZoneInfo
 
@@ -388,8 +389,7 @@ class ServerInstance:
                 # Checks for Oracle Java. Only Oracle Java's helper will cause a re-exec
                 if "/Oracle/Java/" in str(self.helper.wtol_path(oracle_path)):
                     logger.info(
-                        "Oracle Java detected. Changing"
-                        " start command to avoid re-exec."
+                        "Oracle Java detected. Changing start command to avoid re-exec."
                     )
                     which_java_raw = self.helper.which_java()
                     try:
@@ -1178,16 +1178,48 @@ class ServerInstance:
     def server_restore_threader(self, backup_id, backup_file, in_place=False):
         # import the server again based on zipfile
         backup_config = HelpersManagement.get_backup_config(backup_id)
-        backup_location = os.path.join(
-            backup_config["backup_location"],
-            backup_config["backup_id"],
-            backup_file,
-        )
+
+        # This path gets resolved and checked for traversal before restore_starter
+        # so that it remains async.
+        # At this point this path cannot be trusted.
+        backup_type = backup_config.get("backup_type", "zip_vault")
+        if backup_type == "zip_vault":
+            expected_backup_location = Path(
+                backup_config["backup_location"], backup_config["backup_id"]
+            )
+        else:
+            expected_backup_location = Path(
+                backup_config["backup_location"], "snapshot_backups", "manifests"
+            )
+
+        expected_backup_location = expected_backup_location.resolve()
+
+        try:
+            Helpers.validate_traversal(expected_backup_location, backup_file)
+        except ValueError as why:
+            # Crash out on possible traversal.
+            logger.error(
+                f"Possible backup traversal detected on restore request: {why}",
+            )
+
+            server_users = PermissionsServers.get_server_user_list(self.server_id)
+            for user in server_users:
+                WebSocketManager().broadcast_user(
+                    user,
+                    "send_error",
+                    self.helper.translation.translate(
+                        "notify", "restoreFailed", HelperUsers.get_user_lang_by_id(user)
+                    ),
+                )
+            return
+
+        backup_location = (expected_backup_location / backup_file).resolve()
+
         restore_thread = threading.Thread(
             target=self.backup_mgr.restore_starter,
             daemon=True,
             name=f"backup_{backup_config['backup_id']}",
-            args=[backup_config, backup_location, backup_file, self, in_place],
+            args=[backup_config, backup_location, self, in_place],
         )
 
         restore_thread.start()
@@ -1478,7 +1510,6 @@ class ServerInstance:
 
         # lets download the files
         if HelperServers.get_server_type_by_id(self.server_id) != "minecraft-bedrock":
-
             jar_dir = os.path.dirname(current_executable)
             jar_file_name = os.path.basename(current_executable)
 
