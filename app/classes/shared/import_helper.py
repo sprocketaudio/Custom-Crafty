@@ -1,9 +1,13 @@
 import os
+import uuid
 import time
 import pathlib
 import logging
 import threading
+import subprocess
+from pathlib import PurePosixPath, Path
 
+from app.classes.remote_stats.bigbucket import BigBucket
 from app.classes.controllers.server_perms_controller import PermissionsServers
 from app.classes.controllers.servers_controller import ServersController
 from app.classes.helpers.helpers import Helpers
@@ -12,6 +16,8 @@ from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
 
+HYTALE_0UTPUT_NAME = "hytale.zip"
+
 
 class ImportHelpers:
     allowed_quotes = ['"', "'", "`"]
@@ -19,6 +25,7 @@ class ImportHelpers:
     def __init__(self, helper, file_helper):
         self.file_helper: FileHelpers = file_helper
         self.helper: Helpers = helper
+        self.big_bucket = BigBucket(helper)
 
     def import_zipped_server(
         self,
@@ -146,3 +153,88 @@ class ImportHelpers:
         server_users = PermissionsServers.get_server_user_list(new_id)
         for user in server_users:
             WebSocketManager().broadcast_user(user, "send_start_reload", {})
+
+    def download_install_threaded_hytale(self, path, new_id):
+        download_thread = threading.Thread(
+            target=self.download_install_hytale,
+            daemon=True,
+            args=(path, new_id),
+            name=f"{new_id}_download",
+        )
+        download_thread.start()
+
+    def download_install_hytale(self, server_path: str | Path, new_id: uuid.UUID):
+        server_users = PermissionsServers.get_server_user_list(new_id)
+
+        bb_cache = self.big_bucket.get_bucket_data()
+        unix_exe = PurePosixPath(bb_cache["linux_installer"]).name
+        windows_exe = PurePosixPath(bb_cache["windows_installer"]).name
+        install_command = (
+            f"./{unix_exe} {bb_cache["download_path_command"]} {HYTALE_0UTPUT_NAME}"
+        )
+        if self.helper.is_os_windows():
+            install_command = (
+                f"{server_path}/{windows_exe} "
+                f"{bb_cache["download_path_command"]} {HYTALE_0UTPUT_NAME}"
+            )
+        self.process = subprocess.Popen(
+            install_command,
+            cwd=server_path,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+        url_line = ""
+        auth_code_line = ""
+        while self.process.poll() is None:
+            line = self.process.stdout.readline()
+            if not line:
+                continue
+
+            line = line.strip()
+            print(line)
+
+            if (
+                line.startswith(bb_cache["parsing_lines"]["verify_url_line_start"])
+                and url_line == ""
+            ):
+
+                for user in server_users:
+                    WebSocketManager().broadcast_user(
+                        user,
+                        "hytale_auth",
+                        {"link": line},
+                    )
+
+            else:
+                auth_code_line = line
+        # Unzip downloaded archive.
+        self.file_helper.unzip_file(
+            Path(server_path, HYTALE_0UTPUT_NAME),
+            server_path,
+        )
+        self.install_or_update_monitoring_plugins(new_id, server_path)
+        ServersController.finish_import(new_id)
+        for user in server_users:
+            WebSocketManager().broadcast_user(user, "send_start_reload", {})
+
+    def install_or_update_monitoring_plugins(
+        self, server_id: uuid.UUID, server_path: str | Path
+    ):
+        bb_cache = self.big_bucket.get_bucket_data()
+        logger.info("Installing Nitrado Webserver Plugin to server %s", server_id)
+        # make sure our mods dir exists before doing anything
+        # Download webserver plugin required for query plugin
+        self.helper.ensure_dir_exists(Path(server_path, "mods"))
+        self.file_helper.ssl_get_file(
+            bb_cache["plugins"]["webserver_plugin"],
+            Path(server_path, "mods"),
+            "nitrado-webserver.jar",
+        )
+        # Download query plugin
+        logger.info("Installing Nitrado Query Plugin to server %s", server_id)
+        self.file_helper.ssl_get_file(
+            bb_cache["plugins"]["query_plugin"],
+            Path(server_path, "mods"),
+            "nitrado-query.jar",
+        )
