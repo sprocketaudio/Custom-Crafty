@@ -43,10 +43,18 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/panel/edit_user_otp?id={{ data['user']['user_id'] }}" role="tab"
-                                aria-selected="true">
+                                aria-selected="false">
                                 <i class="fa-solid fa-shield-halved"></i>{{ translate('userConfig', 'totpHeader',
                                 data['lang']) }}</a>
                         </li>
+                        {% if data.get('passkey_enabled', False) %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/panel/edit_user_passkey?id={{ data['user']['user_id'] }}"
+                                role="tab" aria-selected="false">
+                                <i class="fa-solid fa-fingerprint"></i>{{ translate('userConfig', 'passkeyHeader',
+                                data['lang']) }}</a>
+                        </li>
+                        {% end %}
                     </ul>
 
                     <div class="row">

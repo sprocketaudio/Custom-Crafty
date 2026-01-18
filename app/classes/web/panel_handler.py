@@ -303,6 +303,7 @@ class PanelHandler(BaseHandler):
                 "mfa"
             ),  # set value if the token has MFA set to true or not
             # for warning banner
+            "password_auth_disabled": exec_user.get("disable_password_auth", False),
             "update_available": self.helper.update_available,
             "support_perm": self.helper.get_setting("general_user_log_access")
             or exec_user["superuser"],
@@ -1438,6 +1439,7 @@ class PanelHandler(BaseHandler):
 
             if exec_user["email"] == "default@example.com":
                 page_data["user"]["email"] = ""
+            page_data["passkey_enabled"] = self.controller.passkey.is_enabled()
             template = "panel/panel_edit_user.html"
 
         elif page == "edit_user_apikeys":
@@ -1460,10 +1462,11 @@ class PanelHandler(BaseHandler):
                 return
             if int(user_id) != exec_user["user_id"] and not exec_user["superuser"]:
                 self.redirect(
-                    "/panel/error?error=You are not authorized to view this page."
+                    "/panel/error?error=Unauthorized access: you do not have permission to edit this user's API keys."
                 )
                 return
 
+            page_data["passkey_enabled"] = self.controller.passkey.is_enabled()
             template = "panel/panel_edit_user_apikeys.html"
 
         elif page == "edit_user_otp":
@@ -1478,6 +1481,7 @@ class PanelHandler(BaseHandler):
                 codes.append({"name": totp.name, "id": totp.id})
 
             page_data["totp"] = codes
+            page_data["passkey_enabled"] = self.controller.passkey.is_enabled()
             # self.controller.crafty_perms.list_defined_crafty_permissions()
 
             if user_id is None:
@@ -1485,11 +1489,51 @@ class PanelHandler(BaseHandler):
                 return
             if int(user_id) != exec_user["user_id"] and not exec_user["superuser"]:
                 self.redirect(
-                    "/panel/error?error=You are not authorized to view this page."
+                    "/panel/error?error=Unauthorized access: you do not have permission to edit this user's OTP settings."
                 )
                 return
 
             template = "panel/panel_edit_user_otp.html"
+
+        elif page == "edit_user_passkey":
+            user_id = self.get_argument("id", None)
+            user_obj = self.controller.users.get_user_object(user_id)
+            page_data["user"] = self.controller.users.get_user_by_id(user_id)
+            page_data["passkey_enabled"] = self.controller.passkey.is_enabled()
+
+            if not page_data["passkey_enabled"]:
+                self.redirect("/panel/error?error=Passkey authentication is disabled")
+                return
+
+            passkeys = []
+            for pk in user_obj.passkey_user:
+                passkeys.append(
+                    {
+                        "id": pk.id,
+                        "name": pk.name,
+                        "device_type": pk.device_type,
+                        "backed_up": pk.backed_up,
+                        "created_at": str(pk.created_at),
+                        "last_used_at": (
+                            str(pk.last_used_at) if pk.last_used_at else None
+                        ),
+                    }
+                )
+
+            page_data["passkeys"] = passkeys
+            page_data["disable_password_auth"] = user_obj.disable_password_auth
+            page_data["has_passkeys"] = len(passkeys) > 0
+
+            if user_id is None:
+                self.redirect("/panel/error?error=Invalid User ID")
+                return
+            if int(user_id) != exec_user["user_id"] and not exec_user["superuser"]:
+                self.redirect(
+                    "/panel/error?error=Unauthorized access: you do not have permission to edit this user's passkey settings."
+                )
+                return
+
+            template = "panel/panel_edit_user_passkey.html"
 
         elif page == "remove_user":
             # pylint: disable=no-member

@@ -22,6 +22,7 @@ from app.classes.models.roles import HelperRoles
 from app.classes.models.management import HelpersManagement
 from app.classes.models.servers import HelperServers
 from app.classes.models.totp import HelperTOTP
+from app.classes.models.passkey import HelperPasskey
 from app.classes.controllers.crafty_perms_controller import CraftyPermsController
 from app.classes.controllers.management_controller import ManagementController
 from app.classes.controllers.users_controller import UsersController
@@ -29,6 +30,7 @@ from app.classes.controllers.roles_controller import RolesController
 from app.classes.controllers.server_perms_controller import ServerPermsController
 from app.classes.controllers.servers_controller import ServersController
 from app.classes.controllers.totp_controller import TOTPController
+from app.classes.controllers.passkey_controller import PasskeyController
 from app.classes.shared.authentication import Authentication
 from app.classes.shared.console import Console
 from app.classes.helpers.helpers import Helpers
@@ -51,9 +53,9 @@ class Controller:
         self.big_bucket: BigBucket = BigBucket(helper)
         self.users_helper: HelperUsers = HelperUsers(database, self.helper)
         self.totp_helper: HelperTOTP = HelperTOTP(database)
+        self.passkey_helper: HelperPasskey = HelperPasskey(database)
         self.roles_helper: HelperRoles = HelperRoles(database)
         self.servers_helper: HelperServers = HelperServers(database)
-        self.totp_helper: HelperTOTP = HelperTOTP(database)
         self.management_helper: HelpersManagement = HelpersManagement(
             database, self.helper
         )
@@ -63,6 +65,9 @@ class Controller:
             self.management_helper
         )
         self.totp: TOTPController = TOTPController(self.totp_helper, self.helper)
+        self.passkey: PasskeyController = PasskeyController(
+            self.passkey_helper, self.helper
+        )
         self.roles: RolesController = RolesController(
             self.users_helper, self.roles_helper
         )

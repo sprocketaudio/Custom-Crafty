@@ -97,6 +97,14 @@
               <button class="login-input btn btn-primary submit-btn btn-block">{{ translate('login', 'login',
                 data['lang']) }}</button>
             </div>
+            <div id="passkey-section" class="form-group" style="display: none;">
+              <div class="text-center my-2">
+                <span class="text-muted">{{ translate('login', 'orSeparator', data['lang']) }}</span>
+              </div>
+              <button type="button" id="passkey-login-btn" class="btn btn-outline-primary btn-block">
+                <i class="mdi mdi-key"></i>&nbsp;{{ translate('login', 'signInWithPasskey', data['lang']) }}
+              </button>
+            </div>
             <fieldset id="error-field" class="loginError">
             </fieldset>
             <div class="form-group d-flex justify-content-between">
@@ -139,6 +147,7 @@
   <script src="/static/assets/js/shared/settings.js"></script>
   <script src="/static/assets/js/shared/todolist.js"></script>
   <script src="../static/assets/vendors/js/bootbox.min.js"></script>
+  <script src="/static/assets/js/shared/passkey.js"></script>
   <!-- endinject -->
   <script>
 
@@ -216,11 +225,11 @@
           location.href = responseData.data.page;
         }
       } else if (responseData.cooldown_time) {
-        $("#error-field").html(`${responseData.error_data}&nbsp;<span id="cooldown">${responseData.cooldown_time || ""}</span>`);
+        $("#error-field").empty().text(responseData.error_data + " ").append($('<span id="cooldown"></span>').text(responseData.cooldown_time));
         let time_array = String(responseData.cooldown_time).split(":")
         startCountdown(time_array[0], time_array[1]);
       } else {
-        $("#error-field").html(`${responseData.error_data}`);
+        $("#error-field").text(responseData.error_data);
       }
     });
     function startCountdown(minutes, seconds) {
@@ -240,6 +249,108 @@
         totalSeconds--;
       }, 1000);
     }
+
+    // Passkey authentication - base64URLToBuffer and bufferToBase64URL loaded from passkey.js
+
+    async function checkPasskeySupport() {
+      if (globalThis.PublicKeyCredential &&
+          PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+        try {
+          // Check if passkey is enabled on server
+          const configCheck = await fetch('/api/v2/auth/passkey/login/options/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({}),
+          });
+          const config = await configCheck.json();
+          if (config.status === 'ok') {
+            document.getElementById('passkey-section').style.display = 'block';
+          }
+        } catch (e) {
+          console.log('Passkey check failed:', e);
+        }
+      }
+    }
+
+    document.getElementById('passkey-login-btn').addEventListener('click', async function() {
+      const loginFailedMsg = '{{ translate("passkey", "loginFailed", data["lang"]) }}';
+      const authFailedMsg = '{{ translate("passkey", "authFailed", data["lang"]) }}';
+      try {
+        const optionsRes = await fetch('/api/v2/auth/passkey/login/options/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+
+        if (!optionsRes.ok) {
+          $('#error-field').text(loginFailedMsg);
+          return;
+        }
+
+        const optionsData = await optionsRes.json();
+        if (optionsData.status !== 'ok') {
+          $('#error-field').text(optionsData.error_data || loginFailedMsg);
+          return;
+        }
+
+        const options = optionsData.data.options;
+        options.challenge = base64URLToBuffer(options.challenge);
+        if (options.allowCredentials) {
+          options.allowCredentials = options.allowCredentials.map(cred => ({
+            ...cred,
+            id: base64URLToBuffer(cred.id),
+          }));
+        }
+
+        const credential = await navigator.credentials.get({ publicKey: options });
+
+        const verifyRes = await fetch('/api/v2/auth/passkey/login/verify/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            challenge_id: optionsData.data.challenge_id,
+            credential: {
+              id: credential.id,
+              rawId: bufferToBase64URL(credential.rawId),
+              type: credential.type,
+              response: {
+                authenticatorData: bufferToBase64URL(credential.response.authenticatorData),
+                clientDataJSON: bufferToBase64URL(credential.response.clientDataJSON),
+                signature: bufferToBase64URL(credential.response.signature),
+                userHandle: credential.response.userHandle ?
+                    bufferToBase64URL(credential.response.userHandle) : null,
+              },
+            },
+          }),
+        });
+
+        if (!verifyRes.ok && verifyRes.status >= 500) {
+          $('#error-field').text(authFailedMsg);
+          return;
+        }
+
+        const verifyData = await verifyRes.json();
+        if (verifyData.status === 'ok') {
+          location.href = '/panel/dashboard';
+        } else {
+          $('#error-field').text(verifyData.error_data || authFailedMsg);
+        }
+      } catch (e) {
+        if (e.name === 'SecurityError' || e.name === 'NotSupportedError') {
+          $('#error-field').text('{{ translate("passkey", "insecureContext", data["lang"]) }}');
+        } else if (e.name === 'NotAllowedError') {
+          $('#error-field').text('{{ translate("passkey", "cancelled", data["lang"]) }}');
+        } else {
+          console.error('Passkey error:', e);
+          $('#error-field').text(authFailedMsg + ': ' + e.message);
+        }
+      }
+    });
+
+    // Check passkey support on page load
+    $(document).ready(function() {
+      checkPasskeySupport();
+    });
   </script>
   <style>
     .modal-content {

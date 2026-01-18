@@ -231,6 +231,13 @@ class TasksManager:
             id="mfa_purge",
             start_date=datetime.datetime.now(),
         )
+        self.scheduler.add_job(
+            self.controller.passkey.purge_expired_challenges,
+            "interval",
+            hours=1,
+            id="passkey_challenge_purge",
+            start_date=datetime.datetime.now(),
+        )
         # self.scheduler.add_job(
         #    self.scheduler.print_jobs, "interval", seconds=10, id="-1"
         # )
