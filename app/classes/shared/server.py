@@ -32,7 +32,6 @@ from app.classes.models.server_stats import HelperServerStats
 from app.classes.models.management import HelpersManagement, HelpersWebhooks
 from app.classes.models.users import HelperUsers
 from app.classes.models.server_permissions import PermissionsServers
-from app.classes.servers.hytale import Hytale
 from app.classes.shared.console import Console
 from app.classes.helpers.helpers import Helpers
 from app.classes.helpers.file_helpers import FileHelpers
@@ -226,7 +225,6 @@ class ServerInstance:
         self.stats_helper = HelperServerStats(self.server_id)
         self.last_backup_failed = False
         self.server_registry = CollectorRegistry()
-        self.hytale = Hytale(self)
 
         try:
             with open(
