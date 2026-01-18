@@ -7,7 +7,6 @@
   <meta charset="utf-8">
   {% if not data.get("mfa", None) %}
   <meta name="mfa_warn" content="{{translate('base', 'getMFA', data['lang'])}}">
-  <meta name="mfa_link" content="{{translate('base', 'createMFA', data['lang'])}}">
   <meta name="userId" content="{{data['user_data']['user_id']}}">
   {% end %}
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -135,10 +134,9 @@
 
   <script>
     const MFA_WARN = document.querySelector('meta[name="mfa_warn"]');
-    const MFA_LINK = document.querySelector('meta[name="mfa_link"]');
     const USER_ID = document.querySelector('meta[name="userId"]');
     if (MFA_WARN) {
-      warn(MFA_WARN.content, `/panel/edit_user_otp?id=${USER_ID.content}`, `${MFA_LINK.content}`, "clean-link", "#cf0000")
+      $(".mfa-warn").removeClass("d-none");
     }
     /**
       * Returns a random number between min (inclusive) and max (exclusive)
@@ -304,7 +302,7 @@
     });
 
     if (webSocket) {
-      webSocket.on('send_start_error', function (start_error) {
+      webSocket.on('send_error', function (start_error) {
         var x = document.querySelector('.bootbox');
         if (x) {
           x.remove()
@@ -533,6 +531,21 @@
           .then(function (registration) {
             console.log('Service Worker Registered');
           });
+      }
+      if (webSocket) {
+        webSocket.on('zip_status', function (data) {
+          if (data.complete) {
+            try {
+              const cur_dir = $("#table-nav").attr("data-cur-path");
+              removeProgressItem(data.id);
+              getTreeView(cur_dir);
+            } catch {
+              $('.bootbox-close-button').click();
+            }
+          } else {
+            updateProgressBar(data.percent, data.id ? "server_upload" : "", 1, data.id);
+          }
+        });
       }
     });
   </script>

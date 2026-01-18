@@ -4,7 +4,6 @@ import pathlib
 from pathlib import Path
 from datetime import datetime
 import platform
-import shutil
 import time
 import json
 import logging
@@ -375,6 +374,10 @@ class Controller:
             return {"percent": 0, "total_files": 0}
 
     def create_api_server(self, data: dict, user_id):
+        # Disable pylint. This is a constant variable
+        IMPORT_PATH = Path(  # pylint: disable=invalid-name
+            self.project_root, "import", "upload"
+        )
         server_fs_uuid = Helpers.create_uuid()
         new_server_path = os.path.join(self.helper.servers_dir, server_fs_uuid)
         backup_path = os.path.join(self.helper.backup_path, server_fs_uuid)
@@ -425,15 +428,9 @@ class Controller:
                         )
             elif root_create_data["create_type"] == "import_server":
                 server_file = create_data["jarfile"]
-            elif root_create_data["create_type"] == "import_zip":
-                # TODO: Copy files from the zip file to the new server directory
-                server_file = create_data["jarfile"]
-                raise NotImplementedError("Not yet implemented")
-                # self.import_helper.import_java_zip_server()
-            if data["create_type"] == "minecraft_java":
-                _create_server_properties_if_needed(
-                    create_data["server_properties_port"],
-                )
+            _create_server_properties_if_needed(
+                create_data["server_properties_port"],
+            )
 
             min_mem = create_data["mem_min"]
             max_mem = create_data["mem_max"]
@@ -483,20 +480,13 @@ class Controller:
 
         elif data["create_type"] == "minecraft_bedrock":
             if root_create_data["create_type"] == "import_server":
-                existing_server_path = Helpers.get_os_understandable_path(
-                    create_data["existing_server_path"]
-                )
                 if Helpers.is_os_windows():
                     server_command = (
                         f'"{os.path.join(new_server_path, create_data["executable"])}"'
                     )
                 else:
                     server_command = f"./{create_data['executable']}"
-                logger.debug("command: " + server_command)
                 server_file = create_data["executable"]
-            elif root_create_data["create_type"] == "import_zip":
-                # TODO: Copy files from the zip file to the new server directory
-                raise NotImplementedError("Not yet implemented")
             else:
                 server_file = "bedrock_server"
                 if Helpers.is_os_windows():
@@ -513,29 +503,8 @@ class Controller:
 
             server_command = create_data.get("command", server_command)
         elif data["create_type"] == "custom":
-            # TODO: working_directory, executable_update
-            if root_create_data["create_type"] == "raw_exec":
-                pass
-            elif root_create_data["create_type"] == "import_server":
-                existing_server_path = Helpers.get_os_understandable_path(
-                    create_data["existing_server_path"]
-                )
-                try:
-                    FileHelpers.copy_dir(existing_server_path, new_server_path, True)
-                except shutil.Error as ex:
-                    logger.error(f"Server import failed with error: {ex}")
-            elif root_create_data["create_type"] == "import_zip":
-                # TODO: Copy files from the zip file to the new server directory
-                raise NotImplementedError("Not yet implemented")
-
-            _create_server_properties_if_needed(0, True)
-
-            server_command = create_data["command"]
-
-            server_file_new = root_create_data["executable_update"].get("file", "")
-            if server_file_new != "":
-                # HACK: Horrible hack to make the server start
-                server_file = server_file_new
+            # This is not implemented yet. Raise a key error
+            raise KeyError
 
         stop_command = data.get("stop_command", "")
         if stop_command == "":
@@ -598,15 +567,22 @@ class Controller:
                     new_server_id,
                 )
             elif root_create_data["create_type"] == "import_server":
+                existing_archive_path = self.file_helper.get_absolute_path(
+                    IMPORT_PATH, create_data["archive_name"]
+                )
+                if not self.helper.validate_traversal(
+                    IMPORT_PATH, Path(existing_archive_path).resolve()
+                ):
+                    return logger.error("Failed to import server due to traversal")
+
                 ServersController.set_import(new_server_id)
-                self.import_helper.import_jar_server(
-                    create_data["existing_server_path"],
+                self.import_helper.import_zipped_server(
+                    existing_archive_path,
                     new_server_path,
+                    create_data["archive_internal_path"],
                     monitoring_port,
                     new_server_id,
                 )
-            elif root_create_data["create_type"] == "import_zip":
-                ServersController.set_import(new_server_id)
 
         elif data["create_type"] == "minecraft_bedrock":
             if root_create_data["create_type"] == "download_exe":
@@ -617,22 +593,20 @@ class Controller:
             elif root_create_data["create_type"] == "import_server":
                 ServersController.set_import(new_server_id)
                 full_exe_path = os.path.join(new_server_path, create_data["executable"])
-                self.import_helper.import_bedrock_server(
-                    create_data["existing_server_path"],
-                    new_server_path,
-                    monitoring_port,
-                    full_exe_path,
-                    new_server_id,
+                existing_archive_path = self.file_helper.get_absolute_path(
+                    IMPORT_PATH, create_data["archive_name"]
                 )
-            elif root_create_data["create_type"] == "import_zip":
-                ServersController.set_import(new_server_id)
-                full_exe_path = os.path.join(new_server_path, create_data["executable"])
-                self.import_helper.import_bedrock_zip_server(
-                    create_data["zip_path"],
+                if not self.helper.validate_traversal(
+                    IMPORT_PATH, Path(existing_archive_path).resolve()
+                ):
+                    return logger.error("Failed to import server due to traversal")
+                self.import_helper.import_zipped_server(
+                    existing_archive_path,
                     new_server_path,
-                    os.path.join(create_data["zip_root"], create_data["executable"]),
+                    create_data["archive_internal_path"],
                     monitoring_port,
                     new_server_id,
+                    full_exe_path,
                 )
 
         exec_user = self.users.get_user_by_id(int(user_id))
@@ -1080,7 +1054,7 @@ class Controller:
         if not self.helper.ensure_dir_exists(new_server_path):
             WebSocketManager().broadcast_user(
                 user_id,
-                "send_start_error",
+                "send_error",
                 {
                     "error": "Crafty failed to move server dir. "
                     "It seems Crafty lacks permission to write to "

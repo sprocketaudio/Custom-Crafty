@@ -103,7 +103,7 @@ class WebSocketManager(metaclass=Singleton):
         # assign self.clients to a static variable here so hopefully
         # the set size won't change
         static_clients = self.clients
-        clients = list(filter(filter_fn, static_clients))
+        clients = list(filter(filter_fn, static_clients.copy()))
         logger.debug(
             f"Sending to {len(clients)}  \
             out of {len(self.clients)} "

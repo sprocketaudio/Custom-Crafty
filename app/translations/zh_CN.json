@@ -464,8 +464,8 @@
         "createFileQuestion": "您希望新文件叫什么名字？",
         "default": "默认",
         "delete": "删除",
-        "deleteItemQuestion": "您确定要删除 \" + name + \" 吗？",
-        "deleteItemQuestionMessage": "您正在删除 \\\"\" + path + \"\\\"！<br/><br/>此操作不可逆转，文件将永远遗失！",
+        "deleteItemQuestion": "您正在删除 ",
+        "deleteItemQuestionMessage": "此操作不可逆转，文件将永远丢失！",
         "download": "下载",
         "editingFile": "正在编辑文件",
         "error": "获取文件时发生错误",
@@ -478,13 +478,28 @@
         "rename": "重命名",
         "renameItemQuestion": "新名称应该是什么？",
         "save": "保存",
-        "size": "切换编辑器大小",
+        "size": "大小",
         "unsupportedLanguage": "警告：这不是一个受支持的文件类型",
         "unzip": "解压",
         "upload": "上传",
         "uploadTitle": "上传文件到： ",
         "waitUpload": "请等待，我们正在上传您的文件……这需要一点时间。",
-        "yesDelete": "是，我知道结果"
+        "yesDelete": "是，我知道结果",
+        "cancel": "取消",
+        "changeConflict": "服务器状态冲突",
+        "copy": "复制",
+        "copying": "复制中",
+        "more": "加载更多",
+        "move": "移动",
+        "moving": "移动中",
+        "name": "名称",
+        "operationStatus": "文件操作状态",
+        "options": "选项",
+        "overwrite": "覆盖服务器上的更改",
+        "repull": "从服务器加载最新文件（所有本地更改将会丢失）",
+        "serverModified": "在您加载此页面之后，此文件的状态在服务器上发生了改变。请选择一个选项。",
+        "type": "类型",
+        "modified": "已修改"
     },
     "serverMetrics": {
         "resetZoom": "重置缩放",
@@ -722,7 +737,8 @@
         "totp": "MFA 代码必须为 6 个数字",
         "additionalProperties": "不允许传递额外属性",
         "mfaName": "输入的属性必须为字符串类型，且最短为 3 个字符",
-        "passProp": "密码必须为最短 8 个字符的字符串。"
+        "passProp": "密码必须为最短 8 个字符的字符串。",
+        "typeEpoch": "必须为一个 epoch 值"
     },
     "webhooks": {
         "areYouSureDel": "您确定要删除此 webhook 吗？",
@@ -808,5 +824,10 @@
         "miscellaneous": "其他",
         "superMFA": "要求超级用户启用 MFA",
         "monitoring": "监控"
+    },
+    "serverFilesEditor": {
+        "saved": "已保存",
+        "save": "保存更改",
+        "unsavedChanges": "您确定要离开吗？您有未保存的更改。"
     }
 }

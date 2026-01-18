@@ -1,37 +1,18 @@
-import os
 import logging
 import json
-import html
+import zipfile
+from pathlib import Path
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
-from app.classes.helpers.helpers import Helpers
 from app.classes.web.base_api_handler import BaseApiHandler
-from app.classes.web.websocket_handler import WebSocketManager
 
 logger = logging.getLogger(__name__)
 files_get_schema = {
     "type": "object",
     "properties": {
-        "page": {
-            "type": "string",
-            "minLength": 1,
-            "error": "filesPageLen",
-            "fill": True,
-        },
-        "folder": {"type": "string", "error": "typeString", "fill": True},
-        "upload": {
-            "type": "boolean",
-            "default": "False",
-            "error": "typeBool",
-            "fill": True,
-        },
-        "unzip": {
-            "type": "boolean",
-            "default": "True",
-            "error": "typeBool",
-            "fill": True,
-        },
+        "file_name": {"type": "string", "error": "typeString", "fill": True},
+        "local_path": {"type": "string", "error": "typeString", "fill": True},
     },
     "additionalProperties": False,
     "minProperties": 1,
@@ -40,6 +21,10 @@ files_get_schema = {
 
 class ApiImportFilesIndexHandler(BaseApiHandler):
     def post(self):
+        # Disable pylint. This is a constant variable
+        IMPORT_PATH = Path(  # pylint: disable=invalid-name
+            self.controller.project_root, "import", "upload"
+        )
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -51,7 +36,7 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
             )
             and not auth_data[4]["superuser"]
         ):
-            # if the user doesn't have Files or Backup permission, return an error
+            # if the user doesn't have server creation, return an error
             return self.finish_json(
                 400,
                 {
@@ -86,76 +71,63 @@ class ApiImportFilesIndexHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
-        # TODO: limit some columns for specific permissions?
-        folder = data["folder"]
-        user_id = auth_data[4]["user_id"]
-        root_path = False
-        if data["unzip"]:
-            # This is awful. Once uploads go to return
-            # JSON we need to remove this and just send
-            # the path.
-            if data["upload"]:
-                folder = os.path.join(
-                    self.controller.project_root, "import", "upload", folder
-                )
-            if Helpers.check_file_exists(folder):
-                folder = self.file_helper.unzip_server(folder, user_id)
-                root_path = True
-            else:
-                if user_id:
-                    user_lang = self.controller.users.get_user_lang_by_id(user_id)
-                    WebSocketManager().broadcast_user(
-                        user_id,
-                        "send_start_error",
-                        {
-                            "error": self.helper.translation.translate(
-                                "error", "no-file", user_lang
-                            )
-                        },
-                    )
-        else:
-            if not self.helper.check_path_exists(folder) and user_id:
-                user_lang = self.controller.users.get_user_lang_by_id(user_id)
-                WebSocketManager().broadcast_user(
-                    user_id,
-                    "send_start_error",
-                    {
-                        "error": self.helper.translation.translate(
-                            "error", "no-file", user_lang
-                        )
-                    },
-                )
         return_json = {
-            "root_path": {
-                "path": folder,
-                "top": root_path,
-            }
+            "top": data["local_path"] == "",
+            "request_path": data["local_path"],
         }
+        zip_path = Path(IMPORT_PATH, data["file_name"]).resolve()
 
-        dir_list = []
-        unsorted_files = []
-        file_list = os.listdir(folder)
-        for item in file_list:
-            if os.path.isdir(os.path.join(folder, item)):
-                dir_list.append(item)
-            else:
-                unsorted_files.append(item)
-        file_list = sorted(dir_list, key=str.casefold) + sorted(
-            unsorted_files, key=str.casefold
-        )
-        for raw_filename in file_list:
-            filename = html.escape(raw_filename)
-            rel = os.path.join(folder, raw_filename)
-            dpath = os.path.join(folder, filename)
-            dpath = self.helper.wtol_path(dpath)
-            if os.path.isdir(rel):
-                return_json[filename] = {
-                    "path": dpath,
+        if data["local_path"] != "":
+            data["local_path"] += "/"
+
+        try:  # Check Traversal On Zipfile local path
+            self.helper.validate_traversal(
+                IMPORT_PATH, zip_path
+            )  # check file name traversal
+        except ValueError as why:
+            return self.finish_json(
+                403,
+                {
+                    "status": "error",
+                    "error": "TRAVERSAL_DETECTED",
+                    "error_data": str(why),
+                },
+            )
+        try:
+            path = zipfile.Path(zip_path, at=str(data["local_path"]))
+        except zipfile.BadZipFile:
+            return self.finish_json(
+                500,
+                {
+                    "status": "error",
+                    "error": "Invalid Or Corrupt File",
+                    "error_data": self.helper.translation.translate(
+                        "serverWizard", "zipError", auth_data[4]["lang"]
+                    ),
+                },
+            )
+        try:
+            self.helper.validate_traversal(
+                str(Path(IMPORT_PATH, data["file_name"])), str(path)
+            )
+        except ValueError as why:
+            return self.finish_json(
+                403,
+                {
+                    "status": "error",
+                    "error": "TRAVERSAL_DETECTED",
+                    "error_data": str(why),
+                },
+            )
+        for file in path.iterdir():
+            if file.is_dir():
+                return_json[file.name] = {
+                    "path": str(file.at),
                     "dir": True,
                 }
             else:
-                return_json[filename] = {
-                    "path": dpath,
+                return_json[file.name] = {
+                    "path": str(file.at),
                     "dir": False,
                 }
-        self.finish_json(200, {"status": "ok", "data": return_json})
+        return self.finish_json(200, {"status": "ok", "data": return_json})

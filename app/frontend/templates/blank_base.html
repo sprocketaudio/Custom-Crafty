@@ -7,7 +7,6 @@
   <meta charset="utf-8">
   {% if not data.get("mfa", None) %}
   <meta name="mfa_warn" content="{{translate('base', 'getMFA', data['lang'])}}">
-  <meta name="mfa_link" content="{{translate('base', 'createMFA', data['lang'])}}">
   <meta name="userId" content="{{data['user_data']['user_id']}}">
   {% end %}
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
