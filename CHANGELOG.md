@@ -1,7 +1,7 @@
 # Changelog
-## --- [4.7.1] - 2026/TBD
+## --- [4.8.0] - 2026/01/19
 ### New features
-TBD
+- Passkey Authentication Support ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/952))
 ### Bug fixes
 - Fix crash on startup due to big bucket cache refresh ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/941))
 - Fix issue where files would incorrectly be classified as not able to be opened by missing mimetypes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/944))
