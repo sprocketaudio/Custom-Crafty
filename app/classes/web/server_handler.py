@@ -177,6 +177,18 @@ class ServerHandler(BaseHandler):
             page_data["server_api"] = True
             template = "server/bedrock_wizard.html"
 
+        if page == "hytale_step1":
+            if not superuser and not self.controller.crafty_perms.can_create_server(
+                exec_user["user_id"]
+            ):
+                self.redirect(
+                    "/panel/error?error=Unauthorized access: "
+                    "not a server creator or server limit reached"
+                )
+                return
+            page_data["server_api"] = True
+            template = "server/hytale_wizard.html"
+
         self.render(
             template,
             data=page_data,
