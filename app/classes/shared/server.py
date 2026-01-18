@@ -281,6 +281,16 @@ class ServerInstance:
         server_data = HelperServers.get_server_data_by_id(self.server_id)
         self.settings = server_data
 
+    def send_server_alert(self, line):
+        server_users = PermissionsServers.get_server_user_list(self.server_id)
+
+        for user in server_users:
+            WebSocketManager().broadcast_user(
+                user,
+                "hytale_auth",
+                {"link": line},
+            )
+
     def do_server_setup(self, server_data_obj):
         server_id = server_data_obj["server_id"]
         server_name = server_data_obj["server_name"]

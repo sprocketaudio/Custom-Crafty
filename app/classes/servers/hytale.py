@@ -1,8 +1,6 @@
 import subprocess
 import logging
 from pathlib import PurePosixPath, Path
-from app.classes.web.websocket_handler import WebSocketManager
-from app.classes.models.server_permissions import PermissionsServers
 
 logger = logging.Logger(__name__)
 
@@ -46,16 +44,7 @@ class Hytale:
                 line.startswith(bb_cache["parsing_lines"]["verify_url_line_start"])
                 and url_line == ""
             ):
-                server_users = PermissionsServers.get_server_user_list(
-                    self.server.server_id
-                )
-                url_line = line
-                for user in server_users:
-                    WebSocketManager().broadcast_user(
-                        user,
-                        "hytale_auth",
-                        {"link": line},
-                    )
+                self.server.send_server_alert(line)
 
             else:
                 auth_code_line = line
