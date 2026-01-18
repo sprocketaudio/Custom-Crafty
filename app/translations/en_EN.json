@@ -686,6 +686,7 @@
         "newServer": "Create New Server",
         "noRole": "No role found with current search parameter",
         "noneRoles": "No Roles Selected",
+        "plugins": "Crafty will automatically install the following plugins for the stats features in Crafty to operate:",
         "quickSettings": "Quick Settings",
         "quickSettingsDescription": "Don't worry, you can change these later",
         "resetForm": "Reset Form",

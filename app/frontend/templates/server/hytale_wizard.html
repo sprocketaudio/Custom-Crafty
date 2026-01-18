@@ -76,6 +76,13 @@
                   data['lang']) }}</button>
                 <button type="reset" class="btn btn-danger mr-2">{{ translate('serverWizard', 'resetForm', data['lang'])
                   }}</button>
+                <br />
+                <br />
+                <small class="text-warning"><i class="fa-solid fa-circle-exclamation"></i>&nbsp;{{
+                  translate("serverWizard", "plugins", data["lang"]) }}&nbsp;<a
+                    href="https://github.com/nitrado/hytale-plugin-query" target="_blank">Nitrado Query</a>,&nbsp;<a
+                    href="https://github.com/nitrado/hytale-plugin-webserver" target="_blank">Nitrado
+                    Webserver</a></small>
               </fieldset>
               {% if not data["server_api"] and data["online"] %}
               <div class="api-alert">
