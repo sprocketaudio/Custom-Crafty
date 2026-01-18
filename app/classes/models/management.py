@@ -394,6 +394,8 @@ class HelpersManagement:
     @staticmethod
     def remove_backup_config(backup_id):
         Backups.delete().where(Backups.backup_id == backup_id).execute()
+        # Delete associated task when deleting backup config
+        Schedules.delete().where(Schedules.action_id == backup_id).execute()
 
     def add_backup_config(self, conf) -> str:
         if "excluded_dirs" in conf:
