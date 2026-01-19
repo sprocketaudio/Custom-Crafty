@@ -1,5 +1,6 @@
 import os
 import uuid
+import json
 import time
 import pathlib
 import logging
@@ -7,7 +8,8 @@ import threading
 import subprocess
 from pathlib import PurePosixPath, Path
 
-from app.classes.remote_stats.bigbucket import BigBucket
+from app.classes.big_bucket.bigbucket import BigBucket
+from app.classes.big_bucket.hytale import HytaleJSON
 from app.classes.controllers.server_perms_controller import PermissionsServers
 from app.classes.controllers.servers_controller import ServersController
 from app.classes.helpers.helpers import Helpers
@@ -167,21 +169,29 @@ class ImportHelpers:
         server_users = PermissionsServers.get_server_user_list(new_id)
 
         bb_cache = self.big_bucket.get_bucket_data(self.helper.big_bucket_hytale_cache)
-
-        unix_exe = PurePosixPath(bb_cache["linux_installer"]).name
-        windows_exe = PurePosixPath(bb_cache["windows_installer"]).name
-        install_command = f"./{unix_exe} {bb_cache["commands"]["download_path_command"]} {HYTALE_0UTPUT_NAME}"
+        try:
+            hytale_json = HytaleJSON(bb_cache)
+            unix_exe = PurePosixPath(hytale_json.linux_installer_url).name
+            windows_exe = PurePosixPath(hytale_json.windows_installer_url).name
+        except KeyError:
+            logger.error("Failed to create Hytale server with keyerror")
+            ServersController.finish_import(new_id)
+            return
+        install_command = (
+            f"./{unix_exe} "
+            f"{hytale_json.commands.download_path_command} {HYTALE_0UTPUT_NAME}"
+        )
         if self.helper.is_os_windows():
             install_command = (
                 f"{server_path}/{windows_exe} "
-                f"{bb_cache["commands"]["download_path_command"]} {HYTALE_0UTPUT_NAME}"
+                f"{hytale_json.commands.download_path_command} {HYTALE_0UTPUT_NAME}"
             )
             self.file_helper.ssl_get_file(
-                bb_cache["windows_installer"], server_path, windows_exe
+                hytale_json.windows_installer_url, server_path, windows_exe
             )
         else:
             self.file_helper.ssl_get_file(
-                bb_cache["linux_installer"], server_path, unix_exe
+                hytale_json.linux_installer_url, server_path, unix_exe
             )
         self.process = subprocess.Popen(
             install_command,
@@ -199,9 +209,17 @@ class ImportHelpers:
                 continue
 
             line = line.strip()
-
+            # TODO: Do not send data to clients who do not have permission to view
+            # this server's console
+            if len(WebSocketManager().clients) > 0:
+                WebSocketManager().broadcast_page_params(
+                    "/panel/server_detail",
+                    {"id": new_id},
+                    "vterm_new_line",
+                    {"line": line + "<br />"},
+                )
             if (
-                line.startswith(bb_cache["parsing_lines"]["verify_url_line_start"])
+                line.startswith(hytale_json.parsing_lines.url_line_start)
                 and url_line == ""
             ):
 
@@ -229,19 +247,42 @@ class ImportHelpers:
         self, server_id: uuid.UUID, server_path: str | Path
     ):
         bb_cache = self.big_bucket.get_bucket_data(self.helper.big_bucket_hytale_cache)
+        try:
+            hytale_json = HytaleJSON(bb_cache)
+        except KeyError:
+            logger.error("Failed to download hytale plugins with keyerror")
+            return
         logger.info("Installing Nitrado Webserver Plugin to server %s", server_id)
         # make sure our mods dir exists before doing anything
         # Download webserver plugin required for query plugin
         self.helper.ensure_dir_exists(Path(server_path, "mods"))
         self.file_helper.ssl_get_file(
-            bb_cache["plugins"]["webserver_plugin"],
+            hytale_json.plugins.webserver_plugin_url,
             Path(server_path, "mods"),
             "nitrado-webserver.jar",
         )
         # Download query plugin
         logger.info("Installing Nitrado Query Plugin to server %s", server_id)
         self.file_helper.ssl_get_file(
-            bb_cache["plugins"]["query_plugin"],
+            hytale_json.plugins.query_plugin_url,
             Path(server_path, "mods"),
             "nitrado-query.jar",
         )
+        self.modify_permissions_json(server_path)
+
+    def modify_permissions_json(self, server_path: str | Path):
+        with open(
+            Path(server_path, "permissions.json"), "r+", encoding="utf-8"
+        ) as perms_file:
+            decoded = json.loads(perms_file)
+            if not "groups" in decoded:
+                decoded["groups"] = {}
+            # Add permissions for Nitrado plugins to access server
+            perms_list = [
+                "nitrado.query.web.read.server",
+                "nitrado.query.web.read.universe",
+                "nitrado.query.web.read.players",
+            ]
+            decoded["groups"]["ANONYMOUS"] = perms_list
+            perms_file.seek(0)  # return to top of file
+            perms_file.write(json.dumps(decoded))
