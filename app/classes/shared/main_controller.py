@@ -413,6 +413,24 @@ class Controller:
         server_file = "server.jar"  # HACK: Throw this horrible default out of here
         root_create_data = data[data["create_type"] + "_create_data"]
         create_data = root_create_data[root_create_data["create_type"] + "_create_data"]
+        if data["monitoring_type"] == "minecraft_java":
+            monitoring_port = data["minecraft_java_monitoring_data"]["port"]
+            monitoring_host = data["minecraft_java_monitoring_data"]["host"]
+            monitoring_type = "minecraft-java"
+        elif data["monitoring_type"] == "minecraft_bedrock":
+            monitoring_port = data["minecraft_bedrock_monitoring_data"]["port"]
+            monitoring_host = data["minecraft_bedrock_monitoring_data"]["host"]
+            monitoring_type = "minecraft-bedrock"
+        elif data["monitoring_type"] == "hytale":
+            monitoring_port = data["hytale_monitoring_data"]["port"]
+            monitoring_host = data["hytale_monitoring_data"]["host"]
+            monitoring_type = "hytale"
+        elif data["monitoring_type"] == "none":
+            # TODO: this needs to be NUKED..
+            # There shouldn't be anything set if there is nothing to monitor
+            monitoring_port = 25565
+            monitoring_host = "127.0.0.1"
+            monitoring_type = "minecraft-java"
         if data["create_type"] == "minecraft_java":
             if root_create_data["create_type"] == "download_jar":
                 server_file = f"{create_data['type']}-{create_data['version']}.jar"
@@ -480,7 +498,6 @@ class Controller:
 
         elif (
             data["create_type"] == "minecraft_bedrock"
-            or data["create_type"] == "hytale"
         ):  # same process for hytale and bedrock
             if root_create_data["create_type"] == "import_server":
                 if Helpers.is_os_windows():
@@ -505,6 +522,19 @@ class Controller:
             _create_server_properties_if_needed(0, True)
 
             server_command = create_data.get("command", server_command)
+
+        elif data["create_type"] == "hytale":  # same process for hytale and bedrock
+            if root_create_data["create_type"] == "import_server":
+                server_file = create_data["executable"]
+            else:
+                server_file = "Server/HytaleServer.jar"
+
+            server_command = (
+                f"java -Xms1G -Xmx5G -jar {server_file} --assets Assets.zip"
+                f" --bind 0.0.0.0:{monitoring_port}"
+            )
+
+            server_command = create_data.get("command", server_command)
         elif data["create_type"] == "custom":
             # This is not implemented yet. Raise a key error
             raise KeyError
@@ -517,25 +547,6 @@ class Controller:
         log_location = data.get("log_location", "")
         if log_location == "" and data["create_type"] == "minecraft_java":
             log_location = "./logs/latest.log"
-
-        if data["monitoring_type"] == "minecraft_java":
-            monitoring_port = data["minecraft_java_monitoring_data"]["port"]
-            monitoring_host = data["minecraft_java_monitoring_data"]["host"]
-            monitoring_type = "minecraft-java"
-        elif data["monitoring_type"] == "minecraft_bedrock":
-            monitoring_port = data["minecraft_bedrock_monitoring_data"]["port"]
-            monitoring_host = data["minecraft_bedrock_monitoring_data"]["host"]
-            monitoring_type = "minecraft-bedrock"
-        elif data["monitoring_type"] == "hytale":
-            monitoring_port = data["hytale_monitoring_data"]["port"]
-            monitoring_host = data["hytale_monitoring_data"]["host"]
-            monitoring_type = "hytale"
-        elif data["monitoring_type"] == "none":
-            # TODO: this needs to be NUKED..
-            # There shouldn't be anything set if there is nothing to monitor
-            monitoring_port = 25565
-            monitoring_host = "127.0.0.1"
-            monitoring_type = "minecraft-java"
 
         new_server_id = self.register_server(
             name=data["name"],

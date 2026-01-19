@@ -87,7 +87,7 @@ new_server_schema = {
             "title": "Server monitoring type",
             "type": "string",
             "default": "minecraft_java",
-            "enum": ["minecraft_java", "minecraft_bedrock", "none"],
+            "enum": ["minecraft_java", "minecraft_bedrock", "hytale", "none"],
             "error": "enumErr",
             "fill": True,
             # TODO: SteamCMD, RakNet, etc.
@@ -740,6 +740,10 @@ new_server_schema = {
                     "then": {"required": ["minecraft_bedrock_create_data"]},
                 },
                 {
+                    "if": {"properties": {"create_type": {"const": "hytale"}}},
+                    "then": {"required": ["hytale_create_data"]},
+                },
+                {
                     "if": {"properties": {"create_type": {"const": "custom"}}},
                     "then": {"required": ["custom_create_data"]},
                 },
@@ -759,6 +763,10 @@ new_server_schema = {
                     },
                     "then": {"required": ["minecraft_bedrock_monitoring_data"]},
                 },
+                {
+                    "if": {"properties": {"monitoring_type": {"const": "hytale"}}},
+                    "then": {"required": ["hytale_monitoring_data"]},
+                },
                 # end require monitoring data
             ],
         },
@@ -767,6 +775,7 @@ new_server_schema = {
             "oneOf": [
                 {"required": ["minecraft_java_create_data"]},
                 {"required": ["minecraft_bedrock_create_data"]},
+                {"required": ["hytale_create_data"]},
                 {"required": ["custom_create_data"]},
             ],
         },
@@ -775,6 +784,7 @@ new_server_schema = {
             "oneOf": [
                 {"required": ["minecraft_java_monitoring_data"]},
                 {"required": ["minecraft_bedrock_monitoring_data"]},
+                {"required": ["hytale_monitoring_data"]},
                 {"properties": {"monitoring_type": {"const": "none"}}},
             ],
         },

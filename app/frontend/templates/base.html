@@ -321,29 +321,44 @@
         })
       });
       webSocket.on('hytale_auth', function (data) {
-        const HYTALE_AUTH_MSG = document.querySelector('meta[name="auth_translation"]');
-        const HYTALE_AUTH_AWAY = document.querySelector('meta[name="auth_away_translation"]');
-        var x = document.querySelector('.bootbox');
-        if (x) {
-          x.remove()
-        }
-        var x = document.querySelector('.modal-backdrop');
-        if (x) {
-          x.remove()
-        }
+        const HYTALE_AUTH_MSG =
+          document.querySelector('meta[name="auth_translation"]')?.content || "";
+
+        const HYTALE_AUTH_AWAY =
+          document.querySelector('meta[name="auth_away_translation"]')?.content || "";
+
+        document.querySelector('.bootbox')?.remove();
+        document.querySelector('.modal-backdrop')?.remove();
+
         const container = $("<div>");
-        const link = $("<a>").attr("href", data.link).text(HYTALE_AUTH_MSG)
-        const warning = $("span").html(`<i class="fa-solid fa-triangle-exclamation"></i>`)
-        warning.append($("<p>").text(HYTALE_AUTH_AWAY))
-        container.append(link)
-        container.append(warning)
+
+        const link = $("<a>")
+          .attr("href", data.link)
+          .attr("target", "_blank")
+          .attr("rel", "noopener noreferrer")
+          .text(HYTALE_AUTH_MSG)
+          .on("click", function (e) {
+            e.preventDefault();
+            window.open(data.link, "_blank", "noopener");
+          });
+
+        const warning = $("<span>").html(
+          `<i class="fa-solid fa-triangle-exclamation"></i>`
+        );
+
+        warning.append($("<p>").text(HYTALE_AUTH_AWAY));
+
+        container.append(link);
+        container.append(warning);
+
         bootbox.alert({
           message: container,
           callback: function () {
             location.reload();
           }
-        })
+        });
       });
+
       webSocket.on('support_status_update', function (logs) {
         if (logs.percent >= 100) {
           document.getElementById('logs_progress_bar').innerHTML = '100%';

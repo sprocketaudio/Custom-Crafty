@@ -166,16 +166,22 @@ class ImportHelpers:
     def download_install_hytale(self, server_path: str | Path, new_id: uuid.UUID):
         server_users = PermissionsServers.get_server_user_list(new_id)
 
-        bb_cache = self.big_bucket.get_bucket_data()
+        bb_cache = self.big_bucket.get_bucket_data(self.helper.big_bucket_hytale_cache)
+
         unix_exe = PurePosixPath(bb_cache["linux_installer"]).name
         windows_exe = PurePosixPath(bb_cache["windows_installer"]).name
-        install_command = (
-            f"./{unix_exe} {bb_cache["download_path_command"]} {HYTALE_0UTPUT_NAME}"
-        )
+        install_command = f"./{unix_exe} {bb_cache["commands"]["download_path_command"]} {HYTALE_0UTPUT_NAME}"
         if self.helper.is_os_windows():
             install_command = (
                 f"{server_path}/{windows_exe} "
-                f"{bb_cache["download_path_command"]} {HYTALE_0UTPUT_NAME}"
+                f"{bb_cache["commands"]["download_path_command"]} {HYTALE_0UTPUT_NAME}"
+            )
+            self.file_helper.ssl_get_file(
+                bb_cache["windows_installer"], server_path, windows_exe
+            )
+        else:
+            self.file_helper.ssl_get_file(
+                bb_cache["linux_installer"], server_path, unix_exe
             )
         self.process = subprocess.Popen(
             install_command,
@@ -183,16 +189,16 @@ class ImportHelpers:
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
+            text=True,
         )
         url_line = ""
         auth_code_line = ""
         while self.process.poll() is None:
-            line = self.process.stdout.readline()
+            line = self.process.stdout.readline().strip()
             if not line:
                 continue
 
             line = line.strip()
-            print(line)
 
             if (
                 line.startswith(bb_cache["parsing_lines"]["verify_url_line_start"])
@@ -200,6 +206,7 @@ class ImportHelpers:
             ):
 
                 for user in server_users:
+                    time.sleep(10)  # let users load back to dashboard
                     WebSocketManager().broadcast_user(
                         user,
                         "hytale_auth",
@@ -221,7 +228,7 @@ class ImportHelpers:
     def install_or_update_monitoring_plugins(
         self, server_id: uuid.UUID, server_path: str | Path
     ):
-        bb_cache = self.big_bucket.get_bucket_data()
+        bb_cache = self.big_bucket.get_bucket_data(self.helper.big_bucket_hytale_cache)
         logger.info("Installing Nitrado Webserver Plugin to server %s", server_id)
         # make sure our mods dir exists before doing anything
         # Download webserver plugin required for query plugin

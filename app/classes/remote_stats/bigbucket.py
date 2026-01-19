@@ -24,8 +24,9 @@ class BigBucket:
             self.helper.get_setting("big_bucket_repo", "https://jars.arcadiatech.org")
         ).rstrip("/")
 
-    def _read_cache(self) -> dict:
-        cache_file = self.helper.big_bucket_minecraft_cache
+    def _read_cache(self, cache_file: str | None = None) -> dict:
+        if not cache_file:
+            cache_file = self.helper.big_bucket_minecraft_cache
         cache = {}
         try:
             with open(cache_file, "r", encoding="utf-8") as f:
@@ -36,8 +37,8 @@ class BigBucket:
 
         return cache
 
-    def get_bucket_data(self) -> dict | None:
-        data = self._read_cache()
+    def get_bucket_data(self, cache_file: str | None = None) -> dict | None:
+        data = self._read_cache(cache_file)
         return data.get("categories")
 
     def _check_bucket_alive(self) -> bool:
