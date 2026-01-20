@@ -40,6 +40,7 @@ from app.classes.shared.websocket_manager import WebSocketManager
 logger = logging.getLogger(__name__)
 
 MODDED_TYPES = ["forge-installer", "neoforge-installer"]
+TRAVERSAL_ERROR = "Failed to import server due to traversal"
 
 
 class Controller:
@@ -593,7 +594,7 @@ class Controller:
                 if not self.helper.validate_traversal(
                     IMPORT_PATH, Path(existing_archive_path).resolve()
                 ):
-                    return logger.error("Failed to import server due to traversal")
+                    return logger.error(TRAVERSAL_ERROR)
 
                 ServersController.set_import(new_server_id)
                 self.import_helper.import_zipped_server(
@@ -619,7 +620,7 @@ class Controller:
                 if not self.helper.validate_traversal(
                     IMPORT_PATH, Path(existing_archive_path).resolve()
                 ):
-                    return logger.error("Failed to import server due to traversal")
+                    return logger.error(TRAVERSAL_ERROR)
                 self.import_helper.import_zipped_server(
                     existing_archive_path,
                     new_server_path,
@@ -644,7 +645,7 @@ class Controller:
                 if not self.helper.validate_traversal(
                     IMPORT_PATH, Path(existing_archive_path).resolve()
                 ):
-                    return logger.error("Failed to import server due to traversal")
+                    return logger.error(TRAVERSAL_ERROR)
                 self.import_helper.import_zipped_server(
                     existing_archive_path,
                     new_server_path,

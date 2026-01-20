@@ -2,6 +2,8 @@ import logging
 
 logger = logging.Logger(__name__)
 
+LOG_ERROR = "Failed to capture object data from BigBucket data with error %s"
+
 
 class HytaleCommands:
     def __init__(self, input_dict: dict[str, int | str | dict[str, int | str]]):
@@ -12,9 +14,7 @@ class HytaleCommands:
             # Repeat for all commands...
         except KeyError as why:
             # shape must have changed of json
-            logger.error(
-                "Failed to capture object data from BigBucket data with error %s", why
-            )
+            logger.error(LOG_ERROR, why)
             raise
 
 
@@ -26,9 +26,7 @@ class HytaleParsingLines:
             self.auth_code_line_start: str = input_dict["auth_code_line_start"]
         except KeyError as why:
             # shape must have changed of json
-            logger.error(
-                "Failed to capture object data from BigBucket data with error %s", why
-            )
+            logger.error(LOG_ERROR, why)
             raise
 
 
@@ -41,9 +39,7 @@ class HytalePlugins:
             # Repeat for all plugins...
         except KeyError as why:
             # shape must have changed of json
-            logger.error(
-                "Failed to capture object data from BigBucket data with error %s", why
-            )
+            logger.error(LOG_ERROR, why)
             raise
 
 
@@ -61,7 +57,5 @@ class HytaleJSON:
             self.plugins: HytalePlugins = HytalePlugins(input_dict["plugins"])
         except KeyError as why:
             # shape must have changed of json
-            logger.error(
-                "Failed to capture object data from BigBucket data with error %s", why
-            )
+            logger.error(LOG_ERROR, why)
             raise

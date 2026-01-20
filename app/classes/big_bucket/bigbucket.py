@@ -146,7 +146,7 @@ class BigBucket:
             logger.info("Automatic cache refresh initiated due to old cache.")
             self._refresh_cache(cache_file_path, "hytale.json")
 
-    def get_fetch_url(self, jar, server, version) -> str:
+    def get_fetch_url(self, jar, server, version) -> str | None:
         """
         Constructs the URL for downloading a server JAR file based on the server type.
         Parameters:

@@ -47,6 +47,7 @@ logger = logging.getLogger(__name__)
 
 PLAIN_TEXT = "text/plain"
 BAT_TEXT = "application/x-bat"
+ERROR_LOG_HIGHLIGHT = r'<span class="mc-log-error">\1</span>'
 
 MASTER_CONFIG = {
     "https_port": 8443,
@@ -814,8 +815,8 @@ class Helpers:
         replacements = [
             (r"(\[.+?/INFO\])", r'<span class="mc-log-info">\1</span>'),
             (r"(\[.+?/WARN\])", r'<span class="mc-log-warn">\1</span>'),
-            (r"(\[.+?/ERROR\])", r'<span class="mc-log-error">\1</span>'),
-            (r"(\[.+?/SEVERE\])", r'<span class="mc-log-error">\1</span>'),
+            (r"(\[.+?/ERROR\])", ERROR_LOG_HIGHLIGHT),
+            (r"(\[.+?/SEVERE\])", ERROR_LOG_HIGHLIGHT),
             (r"(\[.+?/FATAL\])", r'<span class="mc-log-fatal">\1</span>'),
             (
                 r"(\w+?\[/\d+?\.\d+?\.\d+?\.\d+?\:\d+?\])",
@@ -824,8 +825,8 @@ class Helpers:
             (r"\[(\d\d:\d\d:\d\d)\]", r'<span class="mc-log-time">[\1]</span>'),
             (r"(\[.+? INFO\])", r'<span class="mc-log-info">\1</span>'),
             (r"(\[.+? WARN\])", r'<span class="mc-log-warn">\1</span>'),
-            (r"(\[.+? ERROR\])", r'<span class="mc-log-error">\1</span>'),
-            (r"(\[.+? SEVERE\])", r'<span class="mc-log-error">\1</span>'),
+            (r"(\[.+? ERROR\])", ERROR_LOG_HIGHLIGHT),
+            (r"(\[.+? SEVERE\])", ERROR_LOG_HIGHLIGHT),
             (r"(\[.+? FATAL\])", r'<span class="mc-log-fatal">\1</span>'),
         ]
 

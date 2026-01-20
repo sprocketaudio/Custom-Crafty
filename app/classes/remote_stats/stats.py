@@ -124,8 +124,6 @@ class Stats:
                 "mem_total": "",
                 "disk_data": [],
             }
-        # server_stats = self.get_servers_stats()
-        # data['servers'] = server_stats
 
         return {
             "node_stats": node_stats,

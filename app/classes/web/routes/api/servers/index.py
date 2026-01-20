@@ -14,6 +14,8 @@ ZIP_NAME_EXAMPLE = "Server.zip"
 ARCHIVE_PATH_TITLE = "Internal zip path"
 ARCHIVE_PATH_DESCRIPTION = "Path to internal zip folder"
 ARCHIVE_PATH_EXAMPLE = "server_files/my_server/"
+MIN_MEM = "Minimum JVM memory (in GiBs)"
+MAX_MEM = "Maximum JVM memory (in GiBs)"
 
 new_server_schema = {
     "definitions": {},
@@ -227,7 +229,7 @@ new_server_schema = {
                             "fill": True,
                         },
                         "mem_min": {
-                            "title": "Minimum JVM memory (in GiBs)",
+                            "title": MIN_MEM,
                             "type": "number",
                             "examples": [1],
                             "default": 1,
@@ -236,7 +238,7 @@ new_server_schema = {
                             "fill": True,
                         },
                         "mem_max": {
-                            "title": "Maximum JVM memory (in GiBs)",
+                            "title": MAX_MEM,
                             "type": "number",
                             "examples": [2],
                             "default": 2,
@@ -304,7 +306,7 @@ new_server_schema = {
                             "fill": True,
                         },
                         "mem_min": {
-                            "title": "Minimum JVM memory (in GiBs)",
+                            "title": MIN_MEM,
                             "type": "number",
                             "examples": [1],
                             "default": 1,
@@ -313,7 +315,7 @@ new_server_schema = {
                             "fill": True,
                         },
                         "mem_max": {
-                            "title": "Maximum JVM memory (in GiBs)",
+                            "title": MAX_MEM,
                             "type": "number",
                             "examples": [2],
                             "default": 2,
@@ -500,7 +502,7 @@ new_server_schema = {
                             "enum": [True],
                         },
                         "mem_min": {
-                            "title": "Minimum JVM memory (in GiBs)",
+                            "title": MIN_MEM,
                             "type": "number",
                             "examples": [1],
                             "default": 1,
@@ -509,7 +511,7 @@ new_server_schema = {
                             "fill": True,
                         },
                         "mem_max": {
-                            "title": "Maximum JVM memory (in GiBs)",
+                            "title": MAX_MEM,
                             "type": "number",
                             "examples": [2],
                             "default": 2,
@@ -570,7 +572,7 @@ new_server_schema = {
                             "fill": True,
                         },
                         "mem_min": {
-                            "title": "Minimum JVM memory (in GiBs)",
+                            "title": MIN_MEM,
                             "type": "number",
                             "examples": [1],
                             "default": 1,
@@ -579,7 +581,7 @@ new_server_schema = {
                             "fill": True,
                         },
                         "mem_max": {
-                            "title": "Maximum JVM memory (in GiBs)",
+                            "title": MAX_MEM,
                             "type": "number",
                             "examples": [2],
                             "default": 2,
