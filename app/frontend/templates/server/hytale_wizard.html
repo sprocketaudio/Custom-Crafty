@@ -337,14 +337,10 @@
     if (key === "roles" || key === "archive_internal_path") {
       return value
     }
-    if (key == "ignored_exits") {
-      return value;
+    else if (typeof value == "boolean" || key === "host" || key === "version") {
+      return value
     } else {
-      if (typeof value == "boolean" || key === "host" || key === "version") {
-        return value
-      } else {
-        return (Number.isNaN(value) ? value : +value);
-      }
+      return (isNaN(value) ? value : +value);
     }
   }
   function calcRoles() {
@@ -370,7 +366,7 @@
     });
     let responseData = await res.json();
     if (responseData.status === "ok") {
-      globalThis.location.href = `/panel/server_detail?id=${responseData.data.new_server_id}&subpage=term`;
+      window.location.href = `/panel/server_detail?id=${responseData.data.new_server_id}&subpage=term`;
     } else {
       // Close the "be patient..." dialogue box
       $('.bootbox-close-button').click();
