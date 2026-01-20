@@ -365,9 +365,7 @@
       body: data,
     });
     let responseData = await res.json();
-    if (responseData.status === "ok") {
-      window.location.href = `/panel/server_detail?id=${responseData.data.new_server_id}&subpage=term`;
-    } else {
+    if (responseData.status != "ok") {
       // Close the "be patient..." dialogue box
       $('.bootbox-close-button').click();
       // Alert the user that there was an issue.

@@ -321,6 +321,7 @@
         })
       });
       webSocket.on('hytale_auth', function (data) {
+        $('.bootbox-close-button').click();
         const HYTALE_AUTH_MSG =
           document.querySelector('meta[name="auth_translation"]')?.content || "";
 
@@ -356,7 +357,7 @@
         bootbox.alert({
           message: container,
           callback: function () {
-            location.reload();
+            globalThis.location.href = `/panel/server_detail?id=${data.server_id}&subpage=term`
           }
         });
       });

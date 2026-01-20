@@ -166,7 +166,6 @@ class ImportHelpers:
         download_thread.start()
 
     def download_install_hytale(self, server_path: str | Path, new_id: uuid.UUID):
-        time.sleep(5)  # let users catch up
         server_users = PermissionsServers.get_server_user_list(new_id)
 
         bb_cache = self.big_bucket.get_bucket_data(self.helper.big_bucket_hytale_cache)
@@ -233,7 +232,7 @@ class ImportHelpers:
                     WebSocketManager().broadcast_user(
                         user,
                         "hytale_auth",
-                        {"link": line},
+                        {"link": line, "server_id": new_id},
                     )
 
         # Unzip downloaded archive.
