@@ -34,7 +34,7 @@ from app.classes.shared.console import Console
 from app.classes.helpers.helpers import Helpers
 from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.shared.import_helper import ImportHelpers
-from app.classes.remote_stats.bigbucket import BigBucket
+from app.classes.big_bucket.bigbucket import BigBucket
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
@@ -422,7 +422,7 @@ class Controller:
             monitoring_host = data["minecraft_bedrock_monitoring_data"]["host"]
             monitoring_type = "minecraft-bedrock"
         elif data["monitoring_type"] == "hytale":
-            monitoring_port = data["hytale_monitoring_data"]["port"]
+            monitoring_port = data["hytale_monitoring_data"]["port"] + 3
             monitoring_host = data["hytale_monitoring_data"]["host"]
             monitoring_type = "hytale"
         elif data["monitoring_type"] == "none":
@@ -528,10 +528,12 @@ class Controller:
                 server_file = create_data["executable"]
             else:
                 server_file = "Server/HytaleServer.jar"
-
+            min_mem = create_data["mem_min"]
+            max_mem = create_data["mem_max"]
             server_command = (
-                f"java -Xms1G -Xmx5G -jar {server_file} --assets Assets.zip"
-                f" --bind 0.0.0.0:{monitoring_port}"
+                f"java -Xms{Helpers.float_to_string(min_mem)}M "
+                f"-Xmx{Helpers.float_to_string(max_mem)}M -jar {server_file} "
+                f"--assets Assets.zip --bind 0.0.0.0:{int(monitoring_port)-3}"
             )
 
             server_command = create_data.get("command", server_command)

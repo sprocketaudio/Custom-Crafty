@@ -48,12 +48,37 @@
                   <input type="text" class="form-control" id="server_name" name="name"
                     placeholder="{{ translate('serverWizard', 'myNewServer', data['lang']) }}" required>
                 </div>
-                <div class="form-group">
-                  <label for="port1">{{ translate('serverWizard', 'serverPort', data['lang']) }}</label>
-                  <input type="number" class="form-control" id="port1" name="port" value="5520" step="1" min="1"
-                    max="65535 " required>
-                </div>
+                <br />
+                <h4 class="card-title">{{ translate('serverWizard', 'quickSettings', data['lang']) }} <small
+                    class="text-none"> - {{ translate('serverWizard', 'quickSettingsDescription', data['lang'])
+                    }}</small></h4>
+                <div class="row">
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <label for="min_memory1">{{ translate('serverWizard', 'minMem', data['lang']) }} <small> - {{
+                          translate('serverWizard', 'sizeInGB', data['lang']) }}</small></label>
+                      <input type="number" class="form-control" id="min_memory1" name="mem_min" value="1" step="0.5"
+                        min="0.5" required>
+                    </div>
+                  </div>
 
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <label for="max_memory1">{{ translate('serverWizard', 'maxMem', data['lang']) }} <small> - {{
+                          translate('serverWizard', 'sizeInGB', data['lang']) }}</small></label>
+                      <input type="number" class="form-control" id="max_memory1" name="mem_max" value="2" step="0.5"
+                        min="0.5" required>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <label for="port1">{{ translate('serverWizard', 'serverPort', data['lang']) }}</label>
+                      <input type="number" class="form-control" id="port1" name="port" value="5520" step="1" min="1"
+                        max="65535 " required>
+                    </div>
+                  </div>
+                </div>
                 <div class="form-group">
                   <p class="mb-0 p-0" aria-expanded="true">{{ translate('serverWizard', 'addRole', data['lang']) }}
                     <small class="text-none"> - {{ translate('serverWizard', 'autoCreate', data['lang']) }}</small>
@@ -159,10 +184,32 @@
                   data['lang']) }}</small></h4>
               <hr>
 
-              <div class="form-group">
-                <label for="port3">{{ translate('serverWizard', 'serverPort', data['lang']) }}</label>
-                <input type="number" class="form-control" id="port4" name="port" value="5520" step="1" min="1"
-                  max="65535" required>
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="min_memory1">{{ translate('serverWizard', 'minMem', data['lang']) }} <small> - {{
+                        translate('serverWizard', 'sizeInGB', data['lang']) }}</small></label>
+                    <input type="number" class="form-control" id="min_memory1" name="mem_min" value="1" step="0.5"
+                      min="0.5" required>
+                  </div>
+                </div>
+
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="max_memory1">{{ translate('serverWizard', 'maxMem', data['lang']) }} <small> - {{
+                        translate('serverWizard', 'sizeInGB', data['lang']) }}</small></label>
+                    <input type="number" class="form-control" id="max_memory1" name="mem_max" value="2" step="0.5"
+                      min="0.5" required>
+                  </div>
+                </div>
+
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="port1">{{ translate('serverWizard', 'serverPort', data['lang']) }}</label>
+                    <input type="number" class="form-control" id="port1" name="port" value="5520" step="1" min="1"
+                      max="65535 " required>
+                  </div>
+                </div>
               </div>
 
               <div class="form-group">
@@ -323,7 +370,7 @@
     });
     let responseData = await res.json();
     if (responseData.status === "ok") {
-      window.location.href = '/panel/dashboard';
+      window.location.href = `/panel/server_detail?id=${responseData.data.new_server_id}&subpage=term`;
     } else {
       // Close the "be patient..." dialogue box
       $('.bootbox-close-button').click();
@@ -359,6 +406,8 @@
           "download_exe_create_data": {
             //agree to eula since we confirmed before calling this function
             "agree_to_eula": true,
+            "mem_min": formDataObject.mem_min,
+            "mem_max": formDataObject.mem_max,
           }
         }
       }
@@ -402,6 +451,8 @@
             "archive_name": $("#file-uploaded").val(),
             "archive_internal_path": zip_root_path,
             "executable": formDataObject.server_jar,
+            "mem_min": formDataObject.mem_min,
+            "mem_max": formDataObject.mem_max,
           }
         }
       }
