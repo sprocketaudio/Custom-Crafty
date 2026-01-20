@@ -1513,15 +1513,18 @@ class ServerInstance:
                 )
             self.stats_helper.set_update(False)
             return
-
+        server_type = HelperServers.get_server_type_by_id(self.server_id)
         # lets download the files
-        if HelperServers.get_server_type_by_id(self.server_id) != "minecraft-bedrock":
+        if server_type == "minecraft-java":
             jar_dir = os.path.dirname(current_executable)
             jar_file_name = os.path.basename(current_executable)
 
             downloaded = FileHelpers.ssl_get_file(
                 self.settings["executable_update_url"], jar_dir, jar_file_name
             )
+        elif self.server_object.type == "hytale":
+            self.import_helper.download_install_hytale(self.server_path, self.server_id)
+            downloaded = True
         else:
             # downloads zip from remote url
             downloaded = False
