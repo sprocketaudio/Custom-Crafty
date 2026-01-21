@@ -90,7 +90,7 @@ class FileHelpers:
             ):  # check for empty bytes (binary files) this will also capture utf-16
                 return False
             return True
-        except UnicodeDecodeError:
+        except (UnicodeDecodeError, PermissionError):
             return False
 
     def probably_can_open_file(self, path: str) -> tuple:
