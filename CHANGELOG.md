@@ -1,5 +1,5 @@
 # Changelog
-## --- [4.8.0] - 2026/01/19
+## --- [4.8.0] - 2026/01/22
 ### New features
 - Passkey Authentication Support ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/952))
 ### Bug fixes
@@ -15,8 +15,6 @@
 - Remove local file imports ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/936))
 - Allow middle mouse new tab and `ctrl + click` new tab ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/945))
 - Add permission error to exceptions for can_open_files ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/957))
-### Lang
-TBD
 <br><br>
 
 ## --- [4.7.0] - 2025/12/25
