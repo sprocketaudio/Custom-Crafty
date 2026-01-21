@@ -265,7 +265,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             data["path"],
         ):
             return self.finish_json(
-                400,
+                403,
                 {
                     "status": "error",
                     "error": "TRAVERSAL DETECTED",
@@ -301,57 +301,55 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             file_list = sorted(dir_list, key=str.casefold) + sorted(
                 unsorted_files, key=str.casefold
             )
-            for raw_filename in file_list:
-                filename = html.escape(raw_filename)
-                rel = os.path.join(folder, raw_filename)
-                dpath = os.path.join(folder, filename)
-                can_open, mime = self.file_helper.probably_can_open_file(dpath)
-                modified_time = datetime.fromtimestamp(Path(dpath).stat().st_mtime)
+            for filename in file_list:
+                raw_path = Path(folder, filename).resolve()
+                can_open, mime = self.file_helper.probably_can_open_file(str(raw_path))
+                modified_time = datetime.fromtimestamp(Path(raw_path).stat().st_mtime)
                 if backup_id:
                     if str(
-                        dpath
+                        raw_path
                     ) in self.controller.management.get_excluded_backup_dirs(backup_id):
-                        if os.path.isdir(rel):
+                        if os.path.isdir(raw_path):
                             return_json[filename] = {
-                                "path": dpath,
+                                "path": raw_path,
                                 "dir": True,
                                 "excluded": True,
                             }
                         else:
                             try:
-                                file_size = os.path.getsize(rel)
+                                file_size = os.path.getsize(raw_path)
                             except (OSError, IOError):
                                 file_size = 0
                             return_json[filename] = {
-                                "path": dpath,
+                                "path": raw_path,
                                 "dir": False,
                                 "excluded": True,
                                 "size": Helpers.human_readable_file_size(file_size),
                             }
                     else:
-                        if os.path.isdir(rel):
+                        if os.path.isdir(raw_path):
                             return_json[filename] = {
-                                "path": dpath,
+                                "path": raw_path,
                                 "dir": True,
                                 "excluded": False,
                             }
                         else:
                             try:
-                                file_size = os.path.getsize(rel)
+                                file_size = os.path.getsize(raw_path)
                             except (OSError, IOError):
                                 file_size = 0
                             return_json[filename] = {
-                                "path": dpath,
+                                "path": raw_path,
                                 "dir": False,
                                 "excluded": False,
                                 "size": Helpers.human_readable_file_size(file_size),
                             }
                 else:
-                    if os.path.isdir(rel):
+                    if os.path.isdir(raw_path):
                         return_json[filename] = {
                             "path": str(
                                 PurePath.relative_to(
-                                    PurePath(dpath), PurePath(server_path)
+                                    PurePath(raw_path), PurePath(server_path)
                                 )
                             ),
                             "dir": True,
@@ -360,13 +358,13 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                         }
                     else:
                         try:
-                            file_size = os.path.getsize(rel)
+                            file_size = os.path.getsize(raw_path)
                         except (OSError, IOError):
                             file_size = 0
                         return_json[filename] = {
                             "path": str(
                                 PurePath.relative_to(
-                                    PurePath(dpath), PurePath(server_path)
+                                    PurePath(raw_path), PurePath(server_path)
                                 )
                             ),
                             "dir": False,
@@ -439,7 +437,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 or filename == server_path
             ):
                 return self.finish_json(
-                    400,
+                    403,
                     {
                         "status": "error",
                         "error": "TRAVERSAL DETECTED",
@@ -611,7 +609,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             data["path"],
         ):
             return self.finish_json(
-                400,
+                403,
                 {
                     "status": "error",
                     "error": "TRAVERSAL DETECTED",
@@ -735,7 +733,7 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
             new_item_path,
         ):
             return self.finish_json(
-                400,
+                403,
                 {
                     "status": "error",
                     "error": "TRAVERSAL DETECTED",
@@ -840,7 +838,7 @@ class ApiServersServerFilesCreateHandler(BaseApiHandler):
             path,
         ):
             return self.finish_json(
-                400,
+                403,
                 {
                     "status": "error",
                     "error": "TRAVERSAL DETECTED",
@@ -952,7 +950,7 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
             target_file,
         ):
             return self.finish_json(
-                400,
+                403,
                 {
                     "status": "error",
                     "error": "TRAVERSAL DETECTED",
@@ -960,10 +958,11 @@ class ApiServersServerFilesZipHandler(BaseApiHandler):
                 },
             )
         if Helpers.check_file_exists(target_file):
+            destination_path = Path(target_file).parents[0]
             unzip_thread = threading.Thread(
                 target=self.file_helper.unzip_file,
                 daemon=True,
-                args=(target_file, server_id),
+                args=(target_file, destination_path, server_id),
                 kwargs={"proc_id": data.get("proc_id")},
                 name=f"{target_file}_unzip",
             )
@@ -1059,7 +1058,7 @@ class ApiServersServerFileDownload(BaseApiHandler):
                 file_path,
             ):
                 return self.finish_json(
-                    400,
+                    403,
                     {
                         "status": "error",
                         "error": "TRAVERSAL DETECTED",
@@ -1068,7 +1067,7 @@ class ApiServersServerFileDownload(BaseApiHandler):
                 )
         except ValueError:
             return self.finish_json(
-                400,
+                403,
                 {
                     "status": "error",
                     "error": "TRAVERSAL DETECTED",
@@ -1218,6 +1217,21 @@ class ApiServersServerFilesOperationHandler(BaseApiHandler):
                     Path(item["target_path"], Path(source_path).name),
                 )
             )
+
+            # Check for any path traversals out of server_path
+            try:
+                Helpers.validate_traversal(server_path, source_path)
+                Helpers.validate_traversal(server_path, target_path)
+            except ValueError:
+                return self.finish_json(
+                    403,
+                    {
+                        "status": "error",
+                        "error": "TRAVERSAL DETECTED",
+                        "error_data": "TRAVERSAL DETECTED",
+                    },
+                )
+
             try:
                 self.do_operation(operation, source_path, target_path)
             except shutilError as why:

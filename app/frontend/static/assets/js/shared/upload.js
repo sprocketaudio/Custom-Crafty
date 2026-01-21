@@ -153,6 +153,7 @@ async function uploadFile(type, file = null, path = null, file_num = 0, fileId =
         if (type === "import") {
             document.getElementById("lower_half").classList.remove("d-none");
             document.getElementById("lower_half").hidden = false;
+            $("#root_upload_button").click();
         } else if (type === "background") {
             setTimeout(function () {
                 location.href = `/panel/custom_login`;

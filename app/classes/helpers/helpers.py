@@ -45,6 +45,9 @@ if os.name == "nt":
 
 logger = logging.getLogger(__name__)
 
+PLAIN_TEXT = "text/plain"
+BAT_TEXT = "application/x-bat"
+
 MASTER_CONFIG = {
     "https_port": 8443,
     "language": "en_EN",
@@ -69,7 +72,9 @@ MASTER_CONFIG = {
     "max_login_attempts": 3,
     "superMFA": False,
     "general_user_log_access": False,
-    "base_url": "127.0.0.1:8443",
+    "base_url": "localhost:8443",
+    "enable_passkey_auth": False,
+    "passkey_rp_name": "Crafty Controller",
 }
 
 CONFIG_CATEGORIES = {
@@ -90,6 +95,8 @@ CONFIG_CATEGORIES = {
         "enable_otp_skew",
         "superMFA",
         "max_login_attempts",
+        "enable_passkey_auth",
+        "passkey_rp_name",
     ],
     "logs": [
         "max_log_lines",

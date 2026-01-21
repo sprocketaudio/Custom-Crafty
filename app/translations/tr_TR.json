@@ -252,7 +252,9 @@
         "schedule_desc": "Yükseltme sırasında zamanlanmış görevlerinizin bir kısmının veya tamamının başarıyla aktarılmadığını tespit ettik. Lütfen zamanlamalar sekmesinden zamanlamalarınızı onaylayın.",
         "backup_title": "Yedek Taşıma Uyarısı",
         "schedule_title": "Zamanlama Taşıma Uyarısı",
-        "accountSettings": "Hesap Ayarları"
+        "accountSettings": "Hesap Ayarları",
+        "restoreFailed": "Yedek dosyalar geri yüklenemedi. Sunucu dizininden dosyalar silinemedi.",
+        "restoreSuccess": "Sunucu dosyaları başarıyla geri yüklendi."
     },
     "offline": {
         "offline": "Çevrimdışı",
@@ -462,8 +464,8 @@
         "createFileQuestion": "Yeni dosyanın adı ne olsun?",
         "default": "Varsayılan",
         "delete": "Sil",
-        "deleteItemQuestion": "\" + name + \" klasör/dosyasını silmek istediğinizden emin misiniz?",
-        "deleteItemQuestionMessage": "\\\"\" + path + \"\\\" silenecektir!<br/><br/>Bu eylemin geri dönüşü olmayacak ve sonsuza kadar kaybolacak!",
+        "deleteItemQuestion": "Silinen: ",
+        "deleteItemQuestionMessage": "Bu eylemin geri dönüşü olmayacak ve sonsuza kadar kaybolacak!",
         "download": "İndir",
         "editingFile": "Düzenlenen dosya:",
         "error": "Dosyalar alınırken hata oluştu",
@@ -476,13 +478,28 @@
         "rename": "Yeniden Adlandır",
         "renameItemQuestion": "Dosyanın yeni adı ne olsun?",
         "save": "Kaydet",
-        "size": "Düzenleyici Boyutunu Değiştir",
+        "size": "Boyut",
         "unsupportedLanguage": "Uyarı: Bu desteklenen bir dosya türü değil",
         "unzip": "Fermuarı aç",
         "upload": "Dosya Yükle",
         "uploadTitle": "Dosyayı buraya yükle: ",
         "waitUpload": "Lütfen dosyalarınızı yüklerken bekleyiniz... Bu biraz zaman alabilir.",
-        "yesDelete": "Evet, sonuçlarını anlıyorum"
+        "yesDelete": "Evet, sonuçlarını anlıyorum",
+        "cancel": "İptal",
+        "changeConflict": "Sunucu Durumu Çakışması",
+        "copy": "Kopyala",
+        "copying": "Kopyalanıyor",
+        "modified": "Değiştirilmiş",
+        "more": "Daha fazla yükle",
+        "move": "Taşı",
+        "moving": "Taşınıyor",
+        "name": "Ad",
+        "operationStatus": "Dosya İşlem Durumu",
+        "options": "Seçenekler",
+        "overwrite": "Sunucudaki değişiklikleri üzerine yaz",
+        "repull": "Sunucudan güncel dosyayı yükle (Tüm yerel değişiklikler kaybolacaktır)",
+        "serverModified": "Bu sayfayı yüklediğinizden beri bu dosyanın durumu sunucuda değişmiştir. Lütfen bir seçenek seçin.",
+        "type": "Tür"
     },
     "serverMetrics": {
         "resetZoom": "Yakınlaştırmayı Sıfırla",
@@ -587,7 +604,7 @@
         "absoluteZipPath": "Sunucunuzun mutlak konumu",
         "addRole": "Sunucuyu Mevcut Rol(ler)e Ekle",
         "autoCreate": "Hiçbiri seçilmezse Crafty bir tane yapacak!",
-        "bePatient": "Biz sunucuyu ' + (importing ? 'içe aktarırken' :  'indirirken') + ' lütfen sabırlı olun",
+        "bePatient": "Biz sunucuyu oluştururken lütfen sabırlı olun",
         "buildServer": "Sunucuyu Oluştur!",
         "clickRoot": "Kök dizinini seçmek için buraya tıklayın",
         "close": "Kapat",
@@ -720,7 +737,8 @@
         "userName": " dize türünde, tümü KÜÇÜK HARF, en az 4 karakter ve en fazla 20 karakter olmalıdır",
         "additionalProperties": "Ek Özelliklerin geçirilmesine izin verilmez",
         "mfaName": "Özellik için girdi, dize türünde olmalı ve en az 3 karakter içermelidir",
-        "passProp": "Şifre en az 8 karakterden oluşan bir dize olmalıdır."
+        "passProp": "Şifre en az 8 karakterden oluşan bir dize olmalıdır.",
+        "typeEpoch": "bir epoch değeri olmalıdır"
     },
     "webhooks": {
         "areYouSureDel": "Bu webhooku silmek istediğinizden emin misiniz?",
@@ -745,7 +763,9 @@
         "type": "Webhook Tipi",
         "url": "Webhook URLsi",
         "webhook_body": "Webhook Gövdesi",
-        "webhooks": "Webhooklar"
+        "webhooks": "Webhooklar",
+        "documentation": "Dinamik değişkenlerle ilgili bilgiler için lütfen bu belgelere başvurun.",
+        "jinja2": "Crafty'nin webhook motoru, dinamik mesaj oluşturma için Jinja2'den yararlanır."
     },
     "otp": {
         "config": "Konfigürasyon",
@@ -804,5 +824,10 @@
         "logs": "Günlük kaydı",
         "monitoring": "Gözetleme",
         "miscellaneous": "Diğer"
+    },
+    "serverFilesEditor": {
+        "saved": "Kaydedildi",
+        "save": "Değişiklikleri Kaydet",
+        "unsavedChanges": "Çıkmak istediğinizden emin misiniz? Kaydedilmemiş değişiklikleriniz var."
     }
 }

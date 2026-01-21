@@ -4,7 +4,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 {% block content %}
 <link rel="stylesheet" href="../../static/assets/css/vendors/bootstrap-select-1.13.18.css">
-<div class="content-wrapper" id="creation-wrapper" 
+<div class="content-wrapper" id="creation-wrapper"
   data-importing="{{translate('serverWizard', 'importing', data['lang'])}}"
   data-downloading="{{translate('serverWizard', 'downloading', data['lang'])}}"
   data-bePatient="{{translate('serverWizard', 'bePatient', data['lang'])}}"
@@ -75,153 +75,6 @@
         </form>
       </div>
     </div>
-    <div class="col-sm-6 grid-margin stretch-card">
-      <div class="card">
-        <div class="card-body">
-
-          <h4>{{ translate('serverWizard', 'importServer', data['lang']) }}</h4>
-          <br />
-
-          <form method="post" id="import-jar" class="server-wizard">
-            <div class="form-group">
-              <label for="server_name">{{ translate('serverWizard', 'serverName', data['lang']) }}</label>
-              <input type="text" class="form-control" id="server_name" name="name" value=""
-                placeholder="{{ translate('serverWizard', 'myNewServer', data['lang']) }}" required>
-            </div>
-            <div class="form-group">
-              <label for="server">{{ translate('serverWizard', 'serverPath', data['lang']) }} <small>{{
-                  translate('serverWizard', 'absoluteServerPath', data['lang']) }}</small></label>
-              <input type="text" class="form-control" id="server_path" name="server_path" placeholder="/var/opt/server"
-                required>
-            </div>
-            <div class="form-group">
-              <label for="server_jar">{{ translate('serverWizard', 'serverJar', data['lang']) }}</label>
-              <input type="text" class="form-control" id="server_jar" name="server_jar" value=""
-                placeholder="bedrock_server" required>
-            </div>
-            <br />
-            <h4 class="card-title">{{ translate('serverWizard', 'quickSettings', data['lang']) }} <small
-                class="text-none"> - {{ translate('serverWizard', 'quickSettingsDescription',
-                data['lang']) }}</small></h4>
-            <hr>
-            <div class="form-group">
-              <label for="port2">{{ translate('serverWizard', 'serverPort', data['lang']) }}
-                <small></small></label>
-              <input type="number" class="form-control" id="port2" name="port" value="19132" step="1" min="1"
-                max="65535" required>
-            </div>
-
-            <div class="form-group">
-              <p class="mb-0 p-0" aria-expanded="true">{{ translate('serverWizard', 'addRole', data['lang'])
-                }}
-                <small class="text-none"> - {{ translate('serverWizard', 'autoCreate',
-                  data['lang']) }}</small>
-              </p>
-              {% include "../panel/parts/role_select.html" %}
-            </div>
-
-            <button type="submit" class="btn btn-primary mr-2">{{ translate('serverWizard', 'importServerButton',
-              data['lang']) }}</button>
-            <button type="reset" class="btn btn-danger mr-2">{{ translate('serverWizard', 'resetForm', data['lang'])
-              }}</button>
-          </form>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6 grid-margin stretch-card">
-      <div class="card">
-        <div class="card-body">
-
-          <h4>{{ translate('serverWizard', 'importZip', data['lang']) }}</h4>
-          <br />
-          <form name="zip" id="import-zip" method="post" class="server-wizard">
-
-            <div class="form-group">
-              <label for="server_name">{{ translate('serverWizard', 'serverName', data['lang']) }}</label>
-              <input type="text" class="form-control" id="server_name" name="name" value=""
-                placeholder="{{ translate('serverWizard', 'myNewServer', data['lang']) }}" required>
-            </div>
-
-            <div class="form-group">
-              <label for="server">{{ translate('serverWizard', 'zipPath', data['lang']) }} <small>{{
-                  translate('serverWizard', 'absoluteZipPath', data['lang']) }}</small></label>
-              <input type="text" class="form-control" id="zip_server_path" name="server_path"
-                placeholder="/var/opt/server.zip" required>
-            </div>
-
-            <div class="form-group">
-              <label for="server">{{ translate('serverWizard', 'selectRoot', data['lang']) }} <small>{{
-                  translate('serverWizard', 'explainRoot', data['lang']) }}</small></label>
-              <br>
-              <button class="btn btn-primary mr-2" id="root_files_button" type="button">{{
-                translate('serverWizard', 'clickRoot', data['lang']) }}</button>
-            </div>
-            <div class="form-group">
-              <label for="server_jar">{{ translate('serverWizard', 'serverJar', data['lang']) }}</label>
-              <input type="text" class="form-control" id="server_jar" name="server_jar" value=""
-                placeholder="bedrock_server" required>
-            </div>
-            <h4 class="card-title">{{ translate('serverWizard', 'quickSettings', data['lang']) }} <small
-                class="text-none"> - {{ translate('serverWizard', 'quickSettingsDescription', data['lang'])
-                }}</small>
-            </h4>
-            <hr>
-            <div class="form-group">
-              <label for="port3">{{ translate('serverWizard', 'serverPort', data['lang']) }}
-                <small></small></label>
-              <input type="number" class="form-control" id="port3" name="port" value="19132" step="1" min="1"
-                max="65535" required>
-            </div>
-
-            <div class="form-group">
-              <p class="mb-0 p-0" aria-expanded="true">{{ translate('serverWizard', 'addRole', data['lang'])
-                }}
-                <small class="text-none"> - {{ translate('serverWizard', 'autoCreate',
-                  data['lang']) }}</small>
-              </p>
-              {% include "../panel/parts/role_select.html" %}
-            </div>
-            <div class="modal fade" id="dir_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
-              aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">{{ translate('serverWizard',
-                      'selectZipDir', data['lang']) }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="tree-ctx-item overflow-scroll mh-75" id="main-tree-div" data-path="">
-                      <input type="radio" class="root-input" id="main-tree-input" name="root_path" value="" checked>
-                      <span id="main-tree" class="files-tree-title tree-caret-down root-dir" data-path="">
-                        <i class="far fa-folder"></i>
-                        <i class="far fa-folder-open"></i>
-                        {{ translate('serverFiles', 'files', data['lang']) }}
-                      </span>
-                      </input>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{
-                      translate('serverWizard', 'close', data['lang']) }}</button>
-                    <button type="button" id="modal-okay" data-dismiss="modal" class="btn btn-primary">{{
-                      translate('serverWizard', 'save', data['lang']) }}</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <button id="zip_submit" type="submit" title="You must select server root dir first" disabled
-              class="btn btn-primary mr-2">{{ translate('serverWizard', 'importServerButton', data['lang'])
-              }}</button>
-            <button type="button" class="btn btn-danger mr-2 tree-reset">{{ translate('serverWizard', 'resetForm',
-              data['lang'])
-              }}</button>
-          </form>
-        </div>
-      </div>
-    </div>
     <div class="col-md-6 grid-margin stretch-card">
       <div class="card">
         <div class="card-body">
@@ -234,7 +87,7 @@
 
             <div class="form-group">
               <label for="server_name">{{ translate('serverWizard', 'serverName', data['lang']) }}</label>
-              <input type="text" class="form-control" id="server_name" name="name" value=""
+              <input type="text" class="form-control" id="server_name_upload" name="name" value=""
                 placeholder="{{ translate('serverWizard', 'myNewServer', data['lang']) }}" required>
             </div>
 
@@ -253,7 +106,8 @@
                 </div>
               </div>
             </div>
-            <div id="lower_half" class="d-none" hidden>
+            <div id="lower_half" class="d-none"
+              data-loading='{{translate("serverFiles", "loadingRecords", data["lang"])}}'>
               <div class="form-group">
                 <label for="server">{{ translate('serverWizard', 'selectRoot', data['lang']) }} <small>{{
                     translate('serverWizard', 'explainRoot', data['lang']) }}</small></label>
@@ -301,7 +155,7 @@
                       </button>
                     </div>
                     <div class="modal-body">
-                      <div class="tree-ctx-item overflow-scroll mh-75" id="main-tree-div-upload" data-path="">
+                      <div class="tree-ctx-item overflow-scroll mh-75" id="main-tree-div" data-path="">
                         <input type="radio" class="root-input" id="main-tree-input-upload" name="root_path" value=""
                           checked>
                         <span id="main-tree" class="files-tree-title tree-caret-down root-dir" data-path="">
@@ -341,21 +195,6 @@
 {% block js%}
 <script src="../../static/assets/js/shared/upload.js"></script>
 <script>
-  document.getElementById("root_upload_button").addEventListener("click", function (event) {
-    if (document.getElementById('root_upload_button').classList.contains('clicked')) {
-      show_file_tree();
-      return;
-    } else {
-      document.getElementById('root_upload_button').classList.add('clicked')
-    }
-    bootbox.dialog({
-      message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
-      closeButton: false
-    });
-    setTimeout(function () {
-      getDirView();
-    }, 2000);
-  });
 
   function eula_confirm() {
     bootbox.confirm({
@@ -386,25 +225,6 @@
   $(".tree-reset").on("click", function () {
     location.href = "/server/bedrock_step1";
   });
-  document.getElementById("root_files_button").addEventListener("click", function (event) {
-    if (document.forms["zip"]["server_path"].value != "") {
-      if (document.getElementById('root_files_button').classList.contains('clicked')) {
-        show_file_tree();
-        return;
-      } else {
-        document.getElementById('root_files_button').classList.add('clicked')
-      }
-      var dialog = bootbox.dialog({
-        message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Please wait while we gather your files...</p>',
-        closeButton: false
-      });
-      setTimeout(function () {
-        getDirView();
-      }, 2000);
-    } else {
-      bootbox.alert("You must input a path before selecting this button");
-    }
-  });
 </script>
 
 <script>
@@ -425,7 +245,7 @@
     }
   });
   function replacer(key, value) {
-    if (key === "roles") {
+    if (key === "roles" || key === "archive_internal_path") {
       return value
     }
     if (key != "ignored_exits") {
@@ -509,78 +329,6 @@
       send_server(formDataJsonString);
     });
 
-    $("#import-jar").on("submit", async function (e) {
-      wait_msg(true);
-      e.preventDefault();
-      let jarForm = document.getElementById("import-jar");
-
-      let formData = new FormData(jarForm);
-      //Create an object from the form data entries
-      let formDataObject = Object.fromEntries(formData.entries());
-      console.log(formDataObject);
-      let send_data = {
-        "name": formDataObject.name,
-        "roles": calcRoles(),
-        "monitoring_type": "minecraft_bedrock",
-        "minecraft_bedrock_monitoring_data": {
-          "host": "127.0.0.1",
-          "port": formDataObject.port
-        },
-        "create_type": "minecraft_bedrock",
-        "minecraft_bedrock_create_data": {
-          "create_type": "import_server",
-          "import_server_create_data": {
-            "existing_server_path": formDataObject.server_path,
-            "executable": formDataObject.server_jar,
-          }
-        }
-      }
-      console.log(send_data);
-      // Format the plain form data as JSON
-      let formDataJsonString = JSON.stringify(send_data, replacer);
-
-      send_server(formDataJsonString);
-    });
-
-    $("#import-zip").on("submit", async function (e) {
-      wait_msg(true);
-      e.preventDefault();
-      let jarForm = document.getElementById("import-zip");
-      var checkedRadio = $('.root-input:checked');
-      let zip_root_path = ""
-      if (checkedRadio.length > 0) {
-        // Get the value of the checked radio button
-        var checkedValue = checkedRadio.val();
-        zip_root_path = checkedValue; // Return the checked value if needed
-      }
-      let formData = new FormData(jarForm);
-      //Create an object from the form data entries
-      let formDataObject = Object.fromEntries(formData.entries());
-      console.log(formDataObject);
-      let send_data = {
-        "name": formDataObject.name,
-        "roles": calcRoles(),
-        "monitoring_type": "minecraft_bedrock",
-        "minecraft_bedrock_monitoring_data": {
-          "host": "127.0.0.1",
-          "port": formDataObject.port
-        },
-        "create_type": "minecraft_bedrock",
-        "minecraft_bedrock_create_data": {
-          "create_type": "import_server",
-          "import_server_create_data": {
-            "existing_server_path": zip_root_path,
-            "executable": formDataObject.server_jar,
-          }
-        }
-      }
-      console.log(send_data);
-      // Format the plain form data as JSON
-      let formDataJsonString = JSON.stringify(send_data, replacer);
-
-      send_server(formDataJsonString);
-    });
-
     $("#import-upload").on("submit", async function (e) {
       wait_msg(true);
       e.preventDefault();
@@ -609,7 +357,8 @@
         "minecraft_bedrock_create_data": {
           "create_type": "import_server",
           "import_server_create_data": {
-            "existing_server_path": zip_root_path,
+            "archive_name": $("#file-uploaded").val(),
+            "archive_internal_path": zip_root_path,
             "executable": formDataObject.server_jar,
           }
         }

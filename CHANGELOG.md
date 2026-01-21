@@ -1,7 +1,26 @@
 # Changelog
+## --- [4.8.0] - 2026/01/19
+### New features
+- Passkey Authentication Support ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/952))
+### Bug fixes
+- Fix crash on startup due to big bucket cache refresh ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/941))
+- Fix issue where files would incorrectly be classified as not able to be opened by missing mimetypes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/944))
+- Fix issue where filter list size would change during iteration causing the program to halt silently ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/944))
+- [`CVE-2026-0963`] Security: Add `validate_traversal` calls to `ServerFilesOperationHandler` ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/951))
+- Remove HTML encoding on files return ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/943))
+- [`CVE-2026-0805`] Security: Snapshot Backup Traversal ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/937))
+- Catch backup dispatch errors crashing command_watcher ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/955))
+### Tweaks
+- Change the way MFA warning is displayed on front end ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/953))
+- Remove local file imports ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/936))
+- Allow middle mouse new tab and `ctrl + click` new tab ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/945))
+### Lang
+TBD
+<br><br>
+
 ## --- [4.7.0] - 2025/12/25
 ### Refactor
-- Overhaul/Replace `Server Files` panel to be more feature complete and user friendly ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/909))
+- Overhaul/Replace `Server Files` panel to be more feature complete and user friendly ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/909) | [Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/940))
 ### Tweaks
 - Bump tornado for CVE-2025-67725 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/934))
 <br><br>

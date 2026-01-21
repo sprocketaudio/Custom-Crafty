@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 from zoneinfo import ZoneInfoNotFoundError
 from tzlocal import get_localzone
+from peewee import DoesNotExist
 from apscheduler.events import EVENT_JOB_EXECUTED
 from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -141,7 +142,12 @@ class TasksManager:
                         )
 
                 elif command == "backup_server":
-                    svr.server_backup_threader(cmd["action_id"])
+                    try:
+                        svr.server_backup_threader(cmd["action_id"])
+                    except (KeyError, DoesNotExist) as why:
+                        logger.error(
+                            "Failed to run server backup on schedule with error %s", why
+                        )
 
                 elif command == "update_executable":
                     svr.jar_update()
@@ -223,6 +229,13 @@ class TasksManager:
             "interval",
             hours=24,
             id="mfa_purge",
+            start_date=datetime.datetime.now(),
+        )
+        self.scheduler.add_job(
+            self.controller.passkey.purge_expired_challenges,
+            "interval",
+            hours=1,
+            id="passkey_challenge_purge",
             start_date=datetime.datetime.now(),
         )
         # self.scheduler.add_job(
@@ -825,7 +838,10 @@ class TasksManager:
                 )
             if self.helper.is_file_older_than_x_days(file_path):
                 try:
-                    os.remove(file_path)
+                    if Path(file_path).is_dir():
+                        FileHelpers.del_dirs(file_path)
+                    else:
+                        FileHelpers.del_file(file_path)
                 except FileNotFoundError:
                     logger.debug("Could not clear out file from import directory")
 

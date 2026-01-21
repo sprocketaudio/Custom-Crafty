@@ -268,18 +268,29 @@ function setup_table_body(response) {
 }
 
 function setup_table_listeners() {
-    $(".directory").click(function (e) {
+    $(".directory").on("mousedown", function (e) {
+        if (e.button == 1) {
+            e.preventDefault();
+            window.open(`/panel/server_detail?id=${serverId}&dir=${encodeURIComponent($(this).attr("data-path"))}&subpage=files#context-container`, "_blank");
+        }
+    });
+    $(".directory").on("click", function (e) {
+        e.preventDefault();
         // Prevent the click from firing if it’s on the context menu button
         if ($(e.target).closest(".context-button").length) return;
         if ($(e.target).closest(".row-select").length) return;
         if ($(this).children(".column-1").hasClass("editing")) return;
+        if (e.ctrlKey) {
+            window.open(`/panel/server_detail?id=${serverId}&dir=${encodeURIComponent($(this).attr("data-path"))}&subpage=files#context-container`, "_blank");
+            return;
+        }
         getTreeView($(this).attr("data-path"))
     });
     $(".file").click(function (e) {
         // Prevent the click from firing if it’s on the context menu button
         if ($(e.target).closest(".context-button").length) return;
         if ($(e.target).closest(".row-select").length) return;
-        if (!$(this).data("can_open")) return;
+        if (!$(this).data("can_open") && !e.altKey) return; // Allow opening override with alt key + click
         if ($(this).children(".column-1").hasClass("editing")) return;
         window.open(`/panel/edit_file?server_id=${serverId}&file=${encodeURI($(this).attr("data-path"))}`, "_blank")
     });
@@ -929,17 +940,6 @@ $(document).ready(function () {
             $("#status-caret").html(`<i class="fa-solid fa-caret-down"></i>`)
         }
     });
-    if (webSocket) {
-        webSocket.on('zip_status', function (data) {
-            if (data.complete) {
-                const cur_dir = $("#table-nav").attr("data-cur-path");
-                removeProgressItem(data.id);
-                getTreeView(cur_dir);
-            } else {
-                updateProgressBar(data.percent, "server_upload", 1, data.id);
-            }
-        });
-    }
 });
 
 function setup_row_select_listener() {
