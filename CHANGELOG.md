@@ -1,4 +1,15 @@
 # Changelog
+## --- [4.9.0] - 2026/TBD
+### New features
+TBD
+### Bug fixes
+TBD
+### Tweaks
+TBD
+### Lang
+TBD
+<br><br>
+
 ## --- [4.8.0] - 2026/01/22
 ### New features
 - Passkey Authentication Support ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/952))
