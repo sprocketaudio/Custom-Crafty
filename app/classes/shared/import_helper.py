@@ -179,7 +179,7 @@ class ImportHelpers:
             ServersController.finish_import(new_id)
             return
         install_command = (
-            f"{Path(server_path, unix_exe)} "
+            f"./{unix_exe} "
             f"{hytale_json.commands.download_path_command} {HYTALE_0UTPUT_NAME}"
         )
         if self.helper.is_os_windows():
