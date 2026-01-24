@@ -3,7 +3,7 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Add error data to servers running global dir ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/961))
 ### Tweaks
 TBD
 ### Lang
