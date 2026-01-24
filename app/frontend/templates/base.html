@@ -357,6 +357,7 @@
         bootbox.alert({
           message: container,
           callback: function () {
+            globalThis.window.open(data.link)
             globalThis.location.href = `/panel/server_detail?id=${data.server_id}&subpage=term`
           }
         });

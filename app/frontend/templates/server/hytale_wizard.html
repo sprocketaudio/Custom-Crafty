@@ -355,7 +355,7 @@
     });
     return combinedValues;
   }
-  async function send_server(data) {
+  async function send_server(data, create_type = null) {
     let token = getCookie("_xsrf")
     console.log(data)
     console.log(token)
@@ -367,7 +367,7 @@
       body: data,
     });
     let responseData = await res.json();
-    if (responseData.status === "ok" && data.create_type != "download_exe") {
+    if (responseData.status === "ok" && create_type != "download_exe") {
       globalThis.location.href = `/panel/server_detail?id=${responseData.data.new_server_id}&subpage=term`;
     } else if (responseData.status === "error") {
       // Close the "be patient..." dialogue box
@@ -415,7 +415,7 @@
 
 
       console.log(formDataJsonString);
-      send_server(formDataJsonString);
+      send_server(formDataJsonString, send_data["hytale_create_data"]["create_type"]);
     });
 
     $("#import-upload").on("submit", async function (e) {
@@ -457,7 +457,7 @@
       console.log(send_data);
       // Format the plain form data as JSON
       let formDataJsonString = JSON.stringify(send_data, replacer);
-      send_server(formDataJsonString);
+      send_server(formDataJsonString, send_data["hytale_create_data"]["create_type"]);
     });
 
   });
