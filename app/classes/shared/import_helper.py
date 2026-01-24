@@ -37,6 +37,7 @@ class ImportHelpers:
         base_include_path,
         port,
         new_id,
+        server_type,
         full_exe_path=None,
     ):
         import_thread = threading.Thread(
@@ -48,6 +49,7 @@ class ImportHelpers:
                 base_include_path,
                 port,
                 new_id,
+                server_type,
                 full_exe_path,
             ),
             name=f"{new_id}_import",
@@ -61,6 +63,7 @@ class ImportHelpers:
         base_include_path,
         port,
         new_id,
+        server_type,
         full_exe_path,
     ):
         self.file_helper.unzip_file(
@@ -71,6 +74,7 @@ class ImportHelpers:
             base_include_path=base_include_path,
         )
 
+        time.sleep(2)
         if (
             not self.helper.is_os_windows() and full_exe_path
         ):  # we only expect full jar path for bedrock
@@ -83,7 +87,7 @@ class ImportHelpers:
         for item in os.listdir(new_server_dir):
             if str(item) == "server.properties":
                 has_properties = True
-        if not has_properties:
+        if not has_properties and "minecraft" in server_type:
             logger.info(
                 f"No server.properties found on zip file import. "
                 f"Creating one with port selection of {str(port)}"

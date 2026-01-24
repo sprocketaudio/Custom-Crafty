@@ -608,6 +608,7 @@ class Controller:
                     create_data["archive_internal_path"],
                     monitoring_port,
                     new_server_id,
+                    data["create_type"],
                 )
 
         elif data["create_type"] == "minecraft_bedrock":
@@ -632,6 +633,7 @@ class Controller:
                     create_data["archive_internal_path"],
                     monitoring_port,
                     new_server_id,
+                    data["create_type"],
                     full_exe_path,
                 )
 
@@ -657,6 +659,7 @@ class Controller:
                     create_data["archive_internal_path"],
                     monitoring_port,
                     new_server_id,
+                    data["create_type"],
                     full_exe_path,
                 )
 
