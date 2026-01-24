@@ -2,7 +2,7 @@ import os
 import uuid
 import json
 import time
-import stat
+import shlex
 import pathlib
 import logging
 import threading
@@ -196,7 +196,7 @@ class ImportHelpers:
             )
             os.chmod(Path(server_path, unix_exe), 0o2760)  # set executable permissions
         process = subprocess.Popen(
-            install_command,
+            shlex.split(install_command),
             cwd=server_path,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
