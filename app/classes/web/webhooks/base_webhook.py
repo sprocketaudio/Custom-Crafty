@@ -64,6 +64,7 @@ class WebhookProvider(ABC):
             str: The rendered message.
         """
         try:
+            context = self.add_time_variables(context)
             template = self.jinja_env.from_string(template_str)
             return template.render(context)
         except Exception as error:
