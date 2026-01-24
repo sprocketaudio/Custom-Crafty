@@ -1,4 +1,15 @@
 # Changelog
+## --- [4.9.1] - 2026/TBD
+### New features
+TBD
+### Bug fixes
+TBD
+### Tweaks
+TBD
+### Lang
+TBD
+<br><br>
+
 ## --- [4.9.0] - 2026/01/24
 ### New features
 - Add Support For Hytale Servers ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/954))
