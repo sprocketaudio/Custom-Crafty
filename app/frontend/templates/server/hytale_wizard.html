@@ -340,7 +340,8 @@
     else if (typeof value == "boolean" || key === "host" || key === "version") {
       return value
     } else {
-      return (isNaN(value) ? value : +value);
+      const num = Number(value);
+      return Number.isNaN(num) ? value : num;
     }
   }
   function calcRoles() {
