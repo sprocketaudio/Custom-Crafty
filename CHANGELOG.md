@@ -5,7 +5,7 @@
 ### Bug fixes
 - Add error data to servers running global dir ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/961))
 ### Tweaks
-TBD
+- Add Java 25 support to Docker image ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/948))
 ### Lang
 TBD
 <br><br>
