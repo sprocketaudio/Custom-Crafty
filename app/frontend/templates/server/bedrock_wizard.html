@@ -29,7 +29,8 @@
     {% if data.get("experimental") %}
     <li class="nav-item term-nav-item">
       <a class="nav-link" href="/server/steam_cmd_step1" role="tab" aria-selected="false">
-        <i class="fas fa-file-signature"></i>Steam-CMD&nbsp;<span id="steam-badge" class="text-primary"><i
+        <i class="fas fa-file-signature"></i>Steam-CMD&nbsp;<span id="steam-badge"
+          title="{{translate('serverWizard', 'experimentalFeature', data['lang'])}}" class="text-primary"><i
             class="fa-solid fa-flask"></i></span></a>
     </li>
     {% end %}

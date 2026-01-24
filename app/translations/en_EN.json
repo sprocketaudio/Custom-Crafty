@@ -720,6 +720,7 @@
         "downloading": "Downloading Server...",
         "explainRoot": "Please click the button below to select your server's root dir inside of the archive",
         "experimental": "Experimental",
+        "experimentalFeature": "This is an experimental feature",
         "importServer": "Import an Existing Server",
         "importServerButton": "Import Server!",
         "importZip": "Import from a Zip File",
