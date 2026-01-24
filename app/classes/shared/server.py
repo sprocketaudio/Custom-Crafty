@@ -1632,7 +1632,7 @@ class ServerInstance:
             except Exception as e:
                 logger.critical(f"Failed to update SteamCMD Server \n{e}")
                 downloaded = False
-        else:
+        else:  # Bedrock if nothing else
             # downloads zip from remote url
             downloaded = False
             try:
