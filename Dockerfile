@@ -7,15 +7,14 @@ ENV LOG4J_FORMAT_MSG_NO_LOOKUPS=true
 
 # Remove shipped sudoer user (Required for Ubuntu 24.04 base) MR !826
 # Create non-root user & required dirs
+# Install required system packages
 RUN touch /var/mail/ubuntu \
     && chown ubuntu /var/mail/ubuntu \
     && userdel -r ubuntu \
     && useradd -g root -M crafty \
     && mkdir /crafty \
-    && chown -R crafty:root /crafty
-
-# Install required system packages
-RUN apt-get update \
+    && chown -R crafty:root /crafty \
+    && apt-get update \
     && apt-get -y --no-install-recommends install \
         sudo \
         gcc \
@@ -40,7 +39,7 @@ WORKDIR /crafty
 COPY --chown=crafty:root requirements.txt ./
 RUN python3 -m venv ./.venv \
     && . .venv/bin/activate \
-    && pip3 install --no-cache-dir --upgrade setuptools==75.6.0 pip==24.3.1 \
+    && pip3 install --no-cache-dir --upgrade setuptools pip \
     && pip3 install --no-cache-dir -r requirements.txt \
     && deactivate
 USER root
