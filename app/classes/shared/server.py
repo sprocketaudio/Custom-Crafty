@@ -5,7 +5,6 @@ import re
 import shutil
 import time
 import datetime
-import base64
 import threading
 import logging
 import subprocess
@@ -25,8 +24,9 @@ from apscheduler.jobstores.base import JobLookupError, ConflictingIdError
 # OpenMetrics/Prometheus Imports
 from prometheus_client import CollectorRegistry, Gauge, Info
 
-from app.classes.minecraft.stats import Stats
-from app.classes.minecraft.mc_ping import ping, ping_bedrock
+from app.classes.remote_stats.stats import Stats
+from app.classes.remote_stats.nitrado_ping import NitradoPing
+from app.classes.remote_stats.mc_ping import ping, ping_bedrock
 from app.classes.models.servers import HelperServers, Servers
 from app.classes.models.server_stats import HelperServerStats
 from app.classes.models.management import HelpersManagement, HelpersWebhooks
@@ -132,24 +132,19 @@ class ServerOutBuf:
         self.max_lines = self.helper.get_setting("virtual_terminal_lines")
         self.line_buffer = ""
         ServerOutBuf.lines[self.server_id] = []
-        self.lsi = 0
 
     def process_byte(self, char):
-        if char == os.linesep[self.lsi]:
-            self.lsi += 1
-        else:
-            self.lsi = 0
-            self.line_buffer += char
+        if char == "\n":
+            line = self.line_buffer.rstrip("\r")
+            ServerOutBuf.lines[self.server_id].append(line)
 
-        if self.lsi >= len(os.linesep):
-            self.lsi = 0
-            ServerOutBuf.lines[self.server_id].append(self.line_buffer)
-
-            self.new_line_handler(self.line_buffer)
+            self.new_line_handler(line)
             self.line_buffer = ""
             # Limit list length to self.max_lines:
             if len(ServerOutBuf.lines[self.server_id]) > self.max_lines:
                 ServerOutBuf.lines[self.server_id].pop(0)
+        else:
+            self.line_buffer += char
 
     def check(self):
         text_wrapper = io.TextIOWrapper(
@@ -1410,10 +1405,21 @@ class ServerInstance:
             f.write(json.dumps(write_json, indent=4))
             logger.info("Cache file refreshed")
 
+    def get_formatted_server_players(self) -> list:
+        server_players = self.get_server_players()
+        if len(server_players) == 0:
+            return []
+        if isinstance(server_players[0], dict):
+            sp = server_players.copy()
+            server_players = []
+            for player in sp:
+                server_players.append(player["Name"])
+        return server_players
+
     def cache_players(self):
         if not self.check_running():
             return
-        server_players = self.get_server_players()
+        server_players = self.get_formatted_server_players()
         for p in self.player_cache[:]:
             if p["status"] == "Online" and p["name"] not in server_players:
                 p["status"] = "Offline"
@@ -1507,15 +1513,18 @@ class ServerInstance:
                 )
             self.stats_helper.set_update(False)
             return
-
+        server_type = HelperServers.get_server_type_by_id(self.server_id)
         # lets download the files
-        if HelperServers.get_server_type_by_id(self.server_id) != "minecraft-bedrock":
+        if server_type == "minecraft-java":
             jar_dir = os.path.dirname(current_executable)
             jar_file_name = os.path.basename(current_executable)
 
             downloaded = FileHelpers.ssl_get_file(
                 self.settings["executable_update_url"], jar_dir, jar_file_name
             )
+        elif self.server_object.type == "hytale":
+            self.import_helper.download_install_hytale(self.server_path, self.server_id)
+            downloaded = True
         else:
             # downloads zip from remote url
             downloaded = False
@@ -1696,6 +1705,7 @@ class ServerInstance:
         return False
 
     def get_servers_stats(self):
+        server_type = HelperServers.get_server_type_by_id(self.server_id)
         server_stats = {}
 
         server_id = self.server_id
@@ -1712,8 +1722,10 @@ class ServerInstance:
         server_name = server.get("server_name", f"ID#{server_id}")
 
         logger.debug(f"Pinging server '{server}' on {internal_ip}:{server_port}")
-        if HelperServers.get_server_type_by_id(server_id) == "minecraft-bedrock":
+        if server_type == "minecraft-bedrock":
             int_mc_ping = ping_bedrock(internal_ip, int(server_port))
+        elif server_type == "hytale":
+            int_mc_ping = NitradoPing.ping(internal_ip, server_port)
         else:
             try:
                 int_mc_ping = ping(internal_ip, int(server_port))
@@ -1726,11 +1738,10 @@ class ServerInstance:
         # if we got a good ping return, let's parse it
         if int_mc_ping:
             int_data = True
-            if (
-                HelperServers.get_server_type_by_id(server["server_id"])
-                == "minecraft-bedrock"
-            ):
+            if server_type == "minecraft-bedrock":
                 ping_data = Stats.parse_server_raknet_ping(int_mc_ping)
+            elif server_type == "hytale":
+                ping_data = NitradoPing.parse_ping_response(int_mc_ping)
             else:
                 ping_data = Stats.parse_server_ping(int_mc_ping)
         # Makes sure we only show stats when a server is online
@@ -1778,14 +1789,14 @@ class ServerInstance:
 
     def get_server_players(self):
         server = HelperServers.get_server_data_by_id(self.server_id)
-
+        server_type = HelperServers.get_server_type_by_id(self.server_id)
         logger.debug(f"Getting players for server {server['server_name']}")
 
         internal_ip = server["server_ip"]
         server_port = server["server_port"]
 
         logger.debug(f"Pinging {internal_ip} on port {server_port}")
-        if HelperServers.get_server_type_by_id(self.server_id) != "minecraft-bedrock":
+        if server_type == "minecraft-java":
             int_mc_ping = ping(internal_ip, int(server_port))
 
             ping_data = {}
@@ -1794,9 +1805,18 @@ class ServerInstance:
             if int_mc_ping:
                 ping_data = Stats.parse_server_ping(int_mc_ping)
                 return ping_data["players"]
+        elif server_type == "hytale":
+            return NitradoPing.parse_ping_response(
+                NitradoPing.ping(internal_ip, server_port)
+            ).get("players", [])
+
         return []
 
     def get_raw_server_stats(self, server_id):
+        server_type = HelperServers.get_server_type_by_id(server_id)
+        int_data = False
+        ping_data = {}
+
         try:
             server = HelperServers.get_server_obj(server_id)
         except:
@@ -1841,86 +1861,40 @@ class ServerInstance:
         logger.debug(f"Pinging server '{self.name}' on {internal_ip}:{server_port}")
         if HelperServers.get_server_type_by_id(server_id) == "minecraft-bedrock":
             int_mc_ping = ping_bedrock(internal_ip, int(server_port))
+            if int_mc_ping:
+                ping_data = Stats.parse_server_raknet_ping(int_mc_ping)
+                int_data = True
+        elif server_type == "hytale":
+            int_mc_ping = NitradoPing.ping(internal_ip, server_port)
+            if int_mc_ping:
+                int_data = True
+            ping_data = NitradoPing.parse_ping_response(int_mc_ping)
         else:
             int_mc_ping = ping(internal_ip, int(server_port))
-
-        int_data = False
-        ping_data = {}
+            if int_mc_ping:
+                ping_data = Stats.parse_server_ping(int_mc_ping)
+                int_data = True
         # Makes sure we only show stats when a server is online
         # otherwise people have gotten confused.
         if self.check_running():
-            # if we got a good ping return, let's parse it
-            if HelperServers.get_server_type_by_id(server_id) != "minecraft-bedrock":
-                if int_mc_ping:
-                    int_data = True
-                    ping_data = Stats.parse_server_ping(int_mc_ping)
-
-                server_stats = {
-                    "id": server_id,
-                    "started": self.get_start_time(),
-                    "running": self.check_running(),
-                    "cpu": p_stats.get("cpu_usage", 0),
-                    "mem": p_stats.get("memory_usage", 0),
-                    "mem_percent": p_stats.get("mem_percentage", 0),
-                    "world_name": server_name,
-                    "world_size": self.server_size,
-                    "server_port": server_port,
-                    "int_ping_results": int_data,
-                    "online": ping_data.get("online", False),
-                    "max": ping_data.get("max", False),
-                    "players": ping_data.get("players", False),
-                    "desc": ping_data.get("server_description", False),
-                    "version": ping_data.get("server_version", False),
-                    "icon": ping_data.get("server_icon", False),
-                }
-
-            else:
-                if int_mc_ping:
-                    int_data = True
-                    ping_data = Stats.parse_server_raknet_ping(int_mc_ping)
-                    try:
-                        server_icon = base64.encodebytes(ping_data["icon"])
-                    except Exception as ex:
-                        server_icon = False
-                        logger.info(f"Unable to read the server icon : {ex}")
-
-                    server_stats = {
-                        "id": server_id,
-                        "started": self.get_start_time(),
-                        "running": self.check_running(),
-                        "cpu": p_stats.get("cpu_usage", 0),
-                        "mem": p_stats.get("memory_usage", 0),
-                        "mem_percent": p_stats.get("mem_percentage", 0),
-                        "world_name": server_name,
-                        "world_size": self.server_size,
-                        "server_port": server_port,
-                        "int_ping_results": int_data,
-                        "online": ping_data["online"],
-                        "max": ping_data["max"],
-                        "players": [],
-                        "desc": ping_data["server_description"],
-                        "version": ping_data["server_version"],
-                        "icon": server_icon,
-                    }
-                else:
-                    server_stats = {
-                        "id": server_id,
-                        "started": self.get_start_time(),
-                        "running": self.check_running(),
-                        "cpu": p_stats.get("cpu_usage", 0),
-                        "mem": p_stats.get("memory_usage", 0),
-                        "mem_percent": p_stats.get("mem_percentage", 0),
-                        "world_name": server_name,
-                        "world_size": self.server_size,
-                        "server_port": server_port,
-                        "int_ping_results": int_data,
-                        "online": False,
-                        "max": False,
-                        "players": False,
-                        "desc": False,
-                        "version": False,
-                        "icon": False,
-                    }
+            server_stats = {
+                "id": server_id,
+                "started": self.get_start_time(),
+                "running": self.check_running(),
+                "cpu": p_stats.get("cpu_usage", 0),
+                "mem": p_stats.get("memory_usage", 0),
+                "mem_percent": p_stats.get("mem_percentage", 0),
+                "world_name": server_name,
+                "world_size": self.server_size,
+                "server_port": server_port,
+                "int_ping_results": int_data,
+                "online": ping_data.get("online", False),
+                "max": ping_data.get("max", False),
+                "players": ping_data.get("players", False),
+                "desc": ping_data.get("server_description", False),
+                "version": ping_data.get("server_version", False),
+                "icon": ping_data.get("server_icon", False),
+            }
         else:
             server_stats = {
                 "id": server_id,

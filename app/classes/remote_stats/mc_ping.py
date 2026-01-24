@@ -8,7 +8,7 @@ import logging.config
 import uuid
 import random
 
-from app.classes.minecraft.bedrock_ping import BedrockPing
+from app.classes.remote_stats.bedrock_ping import BedrockPing
 from app.classes.shared.console import Console
 
 logger = logging.getLogger(__name__)
@@ -160,7 +160,7 @@ def ping(ip, port):
         sock.sendall(data + b"\x01\x00")  # handshake + status ping
         length = read_var_int()  # full packet length
         if length < 10:
-            return not length < 0
+            return length >= 0
 
         sock.recv(1)  # packet type, 0 for pings
         length = read_var_int()  # string length

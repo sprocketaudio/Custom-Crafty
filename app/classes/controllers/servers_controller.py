@@ -15,7 +15,7 @@ from app.classes.shared.backup_mgr import BackupManager
 from app.classes.helpers.helpers import Helpers
 from app.classes.shared.main_models import DatabaseShortcuts
 
-from app.classes.minecraft.stats import Stats
+from app.classes.remote_stats.stats import Stats
 
 from app.classes.models.servers import HelperServers
 from app.classes.models.users import HelperUsers, ApiKeys
@@ -32,7 +32,12 @@ class ServersController(metaclass=Singleton):
     servers_list: ServerInstance
 
     def __init__(
-        self, helper, servers_helper, management_helper, file_helper, import_helper
+        self,
+        helper,
+        servers_helper,
+        management_helper,
+        file_helper,
+        import_helper,
     ):
         self.helper: Helpers = helper
         self.file_helper: FileHelpers = file_helper

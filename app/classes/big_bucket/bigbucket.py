@@ -24,8 +24,9 @@ class BigBucket:
             self.helper.get_setting("big_bucket_repo", "https://jars.arcadiatech.org")
         ).rstrip("/")
 
-    def _read_cache(self) -> dict:
-        cache_file = self.helper.big_bucket_cache
+    def _read_cache(self, cache_file: str | None = None) -> dict:
+        if not cache_file:
+            cache_file = self.helper.big_bucket_minecraft_cache
         cache = {}
         try:
             with open(cache_file, "r", encoding="utf-8") as f:
@@ -36,8 +37,8 @@ class BigBucket:
 
         return cache
 
-    def get_bucket_data(self):
-        data = self._read_cache()
+    def get_bucket_data(self, cache_file: str | None = None) -> dict | None:
+        data = self._read_cache(cache_file)
         return data.get("categories")
 
     def _check_bucket_alive(self) -> bool:
@@ -62,13 +63,16 @@ class BigBucket:
         )
         return False
 
-    def _get_big_bucket(self) -> dict:
+    def _get_big_bucket(self, remote_file: str = "manifest.json") -> dict:
         logger.debug("Calling for big bucket manifest.")
         try:
-            response = requests.get(f"{self.base_url}/manifest.json", timeout=5)
+            response = requests.get(f"{self.base_url}/{remote_file}", timeout=5)
             if response.status_code in [200, 201]:
                 data = response.json()
-                del data["manifest_version"]
+                try:
+                    del data["manifest_version"]
+                except KeyError:
+                    logger.debug("No manifest version found")
                 return data
             return {}
         except (
@@ -79,7 +83,11 @@ class BigBucket:
             logger.error(f"Unable to get jars from remote with error {e}")
             return {}
 
-    def _refresh_cache(self):
+    def _refresh_cache(
+        self,
+        out_file: str,
+        remote_file: str = "manifest.json",
+    ):
         """
         Contains the shared logic for refreshing the cache.
         This method is called by both manual_refresh_cache and refresh_cache methods.
@@ -90,12 +98,10 @@ class BigBucket:
 
         cache_data = {
             "last_refreshed": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
-            "categories": self._get_big_bucket(),
+            "categories": self._get_big_bucket(remote_file),
         }
         try:
-            with open(
-                self.helper.big_bucket_cache, "w", encoding="utf-8"
-            ) as cache_file:
+            with open(out_file, "w", encoding="utf-8") as cache_file:
                 json.dump(cache_data, cache_file, indent=4)
                 logger.info("Cache file successfully refreshed manually.")
         except Exception as e:
@@ -106,7 +112,7 @@ class BigBucket:
         Manually triggers the cache refresh process.
         """
         logger.info("Manual bucket cache refresh initiated.")
-        self._refresh_cache()
+        self._refresh_cache(self.helper.big_bucket_minecraft_cache)
         logger.info("Manual refresh completed.")
 
     def refresh_cache(self):
@@ -116,7 +122,7 @@ class BigBucket:
         This method checks if the cache file is older than a specified number of days
         before deciding to refresh.
         """
-        cache_file_path = self.helper.big_bucket_cache
+        cache_file_path = self.helper.big_bucket_minecraft_cache
 
         # Determine if the cache is old and needs refreshing
         cache_old = self.helper.is_file_older_than_x_days(cache_file_path)
@@ -124,18 +130,23 @@ class BigBucket:
         # debug override
         # cache_old = True
 
-        if not self._check_bucket_alive():
-            logger.error("big bucket API is not available.")
-            return False
+        if self._check_bucket_alive() and cache_old:
+            logger.info("Automatic cache refresh initiated due to old cache.")
+            self._refresh_cache(cache_file_path)
 
-        if not cache_old:
-            logger.info("Cache file is not old enough to require automatic refresh.")
-            return False
+        cache_file_path = self.helper.big_bucket_hytale_cache
 
-        logger.info("Automatic cache refresh initiated due to old cache.")
-        self._refresh_cache()
+        # Determine if the cache is old and needs refreshing
+        cache_old = self.helper.is_file_older_than_x_days(cache_file_path)
 
-    def get_fetch_url(self, jar, server, version) -> str:
+        # debug override
+        # cache_old = True
+
+        if self._check_bucket_alive() and cache_old:
+            logger.info("Automatic cache refresh initiated due to old cache.")
+            self._refresh_cache(cache_file_path, "hytale.json")
+
+    def get_fetch_url(self, jar, server, version) -> str | None:
         """
         Constructs the URL for downloading a server JAR file based on the server type.
         Parameters:
@@ -220,7 +231,7 @@ class BigBucket:
 
         # Post-download actions
         if success:
-            if server == "forge-installer" or server == "neoforge-installer":
+            if server in ("forge-installer", "neoforge-installer"):
                 # If this is the newer Forge version, run the installer
                 ServersController.finish_import(server_id, True)
             else:

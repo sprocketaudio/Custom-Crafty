@@ -3,7 +3,6 @@ import logging
 import os
 import socket
 import time
-import typing
 
 from app.classes.shared.null_writer import NullWriter
 
@@ -57,7 +56,7 @@ class BedrockPing:
         self.guid_bytes = self.guid.to_bytes(8, BedrockPing.byte_order)
 
     @staticmethod
-    def __byter(in_val: typing.Union[str, int, bool], to_type: str) -> bytes:
+    def __byter(in_val: str | int | bool, to_type: str) -> bytes:
         f = BedrockPing.field_sizes[to_type]
         return in_val.to_bytes(f[0], BedrockPing.byte_order, signed=f[1])
 

@@ -36,12 +36,13 @@ from app.classes.shared.console import Console
 from app.classes.helpers.helpers import Helpers
 from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.shared.import_helper import ImportHelpers
-from app.classes.minecraft.bigbucket import BigBucket
+from app.classes.big_bucket.bigbucket import BigBucket
 from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
 
 MODDED_TYPES = ["forge-installer", "neoforge-installer"]
+TRAVERSAL_ERROR = "Failed to import server due to traversal"
 
 
 class Controller:
@@ -418,6 +419,24 @@ class Controller:
         server_file = "server.jar"  # HACK: Throw this horrible default out of here
         root_create_data = data[data["create_type"] + "_create_data"]
         create_data = root_create_data[root_create_data["create_type"] + "_create_data"]
+        if data["monitoring_type"] == "minecraft_java":
+            monitoring_port = data["minecraft_java_monitoring_data"]["port"]
+            monitoring_host = data["minecraft_java_monitoring_data"]["host"]
+            monitoring_type = "minecraft-java"
+        elif data["monitoring_type"] == "minecraft_bedrock":
+            monitoring_port = data["minecraft_bedrock_monitoring_data"]["port"]
+            monitoring_host = data["minecraft_bedrock_monitoring_data"]["host"]
+            monitoring_type = "minecraft-bedrock"
+        elif data["monitoring_type"] == "hytale":
+            monitoring_port = data["hytale_monitoring_data"]["port"] + 3
+            monitoring_host = data["hytale_monitoring_data"]["host"]
+            monitoring_type = "hytale"
+        elif data["monitoring_type"] == "none":
+            # TODO: this needs to be NUKED..
+            # There shouldn't be anything set if there is nothing to monitor
+            monitoring_port = 25565
+            monitoring_host = "127.0.0.1"
+            monitoring_type = "minecraft-java"
         if data["create_type"] == "minecraft_java":
             if root_create_data["create_type"] == "download_jar":
                 server_file = f"{create_data['type']}-{create_data['version']}.jar"
@@ -483,7 +502,9 @@ class Controller:
                     f"-jar {_wrap_jar_if_windows()} nogui"
                 )
 
-        elif data["create_type"] == "minecraft_bedrock":
+        elif (
+            data["create_type"] == "minecraft_bedrock"
+        ):  # same process for hytale and bedrock
             if root_create_data["create_type"] == "import_server":
                 if Helpers.is_os_windows():
                     server_command = (
@@ -507,6 +528,21 @@ class Controller:
             _create_server_properties_if_needed(0, True)
 
             server_command = create_data.get("command", server_command)
+
+        elif data["create_type"] == "hytale":  # same process for hytale and bedrock
+            if root_create_data["create_type"] == "import_server":
+                server_file = create_data["executable"]
+            else:
+                server_file = "Server/HytaleServer.jar"
+            min_mem = create_data["mem_min"]
+            max_mem = create_data["mem_max"]
+            server_command = (
+                f"java -Xms{Helpers.float_to_string(min_mem)}M "
+                f"-Xmx{Helpers.float_to_string(max_mem)}M -jar {server_file} "
+                f"--assets Assets.zip --bind 0.0.0.0:{int(monitoring_port)-3}"
+            )
+
+            server_command = create_data.get("command", server_command)
         elif data["create_type"] == "custom":
             # This is not implemented yet. Raise a key error
             raise KeyError
@@ -519,21 +555,6 @@ class Controller:
         log_location = data.get("log_location", "")
         if log_location == "" and data["create_type"] == "minecraft_java":
             log_location = "./logs/latest.log"
-
-        if data["monitoring_type"] == "minecraft_java":
-            monitoring_port = data["minecraft_java_monitoring_data"]["port"]
-            monitoring_host = data["minecraft_java_monitoring_data"]["host"]
-            monitoring_type = "minecraft-java"
-        elif data["monitoring_type"] == "minecraft_bedrock":
-            monitoring_port = data["minecraft_bedrock_monitoring_data"]["port"]
-            monitoring_host = data["minecraft_bedrock_monitoring_data"]["host"]
-            monitoring_type = "minecraft-bedrock"
-        elif data["monitoring_type"] == "none":
-            # TODO: this needs to be NUKED..
-            # There shouldn't be anything set if there is nothing to monitor
-            monitoring_port = 25565
-            monitoring_host = "127.0.0.1"
-            monitoring_type = "minecraft-java"
 
         new_server_id = self.register_server(
             name=data["name"],
@@ -578,7 +599,7 @@ class Controller:
                 if not self.helper.validate_traversal(
                     IMPORT_PATH, Path(existing_archive_path).resolve()
                 ):
-                    return logger.error("Failed to import server due to traversal")
+                    return logger.error(TRAVERSAL_ERROR)
 
                 ServersController.set_import(new_server_id)
                 self.import_helper.import_zipped_server(
@@ -587,6 +608,7 @@ class Controller:
                     create_data["archive_internal_path"],
                     monitoring_port,
                     new_server_id,
+                    data["create_type"],
                 )
 
         elif data["create_type"] == "minecraft_bedrock":
@@ -604,13 +626,40 @@ class Controller:
                 if not self.helper.validate_traversal(
                     IMPORT_PATH, Path(existing_archive_path).resolve()
                 ):
-                    return logger.error("Failed to import server due to traversal")
+                    return logger.error(TRAVERSAL_ERROR)
                 self.import_helper.import_zipped_server(
                     existing_archive_path,
                     new_server_path,
                     create_data["archive_internal_path"],
                     monitoring_port,
                     new_server_id,
+                    data["create_type"],
+                    full_exe_path,
+                )
+
+        elif data["create_type"] == "hytale":
+            if root_create_data["create_type"] == "download_exe":
+                ServersController.set_import(new_server_id)
+                self.import_helper.download_install_threaded_hytale(
+                    new_server_path, new_server_id
+                )
+            elif root_create_data["create_type"] == "import_server":
+                ServersController.set_import(new_server_id)
+                full_exe_path = os.path.join(new_server_path, create_data["executable"])
+                existing_archive_path = self.file_helper.get_absolute_path(
+                    IMPORT_PATH, create_data["archive_name"]
+                )
+                if not self.helper.validate_traversal(
+                    IMPORT_PATH, Path(existing_archive_path).resolve()
+                ):
+                    return logger.error(TRAVERSAL_ERROR)
+                self.import_helper.import_zipped_server(
+                    existing_archive_path,
+                    new_server_path,
+                    create_data["archive_internal_path"],
+                    monitoring_port,
+                    new_server_id,
+                    data["create_type"],
                     full_exe_path,
                 )
 

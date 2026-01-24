@@ -19,11 +19,11 @@
         <i class="fas fa-file-signature"></i>Minecraft-Java</a>
     </li>
     <li class="nav-item term-nav-item">
-      <a class="nav-link active" href="/server/bedrock_step1" role="tab" aria-selected="false">
+      <a class="nav-link" href="/server/bedrock_step1" role="tab" aria-selected="false">
         <i class="fas fa-file-signature"></i>Minecraft-Bedrock</a>
     </li>
     <li class="nav-item term-nav-item">
-      <a class="nav-link" href="/server/hytale_step1" role="tab" aria-selected="false">
+      <a class="nav-link active" href="/server/hytale_step1" role="tab" aria-selected="false">
         <i class="fas fa-file-signature"></i>Hytale</a>
     </li>
   </ul>
@@ -48,7 +48,37 @@
                   <input type="text" class="form-control" id="server_name" name="name"
                     placeholder="{{ translate('serverWizard', 'myNewServer', data['lang']) }}" required>
                 </div>
+                <br />
+                <h4 class="card-title">{{ translate('serverWizard', 'quickSettings', data['lang']) }} <small
+                    class="text-none"> - {{ translate('serverWizard', 'quickSettingsDescription', data['lang'])
+                    }}</small></h4>
+                <div class="row">
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <label for="min_memory">{{ translate('serverWizard', 'minMem', data['lang']) }} <small> - {{
+                          translate('serverWizard', 'sizeInGB', data['lang']) }}</small></label>
+                      <input type="number" class="form-control" id="min_memory" name="mem_min" value="1" step="0.5"
+                        min="0.5" required>
+                    </div>
+                  </div>
 
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <label for="max_memory">{{ translate('serverWizard', 'maxMem', data['lang']) }} <small> - {{
+                          translate('serverWizard', 'sizeInGB', data['lang']) }}</small></label>
+                      <input type="number" class="form-control" id="max_memory" name="mem_max" value="2" step="0.5"
+                        min="0.5" required>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <label for="port">{{ translate('serverWizard', 'serverPort', data['lang']) }}</label>
+                      <input type="number" class="form-control" id="port" name="port" value="5520" step="1" min="1"
+                        max="65535 " required>
+                    </div>
+                  </div>
+                </div>
                 <div class="form-group">
                   <p class="mb-0 p-0" aria-expanded="true">{{ translate('serverWizard', 'addRole', data['lang']) }}
                     <small class="text-none"> - {{ translate('serverWizard', 'autoCreate', data['lang']) }}</small>
@@ -71,13 +101,24 @@
                   data['lang']) }}</button>
                 <button type="reset" class="btn btn-danger mr-2">{{ translate('serverWizard', 'resetForm', data['lang'])
                   }}</button>
+                <br />
+                <br />
+                <small class="text-warning"><i class="fa-solid fa-circle-exclamation"></i>&nbsp;{{
+                  translate("serverWizard", "plugins", data["lang"]) }}&nbsp;<a
+                    href="https://github.com/nitrado/hytale-plugin-query" target="_blank">Nitrado Query</a>,&nbsp;<a
+                    href="https://github.com/nitrado/hytale-plugin-webserver" target="_blank">Nitrado
+                    Webserver</a></small>
               </fieldset>
               {% if not data["server_api"] and data["online"] %}
               <div class="api-alert">
-                <p><i class="fas fa-exclamation-triangle"></i>&nbsp;{{ translate('error', 'bedrockError', data['lang'])
-                  }}<a href="https://status.craftycontrol.com/status/craftycontrol" target="_blank"
-                    rel="noopener noreferrer">&nbsp;{{ translate('error', 'craftyStatus', data['lang']) }}</a>
-                  &nbsp;{{ translate('error', 'serverJars2', data['lang']) }}</p>
+                <p><i class="fas fa-exclamation-triangle"></i>&nbsp;{{
+                  translate('error', 'bigBucket1', data['lang']) }}<a
+                    href="https://status.craftycontrol.com/status/craftycontrol" target="_blank" rel="noopener">&nbsp;{{
+                    translate('error',
+                    'craftyStatus', data['lang']) }}</a>
+                  &nbsp;{{ translate('error', 'bigBucket2', data['lang']) }}</br></br><small>{{ translate('error',
+                    'selfHost',
+                    data['lang'])}}</small></p>
               </div>
               {% end %}
               {% if not data["online"] %}
@@ -143,11 +184,32 @@
                   data['lang']) }}</small></h4>
               <hr>
 
-              <div class="form-group">
-                <label for="port3">{{ translate('serverWizard', 'serverPort', data['lang']) }} <small> - {{
-                    translate('serverWizard', 'defaultPort', data['lang']) }}</small></label>
-                <input type="number" class="form-control" id="port4" name="port" value="19132" step="1" min="1"
-                  max="65535" required>
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="min_memory1">{{ translate('serverWizard', 'minMem', data['lang']) }} <small> - {{
+                        translate('serverWizard', 'sizeInGB', data['lang']) }}</small></label>
+                    <input type="number" class="form-control" id="min_memory1" name="mem_min" value="1" step="0.5"
+                      min="0.5" required>
+                  </div>
+                </div>
+
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="max_memory1">{{ translate('serverWizard', 'maxMem', data['lang']) }} <small> - {{
+                        translate('serverWizard', 'sizeInGB', data['lang']) }}</small></label>
+                    <input type="number" class="form-control" id="max_memory1" name="mem_max" value="2" step="0.5"
+                      min="0.5" required>
+                  </div>
+                </div>
+
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="port1">{{ translate('serverWizard', 'serverPort', data['lang']) }}</label>
+                    <input type="number" class="form-control" id="port1" name="port" value="5520" step="1" min="1"
+                      max="65535 " required>
+                  </div>
+                </div>
               </div>
 
               <div class="form-group">
@@ -226,7 +288,7 @@
   function eula_confirm() {
     bootbox.confirm({
       title: `${$("#creation-wrapper").attr("data-eulaTitle")}`,
-      message: `${$("#creation-wrapper").attr("data-eulaMsg")}<a href='https://www.minecraft.net/en-us/eula' target='_blank'>Minecraft EULA</a>&nbsp; ${$("#creation-wrapper").attr("data-privMsg")}<a target='_blank' href='https://privacy.microsoft.com/en-us/privacystatement'>Microsoft Privacy Policy</a>`,
+      message: `${$("#creation-wrapper").attr("data-eulaMsg")}<a href='https://hytale.com/eula' target='_blank'>Hytale EULA</a>&nbsp;`,
       buttons: {
         confirm: {
           label: `${$("#creation-wrapper").attr("data-agree")}`,
@@ -238,7 +300,7 @@
         }
       },
       callback: function (result) {
-        if (result == true) {
+        if (result) {
           $("#download_exe").submit();
         }
         else {
@@ -250,7 +312,7 @@
 </script>
 <script>
   $(".tree-reset").on("click", function () {
-    location.href = "/server/bedrock_step1";
+    location.href = "/server/hytale_step1";
   });
 </script>
 
@@ -275,14 +337,11 @@
     if (key === "roles" || key === "archive_internal_path") {
       return value
     }
-    if (key != "ignored_exits") {
-      if (typeof value == "boolean" || key === "host" || key === "version") {
-        return value
-      } else {
-        return (isNaN(value) ? value : +value);
-      }
+    else if (typeof value == "boolean" || key === "host" || key === "version") {
+      return value
     } else {
-      return value;
+      const num = Number(value);
+      return Number.isNaN(num) ? value : num;
     }
   }
   function calcRoles() {
@@ -298,6 +357,7 @@
   }
   async function send_server(data) {
     let token = getCookie("_xsrf")
+    console.log(data)
     console.log(token)
     let res = await fetch(`/api/v2/servers/`, {
       method: 'POST',
@@ -307,9 +367,9 @@
       body: data,
     });
     let responseData = await res.json();
-    if (responseData.status === "ok") {
-      window.location.href = '/panel/dashboard';
-    } else {
+    if (responseData.status === "ok" && data.create_type != "download_exe") {
+      globalThis.location.href = `/panel/server_detail?id=${responseData.data.new_server_id}&subpage=term`;
+    } else if (responseData.status === "error") {
       // Close the "be patient..." dialogue box
       $('.bootbox-close-button').click();
       // Alert the user that there was an issue.
@@ -333,17 +393,19 @@
       let send_data = {
         "name": formDataObject.name,
         "roles": calcRoles(),
-        "monitoring_type": "minecraft_bedrock",
-        "minecraft_bedrock_monitoring_data": {
+        "monitoring_type": "hytale",
+        "hytale_monitoring_data": {
           "host": "127.0.0.1",
-          "port": 19132
+          "port": formDataObject.port
         },
-        "create_type": "minecraft_bedrock",
-        "minecraft_bedrock_create_data": {
+        "create_type": "hytale",
+        "hytale_create_data": {
           "create_type": "download_exe",
           "download_exe_create_data": {
             //agree to eula since we confirmed before calling this function
             "agree_to_eula": true,
+            "mem_min": formDataObject.mem_min,
+            "mem_max": formDataObject.mem_max,
           }
         }
       }
@@ -375,18 +437,20 @@
       let send_data = {
         "name": formDataObject.name,
         "roles": calcRoles(),
-        "monitoring_type": "minecraft_bedrock",
-        "minecraft_bedrock_monitoring_data": {
+        "monitoring_type": "hytale",
+        "hytale_monitoring_data": {
           "host": "127.0.0.1",
           "port": formDataObject.port
         },
-        "create_type": "minecraft_bedrock",
-        "minecraft_bedrock_create_data": {
+        "create_type": "hytale",
+        "hytale_create_data": {
           "create_type": "import_server",
           "import_server_create_data": {
             "archive_name": $("#file-uploaded").val(),
             "archive_internal_path": zip_root_path,
             "executable": formDataObject.server_jar,
+            "mem_min": formDataObject.mem_min,
+            "mem_max": formDataObject.mem_max,
           }
         }
       }

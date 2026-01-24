@@ -65,7 +65,7 @@
                 <div class="form-group">
                   <label for="log_path">{{ translate('serverConfig', 'serverLogLocation', data['lang']) }} <small class="text-muted ml-1"> - {{ translate('serverConfig', 'serverLogLocationDesc', data['lang'])
                       }}</small> </label>
-                  <input type="text" class="form-control" name="log_path" id="log_path" value="{{ data['server_stats']['server_id']['log_path']  }}" placeholder="{{ translate('serverConfig', 'serverLogLocation', data['lang']) }}" required>
+                  <input type="text" class="form-control" name="log_path" id="log_path" value="{{ data['server_stats']['server_id']['log_path']  }}" placeholder="{{ translate('serverConfig', 'serverLogLocation', data['lang']) }}">
                 </div>
                 {% end %}
 
@@ -75,7 +75,7 @@
                   <input type="text" class="form-control" name="executable" id="executable" value="{{ data['server_stats']['server_id']['executable']  }}" placeholder="{{ translate('serverConfig', 'serverExecutable', data['lang']) }}" required>
                 </div>
                 {% end %}
-                {% if data['server_stats']['server_type'] == "minecraft-java" %}
+                {% if data['server_stats']['server_type'] == "minecraft-java" or  data['server_stats']['server_type'] == "hytale" %}
                 <div class="form-group">
                   <label for="java_selection">{{ translate('serverConfig', 'javaVersion', data['lang']) }}
                     <small class="text-muted ml-1">{{ translate('serverConfig', 'javaVersionDesc', data['lang'])
@@ -118,7 +118,7 @@
                   </div>
 
                   {% if data['super_user'] %}
-                  {% if data['server_stats']['server_type'] != "minecraft-bedrock" %}
+                  {% if data['server_stats']['server_type'] == "minecraft-java" %}
                   <div class="form-group">
                     <label for="executable_update_url">{{ translate('serverConfig', 'exeUpdateURL', data['lang']) }}
                       <small class="text-muted ml-1"> - {{ translate('serverConfig', 'exeUpdateURLDesc', data['lang'])

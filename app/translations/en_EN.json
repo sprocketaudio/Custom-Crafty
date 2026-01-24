@@ -707,6 +707,8 @@
     "serverWizard": {
         "absoluteServerPath": "Absolute path to your server",
         "absoluteZipPath": "Absolute path to your server",
+        "authenticate": "Click here to finish install and authenticate your Hytale account.",
+        "authenticateAway": "Crafty will not store your credentials. This will navigate you away from Crafty.",
         "addRole": "Add Server to Existing Role(s)",
         "autoCreate": "If none are selected Crafty will make one!",
         "bePatient": "Please be patient as we create your server",
@@ -727,6 +729,7 @@
         "newServer": "Create New Server",
         "noRole": "No role found with current search parameter",
         "noneRoles": "No Roles Selected",
+        "plugins": "Crafty will automatically install the following plugins for the stats features in Crafty to operate:",
         "quickSettings": "Quick Settings",
         "quickSettingsDescription": "Don't worry, you can change these later",
         "resetForm": "Reset Form",

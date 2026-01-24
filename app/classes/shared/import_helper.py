@@ -1,9 +1,16 @@
 import os
+import uuid
+import json
 import time
+import shlex
 import pathlib
 import logging
 import threading
+import subprocess
+from pathlib import PurePosixPath, Path
 
+from app.classes.big_bucket.bigbucket import BigBucket
+from app.classes.big_bucket.hytale import HytaleJSON
 from app.classes.controllers.server_perms_controller import PermissionsServers
 from app.classes.controllers.servers_controller import ServersController
 from app.classes.helpers.helpers import Helpers
@@ -12,6 +19,8 @@ from app.classes.shared.websocket_manager import WebSocketManager
 
 logger = logging.getLogger(__name__)
 
+HYTALE_0UTPUT_NAME = "hytale.zip"
+
 
 class ImportHelpers:
     allowed_quotes = ['"', "'", "`"]
@@ -19,6 +28,7 @@ class ImportHelpers:
     def __init__(self, helper, file_helper):
         self.file_helper: FileHelpers = file_helper
         self.helper: Helpers = helper
+        self.big_bucket = BigBucket(helper)
 
     def import_zipped_server(
         self,
@@ -27,6 +37,7 @@ class ImportHelpers:
         base_include_path,
         port,
         new_id,
+        server_type,
         full_exe_path=None,
     ):
         import_thread = threading.Thread(
@@ -38,6 +49,7 @@ class ImportHelpers:
                 base_include_path,
                 port,
                 new_id,
+                server_type,
                 full_exe_path,
             ),
             name=f"{new_id}_import",
@@ -51,6 +63,7 @@ class ImportHelpers:
         base_include_path,
         port,
         new_id,
+        server_type,
         full_exe_path,
     ):
         self.file_helper.unzip_file(
@@ -61,6 +74,7 @@ class ImportHelpers:
             base_include_path=base_include_path,
         )
 
+        time.sleep(2)
         if (
             not self.helper.is_os_windows() and full_exe_path
         ):  # we only expect full jar path for bedrock
@@ -73,7 +87,7 @@ class ImportHelpers:
         for item in os.listdir(new_server_dir):
             if str(item) == "server.properties":
                 has_properties = True
-        if not has_properties:
+        if not has_properties and "minecraft" in server_type:
             logger.info(
                 f"No server.properties found on zip file import. "
                 f"Creating one with port selection of {str(port)}"
@@ -146,3 +160,138 @@ class ImportHelpers:
         server_users = PermissionsServers.get_server_user_list(new_id)
         for user in server_users:
             WebSocketManager().broadcast_user(user, "send_start_reload", {})
+
+    def download_install_threaded_hytale(self, path, new_id):
+        download_thread = threading.Thread(
+            target=self.download_install_hytale,
+            daemon=True,
+            args=(path, new_id),
+            name=f"{new_id}_download",
+        )
+        download_thread.start()
+
+    def download_install_hytale(self, server_path: str | Path, new_id: uuid.UUID):
+        server_users = PermissionsServers.get_server_user_list(new_id)
+
+        bb_cache = self.big_bucket.get_bucket_data(self.helper.big_bucket_hytale_cache)
+        try:
+            hytale_json = HytaleJSON(bb_cache)
+            unix_exe = PurePosixPath(hytale_json.linux_installer_url).name
+            windows_exe = PurePosixPath(hytale_json.windows_installer_url).name
+        except KeyError:
+            logger.error("Failed to create Hytale server with keyerror")
+            ServersController.finish_import(new_id)
+            return
+        install_command = (
+            f"./{unix_exe} "
+            f"{hytale_json.commands.download_path_command} {HYTALE_0UTPUT_NAME}"
+        )
+        if self.helper.is_os_windows():
+            install_command = (
+                f"{server_path}/{windows_exe} "
+                f"{hytale_json.commands.download_path_command} {HYTALE_0UTPUT_NAME}"
+            )
+            self.file_helper.ssl_get_file(
+                hytale_json.windows_installer_url, server_path, windows_exe
+            )
+        else:
+            self.file_helper.ssl_get_file(
+                hytale_json.linux_installer_url, server_path, unix_exe
+            )
+            os.chmod(Path(server_path, unix_exe), 0o2760)  # set executable permissions
+            install_command = shlex.split(install_command)
+        process = subprocess.Popen(
+            install_command,
+            cwd=server_path,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        url_line = ""
+        while process.poll() is None:
+            line = process.stdout.readline().strip()
+            if not line:
+                continue
+
+            line = line.strip()
+            # TODO: Do not send data to clients who do not have permission to view
+            # this server's console
+            if len(WebSocketManager().clients) > 0:
+                WebSocketManager().broadcast_page_params(
+                    "/panel/server_detail",
+                    {"id": new_id},
+                    "vterm_new_line",
+                    {"line": line + "<br />"},
+                )
+            if (
+                line.startswith(hytale_json.parsing_lines.url_line_start)
+                and url_line == ""
+            ):
+                url_line = line
+                with open(
+                    Path(server_path, "hytale_install_auth_url.txt"),
+                    "w",
+                    encoding="utf-8",
+                ) as auth_file:
+                    auth_file.write(url_line)
+                for user in server_users:
+                    WebSocketManager().broadcast_user(
+                        user,
+                        "hytale_auth",
+                        {"link": line, "server_id": new_id},
+                    )
+
+        # Unzip downloaded archive.
+        self.file_helper.unzip_file(
+            Path(server_path, HYTALE_0UTPUT_NAME),
+            server_path,
+        )
+        self.install_or_update_monitoring_plugins(new_id, server_path)
+        ServersController.finish_import(new_id)
+        for user in server_users:
+            WebSocketManager().broadcast_user(user, "send_start_reload", {})
+
+    def install_or_update_monitoring_plugins(
+        self, server_id: uuid.UUID, server_path: str | Path
+    ):
+        bb_cache = self.big_bucket.get_bucket_data(self.helper.big_bucket_hytale_cache)
+        try:
+            hytale_json = HytaleJSON(bb_cache)
+        except KeyError:
+            logger.error("Failed to download hytale plugins with keyerror")
+            return
+        logger.info("Installing Nitrado Webserver Plugin to server %s", server_id)
+        # make sure our mods dir exists before doing anything
+        # Download webserver plugin required for query plugin
+        self.helper.ensure_dir_exists(Path(server_path, "mods"))
+        self.file_helper.ssl_get_file(
+            hytale_json.plugins.webserver_plugin_url,
+            Path(server_path, "mods"),
+            "nitrado-webserver.jar",
+        )
+        # Download query plugin
+        logger.info("Installing Nitrado Query Plugin to server %s", server_id)
+        self.file_helper.ssl_get_file(
+            hytale_json.plugins.query_plugin_url,
+            Path(server_path, "mods"),
+            "nitrado-query.jar",
+        )
+        self.modify_permissions_json(server_path)
+
+    def modify_permissions_json(self, server_path: str | Path):
+        # Make sure we do not overwrite user data
+        if not Helpers.check_file_exists(str(Path(server_path, "permissions.json"))):
+            with open(
+                Path(server_path, "permissions.json"), "w", encoding="utf-8"
+            ) as perms_file:
+                decoded = {
+                    "groups": {
+                        "ANONYMOUS": [
+                            "nitrado.query.web.read.server",
+                            "nitrado.query.web.read.universe",
+                            "nitrado.query.web.read.players",
+                        ]
+                    }
+                }
+                perms_file.write(json.dumps(decoded, indent=4))
