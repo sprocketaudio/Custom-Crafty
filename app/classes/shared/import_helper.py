@@ -195,7 +195,9 @@ class ImportHelpers:
                 hytale_json.linux_installer_url, server_path, unix_exe
             )
             st = os.stat(Path(server_path, unix_exe))
-            os.chmod(unix_exe, st.st_mode | stat.S_IEXEC)  # set executable permissions
+            os.chmod(
+                Path(server_path, unix_exe), st.st_mode | stat.S_IEXEC
+            )  # set executable permissions
         process = subprocess.Popen(
             install_command,
             cwd=server_path,
