@@ -147,7 +147,8 @@ class ServerHandler(BaseHandler):
             "superuser": superuser,
             "themes": self.helper.get_themes(),
         }
-
+        if page_data["online"]:
+            page_data["server_api"] = self.controller.big_bucket._check_bucket_alive()
         if superuser:
             page_data["roles"] = list_roles
 
@@ -157,11 +158,6 @@ class ServerHandler(BaseHandler):
             ):
                 self.redirect(SERVER_CREATOR_ERROR)
                 return
-            page_data["server_api"] = False
-            if page_data["online"]:
-                page_data["server_api"] = (
-                    self.controller.big_bucket._check_bucket_alive()
-                )
             page_data["server_types"] = self.controller.big_bucket.get_bucket_data()
             page_data["js_server_types"] = json.dumps(
                 self.controller.big_bucket.get_bucket_data()
