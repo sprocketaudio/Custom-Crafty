@@ -591,36 +591,39 @@ class ServerInstance:
         elif HelperServers.get_server_type_by_id(self.server_id) == "steam_cmd":
             my_env = os.environ
             env_mod = False
-            with open(
-                self.server_path + "/env.json",
-            ) as env_file:
-                env_file_data = json.load(env_file)
-                for key, value in env_file_data.items():
-                    if "path" in key.lower():
-                        items_validated = []
-                        for item in value["contents"]:
-                            try:
-                                p = Helpers.validate_traversal(self.server_path, item)
-                            except ValueError:
-                                logger.warning(
-                                    "Path traversal detected on server {self.server_id} for env {k} value {i}, skipping"
-                                )
-                            p = str(p).replace(":", "\:")
-                            items_validated.append(p)
-                        if my_env.get(key, None):
+            if Helpers.check_file_exists(Path(self.server_path, "env.json")):
+                with open(
+                    Path(self.server_path, "env.json"), "r", encoding="utf-8"
+                ) as env_file:
+                    env_file_data = json.load(env_file)
+                    for key, value in env_file_data.items():
+                        if "path" in key.lower():
+                            items_validated = []
+                            for item in value["contents"]:
+                                try:
+                                    p = Helpers.validate_traversal(
+                                        self.server_path, item
+                                    )
+                                except ValueError:
+                                    logger.warning(
+                                        "Path traversal detected on server {self.server_id} for env {k} value {i}, skipping"
+                                    )
+                                p = str(p).replace(":", "\:")
+                                items_validated.append(p)
+                            if my_env.get(key, None):
+                                if value["mode"] == "append":
+                                    items_validated.insert(0, my_env[key])
+                                elif value["mode"] == "prepend":
+                                    items_validated.append(my_env[key])
+                            my_env[key] = ":".join(items_validated)
+                        else:
+                            items = value["contents"]
                             if value["mode"] == "append":
-                                items_validated.insert(0, my_env[key])
+                                items.insert(0, my_env[key])
                             elif value["mode"] == "prepend":
-                                items_validated.append(my_env[key])
-                        my_env[key] = ":".join(items_validated)
-                    else:
-                        items = value["contents"]
-                        if value["mode"] == "append":
-                            items.insert(0, my_env[key])
-                        elif value["mode"] == "prepend":
-                            items.append(my_env[key])
-                        my_env[key] = ",".join(items)
-                env_mod = True
+                                items.append(my_env[key])
+                            my_env[key] = ",".join(items)
+                    env_mod = True
             if env_mod:
                 logger.debug(
                     f"Launching process for server {self.server_id} with modified environment {my_env}"
@@ -643,7 +646,7 @@ class ServerInstance:
                     f"Server {self.name} failed to start with error code: {ex}"
                 )
                 if user_id:
-                    self.helper.websocket_helper.broadcast_user(
+                    WebSocketManager().broadcast_user(
                         user_id,
                         "send_start_error",
                         {
