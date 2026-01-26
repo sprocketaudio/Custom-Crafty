@@ -38,9 +38,9 @@ class SteamCMD:
         self.version: int = input_dict["version"]
         self.games: list[SteamGame] = [SteamGame(g) for g in input_dict["games"]]
 
-    def get_game_by_id(self, game_id: int) -> SteamGame | None:
+    def get_game_by_id(self, game_id: int) -> SteamGame:
         try:
-            return next(g for g in self.games if g.id == id)
+            return next(g for g in self.games if g.id == game_id)
         except StopIteration as exc:
             raise KeyError(f"Game with id {id} not found") from exc
 
