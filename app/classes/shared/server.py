@@ -1219,11 +1219,12 @@ class ServerInstance:
 
         restore_thread.start()
 
-    def server_backup_threader(self, backup_id, update=False):
+    def server_backup_threader(self, backup_id=None, update=False):
+        backup_config = self.get_backup_config(backup_id)
         # Check to see if we're already backing up
-        if self.check_backup_by_id(backup_id):
+        if self.check_backup_by_id(backup_config["backup_id"]):
             return False
-        backup_config = HelpersManagement.get_backup_config(backup_id)
+
         if backup_config["before"]:
             logger.debug(
                 "Found running server and send command option. Sending command"
@@ -1247,7 +1248,7 @@ class ServerInstance:
             target=self.backup_server,
             daemon=True,
             name=f"backup_{backup_config['backup_id']}",
-            args=[backup_id],
+            args=[backup_config["backup_id"]],
         )
         logger.info(
             f"Starting Backup Thread for server {self.settings['server_name']}."
@@ -1703,6 +1704,15 @@ class ServerInstance:
                 Console.debug(f"Backup with id {backup_id} already running!")
                 return True
         return False
+
+    def get_backup_config(self, backup_id) -> dict:
+        if not backup_id:
+            policy_list = HelpersManagement.get_backups_by_server(self.server_id)
+            for pol_id, policy in policy_list.items():
+                if policy["default"]:
+                    return policy_list[pol_id]
+        else:
+            return HelpersManagement.get_backup_config(backup_id)
 
     def get_servers_stats(self):
         server_type = HelperServers.get_server_type_by_id(self.server_id)
