@@ -1707,10 +1707,7 @@ class ServerInstance:
 
     def get_backup_config(self, backup_id) -> dict:
         if not backup_id:
-            policy_list = HelpersManagement.get_backups_by_server(self.server_id)
-            for pol_id, policy in policy_list.items():
-                if policy["default"]:
-                    return policy_list[pol_id]
+            return HelpersManagement.get_default_server_backup(self.server_id)
         else:
             return HelpersManagement.get_backup_config(backup_id)
 
