@@ -1580,7 +1580,11 @@ class ServerInstance:
         self.check_server_version()  # Check to make sure the update was
         # successful and that we match remote
         for user in server_users:
-            WebSocketManager().broadcast_user(user, "remove_spinner", {})
+            WebSocketManager().broadcast_user(
+                user,
+                "remove_spinner",
+                {"server_id": self.server_id},
+            )
 
     def check_server_version(self):
         if not self.settings.get("update_watcher"):
