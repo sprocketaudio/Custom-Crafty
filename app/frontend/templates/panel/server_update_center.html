@@ -38,6 +38,7 @@
                     </span>
                     <div class="row">
                         <div class="col-md-9 col-sm-12">
+                            {% if data['server_stats']['server_type'] == "minecraft-java" %}
                             <div id="selectHead" class="form-adapability">
                                 <select id="ba" class="form-control">
                                     <option value="0">Basic</option>
@@ -46,9 +47,10 @@
                                     {% end %}
                                 </select>
                             </div>
+                            {% end %}
                             <br>
                             <div id="basic">
-                                {% if data['server_stats']['server_type'] != "minecraft-bedrock" %}
+                                {% if data['server_stats']['server_type'] == "minecraft-java" %}
                                 <div
                                     class="card-header header-sm d-flex justify-content-between align-items-center form-adapability">
                                     <span id="update-url" class="text-secondary" style="font-size: .9vw;">{{
@@ -60,7 +62,7 @@
                             </div>
                             <div id="advanced" class="d-none form-adapability">
                                 {% if data['super_user'] %}
-                                {% if data['server_stats']['server_type'] != "minecraft-bedrock" %}
+                                {% if data['server_stats']['server_type'] == "minecraft-java" %}
                                 <div class="form-group">
                                     <label for="executable_update_url">{{ translate('serverConfig', 'exeUpdateURL',
                                         data['lang']) }}
@@ -98,6 +100,7 @@
                                     <h4 class="card-title text-center">Update Information
                                     </h4>
                                     <blockquote class="blockquote">
+                                        {% if data['server_stats']['server_type'] == "minecraft-java" %}
                                         <div class="form-group">
                                             <div class="custom-control custom-switch">
                                                 <input type="checkbox" class="custom-control-input" id="update_watcher"
@@ -108,6 +111,7 @@
                                                     'monitorUpdate', data['lang']) }}</label>
                                             </div>
                                         </div>
+                                        {% end %}
                                         <p class="mb-0">
                                             {% if data["server_data"]["update_watcher"] %}
                                             {% if not data['update'] %}
@@ -219,7 +223,7 @@
             if ($("#ba").val() === "0") {
                 let payload = { "category": $("#server_jar").val(), "type": $("#server_type").val(), "version": $("#server").val() }
                 let formDataJsonString = JSON.stringify(payload);
-                if ($("server_jar").val() && $("#server_type").va() && $("#server").val()) { //Only send the first payload if it exists
+                if ($("#server_jar").val() && $("#server_type").val() && $("#server").val()) { //Only send the first payload if it exists
                     let res = await fetch(`/api/v2/servers/${serverId}/update/config/`, {
                         method: 'PATCH',
                         body: formDataJsonString,
@@ -281,6 +285,11 @@
                     });
                 }
             }
+        });
+        $(document).ready(function () {
+            webSocket.on('remove_spinner', function (data) {
+                globalThis.location.href = `/panel/server_detail?id=${data.server_id}&subpage=term`
+            });
         });
     </script>
     {% end %}
