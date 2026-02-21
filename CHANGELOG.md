@@ -1,13 +1,27 @@
 # Changelog
-## --- [4.9.0] - 2026/TBD
+## --- [4.9.1] - 2026/TBD
+### Refactor
+- Switch from Font Awesome to Phosphor Icons (open source) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/972))
+### New features
+TBD
+### Bug fixes
+- Adds missing time variables in static test webhook ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/963))
+- Fix bug where zip imports would get stuck after selecting root ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/964))
+### Tweaks
+- Add Hytale Port Ranges to Docker related stack templates & documentation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/965))
+### Lang
+TBD
+<br><br>
+
+## --- [4.9.0] - 2026/01/24
 ### New features
 - Add Support For Hytale Servers ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/954))
 ### Bug fixes
 - Add error data to servers running global dir ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/961))
+- Fix bug where directories could not be selected ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/960))
+- Add try except to unzip extract to avoid failure over missing files ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/959))
 ### Tweaks
-TBD
-### Lang
-TBD
+- Add Java 25 support to Docker image ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/948))
 <br><br>
 
 ## --- [4.8.0] - 2026/01/22

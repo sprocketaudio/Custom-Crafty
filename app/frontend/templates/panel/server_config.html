@@ -136,7 +136,7 @@
                     <label for="server_port">{{ translate('serverConfig', 'serverPort', data['lang']) }} <small class="text-muted ml-1"> - {{ translate('serverConfig', 'serverPortDesc', data['lang']) }}
                       </small> </label>
                     <input type="number" class="form-control" name="server_port" id="server_port" value="{{ data['server_stats']['server_id']['server_port']  }}" step="1" max="65566" min="1" required>
-                    <span data-html="true" class="port-hint text-center" title="<i class='fa-solid fa-triangle-exclamation'></i> " , data-content="{{
+                    <span data-html="true" class="port-hint text-center" title="<i class='ph-fill ph-warning'></i> " , data-content="{{
                         translate('serverConfig', 'statsHint1' , data['lang'])}} <br> <br> <strong>{{ translate('serverConfig', 'statsHint2', data['lang'])}}</strong>" , data-placement="right"></span>
                   </div>
                   {% end %}
@@ -213,9 +213,9 @@
                     </div>
                   </div>
 
-                  <button type="submit" class="btn btn-success mr-2"><i class="fas fa-save"></i> {{
+                  <button type="submit" class="btn btn-success mr-2"><i class="ph-fill ph-floppy-disk"></i> {{
                     translate('serverConfig', 'save', data['lang']) }}</button>
-                  <button type="reset" class="btn btn-light"><i class="fas fa-times"></i> {{ translate('serverConfig',
+                  <button type="reset" class="btn btn-light"><i class="ph-bold ph-x"></i> {{ translate('serverConfig',
                     'cancel', data['lang']) }}</button>
               </form>
             </div>
@@ -235,10 +235,10 @@
               <div class="text-center">
                 {% if data['server_stats']['running'] %}
                 {% if data['server_stats']['updating'] %}
-                <i id="update-spinner" class="fa fa-spinner fa-spin"></i>&nbsp;<button onclick="send_command(serverId, 'update_executable');" id="update_executable" style="max-width: 7rem;" class="btn btn-warning m-1 flex-grow-1 disabled">{{ translate('serverConfig',
+                <i id="update-spinner" class="ph ph-spinner-gap ph-spin"></i>&nbsp;<button onclick="send_command(serverId, 'update_executable');" id="update_executable" style="max-width: 7rem;" class="btn btn-warning m-1 flex-grow-1 disabled">{{ translate('serverConfig',
                   'update', data['lang']) }}</button>
                 {% else %}
-                <i style="visibility: hidden;" id="update-spinner" class="fa fa-spinner fa-spin"></i>&nbsp;<button onclick="send_command(serverId, 'update_executable');" id="update_executable" style="max-width: 7rem;" class="btn btn-warning m-1 flex-grow-1 disabled">{{ translate('serverConfig',
+                <i style="visibility: hidden;" id="update-spinner" class="ph ph-spinner-gap ph-spin"></i>&nbsp;<button onclick="send_command(serverId, 'update_executable');" id="update_executable" style="max-width: 7rem;" class="btn btn-warning m-1 flex-grow-1 disabled">{{ translate('serverConfig',
                   'update', data['lang']) }}</button>
                 {% end %}
                 <a class="btn btn-sm btn-danger disabled">{{ translate('serverConfig', 'deleteServer', data['lang'])
@@ -247,10 +247,10 @@
                 {% else %}
                 {% if not data['failed'] %}
                 {% if data['server_stats']['updating'] %}
-                <i id="update-spinner" class="fa fa-spinner fa-spin"></i>&nbsp;<button onclick="send_command(serverId, 'update_executable');" id="update_executable" style="max-width: 7rem;" class="btn btn-warning m-1 flex-grow-1">{{ translate('serverConfig',
+                <i id="update-spinner" class="ph ph-spinner-gap ph-spin"></i>&nbsp;<button onclick="send_command(serverId, 'update_executable');" id="update_executable" style="max-width: 7rem;" class="btn btn-warning m-1 flex-grow-1">{{ translate('serverConfig',
                   'update', data['lang']) }}</button>
                 {% else %}
-                <i style="visibility: hidden;" id="update-spinner" class="fa fa-spinner fa-spin"></i>&nbsp;<button onclick="send_command(serverId, 'update_executable');" id="update_executable" style="max-width: 7rem;" class="btn btn-warning m-1 flex-grow-1">{{ translate('serverConfig',
+                <i style="visibility: hidden;" id="update-spinner" class="ph ph-spinner-gap ph-spin"></i>&nbsp;<button onclick="send_command(serverId, 'update_executable');" id="update_executable" style="max-width: 7rem;" class="btn btn-warning m-1 flex-grow-1">{{ translate('serverConfig',
                   'update', data['lang']) }}</button>
                 {% end %}
                 {% end %}
@@ -382,7 +382,7 @@
             bootbox.dialog({
               backdrop: true,
               title: '{% raw translate("serverConfig", "sendingDelete", data['lang']) %}',
-              message: '<div align="center"><i class="fas fa-spin fa-spinner"></i> &nbsp; {% raw translate("serverConfig", "bePatientDeleteFiles", data['lang']) %} </div>',
+              message: '<div align="center"><i class="ph ph-spinner-gap"></i> &nbsp; {% raw translate("serverConfig", "bePatientDeleteFiles", data['lang']) %} </div>',
               closeButton: false
             })
 
@@ -398,7 +398,7 @@
             bootbox.dialog({
               backdrop: true,
               title: '{% raw translate("serverConfig", "sendingDelete", data['lang']) %}',
-              message: '<div align="center"><i class="fas fa-spin fa-spinner"></i> &nbsp; {% raw translate("serverConfig", "bePatientDelete", data['lang']) %} </div>',
+              message: '<div align="center"><i class="ph ph-spinner-gap"></i> &nbsp; {% raw translate("serverConfig", "bePatientDelete", data['lang']) %} </div>',
               closeButton: false
             })
             return;
@@ -476,7 +476,7 @@
           bootbox.dialog({
             backdrop: true,
             title: '{% raw translate("serverConfig", "sendingDelete", data['lang']) %}',
-            message: '<div align="center"><i class="fas fa-spin fa-spinner"></i> &nbsp; {% raw translate("serverConfig", "bePatientDelete", data['lang']) %} </div>',
+            message: '<div align="center"><i class="ph ph-spinner-gap"></i> &nbsp; {% raw translate("serverConfig", "bePatientDelete", data['lang']) %} </div>',
             closeButton: false
           })
           $.ajax({

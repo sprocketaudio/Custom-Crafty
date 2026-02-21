@@ -21,6 +21,12 @@
   <link rel="stylesheet" href="/static/assets/vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="/static/assets/vendors/typicons/typicons.css">
   <link rel="stylesheet" href="/static/assets/vendors/fontawesome6/css/all.css">
+  <link rel="stylesheet" href="/static/assets/vendors/phosphoricons/regular/style.css">
+  <link rel="stylesheet" href="/static/assets/vendors/phosphoricons/fill/style.css">
+  <link rel="stylesheet" href="/static/assets/vendors/phosphoricons/bold/style.css">
+  <link rel="stylesheet" href="/static/assets/vendors/phosphoricons/duotone/style.css">
+  <link rel="stylesheet" href="/static/assets/vendors/phosphoricons/light/style.css">
+  <link rel="stylesheet" href="/static/assets/vendors/phosphoricons/thin/style.css">
   <link rel="stylesheet" type="text/css" href="/static/assets/css/vendors/datatables.min.css" />
   <link rel="stylesheet" href="/static/assets/vendors/css/vendor.bundle.base.css">
 
@@ -344,7 +350,7 @@
           });
 
         const warning = $("<span>").html(
-          `<i class="fa-solid fa-triangle-exclamation"></i>`
+          `<i class="ph-fill ph-warning"></i>`
         );
 
         warning.append($("<p>").text(HYTALE_AUTH_AWAY));
@@ -357,6 +363,7 @@
         bootbox.alert({
           message: container,
           callback: function () {
+            globalThis.window.open(data.link)
             globalThis.location.href = `/panel/server_detail?id=${data.server_id}&subpage=term`
           }
         });
