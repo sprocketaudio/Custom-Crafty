@@ -291,5 +291,18 @@
                 globalThis.location.href = `/panel/server_detail?id=${data.server_id}&subpage=term`
             });
         });
+
+        webSocket.on('backup_status', function (backup) {
+            let progress = backup.percent;
+            try {
+                if (progress < 100) {
+                    $("#download-progress").removeClass("d-none");
+                    $("#download-progress-bar").css("width", progress);
+                    $("#download-progress-bar").text(progress);
+                }
+            } catch {
+                console.log("Could not find dom element for update")
+            }
+        });
     </script>
     {% end %}
