@@ -3,7 +3,7 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Adds missing time variables in static test webhook ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/963))
 ### Tweaks
 TBD
 ### Lang
