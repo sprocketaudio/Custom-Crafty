@@ -74,6 +74,7 @@ services:
     environment:
       - TZ=Etc/UTC
     ports:
+      - "5520-5550:5520-5550/udp" # Hytale
       - "8000:8000" # HTTP
       - "8443:8443" # HTTPS
       - "8123:8123" # DYNMAP
@@ -97,6 +98,7 @@ $ docker run \
 	--name crafty_container \
 	--detach \
 	--restart always \
+	-P 5520-5550:5520-5550/udp \
 	-p 8000:8000 \
 	-p 8443:8443 \
 	-p 8123:8123 \
@@ -124,6 +126,7 @@ $ docker run \
 	--name crafty_container \
 	--detach \
 	--restart always \
+	-P 5520-5550:5520-5550/udp \
 	-p 8000:8000 \
 	-p 8443:8443 \
 	-p 8123:8123 \

@@ -5,7 +5,7 @@ TBD
 ### Bug fixes
 - Adds missing time variables in static test webhook ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/963))
 ### Tweaks
-TBD
+- Add Hytale Port Ranges to Docker related stack templates & documentation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/965))
 ### Lang
 TBD
 <br><br>
