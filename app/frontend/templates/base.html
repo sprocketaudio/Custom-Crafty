@@ -325,6 +325,7 @@
           if (progress < 100) {
             $("#download-progress").removeClass("d-none");
             $("#download-progress-bar").css("width", progress);
+            $("#download-progress-bar").text(progress);
           } else {
             $("#download-progress").addClass("d-none");
           }
