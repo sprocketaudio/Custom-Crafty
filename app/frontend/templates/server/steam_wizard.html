@@ -10,22 +10,22 @@
   <ul class="nav nav-pills tab-simple-styled " role="tablist">
     <li class="nav-item term-nav-item">
       <a class="nav-link" href="/server/step1" role="tab" aria-selected="false">
-        <i class="fas fa-file-signature"></i>Minecraft-Java</a>
+        <i class="ph-fill ph-file-text"></i>Minecraft-Java</a>
     </li>
     <li class="nav-item term-nav-item">
       <a class="nav-link" href="/server/bedrock_step1" role="tab" aria-selected="false">
-        <i class="fas fa-file-signature"></i>Minecraft-Bedrock</a>
+        <i class="ph-fill ph-file-text"></i>Minecraft-Bedrock</a>
     </li>
     <li class="nav-item term-nav-item">
       <a class="nav-link" href="/server/hytale_step1" role="tab" aria-selected="false">
-        <i class="fas fa-file-signature"></i>Hytale</a>
+        <i class="ph-fill ph-file-text"></i>Hytale</a>
     </li>
     {% if data.get("experimental") %}
     <li class="nav-item term-nav-item">
       <a class="nav-link active" href="/server/steam_cmd_step1" role="tab" aria-selected="false">
-        <i class="fas fa-file-signature"></i>Steam-CMD&nbsp;<span id="steam-badge"
+        <i class="ph-fill ph-file-text"></i>Steam-CMD&nbsp;<span id="steam-badge"
           title="{{translate('serverWizard', 'experimentalFeature', data['lang'])}}" class="text-primary"><i
-            class="fa-solid fa-flask"></i></span></a>
+            class="ph ph-flask"></i></span></a>
     </li>
     {% end %}
   </ul>
