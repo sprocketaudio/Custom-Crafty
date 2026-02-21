@@ -52,7 +52,9 @@ RUN mv ./app/config ./app/config_original \
     && chmod +x ./docker_launcher.sh
 
 # Expose Web Interface port & Server port range
+EXPOSE 5520-5550
 EXPOSE 8000
+EXPOSE 8123
 EXPOSE 8443
 EXPOSE 19132
 EXPOSE 25500-25600
