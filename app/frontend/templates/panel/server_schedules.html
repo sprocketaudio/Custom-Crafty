@@ -44,12 +44,12 @@
             <div class="col-md-12 col-sm-12 overflow-x-auto">
               <div class="card">
                 <div class="card-header header-sm d-flex justify-content-between align-items-center">
-                  <h4 class="card-title"><i class="fas fa-calendar"></i> {{ translate('serverSchedules',
+                  <h4 class="card-title"><i class="ph-fill ph-calendar-blank"></i> {{ translate('serverSchedules',
                     'scheduledTasks', data['lang']) }} </h4>
                   {% if data['user_data']['hints'] %}
                   <span class="too_small" title="{{ translate('serverSchedules', 'cannotSee', data['lang']) }}" , data-content="{{ translate('serverSchedules', 'cannotSeeOnMobile', data['lang']) }}" , data-placement="bottom"></span>
                   {% end %}
-                  <div><a class="btn btn-info" href="/panel/add_schedule?id={{ data['server_stats']['server_id']['server_id'] }}"><i class="fas fa-plus-circle"></i> {{ translate('serverSchedules', 'create', data['lang']) }}</a></div>
+                  <div><a class="btn btn-info" href="/panel/add_schedule?id={{ data['server_stats']['server_id']['server_id'] }}"><i class="ph-fill ph-plus-circle"></i> {{ translate('serverSchedules', 'create', data['lang']) }}</a></div>
                 </div>
                 <div class="card-body">
                   {% if len(data['schedules']) == 0 %}
@@ -112,10 +112,10 @@
                           </td>
                           <td id="{{schedule.action}}" class="action">
                             <button onclick="window.location.href='/panel/edit_schedule?id={{ data['server_stats']['server_id']['server_id'] }}&sch_id={{schedule.schedule_id}}'" class="btn btn-info">
-                              <i class="fas fa-pencil-alt"></i>
+                              <i class="ph-fill ph-pencil-simple"></i>
                             </button>
                             <button data-sch={{ schedule.schedule_id }} class="btn btn-danger del_button">
-                              <i class="fas fa-trash" aria-hidden="true"></i>
+                              <i class="ph-fill ph-trash-simple" aria-hidden="true"></i>
                             </button>
                           </td>
                         </tr>
@@ -206,11 +206,11 @@
                               </div>
                               <div class="modal-footer">
                                 <button onclick="window.location.href='/panel/edit_schedule?id={{ data['server_stats']['server_id']['server_id'] }}&sch_id={{schedule.schedule_id}}'" class="btn btn-info">
-                                  <i class="fas fa-pencil-alt"></i> {{ translate('serverSchedules', 'edit', data['lang'])
+                                  <i class="ph-fill ph-pencil-simple"></i> {{ translate('serverSchedules', 'edit', data['lang'])
                                   }}
                                 </button>
                                 <button data-sch={{ schedule.schedule_id }} class="btn btn-danger del_button">
-                                  <i class="fas fa-trash" aria-hidden="true"></i> {{ translate('serverSchedules',
+                                  <i class="ph-fill ph-trash-simple" aria-hidden="true"></i> {{ translate('serverSchedules',
                                   'delete', data['lang']) }}
                                 </button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">{{
@@ -384,12 +384,12 @@
       message: "{{ translate('serverSchedules', 'confirmDelete', data['lang']) }}",
       buttons: {
         cancel: {
-          label: '<i class="fas fa-times"></i> {{ translate("serverSchedules", "cancel", data['lang']) }}'
+          label: '<i class="ph-bold ph-x"></i> {{ translate("serverSchedules", "cancel", data['lang']) }}'
           },
-        confirm: {
+        confirm: 
           className: 'btn-outline-danger',
-          label: '<i class="fas fa-check"></i> {{ translate("serverSchedules", "confirm", data['lang']) }}'
-          }
+          label: '<i class="ph-bold ph-check"></i> {{ translate("serverSchedules", "confirm", data['lang']) }}'
+          
       },
       callback: function (result) {
         console.log(result);

@@ -56,7 +56,7 @@
               data-target="#{{section[0]}}">
               <h3>{{translate('configJson', section[0], data['lang'])}}</h3>
               <div class="right position-absolute top-0 end-0 p-2">
-                <i class="fa-solid fa-arrow-down-wide-short"></i>
+                <i class="ph-bold ph-arrows-vertical"></i>
               </div>
             </div>
             <div class="collapse" id="{{section[0]}}">
@@ -197,7 +197,7 @@
   }
   $("#config-form").on("submit", async function (e) {
     e.preventDefault();
-    $("#submit-status").html('<i class="fa fa-spinner fa-spin"></i>');
+    $("#submit-status").html('<i class="ph-bold ph-spinner-gap"></i>');
     const token = getCookie("_xsrf")
     let configForm = document.getElementById("config-form");
 
@@ -233,7 +233,7 @@
     });
     let responseData = await res.json();
     if (responseData.status === "ok") {
-      $("#submit-status").html('<i class="fa fa-check"></i>');
+      $("#submit-status").html('<i class="ph-bold ph-check"></i>');
     } else {
 
       bootbox.alert({

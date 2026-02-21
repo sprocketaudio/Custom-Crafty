@@ -16,15 +16,15 @@
   <ul class="nav nav-pills tab-simple-styled " role="tablist">
     <li class="nav-item term-nav-item">
       <a class="nav-link" href="/server/step1" role="tab" aria-selected="false">
-        <i class="fas fa-file-signature"></i>Minecraft-Java</a>
+        <i class="ph-fill ph-file-text"></i>Minecraft-Java</a>
     </li>
     <li class="nav-item term-nav-item">
       <a class="nav-link active" href="/server/bedrock_step1" role="tab" aria-selected="false">
-        <i class="fas fa-file-signature"></i>Minecraft-Bedrock</a>
+        <i class="ph-fill ph-file-text"></i>Minecraft-Bedrock</a>
     </li>
     <li class="nav-item term-nav-item">
       <a class="nav-link" href="/server/hytale_step1" role="tab" aria-selected="false">
-        <i class="fas fa-file-signature"></i>Hytale</a>
+        <i class="ph-fill ph-file-text"></i>Hytale</a>
     </li>
   </ul>
   <div class="d-none" id="overlay" onclick="hide(event)"></div>
@@ -74,7 +74,7 @@
               </fieldset>
               {% if not data["server_api"] and data["online"] %}
               <div class="api-alert">
-                <p><i class="fas fa-exclamation-triangle"></i>&nbsp;{{ translate('error', 'bedrockError', data['lang'])
+                <p><i class="ph-fill ph-warning"></i>&nbsp;{{ translate('error', 'bedrockError', data['lang'])
                   }}<a href="https://status.craftycontrol.com/status/craftycontrol" target="_blank"
                     rel="noopener noreferrer">&nbsp;{{ translate('error', 'craftyStatus', data['lang']) }}</a>
                   &nbsp;{{ translate('error', 'serverJars2', data['lang']) }}</p>
@@ -82,7 +82,7 @@
               {% end %}
               {% if not data["online"] %}
               <div class="api-alert">
-                <p><i class="fas fa-exclamation-triangle"></i>&nbsp;{{ translate('error', 'noInternet', data['lang']) }}
+                <p><i class="ph-fill ph-warning"></i>&nbsp;{{ translate('error', 'noInternet', data['lang']) }}
                 </p>
               </div>
               {% end %}
@@ -186,8 +186,8 @@
                         <input type="radio" class="root-input" id="main-tree-input-upload" name="root_path" value=""
                           checked>
                         <span id="main-tree" class="files-tree-title tree-caret-down root-dir" data-path="">
-                          <i class="far fa-folder"></i>
-                          <i class="far fa-folder-open"></i>
+                          <i class="ph-fill ph-folder"></i>
+                          <i class="ph-fill ph-folder-open"></i>
                           {{ translate('serverFiles', 'files', data['lang']) }}
                         </span>
                         </input>
@@ -259,7 +259,7 @@
   function wait_msg(importing) {
     bootbox.alert({
       title: importing ? `${$("#creation-wrapper").attr("data-importing")}` : `${$("#creation-wrapper").attr("data-downloading")}`,
-      message: `<i class="fas fa-cloud-download"></i> ${$("#creation-wrapper").attr("data-bePatient")}`,
+      message: `<i class="ph-fill ph-cloud-arrow-down"></i> ${$("#creation-wrapper").attr("data-bePatient")}`,
       className: "waitMsg",
     });
   }

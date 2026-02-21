@@ -150,9 +150,9 @@ async function getTreeView(path) {
 }
 
 function fileIcon(value) {
-    if (value.dir) return '<i class="fa-regular fa-folder text-info"></i>';
-    if (value.can_open) return '<i class="fa-regular fa-file text-success"></i>';
-    return '<i class="fa-regular fa-file-excel text-danger"></i>';
+    if (value.dir) return '<i class="ph-fill ph-folder-simple text-info"></i>';
+    if (value.can_open) return '<i class="ph ph-file text-success"></i>';
+    return '<i class="ph-fill ph-file-x text-danger"></i>';
 }
 
 function setup_table_nav(response) {
@@ -167,7 +167,7 @@ function setup_table_nav(response) {
     span.className = "tree-nav";
     let local_path = ""
     span.dataset.path = local_path; // or set the actual path if needed
-    span.innerHTML = `<i class="fa-solid fa-server"></i>${path_list[0] === "" ? '&nbsp; <i class="fa-solid fa-rotate-right"></i>' : ""}`; //Set root text as server icon
+    span.innerHTML = `<i class="ph-fill ph-hard-drives"></i>${path_list[0] === "" ? '&nbsp; <i class="ph-fill ph-arrow-clockwise"></i>' : ""}`; //Set root text as server icon
     container.appendChild(span);
     for (let [index, part] of path_list.entries()) {
         if (!(part === "" && index === 0)) {
@@ -185,7 +185,7 @@ function setup_table_nav(response) {
             span.dataset.path = local_path; // or set the actual path if needed // if we're on the first iteration and it's the server ID ignore it
             span.textContent = part; // safe text;
             if (index == path_list.length - 1) {
-                refresh.innerHTML = `&nbsp; <i class="fa-solid fa-rotate-right"></i>`;
+                refresh.innerHTML = `&nbsp; <i class="ph-fill ph-arrow-clockwise"></i>`;
                 span.appendChild(refresh);
             }
 
@@ -232,7 +232,7 @@ function setup_table_body(response) {
         if (value.mime || value.dir) {
             $td3.text(value.mime ? value.mime : "Dir");
         } else {
-            $td3.html('<i class="fa fa-question-circle" aria-hidden="true"></i>');
+            $td3.html('<i class="ph ph-question" aria-hidden="true"></i>');
         }
 
         // Column 3: modified date
@@ -243,7 +243,7 @@ function setup_table_body(response) {
 
         // Column 5: context button
         const $td6 = $("<td>")
-            .addClass("context-button").append($("<span>").addClass("options").html(`<i class="fa-solid fa-ellipsis options"></i>`)).addClass("text-align-center");
+            .addClass("context-button").append($("<span>").addClass("options").html(`<i class="ph-bold ph-dots-three options"></i>`)).addClass("text-align-center");
         if ($("#files_table thead tr:first th:visible").length > 1) {
 
             // Append all columns to the row
@@ -384,9 +384,9 @@ function add_rename_listener() {
                         $(selected_row).attr("data-path", $(selected_row).attr("data-path").replace($(selected_row).children(".column-1").attr("data-name"), result))
 
                         $(selected_row).children(".column-1").empty()
-                        let icon = '<i class="fa-regular fa-file-excel text-danger"></i>'
-                        if ($(selected_row).hasClass("directory")) icon = '<i class="fa-regular fa-folder text-info"></i>';
-                        if ($(selected_row).hasClass("file") && $(selected_row).data("can_open")) icon = '<i class="fa-regular fa-file text-success"></i>';
+                        let icon = '<i class="ph-fill ph-file-x text-danger"></i>'
+                        if ($(selected_row).hasClass("directory")) icon = '<i class="ph-fill ph-folder-simple text-info"></i>';
+                        if ($(selected_row).hasClass("file") && $(selected_row).data("can_open")) icon = '<i class="ph ph-file text-success"></i>';
                         $(selected_row).children(".column-1").append($("<span>").html(icon))
                             .append("\u00A0\u00A0\u00A0")
                             .append(document.createTextNode(result));
@@ -431,7 +431,7 @@ function setup_nav_listeners() {
             "<div>" +
             '<form id="upload-file-form"  enctype="multipart/form-data">' +
             "<label class='upload-area' style='width:100%;text-align:center;' for='files'>" +
-            "<i class='fa fa-cloud-upload fa-3x'></i>" +
+            "<i class='ph-bold ph-cloud-arrow-up' scale='scale: 3;'></i>" +
             "<br />" +
             $("#table-nav-container").attr("data-clickUpload") +
             "<input style='margin-left: 21%;' id='files' name='files' type='file' multiple='true'>" +
@@ -806,12 +806,12 @@ function setup_copy_move_table_nav() {
     if (copy) {
         move_button = $("<button>").attr("id", "copy-op").addClass("btn").addClass("btn-info").text($("#files_table").attr("data-copy"));
     }
-    let move_source = $("<span>").attr("id", "copy-move-source").html(`${move_copy_source.length} <i class="fa-solid fa-file"></i>`);
+    let move_source = $("<span>").attr("id", "copy-move-source").html(`${move_copy_source.length} <i class="ph ph-file"></i>`);
     if (move_copy_source.length <= 1) {
         move_source = $("<span>").attr("id", "copy-move-source").text(move_copy_source[0].replace(serverId, ""));
     }
     const move_target = $("<span>").attr("id", "copy-move-target");
-    const move_arrow = $("<span>").attr("id", "copy-move-arrow").html(`<i class="fa-solid fa-arrow-right"></i>`);
+    const move_arrow = $("<span>").attr("id", "copy-move-arrow").html(`<i class="ph-bold ph-arrow-right"></i>`);
     const cancel = $("<button>").attr("id", "copy-move-cancel").addClass("btn").addClass("btn-secondary").text($("#files_table").attr("data-cancel"));
     container.html("");
     container.append(move_source);
@@ -937,9 +937,9 @@ $(document).ready(function () {
     $("#file-status").on("click", function () {
         $("#file-status-content").toggleClass("d-none");
         if ($("#file-status-content").hasClass("d-none")) {
-            $("#status-caret").html(`<i class="fa-solid fa-caret-up"></i>`)
+            $("#status-caret").html(`<i class="ph-bold ph-caret-up"></i>`)
         } else {
-            $("#status-caret").html(`<i class="fa-solid fa-caret-down"></i>`)
+            $("#status-caret").html(`<i class="ph-bold ph-caret-down"></i>`)
         }
     });
 });

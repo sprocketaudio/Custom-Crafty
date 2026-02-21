@@ -599,6 +599,9 @@ class FileHelpers:
                 files_list = zip_ref.namelist()
                 for idx, file in enumerate(files_list):
                     info = zip_ref.getinfo(file)
+                    # Skip directory entries
+                    if info.is_dir():
+                        continue
                     target = Path(destination_path, file).resolve()
                     try:
                         self.helper.validate_traversal(destination_path, target)
@@ -613,7 +616,7 @@ class FileHelpers:
                             file, base_include_path
                         )
                         try:
-                            zip_ref.extract(file, destination_path)
+                            zip_ref.extract(info, destination_path)
                         except FileNotFoundError:
                             logger.error(
                                 "Could not extract file: %s to %s from archive %s",

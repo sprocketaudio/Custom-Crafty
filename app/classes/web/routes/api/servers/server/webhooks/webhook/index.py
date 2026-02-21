@@ -297,6 +297,8 @@ class ApiServersServerWebhooksManagementIndexHandler(BaseApiHandler):
             "backup_error": "[Errno 2] This Backup is not real!",
         }
 
+        event_data = webhook_provider.add_time_variables(event_data)
+
         try:
 
             webhook_provider.send(
