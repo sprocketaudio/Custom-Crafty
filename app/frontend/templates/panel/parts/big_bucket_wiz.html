@@ -55,7 +55,7 @@
         let idx_list = idx.split("|");
         // get the value of the selected option
         let cSelect = document.getElementById("server");
-        let which = {};
+        let versions = [];
         try {
             versions = Object.keys(serverTypesLists[idx_list[0]]["types"][idx_list[1]]["versions"]);
         } catch {
@@ -71,7 +71,7 @@
 
         // create new options ordered by ascending
         versions.forEach(type => {
-            newOption = document.createElement("option");
+            let newOption = document.createElement("option");
             newOption.value = idx + "|" + type;  // assumes option string and value are the same
             newOption.text = type;
             // add the new option
@@ -79,6 +79,7 @@
                 cSelect.add(newOption);  // this will fail in DOM browsers but is needed for IE
             }
             catch (e) {
+                console.log(`Failed on DOM: ${e}`);
                 cSelect.appendChild(newOption);
             }
         })
@@ -86,9 +87,9 @@
 
     $("#server").change(function () {
         let selected_version = $("#server :selected").text().split(".");
-        if (parseInt(selected_version[0]) === 1 && parseInt(selected_version[1]) < 8) {
+        if (Number(selected_version[0]) === 1 && Number(selected_version[1]) < 8) {
             $('[data-toggle="popover"]').popover();
-            if ($(window).width() < 1000) {
+            if ($(globalThis).width() < 1000) {
                 $('.version-hint').attr("data-placement", "top")
             } else {
                 $('.version-hint').attr("data-placement", "right")
