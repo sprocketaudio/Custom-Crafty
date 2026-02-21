@@ -353,7 +353,10 @@ class FileHelpers:
     ):
         # create a ZipFile object
         path_to_destination += ".zip"
-        ex_replace = [p.replace("\\", "/") for p in excluded_dirs]
+        ex_replace = [
+            Path(self.get_absolute_path(path_to_zip, p)).as_posix()
+            for p in excluded_dirs
+        ]
         total_bytes = 0
         dir_bytes = FileHelpers.get_dir_size(path_to_zip)
         results = {
