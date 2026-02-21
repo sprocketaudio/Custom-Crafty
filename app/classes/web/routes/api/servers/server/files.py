@@ -307,9 +307,9 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 can_open, mime = self.file_helper.probably_can_open_file(str(raw_path))
                 modified_time = datetime.fromtimestamp(lib_stat.st_mtime)
                 permissions = {
-                    "can_read": os.access(raw_path, os.R_OK, follow_symlinks=False),
-                    "can_write": os.access(raw_path, os.W_OK, follow_symlinks=False),
-                    "can_execute": os.access(raw_path, os.X_OK, follow_symlinks=False),
+                    "can_read": os.access(raw_path, os.R_OK),
+                    "can_write": os.access(raw_path, os.W_OK),
+                    "can_execute": os.access(raw_path, os.X_OK),
                 }
                 if backup_id:
                     if str(

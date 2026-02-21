@@ -241,11 +241,11 @@ function setup_table_body(response) {
         // Column 4: size
         const $size_column = $("<td>").text(value.size || "-");
 
-        const $can_read = $(value.permissions.can_read ? '<i class="fa-solid fa-glasses mr-2"></i>' : "");
+        const $can_read = $(value.permissions.can_read ? '<i class="ph ph-eyeglasses mr-2"></i>' : "");
 
-        const $can_write = $(value.permissions.can_write ? '<i class="fa-regular fa-floppy-disk mr-2"></i>' : "");
+        const $can_write = $(value.permissions.can_write ? '<i class="ph ph-floppy-disk mr-2"></i>' : "");
 
-        const $can_execute = $(value.permissions.can_execute ? '<i class="fa-solid fa-terminal mr-2"></i>' : "");
+        const $can_execute = $(value.permissions.can_execute ? '<i class="ph ph-binary mr-2"></i>' : "");
 
         const $perms_column = $("<td>").append($can_read, $can_write, $can_execute)
 
