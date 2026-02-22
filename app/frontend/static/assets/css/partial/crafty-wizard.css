@@ -106,3 +106,7 @@ div>.input-group>.custom-file-input {
     margin-bottom: 0 !important;
     border: 1px solid var(--outline);
 }
+
+#steam-badge {
+    -webkit-transform: translate(-0%, -30%);
+}

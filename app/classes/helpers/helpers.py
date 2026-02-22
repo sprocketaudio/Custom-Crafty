@@ -76,6 +76,7 @@ MASTER_CONFIG = {
     "base_url": "localhost:8443",
     "enable_passkey_auth": False,
     "passkey_rp_name": "Crafty Controller",
+    "experimental": False,
 }
 
 CONFIG_CATEGORIES = {
@@ -88,6 +89,7 @@ CONFIG_CATEGORIES = {
         "big_bucket_repo",
         "enable_user_self_delete",
         "base_url",
+        "experimental",
     ],
     "security": [
         "allow_nsfw_profile_pictures",
@@ -147,11 +149,16 @@ class Helpers:
         self.db_path = os.path.join(
             self.root_dir, "app", "config", "db", "crafty.sqlite"
         )
+
+        self.big_bucket_steamapps_cache = os.path.join(
+            self.config_dir, "steamapps.json"
+        )
         self.big_bucket_minecraft_cache = os.path.join(
             self.config_dir, "bigbucket.json"
         )
         self.big_bucket_hytale_cache = os.path.join(self.config_dir, "hytale.json")
         self.credits_cache = os.path.join(self.config_dir, "credits.json")
+
         self.passhasher = PasswordHasher()
         self.exiting = False
 

@@ -22,6 +22,14 @@
       <a class="nav-link" href="/server/hytale_step1" role="tab" aria-selected="false">
         <i class="ph-fill ph-file-text"></i>Hytale</a>
     </li>
+    {% if data.get("experimental") %}
+    <li class="nav-item term-nav-item">
+      <a class="nav-link" href="/server/steam_cmd_step1" role="tab" aria-selected="false">
+        <i class="ph-fill ph-file-text"></i>Steam-CMD&nbsp;<span id="steam-badge"
+          title="{{translate('serverWizard', 'experimentalFeature', data['lang'])}}" class="text-primary"><i
+            class="ph ph-flask"></i></span></a>
+    </li>
+    {% end %}
   </ul>
   <div class="d-none" id="overlay" onclick="hide(event)"></div>
   <div class="row">
@@ -254,6 +262,13 @@
 <script type="text/javascript" src="../../static/assets/js/shared/root-dir.js"></script>
 
 <script>
+  $("#steam_link").mouseenter(function () {
+    $('[data-toggle="popover"]').popover();
+    $('.missing').popover("show");
+  })
+  $("#steam_link").mouseleave(function () {
+    $('.missing').popover("hide");
+  });
   function replacer(key, value) {
     if (key === "roles" || key == "archive_internal_path") {
       return value

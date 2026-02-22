@@ -536,7 +536,7 @@
   }
   function replacer(key, value) {
     if (key != "ignored_exits") {
-      if (typeof value == "boolean" || key === "executable_update_url") {
+      if (typeof value == "boolean" || key === "executable_update_url" || value === '') {
         return value
       } else {
         return (isNaN(value) ? value : +value);

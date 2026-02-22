@@ -146,6 +146,11 @@ config_json_schema = {
             "error": "typeString",
             "fill": True,
         },
+        "experimental": {
+            "type": "boolean",
+            "error": "typeBool",
+            "fill": True,
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,

@@ -30,6 +30,7 @@ RUN touch /var/mail/ubuntu \
         openjdk-17-jre-headless \
         openjdk-21-jre-headless \
         openjdk-25-jre-headless \
+        lib32stdc++6 \
         tzdata \
     && apt-get autoremove \
     && apt-get clean

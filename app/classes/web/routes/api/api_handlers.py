@@ -105,7 +105,10 @@ from app.classes.web.routes.api.crafty.stats.stats import ApiCraftyHostStatsHand
 from app.classes.web.routes.api.crafty.clogs.index import ApiCraftyLogIndexHandler
 from app.classes.web.routes.api.crafty.clogs.support import ApiCraftySupportIndexHandler
 from app.classes.web.routes.api.crafty.imports.index import ApiImportFilesIndexHandler
-from app.classes.web.routes.api.crafty.exe_cache import ApiCraftyJarCacheIndexHandler
+from app.classes.web.routes.api.crafty.exe_cache import (
+    ApiCraftyJarCacheIndexHandler,
+    ApiCraftySteamCacheIndexHandler,
+)
 from app.classes.web.routes.api.crafty.antilockout.index import ApiCraftyLockoutHandler
 
 
@@ -312,6 +315,16 @@ def api_handlers(handler_args):
         (
             r"/api/v2/servers/?",
             ApiServersIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/crafty/JarCache/?",
+            ApiCraftyJarCacheIndexHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/crafty/SteamCache/?",
+            ApiCraftySteamCacheIndexHandler,
             handler_args,
         ),
         (

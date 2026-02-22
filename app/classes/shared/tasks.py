@@ -150,7 +150,7 @@ class TasksManager:
                         )
 
                 elif command == "update_executable":
-                    svr.jar_update()
+                    svr.server_upgrade()
                 else:
                     svr.send_command(command)
 

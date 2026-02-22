@@ -15,6 +15,7 @@ from peewee import DoesNotExist
 from tzlocal import get_localzone
 from apscheduler.schedulers.background import BackgroundScheduler
 
+from app.classes.big_bucket.steamcmd import SteamCMD
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.shared.main_models import DatabaseShortcuts
 from app.classes.models.users import HelperUsers
@@ -39,6 +40,7 @@ from app.classes.shared.import_helper import ImportHelpers
 from app.classes.big_bucket.bigbucket import BigBucket
 from app.classes.shared.websocket_manager import WebSocketManager
 
+
 logger = logging.getLogger(__name__)
 
 MODDED_TYPES = ["forge-installer", "neoforge-installer"]
@@ -51,7 +53,9 @@ class Controller:
         self.helper: Helpers = helper
         self.file_helper: FileHelpers = file_helper
         self.import_helper: ImportHelpers = import_helper
+
         self.big_bucket: BigBucket = BigBucket(helper)
+
         self.users_helper: HelperUsers = HelperUsers(database, self.helper)
         self.totp_helper: HelperTOTP = HelperTOTP(database)
         self.passkey_helper: HelperPasskey = HelperPasskey(database)
@@ -431,6 +435,10 @@ class Controller:
             monitoring_port = data["hytale_monitoring_data"]["port"] + 3
             monitoring_host = data["hytale_monitoring_data"]["host"]
             monitoring_type = "hytale"
+        elif data["monitoring_type"] == "steam_cmd":
+            monitoring_port = data["steam_cmd_monitoring_data"]["port"]
+            monitoring_host = data["steam_cmd_monitoring_data"]["host"]
+            monitoring_type = "steam_cmd"
         elif data["monitoring_type"] == "none":
             # TODO: this needs to be NUKED..
             # There shouldn't be anything set if there is nothing to monitor
@@ -543,6 +551,27 @@ class Controller:
             )
 
             server_command = create_data.get("command", server_command)
+        elif data["create_type"] == "steam_cmd":
+            server_file = "steamcmd.exe"
+            full_jar_path = os.path.join(new_server_path, server_file)
+            try:
+                steamcmd = SteamCMD(
+                    self.big_bucket.get_bucket_data(
+                        self.helper.big_bucket_steamapps_cache
+                    )
+                )
+                steam_server = steamcmd.get_game_by_id(create_data["app_id"])
+            except KeyError:
+                return logger.error("Failed to get big bucket. Crashing out.")
+
+            if Helpers.is_os_windows():
+                server_command = steam_server.windows_startup_command.replace(
+                    "SERVER_PORT", monitoring_port
+                )
+            else:
+                server_command = steam_server.unix_startup_command.replace(
+                    "SERVER_PORT", monitoring_port
+                )
         elif data["create_type"] == "custom":
             # This is not implemented yet. Raise a key error
             raise KeyError
@@ -662,7 +691,16 @@ class Controller:
                     data["create_type"],
                     full_exe_path,
                 )
-
+        elif data["create_type"] == "steam_cmd":
+            server_exe = "steamcmd.exe"
+            if root_create_data["create_type"] == "download_exe":
+                ServersController.set_import(new_server_id)
+                self.import_helper.download_steam_server(
+                    create_data["app_id"],
+                    new_server_id,
+                    new_server_path,
+                    server_exe,
+                )
         exec_user = self.users.get_user_by_id(int(user_id))
         captured_roles = data.get("roles", [])
         # These lines create a new Role for the Server with full permissions
@@ -891,6 +929,7 @@ class Controller:
         created_by: int,
         server_type: str,
         server_host: str = "127.0.0.1",
+        app_id: int = None,
     ):
         # put data in the db
         new_id = self.servers.create_server(
@@ -905,6 +944,7 @@ class Controller:
             created_by,
             server_port,
             server_host,
+            app_id,
         )
 
         if not Helpers.check_file_exists(
