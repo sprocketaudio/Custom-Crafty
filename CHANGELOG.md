@@ -1,9 +1,9 @@
 # Changelog
-## --- [4.9.1] - 2026/TBD
+## --- [4.10.0] - 2026/TBD
 ### Refactor
 - Switch from Font Awesome to Phosphor Icons (open source) ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/972))
 ### New features
-TBD
+- Experimental SteamCMD Alpha ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/451))
 ### Bug fixes
 - Adds missing time variables in static test webhook ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/963))
 - Fix bug where zip imports would get stuck after selecting root ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/964))
