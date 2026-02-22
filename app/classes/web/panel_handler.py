@@ -37,6 +37,7 @@ SUBPAGE_PERMS = {
     "admin_controls": EnumPermissionsServer.PLAYERS,
     "metrics": EnumPermissionsServer.LOGS,
     "webhooks": EnumPermissionsServer.CONFIG,
+    "update_center": EnumPermissionsServer.CONFIG,
 }
 
 SCHEDULE_AUTH_ERROR_URL = "/panel/error?error=Unauthorized access To Schedules"
@@ -489,10 +490,11 @@ class PanelHandler(BaseHandler):
                 server_obj = self.controller.servers.get_server_instance_by_id(
                     server["server_data"]["server_id"]
                 )
-                alert = False
-                if server_obj.last_backup_status():
-                    alert = True
-                server["alert"] = alert
+                server["alert"] = server_obj.last_backup_failed
+                server["update"] = (
+                    server_obj.update_available
+                    and server["server_data"]["update_watcher"]
+                )  # Only add update notify if user has the watcher enabled
 
             # num players is set to zero here. If we poll all servers while
             # dashboard is loading it takes FOREVER. We leave this to the
@@ -528,7 +530,11 @@ class PanelHandler(BaseHandler):
                 server_obj = self.controller.servers.get_server_instance_by_id(
                     server_id
                 )
-                page_data["backup_failed"] = server_obj.last_backup_status()
+                page_data["backup_failed"] = server_obj.last_backup_failed
+                page_data["update"] = server_obj.update_available
+                page_data["update_next_run"] = server_obj.server_scheduler.get_job(
+                    f"{server_obj.server_id}_update_watcher"
+                ).next_run_time.strftime("%m/%d/%Y, %H:%M:%S")
             server_obj = None
 
             if not self.failed_server:
@@ -649,6 +655,18 @@ class PanelHandler(BaseHandler):
                 page_data["schedules"] = HelpersManagement.get_schedules_by_server(
                     server_id
                 )
+
+            if subpage == "update_center":
+                page_data["server_api"] = (
+                    self.controller.big_bucket._check_bucket_alive()
+                )
+                page_data["server_types"] = self.controller.big_bucket.get_bucket_data()
+                page_data["js_server_types"] = json.dumps(
+                    self.controller.big_bucket.get_bucket_data()
+                )
+                if page_data["server_types"] is None:
+                    page_data["server_types"] = []
+                    page_data["js_server_types"] = []
 
             if subpage == "config":
                 page_data["java_versions"] = Helpers.find_java_installs()
@@ -956,7 +974,7 @@ class PanelHandler(BaseHandler):
             if server_id is None:
                 return self.redirect("/panel/error?error=Invalid Server ID")
             server_obj = self.controller.servers.get_server_instance_by_id(server_id)
-            page_data["backup_failed"] = server_obj.last_backup_status()
+            page_data["backup_failed"] = server_obj.last_backup_failed
             server_obj = None
             page_data["active_link"] = "webhooks"
             page_data["server_data"] = self.controller.servers.get_server_data_by_id(
@@ -1010,7 +1028,7 @@ class PanelHandler(BaseHandler):
             if server_id is None:
                 return self.redirect("/panel/error?error=Invalid Server ID")
             server_obj = self.controller.servers.get_server_instance_by_id(server_id)
-            page_data["backup_failed"] = server_obj.last_backup_status()
+            page_data["backup_failed"] = server_obj.last_backup_failed
             server_obj = None
             page_data["active_link"] = "webhooks"
             page_data["server_data"] = self.controller.servers.get_server_data_by_id(
@@ -1060,7 +1078,7 @@ class PanelHandler(BaseHandler):
             if server_id is None:
                 return self.redirect("/panel/error?error=Invalid Schedule ID")
             server_obj = self.controller.servers.get_server_instance_by_id(server_id)
-            page_data["backup_failed"] = server_obj.last_backup_status()
+            page_data["backup_failed"] = server_obj.last_backup_failed
             server_obj = None
             page_data["schedules"] = HelpersManagement.get_schedules_by_server(
                 server_id
@@ -1126,7 +1144,7 @@ class PanelHandler(BaseHandler):
             if not server_id:
                 return self.redirect("/panel/error?error=Invalid Schedule ID")
             server_obj = self.controller.servers.get_server_instance_by_id(server_id)
-            page_data["backup_failed"] = server_obj.last_backup_status()
+            page_data["backup_failed"] = server_obj.last_backup_failed
             server_obj = None
 
             page_data["schedules"] = HelpersManagement.get_schedules_by_server(
@@ -1237,7 +1255,7 @@ class PanelHandler(BaseHandler):
                 server_obj = self.controller.servers.get_server_instance_by_id(
                     server_id
                 )
-                page_data["backup_failed"] = server_obj.last_backup_status()
+                page_data["backup_failed"] = server_obj.last_backup_failed
             page_data["user_permissions"] = (
                 self.controller.server_perms.get_user_id_permissions_list(
                     exec_user["user_id"], server_id
@@ -1308,7 +1326,7 @@ class PanelHandler(BaseHandler):
                 server_obj = self.controller.servers.get_server_instance_by_id(
                     server_id
                 )
-                page_data["backup_failed"] = server_obj.last_backup_status()
+                page_data["backup_failed"] = server_obj.last_backup_failed
             page_data["user_permissions"] = (
                 self.controller.server_perms.get_user_id_permissions_list(
                     exec_user["user_id"], server_id

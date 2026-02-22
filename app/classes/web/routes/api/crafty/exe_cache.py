@@ -2,7 +2,7 @@ from app.classes.web.base_api_handler import BaseApiHandler
 
 
 class ApiCraftyJarCacheIndexHandler(BaseApiHandler):
-    def get(self):
+    def get(self, refresh=True):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -17,16 +17,16 @@ class ApiCraftyJarCacheIndexHandler(BaseApiHandler):
 
         if not auth_data[4]["superuser"]:
             return self.finish_json(
-                400,
+                200,
                 {
-                    "status": "error",
-                    "error": "NOT_AUTHORIZED",
-                    "error_data": "NOT A SUPER USER",
+                    "status": "ok",
+                    "data": self.controller.big_bucket.get_bucket_data(),
                 },
             )
 
-        self.controller.big_bucket.manual_refresh_cache()
-        self.finish_json(
+        if refresh:
+            self.controller.big_bucket.manual_refresh_cache()
+        return self.finish_json(
             200,
             {
                 "status": "ok",
