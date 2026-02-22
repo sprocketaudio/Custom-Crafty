@@ -13,12 +13,10 @@ import glob
 import json
 from pathlib import Path
 from zoneinfo import ZoneInfo
-
+from zoneinfo import ZoneInfoNotFoundError
 import requests
-from pathlib import Path
 
 # TZLocal is set as a hidden import on win pipeline
-from zoneinfo import ZoneInfoNotFoundError
 from tzlocal import get_localzone
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.base import JobLookupError, ConflictingIdError
