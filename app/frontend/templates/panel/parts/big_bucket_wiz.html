@@ -151,7 +151,7 @@
         serverTypeChange(selectObj);
     }
     async function refreshCache() {
-        document.getElementById("refresh-cache").classList.add("fa-spin")
+        document.getElementById("refresh-cache").classList.add("ph-spin")
         let token = getCookie("_xsrf")
         let res = await fetch(`/api/v2/crafty/JarCache`, {
             method: 'GET',
@@ -161,9 +161,9 @@
         });
         let responseData = await res.json();
         if (responseData.status === "ok") {
-            document.getElementById("refresh-cache").classList.remove("fa-sync");
-            document.getElementById("refresh-cache").classList.remove("fa-spin");
-            document.getElementById("refresh-cache").classList.add("fa-check");
+            document.getElementById("refresh-cache").classList.remove("ph-arrows-clockwise");
+            document.getElementById("refresh-cache").classList.remove("ph-spin");
+            document.getElementById("refresh-cache").classList.add("ph-check-fat");
             setTimeout(() => {
                 location.reload();
             }, 2000);
