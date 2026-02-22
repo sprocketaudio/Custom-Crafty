@@ -150,6 +150,31 @@
         })
         serverTypeChange(selectObj);
     }
+    async function refreshCache() {
+        document.getElementById("refresh-cache").classList.add("fa-spin")
+        let token = getCookie("_xsrf")
+        let res = await fetch(`/api/v2/crafty/JarCache`, {
+            method: 'GET',
+            headers: {
+                'X-XSRFToken': token
+            },
+        });
+        let responseData = await res.json();
+        if (responseData.status === "ok") {
+            document.getElementById("refresh-cache").classList.remove("fa-sync");
+            document.getElementById("refresh-cache").classList.remove("fa-spin");
+            document.getElementById("refresh-cache").classList.add("fa-check");
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        } else {
+
+            bootbox.alert({
+                title: responseData.error,
+                message: responseData.error_data
+            });
+        }
+    }
 </script>
 
 <script src="../../static/assets/js/shared/bootstrap-select-1.13.18.js"></script>
