@@ -61,18 +61,7 @@
                   <p class="mb-0 p-0" aria-expanded="true">{{ translate('serverWizard', 'addRole', data['lang']) }}
                     <small class="text-none"> - {{ translate('serverWizard', 'autoCreate', data['lang']) }}</small>
                   </p>
-                  <select data-container="body"
-                    data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
-                    data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
-                    class="selectpicker form-control form-control-lg select-css roles_select"
-                    data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles"
-                    multiple>
-                    {% for r in data['roles'] %}
-                    <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
-                      &nbsp; {{ r['role_name'].capitalize() }}
-                    </option>
-                    {% end %}
-                  </select>
+                  {% include "../panel/parts/role_select.html" %}
                 </div>
                 <button onclick="eula_confirm()" type="button" class="btn btn-primary mr-2">{{ translate('serverWizard',
                   'buildServer',
@@ -164,21 +153,9 @@
                   <small class="text-none"> - {{ translate('serverWizard', 'autoCreate',
                     data['lang']) }}</small>
                 </p>
-                <select data-container="body"
-                  data-none-selected-text="{{ translate('serverWizard', 'noneRoles', data['lang']) }}"
-                  data-none-results-text="{{ translate('serverWizard', 'noRole', data['lang']) }} {0}"
-                  class="selectpicker form-control form-control-lg select-css roles_select"
-                  data-styleBase="form-control" data-style="form-control" data-live-search="true" name="server_roles"
-                  multiple>
-                  {% for r in data['roles'] %}
-                  <option class="roles" type="checkbox" value="{{ r['role_id'] }}">
-                    &nbsp; {{ r['role_name'].capitalize()
-                    }}
-                  </option>
-                  {% end %}
-                </select>
+                {% include "../panel/parts/role_select.html" %}
               </div>
-              <div class="modal fade" id="dir_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
+              <div class="modal fade" id="dir_upload_select" tabindex="-1" role="dialog" aria-labelledby="dir_select"
                 aria-hidden="true">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">

@@ -217,10 +217,10 @@ function setup_table_body(response) {
             .attr("data-path", value.path)
             .attr("data-can_open", value.can_open);
 
-        const $td1 = $("<td>").append($("<div>").append($("<input>").attr("type", "checkbox").addClass("row-select").attr("data-name", key)).addClass("custom-check").addClass("checkbox-lg")).addClass("justify-content-center");
+        const $check_column = $("<td>").append($("<div>").append($("<input>").attr("type", "checkbox").addClass("row-select").attr("data-name", key)).addClass("custom-check").addClass("checkbox-lg")).addClass("justify-content-center");
 
         // Column 1: icon + filename
-        const $td2 = $("<td>")
+        const $name_column = $("<td>")
             .addClass("column-1")
             .attr("data-name", key)
             .append($("<span>").html(fileIcon(value)))
@@ -228,28 +228,36 @@ function setup_table_body(response) {
             .append(document.createTextNode(key));
 
         // Column 2: MIME or "Dir"
-        const $td3 = $("<td>");
+        const $type_column = $("<td>");
         if (value.mime || value.dir) {
-            $td3.text(value.mime ? value.mime : "Dir");
+            $type_column.text(value.mime ? value.mime : "Dir");
         } else {
-            $td3.html('<i class="ph ph-question" aria-hidden="true"></i>');
+            $type_column.html('<i class="ph ph-question" aria-hidden="true"></i>');
         }
 
         // Column 3: modified date
-        const $td4 = $("<td>").text(value.modified);
+        const $modified_column = $("<td>").text(value.modified);
 
         // Column 4: size
-        const $td5 = $("<td>").text(value.size || "-");
+        const $size_column = $("<td>").text(value.size || "-");
+
+        const $can_read = $(value.permissions.can_read ? '<i class="ph ph-eyeglasses mr-2"></i>' : "");
+
+        const $can_write = $(value.permissions.can_write ? '<i class="ph ph-floppy-disk mr-2"></i>' : "");
+
+        const $can_execute = $(value.permissions.can_execute ? '<i class="ph ph-binary mr-2"></i>' : "");
+
+        const $perms_column = $("<td>").append($can_read, $can_write, $can_execute)
 
         // Column 5: context button
-        const $td6 = $("<td>")
+        const $options_column = $("<td>")
             .addClass("context-button").append($("<span>").addClass("options").html(`<i class="ph-bold ph-dots-three options"></i>`)).addClass("text-align-center");
         if ($("#files_table thead tr:first th:visible").length > 1) {
 
             // Append all columns to the row
-            $tr.append($td1, $td2, $td3, $td4, $td5, $td6);
+            $tr.append($check_column, $name_column, $type_column, $modified_column, $size_column, $perms_column, $options_column);
         } else {
-            $tr.append($td2)
+            $tr.append($name_column)
         }
 
         // Append row to tbody (also as jQuery object)

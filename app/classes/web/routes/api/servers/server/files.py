@@ -5,7 +5,7 @@ import html
 import threading
 from shutil import Error as shutilError
 from datetime import datetime
-from pathlib import Path, PurePath
+from pathlib import Path, PurePosixPath
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
@@ -303,15 +303,21 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             )
             for filename in file_list:
                 raw_path = Path(folder, filename).resolve()
+                lib_stat = Path(raw_path).stat()
                 can_open, mime = self.file_helper.probably_can_open_file(str(raw_path))
-                modified_time = datetime.fromtimestamp(Path(raw_path).stat().st_mtime)
+                modified_time = datetime.fromtimestamp(lib_stat.st_mtime)
+                permissions = {
+                    "can_read": os.access(raw_path, os.R_OK),
+                    "can_write": os.access(raw_path, os.W_OK),
+                    "can_execute": os.access(raw_path, os.X_OK),
+                }
                 if backup_id:
                     if str(
                         raw_path
                     ) in self.controller.management.get_excluded_backup_dirs(backup_id):
                         if os.path.isdir(raw_path):
                             return_json[filename] = {
-                                "path": raw_path,
+                                "path": str(PurePosixPath(raw_path)),
                                 "dir": True,
                                 "excluded": True,
                             }
@@ -321,7 +327,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                             except (OSError, IOError):
                                 file_size = 0
                             return_json[filename] = {
-                                "path": raw_path,
+                                "path": str(PurePosixPath(raw_path)),
                                 "dir": False,
                                 "excluded": True,
                                 "size": Helpers.human_readable_file_size(file_size),
@@ -329,7 +335,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     else:
                         if os.path.isdir(raw_path):
                             return_json[filename] = {
-                                "path": raw_path,
+                                "path": str(PurePosixPath(raw_path)),
                                 "dir": True,
                                 "excluded": False,
                             }
@@ -339,7 +345,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                             except (OSError, IOError):
                                 file_size = 0
                             return_json[filename] = {
-                                "path": raw_path,
+                                "path": str(PurePosixPath(raw_path)),
                                 "dir": False,
                                 "excluded": False,
                                 "size": Helpers.human_readable_file_size(file_size),
@@ -348,12 +354,13 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     if os.path.isdir(raw_path):
                         return_json[filename] = {
                             "path": str(
-                                PurePath.relative_to(
-                                    PurePath(raw_path), PurePath(server_path)
+                                PurePosixPath.relative_to(
+                                    PurePosixPath(raw_path), PurePosixPath(server_path)
                                 )
                             ),
                             "dir": True,
                             "excluded": False,
+                            "permissions": permissions,
                             "modified": modified_time.strftime(HUMAN_TIME_FORMAT),
                         }
                     else:
@@ -363,13 +370,14 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                             file_size = 0
                         return_json[filename] = {
                             "path": str(
-                                PurePath.relative_to(
-                                    PurePath(raw_path), PurePath(server_path)
+                                PurePosixPath.relative_to(
+                                    PurePosixPath(raw_path), PurePosixPath(server_path)
                                 )
                             ),
                             "dir": False,
                             "excluded": False,
                             "can_open": can_open,
+                            "permissions": permissions,
                             "mime": mime,
                             "modified": modified_time.strftime(HUMAN_TIME_FORMAT),
                             "size": Helpers.human_readable_file_size(file_size),

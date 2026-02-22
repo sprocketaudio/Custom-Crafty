@@ -12,11 +12,11 @@ import html
 import glob
 import json
 from pathlib import Path
-
 from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfoNotFoundError
+import requests
 
 # TZLocal is set as a hidden import on win pipeline
-from zoneinfo import ZoneInfoNotFoundError
 from tzlocal import get_localzone
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.base import JobLookupError, ConflictingIdError
@@ -215,7 +215,7 @@ class ServerInstance:
         self.server_command = None
         self.server_path = None
         self.server_thread = None
-        self.settings = None
+        self.settings = {}
         self.updating = False
         self.server_id = server_id
         self.jar_update_url = None
@@ -263,6 +263,14 @@ class ServerInstance:
         # Reset crash and update at initialization
         self.stats_helper.server_crash_reset()
         self.stats_helper.set_update(False)
+        # Start update watcher
+        self.server_scheduler.add_job(
+            self.check_server_version,
+            "interval",
+            hours=12,
+            id=f"{str(self.server_id)}_update_watcher",
+        )
+        self.update_available = False
 
     # **********************************************************************************
     #                               Minecraft Server Management
@@ -293,6 +301,9 @@ class ServerInstance:
         self.server_id = server_id
         self.name = server_name
         self.settings = server_data_obj
+
+        self.check_server_version()  # Check update relies on information from self.settings.
+        # Running it after instead of during init function
 
         self.record_server_stats()
 
@@ -518,32 +529,6 @@ class ServerInstance:
         logger.info(
             f"Starting server in {self.server_path} with command: {self.server_command}"
         )
-
-        # checks to make sure file is openable (downloaded) and exists.
-        try:
-            with open(
-                os.path.join(
-                    self.server_path,
-                    HelperServers.get_server_data_by_id(self.server_id)["executable"],
-                ),
-                "r",
-                encoding="utf-8",
-            ):
-                # Can open the file
-                pass
-
-        except:
-            if user_id:
-                WebSocketManager().broadcast_user(
-                    user_id,
-                    "send_error",
-                    {
-                        "error": self.helper.translation.translate(
-                            "error", "not-downloaded", user_lang
-                        )
-                    },
-                )
-            return
 
         if (
             not Helpers.is_os_windows()
@@ -1297,11 +1282,12 @@ class ServerInstance:
 
         restore_thread.start()
 
-    def server_backup_threader(self, backup_id, update=False):
+    def server_backup_threader(self, backup_id=None, update=False):
+        backup_config = self.get_backup_config(backup_id)
         # Check to see if we're already backing up
-        if self.check_backup_by_id(backup_id):
+        if self.check_backup_by_id(backup_config["backup_id"]):
             return False
-        backup_config = HelpersManagement.get_backup_config(backup_id)
+
         if backup_config["before"]:
             logger.debug(
                 "Found running server and send command option. Sending command"
@@ -1325,7 +1311,7 @@ class ServerInstance:
             target=self.backup_server,
             daemon=True,
             name=f"backup_{backup_config['backup_id']}",
-            args=[backup_id],
+            args=[backup_config["backup_id"]],
         )
         logger.info(
             f"Starting Backup Thread for server {self.settings['server_name']}."
@@ -1359,17 +1345,6 @@ class ServerInstance:
             )
         time.sleep(3)
 
-        # Get the backup config
-        if not backup_id:
-            logger.error("No backup ID provided. Exiting backup")
-            last_failed = self.last_backup_status()
-            if last_failed:
-                last_backup_status = "❌"
-                reason = "No backup ID provided"
-                return {
-                    "backup_status": last_backup_status,
-                    "backup_error": reason,
-                }
         conf = HelpersManagement.get_backup_config(backup_id)
         # Adjust the location to include the backup ID for destination.
         backup_location = os.path.join(conf["backup_location"], conf["backup_id"])
@@ -1704,8 +1679,57 @@ class ServerInstance:
                 )
             logger.error("Executable download failed.")
             self.stats_helper.set_update(False)
+        self.check_server_version()  # Check to make sure the update was
+        # successful and that we match remote
         for user in server_users:
-            WebSocketManager().broadcast_user(user, "remove_spinner", {})
+            WebSocketManager().broadcast_user(
+                user,
+                "remove_spinner",
+                {"server_id": self.server_id},
+            )
+
+    def check_server_version(self):
+        if not self.settings.get("update_watcher"):
+            logger.debug("User has update watcher turned off. Killing out of function")
+            self.update_available = False
+            return
+        current_hash = self.helper.crypto_helper.calculate_file_hash_sha256(
+            str(
+                Path(
+                    str(self.settings.get("path")),
+                    str(self.settings.get("executable")),
+                )
+            )
+        )
+        url_pattern = (
+            r"^https:\/\/(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}"
+            r"(\/[a-zA-Z0-9-._~:/?#\[\]@!$&'()*+,;=]*)?$"
+        )
+        try:  # Get hash from Big Bucket remote
+            if re.match(
+                url_pattern,
+                str(self.server_object.executable_update_url),
+            ):
+                response = requests.get(
+                    f"{self.server_object.executable_update_url}.sha256", timeout=1
+                )
+            else:
+                self.update_available = False
+                return logger.error(
+                    "Server version check failed. Invalid url: %s",
+                    self.server_object.executable_update_url,
+                )
+        except TimeoutError as why:
+            self.update_available = False
+            return logger.error("Could not capture remote URL hash with error %s", why)
+        remote_hash = None
+        if response.status_code == 200:
+            remote_hash = response.text
+
+        if remote_hash != current_hash:  # Compare hashes
+            self.update_available = True
+        else:
+            self.update_available = False
 
     def start_dir_calc_task(self):
         server_dt = HelperServers.get_server_data_by_id(self.server_id)
@@ -1817,6 +1841,11 @@ class ServerInstance:
                 Console.debug(f"Backup with id {backup_id} already running!")
                 return True
         return False
+
+    def get_backup_config(self, backup_id) -> dict:
+        if not backup_id:
+            return HelpersManagement.get_default_server_backup(self.server_id)
+        return HelpersManagement.get_backup_config(backup_id)
 
     def get_servers_stats(self):
         server_type = HelperServers.get_server_type_by_id(self.server_id)

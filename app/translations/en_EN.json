@@ -240,8 +240,7 @@
         "migration": "Crafty's main server storage is being migrated to a new location. All server starts have been suspended during this time. Please wait while we finish this migration",
         "no-file": "We can't seem to locate the requested file. Double-check the path. Does Crafty have proper permissions?",
         "noInternet": "Crafty is having trouble accessing the internet. Server Creation has been disabled. Please check your internet connection and refresh this page.",
-        "noJava": "Server {} failed to start with error: We have detected Java is not installed. Please install Java, then start the server.",
-        "not-downloaded": "We can't seem to find your executable file. Has it finished downloading? Are the permissions set to executable?",
+        "noJava": "Server {} failed to start with error code: We have detected Java is not installed. Please install java then start the server.",
         "portReminder": "We have detected this is the first time {} has been run. Make sure to forward port {} through your router/firewall to make this remotely accessible from the internet.",
         "privMsg": "and the ",
         "return": "Return to Dashboard",
@@ -500,7 +499,7 @@
         "serverAutostartDelayDesc": "Delay before auto-starting (If enabled below)",
         "serverCrashDetection": "Server Crash Detection",
         "serverExecutable": "Server Executable",
-        "serverExecutableDesc": "The server's executable file",
+        "serverExecutableDesc": "The executable file you call in your server execution command. This is the file we will update.",
         "serverExecutionCommand": "Server Execution Command",
         "serverExecutionCommandDesc": "What will be launched in a hidden terminal",
         "serverIP": "Server IP",
@@ -522,7 +521,7 @@
         "stopBeforeDeleting": "Please stop the server before deleting it",
         "timeoutExplain1": "How long Crafty will wait for your server to shutdown after executing the",
         "timeoutExplain2": "command before it forces the process down.",
-        "update": "Update Executable",
+        "update": "Update Server",
         "yesDelete": "Yes, delete",
         "yesDeleteFiles": "Yes, delete files"
     },
@@ -589,6 +588,7 @@
         "operationStatus": "File Operation Status",
         "options": "Options",
         "overwrite": "Overwrite changes on server",
+        "permissions": "Permissions",
         "rename": "Rename",
         "renameItemQuestion": "What should the new name be?",
         "repull": "Load up to date file from server (All local changes will be lost)",
@@ -705,6 +705,12 @@
         "stop": "Stop",
         "stopScroll": "Stop Auto Scrolling",
         "updating": "Updating..."
+    },
+    "serverUpdate": {
+        "monitorUpdate": "Alert On New Version",
+        "newVersion": "New Version Available",
+        "updateCtr": "Update Center",
+        "upToDate": "Up To Date"
     },
     "serverWizard": {
         "absoluteServerPath": "Absolute path to your server",
