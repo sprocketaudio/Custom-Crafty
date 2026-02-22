@@ -150,8 +150,6 @@ class SteamCMD:
                 f"Failed to install, check error code {e.returncode}"
             ) from e
 
-        return
-
     def login(self, uname: str = None, passw: str = None):
         """
         Login function in order to do a persistent login on the steam servers.

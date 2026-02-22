@@ -115,10 +115,8 @@ class ImportHelpers:
         download_thread.start()
 
     def create_steam_server(self, app_id, server_id, server_dir, server_exe):
-        # TODO: what is the server exe called @zedifus
-        # @pretzel As we are not able to use steamcmd to launch game it
-        # is not possible to be populate as we dont know the executable.
-        server_exe = "game.exe"
+        if not server_exe:
+            server_exe = "game.exe"  # replace with actual exe eventually
 
         # Initiate SteamCMD & game installing status.
         ServersController.set_import(server_id)
@@ -141,9 +139,9 @@ class ImportHelpers:
         self.steam.app_update(app_id, gamefiles_path)
 
         # Set the server execuion command. TODO brainstorm how to approach.
-        full_jar_path = os.path.join(steamcmd_path, server_exe)
+        full_exe_path = os.path.join(steamcmd_path, server_exe)
         if Helpers.is_os_windows():
-            server_command = f'"{full_jar_path}"'  # TODO why called jar
+            server_command = f'"{full_exe_path}"'
         else:
             server_command = f"./{server_exe}"
         logger.debug("command: " + server_command)

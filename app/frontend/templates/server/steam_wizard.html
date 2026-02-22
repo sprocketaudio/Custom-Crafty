@@ -88,14 +88,14 @@
                 <hr>
                 <script>
                   function searchBar() {
-                    var input, filter, select, options, a, i, txtValue;
+                    var input, filter, select, options, i, txtValue;
                     input = document.getElementById("search_bar");
                     filter = input.value.toUpperCase();
                     select = document.getElementById("steam_server");
                     options = select.getElementsByTagName("option");
                     for (i = 0; i < options.length; i++) {
                       txtValue = options[i].innerText;
-                      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                      if (txtValue.toUpperCase().includes(filter) > -1) {
                         options[i].style.display = "";
                       } else {
                         options[i].style.display = "none";
@@ -395,7 +395,7 @@
     });
     let responseData = await res.json();
     if (responseData.status === "ok") {
-      window.location.href = '/panel/dashboard';
+      globalThis.location.href = '/panel/dashboard';
     } else {
 
       bootbox.alert({
@@ -521,25 +521,6 @@
     bootbox.alert({
       title: importing ? '{% raw translate("serverWizard", "importing", data["lang"]) %}' : '{% raw translate("serverWizard", "downloading", data["lang"]) %}',
       message: '<i class="fas fa-cloud-download"></i> {% raw translate("serverWizard", "bePatient", data["lang"]) %}',
-    });
-  }
-
-  function refreshCache() {
-    var token = getCookie("_xsrf")
-    document.getElementById("refresh-cache").classList.add("fa-spin")
-    $.ajax({
-      type: "POST",
-      headers: { 'X-XSRFToken': token },
-      url: '/ajax/jar_cache',
-      success: function () {
-        document.getElementById("refresh-cache").classList.remove("fa-sync");
-        document.getElementById("refresh-cache").classList.remove("fa-spin");
-        document.getElementById("refresh-cache").classList.add("fa-check");
-
-        setTimeout(function () {
-          location.reload();
-        }, 2000);
-      },
     });
   }
 
