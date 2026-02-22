@@ -13,6 +13,7 @@ TBD
 ### Tweaks
 - Add Hytale Port Ranges to Docker related stack templates & documentation ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/965))
 - File Browser Permissions Indicators ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/974))
+- Add update center and compartmentalize big bucket ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/817))
 ### Lang
 TBD
 <br><br>
