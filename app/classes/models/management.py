@@ -141,18 +141,21 @@ class HelpersManagement:
     #                                   Audit_Log Methods
     # **********************************************************************************
 
-    def add_to_audit_log(self, user_id, log_msg, server_id=None, source_ip=None):
+    def add_to_audit_log(
+        self, user_id, log_msg, server_id=None, source_ip=None, notify=True
+    ):
         logger.debug(f"Adding to audit log User:{user_id} - Message: {log_msg} ")
         user_data = HelperUsers.get_user(user_id)
 
         audit_msg = f"{str(user_data['username']).capitalize()} {log_msg}"
 
-        server_users = PermissionsServers.get_server_user_list(server_id)
-        for user in server_users:
-            try:
-                WebSocketManager().broadcast_user(user, "notification", audit_msg)
-            except Exception as e:
-                logger.error(f"Error broadcasting to user {user} - {e}")
+        if notify:
+            server_users = PermissionsServers.get_server_user_list(server_id)
+            for user in server_users:
+                try:
+                    WebSocketManager().broadcast_user(user, "notification", audit_msg)
+                except Exception as e:
+                    logger.error(f"Error broadcasting to user {user} - {e}")
         auth_logger.info(
             str(log_msg),
             extra={

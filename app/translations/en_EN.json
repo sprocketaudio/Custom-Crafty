@@ -72,7 +72,8 @@
         "superMFA": "Require superusers to enable MFA",
         "virtual_terminal_lines": "How many lines we should allow in your server terminal buffer",
         "enable_passkey_auth": "Enable passkey (WebAuthn) authentication",
-        "passkey_rp_name": "Passkey relying party name (displayed in authenticator prompts)"
+        "passkey_rp_name": "Passkey relying party name (displayed in authenticator prompts)",
+        "silent_notif_fields": "User fields that log changes silently (no notification popup)"
     },
     "credits": {
         "developmentTeam": "Development Team",
@@ -121,6 +122,7 @@
         "cannotSeeOnMobile2": "Try scrolling the table sideways.",
         "clone": "Clone",
         "cloneConfirm": "Are you sure you would like to clone this server? This process may take a while.",
+        "columnSettings": "Column Settings",
         "cpuCores": "CPU Cores",
         "cpuCurFreq": "CPU Current Clock",
         "cpuMaxFreq": "CPU Maximum Clock",
@@ -142,9 +144,11 @@
         "offline": "Offline",
         "online": "Online",
         "players": "Players",
+        "port": "Port",
         "restart": "Restart",
         "sendingCommand": "Sending your command",
         "server": "Server",
+        "serverIcon": "Server Icon",
         "servers": "Servers",
         "size": "Server Dir Size",
         "start": "Start",

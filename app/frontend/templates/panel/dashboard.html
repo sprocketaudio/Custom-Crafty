@@ -178,22 +178,33 @@
           {% if len(data['servers']) > 0 or len(data['failed_servers']) > 0 %}
           <!-- View for Large screen -->
           <div class="table-responsive d-none d-sm-block">
+            <style id="column-visibility">
+              {% set all_columns = ['server', 'serverIcon', 'actions', 'cpuUsage', 'memUsage', 'size', 'players', 'port', 'version', 'status'] %}
+              {% for col in all_columns %}
+                {% if col not in data['dashboard_columns'] %}
+              #servers_table .col-{{ col }} { display: none; }
+                {% end %}
+              {% end %}
+            </style>
             <table id="servers_table" class="table table-hover">
               <thead>
                 <tr class="rounded" id="first" draggable="false">
-                  <th draggable="false">{{ translate('dashboard', 'server', data['lang']) }}</th>
-                  <th draggable="false">{{ translate('dashboard', 'actions', data['lang']) }}</th>
-                  <th draggable="false">{{ translate('dashboard', 'cpuUsage', data['lang']) }}</th>
-                  <th draggable="false">{{ translate('dashboard', 'memUsage', data['lang']) }}</th>
-                  <th draggable="false">{{ translate('dashboard', 'size', data['lang']) }}</th>
-                  <th draggable="false">{{ translate('dashboard', 'players', data['lang']) }}</th>
-                  <th draggable="false">{{ translate('dashboard', 'status', data['lang']) }}</th>
+                  <th class="col-server" draggable="false">{{ translate('dashboard', 'server', data['lang']) }}</th>
+                  <th class="col-serverIcon" draggable="false">{{ translate('dashboard', 'serverIcon', data['lang']) }}</th>
+                  <th class="col-actions" draggable="false">{{ translate('dashboard', 'actions', data['lang']) }}</th>
+                  <th class="col-cpuUsage" draggable="false">{{ translate('dashboard', 'cpuUsage', data['lang']) }}</th>
+                  <th class="col-memUsage" draggable="false">{{ translate('dashboard', 'memUsage', data['lang']) }}</th>
+                  <th class="col-size" draggable="false">{{ translate('dashboard', 'size', data['lang']) }}</th>
+                  <th class="col-players" draggable="false">{{ translate('dashboard', 'players', data['lang']) }}</th>
+                  <th class="col-port" draggable="false">{{ translate('dashboard', 'port', data['lang']) }}</th>
+                  <th class="col-version" draggable="false">{{ translate('dashboard', 'version', data['lang']) }}</th>
+                  <th class="col-status" draggable="false">{{ translate('dashboard', 'status', data['lang']) }}</th>
                 </tr>
               </thead>
               <tbody>
                 {% for server in data['servers'] %}
                 <tr id="{{server['server_data']['server_id']}}" draggable="true">
-                  <td draggable="false">
+                  <td class="col-server" draggable="false">
                     <i class="ph-fill ph-hard-drives"></i>
                     {% if server['alert'] %}
                     <a class="server-alert" draggable="false"
@@ -212,7 +223,14 @@
                     </a>
                     {% end %}
                   </td>
-                  <td draggable="false" id="controls{{server['server_data']['server_id']}}" class="actions_serverlist">
+                  <td class="col-serverIcon" draggable="false" id="server_icon_{{server['server_data']['server_id']}}">
+                    {% if server['stats'].get('icon') and server['stats']['icon'] not in ('', 'False', 'None') %}
+                    <img src="data:image/png;base64,{{ server['stats']['icon'] }}" alt="Server Icon" style="width: 32px; height: 32px;" />
+                    {% else %}
+                    <img src="/static/assets/images/pack.png" alt="Server Icon" style="width: 32px; height: 32px;" />
+                    {% end %}
+                  </td>
+                  <td draggable="false" id="controls{{server['server_data']['server_id']}}" class="col-actions actions_serverlist">
                     {% if server['user_command_permission'] %}
                     {% if server['stats']['importing'] and server['stats']['running'] %}
                     <!-- WHAT HAPPENED HERE -->
@@ -264,7 +282,7 @@
                     {% end %}
                     {% end %}
                   </td>
-                  <td draggable="false" id="server_cpu_{{server['server_data']['server_id']}}">
+                  <td class="col-cpuUsage" draggable="false" id="server_cpu_{{server['server_data']['server_id']}}">
                     <div class="progress mb-1" data-toggle="tooltip" data-placement="top"
                       title="{{server['stats']['cpu']}}">
                       <div class="progress-bar
@@ -280,7 +298,7 @@
                     </div>
                     {{server['stats']['cpu']}}%
                   </td>
-                  <td draggable="false" id="server_mem_{{server['server_data']['server_id']}}">
+                  <td class="col-memUsage" draggable="false" id="server_mem_{{server['server_data']['server_id']}}">
                     <div class="progress mb-1" data-toggle="tooltip" data-placement="top"
                       title="{{server['stats']['mem']}}">
                       <div class="progress-bar
@@ -302,10 +320,10 @@
                     {{server['stats']['mem']}}
                     {% end %}
                   </td>
-                  <td draggable="false" id="server_world_{{server['server_data']['server_id']}}">
+                  <td class="col-size" draggable="false" id="server_world_{{server['server_data']['server_id']}}">
                     {{ server['stats']['world_size'] }}
                   </td>
-                  <td draggable="false">
+                  <td class="col-players" draggable="false">
                     {% if server['stats']['int_ping_results'] %}
                     <span id="server_desc_{{server['server_data']['server_id']}}">
                       {{ server['stats']['online'] }} / {{ server['stats']['max'] }} {{ translate('dashboard', 'max',
@@ -317,9 +335,14 @@
                       data-players="{{ server['stats']['online']}}" data-max="{{ server['stats']['max'] }}"
                       data-count="{{server['server_data']['count_players']}}"></span>
                   </td>
-                  <td draggable="false">
-                    <div id="server_running_status_{{server['server_data']['server_id']}}" data-toggle="tooltip" title="{{
-                        server['server_data']['server_port'] }}">
+                  <td class="col-port" draggable="false" id="server_port_{{server['server_data']['server_id']}}">
+                    {{ server['stats'].get('game_port', server['stats']['server_port']) }}
+                  </td>
+                  <td class="col-version" draggable="false" id="server_version_{{server['server_data']['server_id']}}">
+                    {{ server['stats']['version'] }}
+                  </td>
+                  <td class="col-status" draggable="false">
+                    <div id="server_running_status_{{server['server_data']['server_id']}}">
                       {% if server['stats']['running'] %}
                       <span class="text-success"><i class="ph ph-cell-signal-full"></i> {{ translate('dashboard', 'online',
                         data['lang']) }}</span>
@@ -337,15 +360,18 @@
           </div>
           {% for server in data['failed_servers'] %}
           <tr id="{{server['server_id']}}" draggable="false">
-            <td class="text-warning"><i class="ph-fill ph-hard-drives"></i>&nbsp;<a class="text-warning"
+            <td class="col-server text-warning"><i class="ph-fill ph-hard-drives"></i>&nbsp;<a class="text-warning"
                 href="/panel/server_detail?id={{server['server_id']}}&subpage=config">{{server['server_name']}}</a>
             </td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><i class="ph-fill ph-cloud"></i>&nbsp;Unloaded</td>
+            <td class="col-serverIcon"></td>
+            <td class="col-actions"></td>
+            <td class="col-cpuUsage"></td>
+            <td class="col-memUsage"></td>
+            <td class="col-size"></td>
+            <td class="col-players"></td>
+            <td class="col-port"></td>
+            <td class="col-version"></td>
+            <td class="col-status"><i class="ph-fill ph-cloud"></i>&nbsp;Unloaded</td>
           </tr>
           {% end %}
           </tbody>
@@ -557,6 +583,21 @@
                       </div>
                     </div>
                   </div>
+                  <br />
+                  <div class="row">
+                    <div class="col-6">
+                      <h6>{{ translate('dashboard', 'port', data['lang']) }}</h6>
+                      <div draggable="false" id="m_server_port_{{server['server_data']['server_id']}}">
+                        {{ server['stats'].get('game_port', server['stats']['server_port']) }}
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <h6>{{ translate('dashboard', 'version', data['lang']) }}</h6>
+                      <div draggable="false" id="m_server_version_{{server['server_data']['server_id']}}">
+                        {{ server['stats']['version'] }}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -688,6 +729,9 @@
     server_cpu = document.getElementById('server_cpu_' + server.id);
     server_mem = document.getElementById('server_mem_' + server.id);
     server_world = document.getElementById('server_world_' + server.id);
+    server_port = document.getElementById('server_port_' + server.id);
+    server_icon = document.getElementById('server_icon_' + server.id);
+    server_version = document.getElementById('server_version_' + server.id);
     server_desc = document.getElementById('server_desc_' + server.id);
     server_online_status = document.getElementById('server_running_status_' + server.id);
     server_players = document.getElementById('server_players_' + server.id);
@@ -697,6 +741,8 @@
     m_server_cpu = document.getElementById('m_server_cpu_' + server.id);
     m_server_mem = document.getElementById('m_server_mem_' + server.id);
     m_server_world = document.getElementById('m_server_world_' + server.id);
+    m_server_port = document.getElementById('m_server_port_' + server.id);
+    m_server_version = document.getElementById('m_server_version_' + server.id);
     m_server_desc = document.getElementById('m_server_desc_' + server.id);
     m_server_online_status = document.getElementById('m_server_running_status_' + server.id);
 
@@ -736,6 +782,22 @@
     server_world.innerHTML = server.world_size
     m_server_world.innerHTML = server.world_size
 
+    /* Update Port */
+    if (server_port) {
+      server_port.innerHTML = server.game_port || server.server_port;
+    }
+    if (m_server_port) {
+      m_server_port.innerHTML = server.game_port || server.server_port;
+    }
+
+    /* Update Version */
+    if (server_version) {
+      server_version.innerHTML = server.version;
+    }
+    if (m_server_version) {
+      m_server_version.innerHTML = server.version;
+    }
+
     /* Update Server Infos */
     if (server.int_ping_results) {
       /* Update Players */
@@ -774,6 +836,15 @@
       }
       server_desc.innerHTML = server_infos;
       m_server_desc.innerHTML = m_server_infos;
+    }
+
+    /* Update Icon */
+    if (server_icon) {
+      if (server.icon && server.icon !== 'False' && server.icon !== 'None') {
+        server_icon.innerHTML = '<img src="data:image/png;base64,' + server.icon + '" alt="Server Icon" style="width: 32px; height: 32px;" />';
+      } else {
+        server_icon.innerHTML = '<img src="/static/assets/images/pack.png" alt="Server Icon" style="width: 32px; height: 32px;" />';
+      }
     }
 
     /* Update Online Status */
@@ -979,6 +1050,82 @@
     cursor: grab !important;
     padding: 2px;
   }
+
+  .table-responsive {
+    padding-bottom: 8px;
+  }
+
+  @media (max-width: 992px) {
+    #servers_table {
+      min-width: 750px;
+    }
+  }
+
+
+  .column-settings {
+    position: relative;
+    display: inline-block;
+    margin-left: 8px;
+  }
+
+  .column-settings-btn {
+    cursor: pointer;
+    padding: 4px 8px;
+    color: var(--base-text, #6c757d);
+    font-size: 1rem;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+  }
+
+  .column-settings-btn:hover {
+    opacity: 1;
+  }
+
+  .column-settings-dropdown {
+    display: none;
+    position: absolute;
+    background: var(--dropdown-bg, #222437);
+    border: 1px solid var(--outline, #383e5d);
+    border-radius: 4px;
+    padding: 6px 0;
+    min-width: 190px;
+    max-height: 60vh;
+    overflow-y: auto;
+    z-index: 1050;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-size: 0.875rem;
+  }
+
+  .column-settings-dropdown.show {
+    display: block;
+  }
+
+  .column-settings-dropdown label {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 1rem;
+    margin: 0;
+    cursor: pointer;
+    white-space: nowrap;
+    font-weight: normal;
+    color: var(--base-text, #b9c0d3);
+    transition: background-color 0.1s;
+  }
+
+  .column-settings-dropdown label:hover {
+    background-color: var(--card-banner-bg, #282a40);
+  }
+
+  .column-settings-dropdown label.disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .column-settings-dropdown input[type="checkbox"] {
+    margin-right: 10px;
+    accent-color: var(--primary, #2196f3);
+  }
 </style>
 <script>
 
@@ -988,11 +1135,127 @@
       "ordering": false, // false to disable sorting (or any other option)
       "paging": false
     });
+    // DataTables sets overflow:hidden on the wrapper after init completes.
+    // Defer override so table-responsive can provide horizontal scrolling.
+    setTimeout(function() {
+      $('.table-responsive .dataTables_wrapper').css('overflow', 'visible');
+    }, 0);
     const first = document.querySelector('#first')
     first !== null && first.setAttribute('draggable', false);
     $('.dataTables_length').addClass('bs-select');
   });
   /* Search Bar End */
+
+  /* Column Settings Dropdown */
+  $(document).ready(function() {
+    const columnDefs = [
+      { key: 'server', label: "{{ translate('dashboard', 'server', data['lang']) }}", locked: true },
+      { key: 'serverIcon', label: "{{ translate('dashboard', 'serverIcon', data['lang']) }}", locked: false },
+      { key: 'actions', label: "{{ translate('dashboard', 'actions', data['lang']) }}", locked: false },
+      { key: 'cpuUsage', label: "{{ translate('dashboard', 'cpuUsage', data['lang']) }}", locked: false },
+      { key: 'memUsage', label: "{{ translate('dashboard', 'memUsage', data['lang']) }}", locked: false },
+      { key: 'size', label: "{{ translate('dashboard', 'size', data['lang']) }}", locked: false },
+      { key: 'players', label: "{{ translate('dashboard', 'players', data['lang']) }}", locked: false },
+      { key: 'port', label: "{{ translate('dashboard', 'port', data['lang']) }}", locked: false },
+      { key: 'version', label: "{{ translate('dashboard', 'version', data['lang']) }}", locked: false },
+      { key: 'status', label: "{{ translate('dashboard', 'status', data['lang']) }}", locked: true },
+    ];
+
+    const visibleColumns = new Set({% raw json_encode(data['dashboard_columns']) %});
+
+    // Build dropdown HTML
+    let dropdownHtml = '<div class="column-settings">' +
+      '<span class="column-settings-btn" title="{{ translate("dashboard", "columnSettings", data["lang"]) }}">' +
+      '<i class="ph-fill ph-gear"></i></span>' +
+      '<div class="column-settings-dropdown">';
+
+    columnDefs.forEach(function(col) {
+      const checked = visibleColumns.has(col.key) ? 'checked' : '';
+      const disabled = col.locked ? 'disabled' : '';
+      const labelClass = col.locked ? ' class="disabled"' : '';
+      dropdownHtml += '<label' + labelClass + '><input type="checkbox" ' +
+        'data-column="' + col.key + '" ' +
+        checked + ' ' + disabled + '> ' + col.label + '</label>';
+    });
+
+    dropdownHtml += '</div></div>';
+
+    // Insert gear button inline with search; move dropdown to body so it
+    // escapes any overflow clipping from table-responsive / DataTables wrapper.
+    $('.dataTables_filter').append(dropdownHtml);
+    var $dropdown = $('.column-settings-dropdown').detach();
+    $('body').append($dropdown);
+
+    // Position dropdown below gear icon (absolute, accounts for scroll)
+    function positionDropdown() {
+      var btn = document.querySelector('.column-settings-btn');
+      if (!btn) return;
+      var rect = btn.getBoundingClientRect();
+      $dropdown.css({
+        top: rect.bottom + window.scrollY + 4 + 'px',
+        right: (window.innerWidth - rect.right) + 'px',
+        left: ''
+      });
+    }
+
+    // Toggle dropdown
+    $(document).on('click', '.column-settings-btn', function(e) {
+      e.stopPropagation();
+      if ($dropdown.hasClass('show')) {
+        $dropdown.removeClass('show');
+      } else {
+        positionDropdown();
+        $dropdown.addClass('show');
+      }
+    });
+
+    // Close on click outside
+    $(document).on('click', function() {
+      $dropdown.removeClass('show');
+    });
+
+    $dropdown.on('click', function(e) {
+      e.stopPropagation();
+    });
+
+    // Handle checkbox toggle
+    $(document).on('change', '.column-settings-dropdown input[type="checkbox"]', function() {
+      const col = $(this).data('column');
+      const visible = $(this).is(':checked');
+      const styleEl = document.getElementById('column-visibility');
+
+      if (visible) {
+        visibleColumns.add(col);
+      } else {
+        visibleColumns.delete(col);
+      }
+
+      // Rebuild style rules
+      let css = '';
+      columnDefs.forEach(function(c) {
+        if (!visibleColumns.has(c.key)) {
+          css += '#servers_table .col-' + c.key + ' { display: none; }\n';
+        }
+      });
+      styleEl.textContent = css;
+
+      // Save to server
+      const token = getCookie("_xsrf");
+      fetch('/api/v2/users/@me', {
+        method: 'PATCH',
+        headers: { 'X-XSRFToken': token },
+        body: JSON.stringify({
+          dashboard_columns: Array.from(visibleColumns).join(','),
+        }),
+      }).then(function(res) {
+        return res.json();
+      }).then(function(data) {
+        if (data.status !== "ok") {
+          bootbox.alert({ title: data.error, message: data.error_data });
+        }
+      });
+    });
+  });
 
   $(document).on("mousedown keyup click", function (event) {
     const value = $('.dataTables_filter input').val();
