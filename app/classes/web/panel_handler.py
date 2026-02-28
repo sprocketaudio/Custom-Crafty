@@ -455,6 +455,15 @@ class PanelHandler(BaseHandler):
 
             # set user server order
             user_order = self.controller.users.get_user_by_id(exec_user["user_id"])
+            dashboard_cols_raw = user_order.get(
+                "dashboard_columns",
+                "server,actions,cpuUsage,memUsage,size,players,status",
+            )
+            if not dashboard_cols_raw or not dashboard_cols_raw.strip():
+                dashboard_cols_raw = (
+                    "server,actions,cpuUsage,memUsage,size,players,status"
+                )
+            page_data["dashboard_columns"] = dashboard_cols_raw.split(",")
             user_order = user_order["server_order"].split(",")
             page_servers = []
             server_ids = []

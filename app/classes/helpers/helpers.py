@@ -77,6 +77,7 @@ MASTER_CONFIG = {
     "enable_passkey_auth": False,
     "passkey_rp_name": "Crafty Controller",
     "experimental": False,
+    "silent_notif_fields": ["dashboard_columns", "server_order"],
     "time_range_presets": [
         {"hours": 1, "label": "Last Hour"},
         {"hours": 3, "label": "Last 3 Hours"},
@@ -124,6 +125,7 @@ CONFIG_CATEGORIES = {
         "virtual_terminal_lines",
         "keywords",
         "general_user_log_access",
+        "silent_notif_fields",
     ],
     "monitoring": [
         "monitored_mounts",
