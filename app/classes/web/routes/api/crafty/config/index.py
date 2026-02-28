@@ -151,6 +151,42 @@ config_json_schema = {
             "error": "typeBool",
             "fill": True,
         },
+        "time_range_presets": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "hours": {"type": "integer", "minimum": 1},
+                    "label": {"type": "string", "minLength": 1},
+                },
+                "required": ["hours", "label"],
+                "additionalProperties": False,
+            },
+            "minItems": 1,
+            "error": "typeList",
+            "fill": True,
+        },
+        "sampling_tiers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "max_hours": {"type": "integer", "minimum": 1},
+                    "sample_rate": {"type": "integer", "minimum": 1},
+                },
+                "required": ["max_hours", "sample_rate"],
+                "additionalProperties": False,
+            },
+            "minItems": 1,
+            "error": "typeList",
+            "fill": True,
+        },
+        "sampling_fallback_divisor": {
+            "type": "integer",
+            "minimum": 1,
+            "error": "typeInteger",
+            "fill": True,
+        },
     },
     "additionalProperties": False,
     "minProperties": 1,
