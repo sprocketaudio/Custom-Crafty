@@ -85,9 +85,9 @@
                   <label for="backup_name">{{ translate('serverBackups', 'name', data['lang']) }}
                     {% if data["backup_config"].get("default", None) %}
                     &nbsp;&nbsp; <span class="badge-pill badge-outline-warning">{{ translate('serverBackups', 'default',
-                      data['lang']) }}</span><small><button class="badge-pill badge-outline-info backup-explain"
+                      data['lang']) }}</span><small><button class="backup-explain transparent-button"
                         data-explain="{{ translate('serverBackups', 'defaultExplain', data['lang'])}}"><i
-                          class="fa-solid fa-question"></i></button></small>
+                          class="ph-duotone ph-question text-secondary"></i></button></small>
                     {% end %}
                   </label>
                   {% if data["backup_config"].get("backup_id", None) %}
@@ -203,9 +203,9 @@
                       </div>
                       <div class="modal-footer">
                         <button type="button" id="modal-cancel" class="btn btn-secondary" data-dismiss="modal"><i
-                            class="fa-solid fa-xmark"></i></button>
+                            class="ph-solid ph-x"></i></button>
                         <button type="button" id="modal-okay" data-dismiss="modal" class="btn btn-primary"><i
-                            class="fa-solid fa-thumbs-up"></i></button>
+                            class="ph-solid ph-thumbs-up"></i></button>
                       </div>
                     </div>
                   </div>
@@ -270,7 +270,8 @@
             <br>
             <br>
             <div class="card-header header-sm d-flex justify-content-between align-items-center">
-              <h4 class="card-title"><i class="ph-fill ph-hard-drives"></i> {{ translate('serverBackups', 'excludedBackups',
+              <h4 class="card-title"><i class="ph-fill ph-hard-drives"></i> {{ translate('serverBackups',
+                'excludedBackups',
                 data['lang']) }} <small class="text-muted ml-1"></small> </h4>
             </div>
             <br>
@@ -723,7 +724,6 @@
                             <input type="checkbox" class="checkBoxClass excluded" value="${dpath}" ${checked}>
                             <span id="${dpath}span" class="files-tree-title" data-path="${dpath}" data-name="${filename}" onclick="getDirView(event)">
                             <i class="text-info ph-fill ph-folder"></i>
-                            <i class="text-info ph-fill ph-folder-open"></i>
                             <strong>${filename}</strong>
                             </span>
                             </input></div><li>`
