@@ -423,6 +423,11 @@ class Controller:
         server_file = "server.jar"  # HACK: Throw this horrible default out of here
         root_create_data = data[data["create_type"] + "_create_data"]
         create_data = root_create_data[root_create_data["create_type"] + "_create_data"]
+
+        monitoring_port = 25565
+        monitoring_host = "127.0.0.1"
+        monitoring_type = "custom"
+
         if data["monitoring_type"] == "minecraft_java":
             monitoring_port = data["minecraft_java_monitoring_data"]["port"]
             monitoring_host = data["minecraft_java_monitoring_data"]["host"]
@@ -439,12 +444,6 @@ class Controller:
             monitoring_port = data["steam_cmd_monitoring_data"]["port"]
             monitoring_host = data["steam_cmd_monitoring_data"]["host"]
             monitoring_type = "steam_cmd"
-        elif data["monitoring_type"] == "none":
-            # TODO: this needs to be NUKED..
-            # There shouldn't be anything set if there is nothing to monitor
-            monitoring_port = 25565
-            monitoring_host = "127.0.0.1"
-            monitoring_type = "minecraft-java"
         if data["create_type"] == "minecraft_java":
             if root_create_data["create_type"] == "download_jar":
                 server_file = f"{create_data['type']}.jar"

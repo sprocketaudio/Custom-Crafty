@@ -14,10 +14,6 @@ case "$(uname -m)" in
   x86_64|amd64)
     printf "\033[36mWrapper | \033[32m🚂✅ SteamCMD dependencies are available in this image!\033[0m\n"
     ;;
-  aarch64|arm64)
-    printf "\033[36mWrapper | \033[33m⚠️ SteamCMD is only available on amd64/x86_64 images.\033[0m\n"
-    printf "\033[36mWrapper | \033[33m    You are running on ARM64, SteamCMD features are disabled.\033[0m\n"
-    ;;
   *)
     printf "\033[36mWrapper | \033[33m⚠️ SteamCMD is only available on amd64/x86_64 images.\033[0m\n"
     printf "\033[36mWrapper | \033[33m    Detected architecture: %s. SteamCMD features are disabled.\033[0m\n" "$(uname -m)"

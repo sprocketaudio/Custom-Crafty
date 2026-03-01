@@ -813,7 +813,8 @@ class PanelHandler(BaseHandler):
                             hours = 24  # Default to 1 day
                     except ValueError as e:
                         self.redirect(
-                            f"/panel/error?error=Type error: Time argument must be an int ({e})"
+                            "/panel/error?error=Type error: "
+                            f"Time argument must be an int ({e})"
                         )
                         return
 

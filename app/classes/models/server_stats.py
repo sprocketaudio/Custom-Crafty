@@ -266,9 +266,9 @@ class HelperServerStats:
         # Legacy fallback if no tiers provided
         if num_hours <= 6:
             return 1
-        elif num_hours <= 24:
+        if num_hours <= 24:
             return 2
-        elif num_hours <= 72:
+        if num_hours <= 72:
             return 6
         return max(1, int(num_hours // 12))
 
