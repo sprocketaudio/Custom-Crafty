@@ -596,7 +596,7 @@ class ServerInstance:
                                     logger.warning(
                                         "Path traversal detected on server {self.server_id} for env {k} value {i}, skipping"
                                     )
-                                p = str(p).replace(":", "\:")
+                                p = str(p).replace(":", "\\:")
                                 items_validated.append(p)
                             if my_env.get(key, None):
                                 if value["mode"] == "append":
