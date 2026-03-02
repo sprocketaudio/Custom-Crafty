@@ -174,7 +174,6 @@
         "internet": "Detectamos que a máquina rodando Crafty não possui conexão com a internet. Conexões de clientes ao serviço podem ser limitadas.",
         "no-file": "Não conseguimos encontrar o arquivo solicitado. Verifique o caminho do arquivo. O Crafty tem as permissões necessárias?",
         "noJava": "Servidor {} falhou ao iniciar com código de erro: Detectamos que o Java não está instalado. Por favor, instale o Java e então inicie o servidor.",
-        "not-downloaded": "Não conseguimos encontrar seu arquivo executável. O download foi concluído? As permissões estão definidas para executável?",
         "portReminder": "Detectamos que esta é a primeira vez que {} está rodando. Certifique-se de encaminhar a porta {} através do seu roteador/firewall para torná-lo acessível remotamente da internet.",
         "start-error": "Servidor {} falhou ao iniciar com código de erro: {}",
         "terribleFailure": "Que Falha terrível!"

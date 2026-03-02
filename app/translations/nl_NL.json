@@ -33,8 +33,7 @@
     },
     "base": {
         "doesNotWorkWithoutJavascript": "<strong>Warning: </strong>Crafty werkt niet naar behoren als JavaScript niet ingeschakeld is!",
-        "getMFA": "Beveilig je servers!",
-        "createMFA": "Voeg Multifactorauthenticatie toe aan je account!"
+        "getMFA": "Beveilig je servers!"
     },
     "credits": {
         "developmentTeam": "Ontwikkelingsteam",
@@ -179,7 +178,6 @@
         "internet": "We hebben gedetecteerd dat de serverhost geen internetverbinding heeft. Client connecties zijn mogelijk gelimiteerd.",
         "no-file": "We kunnen het opgevraagde bestand niet vinden. Check het pad nog eens. Heeft Crafty de juiste toestemmingen?",
         "noJava": "Server {} kon niet starten met error: We hebben gedetecteerd dat Java niet geïnstalleerd is. Installeer Java en start vervolgens de server.",
-        "not-downloaded": "We kunnen je executable-bestand niet vinden. Is het klaar met downloaden? Zijn de toestemmingen gezet op 'uitvoerbaar'?",
         "portReminder": "We zien dat dit de eerste keer is dat {} uitgevoerd wordt. Zorg dat poort {} door je router/firewall gestuurd wordt om er via het openbare internet bij te kunnen komen.",
         "start-error": "Server {} kon niet starten, error code: {}",
         "terribleFailure": "Een verschrikkelijke fout!",

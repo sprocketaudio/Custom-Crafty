@@ -33,7 +33,6 @@
     },
     "base": {
         "doesNotWorkWithoutJavascript": "<strong>Attention : </strong>Crafty ne fonctionne pas correctement si JavaScript n'est pas activé !",
-        "createMFA": "Ajoutez l’authentification multifacteur à votre compte !",
         "getMFA": "Sécurisez vos serveurs !"
     },
     "credits": {
@@ -204,7 +203,6 @@
         "no-file": "Nous n’arrivons pas à localiser le fichier demandé. Vérifiez le chemin d’accès. Crafty dispose-t-il des permissions nécessaires ?",
         "noInternet": "Crafty rencontre des difficultés pour accéder à Internet. La création de serveur a été désactivée. Veuillez vérifier votre connexion internet et actualiser cette page.",
         "noJava": "Le démarrage du serveur {} a échoué avec le code d'erreur : Nous avons détecté que Java n'est pas installé. Merci d'installer java avant de démarrer le serveur.",
-        "not-downloaded": "Nous ne parvenons pas à trouver le fichier exécutable. Est-il fini de télécharger ? Les permissions permettent elles l'exécution ?",
         "portReminder": "Nous avons détecté que c'est la première fois que {} est exécuté. Assurez-vous de transférer le port {} via votre routeur/pare-feu pour le rendre accessible à distance depuis internet.",
         "privMsg": "et le ",
         "return": "Revenir au tableau de bord",

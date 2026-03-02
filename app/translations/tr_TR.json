@@ -33,8 +33,7 @@
     },
     "base": {
         "doesNotWorkWithoutJavascript": "<strong>Uyarı: </strong>Crafty, Javascript aktifleştirilmediği zaman düzgün çalışmaz!",
-        "getMFA": "Sunucularınızı güvence altına alın!",
-        "createMFA": "Hesabınıza Çok Faktörlü Kimlik Doğrulama ekleyin!"
+        "getMFA": "Sunucularınızı güvence altına alın!"
     },
     "credits": {
         "developmentTeam": "Geliştirme Takımı",
@@ -204,7 +203,6 @@
         "no-file": "Talep edilen dosyayı bulamıyoruz. Dosya yolunu tekrar kontrol edin. Crafty'nin doğru izinleri var mı?",
         "noInternet": "Crafty internete erişimde sorun yaşıyor. Sunucu oluşturma devre dışı bırakıldı. Lütfen internet bağlantınızı kontrol edin ve bu sayfayı yenileyin.",
         "noJava": "{} sunucusu başlamatılamadı. Hata: Java'nın yüklü olmadığını tespit ettik. Lütfen Java'yı yükleyin ve ardından sunucuyu başlatın.",
-        "not-downloaded": "Çalıştırılabilir dosyanızı bulamıyoruz. İndirme işlemi tamamlandı mı? İzinler çalıştırılabilir olarak ayarlandı mı?",
         "portReminder": "{} ilk kez çalıştırılıyor olduğunu tespit ettik. Bunu internet üzerinden uzaktan erişilebilir kılmak için {} bağlantı noktasını yönlendiriciniz/güvenlik duvarınız üzerinden ilettiğinizden emin olun.",
         "privMsg": "ve ",
         "return": "Arayüze Geri Dön",
