@@ -33,7 +33,6 @@
     },
     "base": {
         "doesNotWorkWithoutJavascript": "<strong>警告：</strong>Crafty 无法在没有 JavaScript 的情况下使用！",
-        "createMFA": "为您的账号添加多因素验证！",
         "getMFA": "保护您的服务器！"
     },
     "credits": {
@@ -204,7 +203,6 @@
         "no-file": "我们似乎找不到请求的文件。请再次检查路径。Crafty 是否拥有了正确的权限？",
         "noInternet": "Crafty 无法访问网络。服务器创建已被禁用。请检查您的网络连接并刷新此页面。",
         "noJava": "服务器 {} 启动失败，并输出了以下错误：我们检测到 Java 未安装。请先安装 Java 然后再启动服务器。",
-        "not-downloaded": "我们似乎找不到您的可执行文件。它下载完成了吗？可执行文件的权限设置正确了吗？",
         "portReminder": "我们检测到这是你首次运行 {}。请确保从您的路由器/防火墙转发 {} 端口，以使程序可以从公网远程访问。",
         "privMsg": "以及 ",
         "return": "返回仪表板",
