@@ -105,7 +105,6 @@ class HelperServerStats:
             logger.warning(
                 f"Error try to look for the db_stats files for server : {ex}"
             )
-            return None
 
     def select_database(self):
         try:
@@ -126,7 +125,6 @@ class HelperServerStats:
             logger.warning(
                 f"Error try to look for the db_stats files for server : {ex}"
             )
-            return None
 
     def get_all_servers_stats(self):
         self.database.connect(reuse_if_open=True)
@@ -344,7 +342,6 @@ class HelperServerStats:
         except DoesNotExist:
             # No metrics exist for this server yet
             self.database.close()
-            return None
 
     def get_server_stats(self):
         self.database.connect(reuse_if_open=True)
