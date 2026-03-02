@@ -235,12 +235,12 @@
                     {% if server['stats']['importing'] and server['stats']['running'] %}
                     <!-- WHAT HAPPENED HERE -->
                     <a data-id="{{server['server_data']['server_id']}}" class=""><i
-                        class="ph ph-spinner-gap"></i>&nbsp;{{ translate('serverTerm', 'installing',
+                        class="ph ph-spinner-gap ph-spin"></i>&nbsp;{{ translate('serverTerm', 'installing',
                       data['lang']) }}</i></a>
                     {% elif server['stats']['updating']%}
                     <!-- WHAT HAPPENED HERE -->
                     <a data-id="{{server['server_data']['server_id']}}" class=""><i
-                        class="ph ph-spinner-gap"></i>&nbsp;{{ translate('serverTerm', 'updating',
+                        class="ph ph-spinner-gap ph-spin"></i>&nbsp;{{ translate('serverTerm', 'updating',
                       data['lang']) }}</i></a>
                     {% elif server['stats']['waiting_start']%}
                     <!-- WHAT HAPPENED HERE -->
@@ -248,7 +248,7 @@
                       translate('dashboard', 'delay-explained' , data['lang'])}}">{{ translate('dashboard', 'starting',
                       data['lang']) }}</i></a>
                     {% elif server['stats']['importing']%}
-                    <a data-id="{{server['server_data']['server_id']}}" class=""><i class="ph ph-spinner-gap"></i>
+                    <a data-id="{{server['server_data']['server_id']}}" class=""><i class="ph ph-spinner-gap ph-spin"></i>
                       {{ translate('serverTerm', 'importing',
                       data['lang']) }}</a>
                     {% elif server['stats']['running'] %}
@@ -480,7 +480,7 @@
                         <div class="row">
                           <div class="col-12 px-0">
                             <a data-id="{{server['server_data']['server_id']}}" class="btn btn-link"><i
-                                class="ph ph-spinner-gap"></i>
+                                class="ph ph-spinner-gap ph-spin"></i>
                               {{ translate('serverTerm', 'importing', data['lang']) }}</a>
                           </div>
                         </div>
@@ -879,7 +879,7 @@
       bootbox.alert({
         backdrop: true,
         title: '<span class="dynamicMsg">{% raw translate("dashboard", "sendingCommand", data["lang"]) %}</span>',
-        message: '<div align="center"><i class="ph ph-spinner-gap"></i> &nbsp; {% raw translate("dashboard", "bePatientStart", data["lang"]) %} </div>'
+        message: '<div align="center"><i class="ph ph-spinner-gap ph-spin"></i> &nbsp; {% raw translate("dashboard", "bePatientStart", data["lang"]) %} </div>'
       });
       setTimeout(finishTimeout, 60000);
     });
@@ -894,7 +894,7 @@
       bootbox.alert({
         backdrop: true,
         title: '{% raw translate("dashboard", "sendingCommand", data["lang"]) %}',
-        message: '<div align="center"><i class="ph ph-spinner-gap"></i> &nbsp; {% raw translate("dashboard", "bePatientStop", data["lang"]) %} </div>'
+        message: '<div align="center"><i class="ph ph-spinner-gap ph-spin"></i> &nbsp; {% raw translate("dashboard", "bePatientStop", data["lang"]) %} </div>'
       });
     });
 
@@ -904,7 +904,7 @@
       bootbox.alert({
         backdrop: true,
         title: '{% raw translate("dashboard", "sendingCommand", data["lang"]) %}',
-        message: '<div align="center"><i class="ph ph-spinner-gap"></i> &nbsp; {% raw translate("dashboard", "bePatientRestart", data["lang"]) %} </div>'
+        message: '<div align="center"><i class="ph ph-spinner-gap ph-spin"></i> &nbsp; {% raw translate("dashboard", "bePatientRestart", data["lang"]) %} </div>'
       });
     });
     $(".kill_button").click(function () {
@@ -926,7 +926,7 @@
             send_command(server_id, "kill_server");
             let dialog = bootbox.dialog({
               title: '{% raw translate("dashboard", "killing", data["lang"]) %}',
-              message: '<p><i class="ph ph-spinner-gap"></i> Loading...</p>'
+              message: '<p><i class="ph ph-spinner-gap ph-spin"></i> Loading...</p>'
             });
           }
         }
@@ -1020,7 +1020,7 @@
             bootbox.dialog({
               backdrop: true,
               title: '{% raw translate("dashboard", "sendingCommand", data["lang"]) %}',
-              message: '<div align="center"><i class="ph ph-spinner-gap"></i> &nbsp; {% raw translate("dashboard", "bePatientClone", data["lang"]) %} </div>',
+              message: '<div align="center"><i class="ph ph-spinner-gap ph-spin"></i> &nbsp; {% raw translate("dashboard", "bePatientClone", data["lang"]) %} </div>',
               closeButton: false,
             });
           }

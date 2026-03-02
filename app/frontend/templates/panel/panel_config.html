@@ -376,7 +376,7 @@
         $("#submit-list").html("");
         $("#submit-status").html('<i class="ph-bold ph-check"></i>');
       } else {
-        $("#submit-status").html('<i class="ph ph-spinner-gap"></i>');
+        $("#submit-status").html('<i class="ph ph-spinner-gap ph-spin"></i>');
         $("#submit-list").text(message).html();
         $("#submit-list").addClass("loading");
       }
@@ -387,7 +387,7 @@
     const token = getCookie("_xsrf")
     e.preventDefault();
 
-    $("#submit-status").html('<i class="ph ph-spinner-gap"></i>');
+    $("#submit-status").html('<i class="ph ph-spinner-gap ph-spin"></i>');
 
     let path = $("#global_server_path").val();
     let res = await fetch(`/api/v2/crafty/config/servers_dir`, {

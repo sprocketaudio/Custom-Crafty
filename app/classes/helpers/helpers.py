@@ -1371,8 +1371,8 @@ class Helpers:
                     + """\n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">"""  # pylint: disable=line-too-long
                     + """<input type="radio" name="root_path" value="{dpath}">"""
                     + """<span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">"""  # pylint: disable=line-too-long
-                    + """  <i class="text-info far fa-folder"></i>"""
-                    + """  <i class="text-info far fa-folder-open"></i>"""
+                    + """  <i class="text-info ph ph-folder"></i>"""
+                    + """  <i class="text-info ph ph-folder-open"></i>"""
                     + """  {filename}"""
                     + """  </span>"""
                     + """</input></div><li>"""
@@ -1396,8 +1396,8 @@ class Helpers:
                     + """\n<div id="{dpath}" data-path="{dpath}" data-name="{filename}" class="tree-caret tree-ctx-item tree-folder">"""  # pylint: disable=line-too-long
                     + """<input type="radio" name="root_path" value="{dpath}">"""
                     + """<span id="{dpath}span" class="files-tree-title" data-path="{dpath}" data-name="{filename}" onclick="getDirView(event)">"""  # pylint: disable=line-too-long
-                    + """  <i class="text-info far fa-folder"></i>"""
-                    + """  <i class="text-info far fa-folder-open"></i>"""
+                    + """  <i class="text-info ph ph-folder"></i>"""
+                    + """  <i class="text-info ph ph-folder-open"></i>"""
                     + """  {filename}"""
                     + """  </span>"""
                     + """</input></div><li>"""

@@ -54,7 +54,7 @@
                 style="height: 15px; display: none;">
               </div>
               {% if data['backing_up'] %}
-              <p>Backing up <i class="ph ph-spinner-gap"></i> <span
+              <p>Backing up <i class="ph ph-spinner-gap ph-spin"></i> <span
                   id="total_files">{{data['server_stats']['world_size']}}</span></p>
               {% end %}
 
@@ -355,7 +355,7 @@
     const token = getCookie("_xsrf")
     let contents = JSON.stringify({ "filename": filename, "inPlace": Boolean(parseInt(in_place)) })
     var dialog = bootbox.dialog({
-      message: "<i class='ph ph-spinner-gap'></i> {{ translate('serverBackups', 'restoring', data['lang']) }}",
+      message: "<i class='ph ph-spinner-gap ph-spin'></i> {{ translate('serverBackups', 'restoring', data['lang']) }}",
       closeButton: false
     });
     let res = await fetch(`/api/v2/servers/${serverId}/backups/backup/${backup_id}/`, {

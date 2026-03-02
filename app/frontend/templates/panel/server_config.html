@@ -375,7 +375,7 @@
             bootbox.dialog({
               backdrop: true,
               title: '{% raw translate("serverConfig", "sendingDelete", data['lang']) %}',
-              message: '<div align="center"><i class="ph ph-spinner-gap"></i> &nbsp; {% raw translate("serverConfig", "bePatientDeleteFiles", data['lang']) %} </div>',
+              message: '<div align="center"><i class="ph ph-spinner-gap ph-spin"></i> &nbsp; {% raw translate("serverConfig", "bePatientDeleteFiles", data['lang']) %} </div>',
               closeButton: false
             })
 
@@ -391,7 +391,7 @@
             bootbox.dialog({
               backdrop: true,
               title: '{% raw translate("serverConfig", "sendingDelete", data['lang']) %}',
-              message: '<div align="center"><i class="ph ph-spinner-gap"></i> &nbsp; {% raw translate("serverConfig", "bePatientDelete", data['lang']) %} </div>',
+              message: '<div align="center"><i class="ph ph-spinner-gap ph-spin"></i> &nbsp; {% raw translate("serverConfig", "bePatientDelete", data['lang']) %} </div>',
               closeButton: false
             })
             return;
@@ -469,7 +469,7 @@
           bootbox.dialog({
             backdrop: true,
             title: '{% raw translate("serverConfig", "sendingDelete", data['lang']) %}',
-            message: '<div align="center"><i class="ph ph-spinner-gap"></i> &nbsp; {% raw translate("serverConfig", "bePatientDelete", data['lang']) %} </div>',
+            message: '<div align="center"><i class="ph ph-spinner-gap ph-spin"></i> &nbsp; {% raw translate("serverConfig", "bePatientDelete", data['lang']) %} </div>',
             closeButton: false
           })
           $.ajax({
