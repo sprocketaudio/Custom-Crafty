@@ -1,4 +1,15 @@
 # Changelog
+## --- [4.10.2] - 2026/TBD
+### New features
+TBD
+### Bug fixes
+TBD
+### Tweaks
+TBD
+### Lang
+TBD
+<br><br>
+
 ## --- [4.10.1] - 2026/03/05
 ### Bug fixes
 - Fix stack-trace on non-super user server nav when without config perms ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/987))
