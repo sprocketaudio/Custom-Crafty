@@ -447,6 +447,10 @@ class Controller:
         if data["create_type"] == "minecraft_java":
             if root_create_data["create_type"] == "download_jar":
                 server_file = f"{create_data['type']}.jar"
+                if create_data["type"] in MODDED_TYPES:  # Modded types need version
+                    # because that's how we create the execution command.
+                    # This needs to be changed in the future. Too messy.
+                    server_file = f"{create_data['type']}-{create_data['version']}.jar"
 
                 # Create an EULA file
                 if "agree_to_eula" in create_data:
