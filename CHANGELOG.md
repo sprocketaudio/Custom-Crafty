@@ -7,6 +7,7 @@ TBD
 - Fix bug where server creation page would stack trace if system did not have internet ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/989))
 - Fix graphical differences between steamCMD roles selection and the rest of the offerings ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/989))
 - Add server backup location verification ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/980))
+- Fix issue where (neo)forge installations would have improper targeting on execution commands ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/990))
 ### Tweaks
 TBD
 ### Lang
