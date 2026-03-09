@@ -1,13 +1,22 @@
 # Changelog
-## --- [4.10.1] - 2026/TBD
+## --- [4.10.2] - 2026/TBD
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Fix bug where roles selection on server creation page did not show any available roles ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/989))
+- Fix bug where server creation page would stack trace if system did not have internet ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/989))
+- Fix graphical differences between steamCMD roles selection and the rest of the offerings ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/989))
+- Add server backup location verification ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/980))
+- Fix issue where (neo)forge installations would have improper targeting on execution commands ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/990))
 ### Tweaks
 TBD
 ### Lang
 TBD
+<br><br>
+
+## --- [4.10.1] - 2026/03/05
+### Bug fixes
+- Fix stack-trace on non-super user server nav when without config perms ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/987))
 <br><br>
 
 ## --- [4.10.0] - 2026/03/02
