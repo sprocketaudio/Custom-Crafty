@@ -324,7 +324,7 @@
 
   $(document).ready(function () {
     $('.schedule-custom-toggle').each(function () {
-      const enabled = JSON.parse(this.getAttribute('data-schedule-enabled'));
+      const enabled = JSON.parse(this.dataset.scheduleEnabled);
       if (enabled) {
         this.classList.add("active");
       }
@@ -335,8 +335,8 @@
   });
   $(() => {
     $('.schedule-custom-toggle').click(function () {
-      const id = this.getAttribute('data-schedule-id');
-      const enabled = !JSON.parse(this.getAttribute('data-schedule-enabled'));
+      const id = this.dataset.scheduleId;
+      const enabled = !JSON.parse(this.dataset.scheduleEnabled);
 
       fetch(`/api/v2/servers/{{data['server_id']}}/tasks/${id}`, {
         method: 'PATCH',
