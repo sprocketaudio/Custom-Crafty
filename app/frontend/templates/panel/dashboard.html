@@ -1137,7 +1137,8 @@
   $(document).ready(function () {
     let servers_table = $('#servers_table').DataTable({
       "ordering": false, // false to disable sorting (or any other option)
-      "paging": false
+      "paging": false,
+      "autoWidth": false
     });
     // DataTables sets overflow:hidden on the wrapper after init completes.
     // Defer override so table-responsive can provide horizontal scrolling.
