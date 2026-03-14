@@ -58,6 +58,10 @@
                 {% raw xsrf_form_html() %}
                 <div id="login-inputs"></div>
                 <div class="form-group">
+                  <div id="error-field" class="alert alert-danger" role="alert"
+                    style="background: rgba(220, 53, 69, 0.15); border: 1px solid rgba(220, 53, 69, 0.4); color: #dc3545; border-radius: 0.4rem;"></div>
+                </div>
+                <div class="form-group">
                   <label class="label">{{ translate('login', 'username', data['lang']) }}</label>
                   <div class="input-group">
                     <input type="text" class="form-control login-text-input login-input"
@@ -105,8 +109,6 @@
                 <i class="mdi mdi-key"></i>&nbsp;{{ translate('login', 'signInWithPasskey', data['lang']) }}
               </button>
             </div>
-            <fieldset id="error-field" class="loginError">
-            </fieldset>
             <div class="form-group d-flex justify-content-between">
               <div class="form-check form-check-flat mt-0">
                 &nbsp;

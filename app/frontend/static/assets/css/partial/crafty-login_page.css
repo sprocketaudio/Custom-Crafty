@@ -29,9 +29,12 @@
 }
 
 #error-field {
-    color: var(--red);
     text-align: center;
     margin-bottom: 2rem;
+}
+
+#error-field:empty {
+    display: none;
 }
 
 .loginError {
