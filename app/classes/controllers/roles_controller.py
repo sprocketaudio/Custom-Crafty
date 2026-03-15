@@ -68,12 +68,12 @@ class RolesController:
         return HelperRoles.add_role(role_name, manager, mfa_required)
 
     class RoleServerJsonType(t.TypedDict):
-        server_id: t.Union[str, int]
+        server_id: str | int
         permissions: str
 
     @staticmethod
     def get_server_ids_and_perms_from_role(
-        role_id: t.Union[str, int],
+        role_id: str | int,
     ) -> t.List[RoleServerJsonType]:
         # FIXME: somehow retrieve only the server ids, not the whole servers
         return [
@@ -113,7 +113,7 @@ class RolesController:
 
     @staticmethod
     def update_role_advanced(
-        role_id: t.Union[str, int],
+        role_id: str | int,
         role_name: t.Optional[str],
         servers: t.Optional[t.Iterable[RoleServerJsonType]],
         manager: int,
