@@ -1,7 +1,5 @@
 # Changelog
-## --- [4.10.2] - 2026/TBD
-### New features
-TBD
+## --- [4.10.2] - 2026/03/15
 ### Bug fixes
 - Fix bug where roles selection on server creation page did not show any available roles ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/989))
 - Fix bug where server creation page would stack trace if system did not have internet ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/989))
