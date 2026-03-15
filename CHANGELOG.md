@@ -1,4 +1,13 @@
 # Changelog
+## --- [4.10.3] - 2026/TBD
+### New features
+TBD
+### Bug fixes
+TBD
+### Tweaks
+TBD
+<br><br>
+
 ## --- [4.10.2] - 2026/03/15
 ### Bug fixes
 - Fix bug where roles selection on server creation page did not show any available roles ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/989))
