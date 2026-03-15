@@ -1,5 +1,5 @@
 import logging
-import typing as t
+from typing import Final, Iterable, List, Optional, TypedDict
 
 from app.classes.helpers.helpers import Helpers
 from app.classes.models.roles import HelperRoles
@@ -67,14 +67,14 @@ class RolesController:
     def add_role(role_name, manager, mfa_required):
         return HelperRoles.add_role(role_name, manager, mfa_required)
 
-    class RoleServerJsonType(t.TypedDict):
+    class RoleServerJsonType(TypedDict):
         server_id: str | int
         permissions: str
 
     @staticmethod
     def get_server_ids_and_perms_from_role(
         role_id: str | int,
-    ) -> t.List[RoleServerJsonType]:
+    ) -> List[RoleServerJsonType]:
         # FIXME: somehow retrieve only the server ids, not the whole servers
         return [
             {
@@ -91,7 +91,7 @@ class RolesController:
     @staticmethod
     def add_role_advanced(
         name: str,
-        servers: t.Iterable[RoleServerJsonType],
+        servers: Iterable[RoleServerJsonType],
         manager: int,
         mfa_requried: bool,
     ) -> int:
@@ -104,7 +104,7 @@ class RolesController:
         Returns:
             int: The new role's ID
         """
-        role_id: t.Final[int] = HelperRoles.add_role(name, manager, mfa_requried)
+        role_id: Final[int] = HelperRoles.add_role(name, manager, mfa_requried)
         for server in servers:
             PermissionsServers.get_or_create(
                 role_id, server["server_id"], server["permissions"]
@@ -114,8 +114,8 @@ class RolesController:
     @staticmethod
     def update_role_advanced(
         role_id: str | int,
-        role_name: t.Optional[str],
-        servers: t.Optional[t.Iterable[RoleServerJsonType]],
+        role_name: Optional[str],
+        servers: Optional[Iterable[RoleServerJsonType]],
         manager: int,
         mfa_required: bool,
     ) -> None:
