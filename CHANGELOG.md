@@ -9,7 +9,7 @@ TBD
 - Add server backup location verification ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/980))
 - Fix issue where (neo)forge installations would have improper targeting on execution commands ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/990))
 ### Tweaks
-TBD
+- Change login error message style to use bootstrap classes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/993))
 ### Lang
 TBD
 <br><br>
