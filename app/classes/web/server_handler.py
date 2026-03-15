@@ -147,10 +147,8 @@ class ServerHandler(BaseHandler):
             "superuser": superuser,
             "themes": self.helper.get_themes(),
         }
-        if page_data["online"]:
-            page_data["server_api"] = self.controller.big_bucket._check_bucket_alive()
-        if superuser:
-            page_data["roles"] = list_roles
+
+        page_data["server_api"] = self.controller.big_bucket._check_bucket_alive()
 
         if page == "step1":
             if not superuser and not self.controller.crafty_perms.can_create_server(

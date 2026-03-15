@@ -947,7 +947,6 @@ class ApiServersIndexHandler(BaseApiHandler):
             return self.finish_json(
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
-        print(data)
         try:
             validate(data, new_server_schema)
         except ValidationError as why:

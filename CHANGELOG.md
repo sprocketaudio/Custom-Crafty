@@ -1,4 +1,17 @@
 # Changelog
+## --- [4.10.2] - 2026/03/15
+### Bug fixes
+- Fix bug where roles selection on server creation page did not show any available roles ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/989))
+- Fix bug where server creation page would stack trace if system did not have internet ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/989))
+- Fix graphical differences between steamCMD roles selection and the rest of the offerings ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/989))
+- Add server backup location verification ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/980))
+- Fix issue where (neo)forge installations would have improper targeting on execution commands ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/990))
+- Fix frontend bug where schedules could not be deleted after a Phosphor refactor ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/991))
+- Fix crash when jarfile does not exist on startup ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/997))
+### Tweaks
+- Change login error message style to use bootstrap classes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/993))
+<br><br>
+
 ## --- [4.10.1] - 2026/03/05
 ### Bug fixes
 - Fix stack-trace on non-super user server nav when without config perms ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/987))
