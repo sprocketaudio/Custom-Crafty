@@ -7,6 +7,7 @@
 - Add server backup location verification ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/980))
 - Fix issue where (neo)forge installations would have improper targeting on execution commands ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/990))
 - Fix frontend bug where schedules could not be deleted after a Phosphor refactor ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/991))
+- Fix crash when jarfile does not exist on startup ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/997))
 ### Tweaks
 - Change login error message style to use bootstrap classes ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/993))
 <br><br>
