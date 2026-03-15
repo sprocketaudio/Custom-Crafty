@@ -187,7 +187,7 @@ class PermissionsServers:
 
     @staticmethod
     def delete_roles_permissions(
-        role_id: t.Union[str, int], removed_servers: Collection[t.Union[str, int]]
+        role_id: str | int, removed_servers: Collection[str | int]
     ) -> int:
         """Delete rows from role_servers for a given row and list of server.
 
