@@ -228,7 +228,7 @@ class BackupManager:
         size = False
         if not self.validate_backup_location(server, backup_config):
             self.fail_backup(
-                Exception(
+                ValueError(
                     "Recursive backup target: backup location can not be within "
                     "directory that is being backed up"
                 ),
