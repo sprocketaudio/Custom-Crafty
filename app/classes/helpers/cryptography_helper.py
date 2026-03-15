@@ -31,10 +31,14 @@ class CryptoHelper:
         """
         sha256_hash = sha256()
         file_path_resolved = Path(file_path).resolve()
-        with open(file_path_resolved, "rb") as f:
-            for byte_block in iter(lambda: f.read(4096), b""):
-                sha256_hash.update(byte_block)
-        return sha256_hash.hexdigest()
+        try:
+            with open(file_path_resolved, "rb") as f:
+                for byte_block in iter(lambda: f.read(4096), b""):
+                    sha256_hash.update(byte_block)
+            return sha256_hash.hexdigest()
+        except OSError:
+            # If file is not found we'll return an empty string
+            return ""
 
     @staticmethod
     def blake2b_hash_bytes(bytes_to_hash: bytes) -> bytes:
