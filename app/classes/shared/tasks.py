@@ -104,54 +104,58 @@ class TasksManager:
                 "Queue currently has "
                 f"{self.controller.management.command_queue.qsize()} queued commands."
             )
-            if not self.controller.management.command_queue.empty():
-                command_log.info(
-                    "Current queued commands: "
-                    f"{list(self.controller.management.command_queue.queue)}"
-                )
-                cmd = self.controller.management.command_queue.get()
-                try:
-                    svr = self.controller.servers.get_server_instance_by_id(
-                        cmd["server_id"]
-                    )
-                except:
-                    logger.error(
-                        f"Server value {cmd['server_id']} requested does not exist! "
-                        "Purging item from waiting commands."
-                    )
-                    continue
+            # Unwrap indentation block
+            if self.controller.management.command_queue.empty():
+                time.sleep(1)
+                continue
 
-                user_id = cmd["user_id"]
-                command = cmd["command"]
-                match command:
-                    case "start_server":
-                        svr.run_threaded_server(user_id)
-                    case "stop_server":
-                        svr.stop_threaded_server()
-                    case "restart_server":
-                        svr.restart_threaded_server(user_id)
-                    case "kill_server":
-                        try:
-                            svr.kill()
-                            time.sleep(5)
-                            svr.cleanup_server_object()
-                            svr.record_server_stats()
-                        except Exception as e:
-                            logger.error(
-                                f"Could not find PID for requested termsig. Full error: {e}"
-                            )
-                    case "backup_server":
-                        try:
-                            svr.server_backup_threader(cmd["action_id"])
-                        except (KeyError, DoesNotExist) as why:
-                            logger.error(
-                                "Failed to run server backup on schedule with error %s",
-                                why,
-                            )
-                    case "update_executable":
-                        svr.server_upgrade()
-                    case _:
-                        svr.send_command(command)
+            command_log.info(
+                "Current queued commands: "
+                f"{list(self.controller.management.command_queue.queue)}"
+            )
+            cmd = self.controller.management.command_queue.get()
+            try:
+                svr = self.controller.servers.get_server_instance_by_id(
+                    cmd["server_id"]
+                )
+            except:
+                logger.error(
+                    f"Server value {cmd['server_id']} requested does not exist! "
+                    "Purging item from waiting commands."
+                )
+                continue
+
+            user_id = cmd["user_id"]
+            command = cmd["command"]
+            match command:
+                case "start_server":
+                    svr.run_threaded_server(user_id)
+                case "stop_server":
+                    svr.stop_threaded_server()
+                case "restart_server":
+                    svr.restart_threaded_server(user_id)
+                case "kill_server":
+                    try:
+                        svr.kill()
+                        time.sleep(5)
+                        svr.cleanup_server_object()
+                        svr.record_server_stats()
+                    except Exception as e:
+                        logger.error(
+                            f"Could not find PID for requested termsig. Full error: {e}"
+                        )
+                case "backup_server":
+                    try:
+                        svr.server_backup_threader(cmd["action_id"])
+                    except (KeyError, DoesNotExist) as why:
+                        logger.error(
+                            "Failed to run server backup on schedule with error %s",
+                            why,
+                        )
+                case "update_executable":
+                    svr.server_upgrade()
+                case _:
+                    svr.send_command(command)
 
             time.sleep(1)
 
