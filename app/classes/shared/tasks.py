@@ -177,13 +177,25 @@ class TasksManager:
     def _main_graceful_exit(self):
         try:
             os.remove(self.helper.session_file)
+        except OSError as why:
+            logger.warning(
+                f"Caught error deleting session file during shutdown: {why}",
+                exc_info=True,
+            )
+
+        # Shutting down servers is capable of throwing many different errors. This may
+        # need to be handled in subclasses rather than here. A quick review of sub-calls
+        # shows ValueError, RuntimeError, BrokenPipeError, and OSError are all
+        # possible.
+        try:
             self.controller.servers.stop_all_servers()
         except:
             logger.info("Caught error during shutdown", exc_info=True)
+
         try:
             temp_dir = os.path.join(self.controller.project_root, "temp")
             FileHelpers.del_dirs(temp_dir)
-        except:
+        except OSError:
             logger.info(
                 "Caught error during shutdown - "
                 "unable to delete files from Crafty Temp Dir",
