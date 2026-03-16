@@ -123,39 +123,35 @@ class TasksManager:
 
                 user_id = cmd["user_id"]
                 command = cmd["command"]
-
-                if command == "start_server":
-                    svr.run_threaded_server(user_id)
-
-                elif command == "stop_server":
-                    svr.stop_threaded_server()
-
-                elif command == "restart_server":
-                    svr.restart_threaded_server(user_id)
-
-                elif command == "kill_server":
-                    try:
-                        svr.kill()
-                        time.sleep(5)
-                        svr.cleanup_server_object()
-                        svr.record_server_stats()
-                    except Exception as e:
-                        logger.error(
-                            f"Could not find PID for requested termsig. Full error: {e}"
-                        )
-
-                elif command == "backup_server":
-                    try:
-                        svr.server_backup_threader(cmd["action_id"])
-                    except (KeyError, DoesNotExist) as why:
-                        logger.error(
-                            "Failed to run server backup on schedule with error %s", why
-                        )
-
-                elif command == "update_executable":
-                    svr.server_upgrade()
-                else:
-                    svr.send_command(command)
+                match command:
+                    case "start_server":
+                        svr.run_threaded_server(user_id)
+                    case "stop_server":
+                        svr.stop_threaded_server()
+                    case "restart_server":
+                        svr.restart_threaded_server(user_id)
+                    case "kill_server":
+                        try:
+                            svr.kill()
+                            time.sleep(5)
+                            svr.cleanup_server_object()
+                            svr.record_server_stats()
+                        except Exception as e:
+                            logger.error(
+                                f"Could not find PID for requested termsig. Full error: {e}"
+                            )
+                    case "backup_server":
+                        try:
+                            svr.server_backup_threader(cmd["action_id"])
+                        except (KeyError, DoesNotExist) as why:
+                            logger.error(
+                                "Failed to run server backup on schedule with error %s",
+                                why,
+                            )
+                    case "update_executable":
+                        svr.server_upgrade()
+                    case _:
+                        svr.send_command(command)
 
             time.sleep(1)
 
@@ -513,7 +509,7 @@ class TasksManager:
             and "cron_string" in job_data
             and "interval_type" in job_data
         ):
-            if not "enabled" in job_data:
+            if "enabled" not in job_data:
                 return
 
             if job_data["enabled"] is True:
