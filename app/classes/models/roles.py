@@ -89,7 +89,7 @@ class HelperRoles:
         return role_id
 
     @staticmethod
-    def update_role(role_id: t.Union[str, int], up_data: t.Mapping[str, t.Any]) -> int:
+    def update_role(role_id: str | int, up_data: t.Mapping[str, t.Any]) -> int:
         """Update a role and refresh last_update in SQLite.
 
         Args:
