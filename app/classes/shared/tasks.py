@@ -174,7 +174,17 @@ class TasksManager:
 
             time.sleep(1)
 
-    def _main_graceful_exit(self):
+    def _main_graceful_exit(self) -> None:
+        """Shutdown all servers and remove all temporary/runtime files
+
+        Removes the session lock file, sends the call to stop all servers, and delete
+        all temporary files and directories. This function also sends the shutdown
+        messages to the log and console. This function also sets main_thread_exiting to
+        True.
+
+        Returns:
+            None
+        """
         try:
             os.remove(self.helper.session_file)
         except OSError as why:
