@@ -120,18 +120,20 @@ class RolesController:
         name: str,
         servers: Iterable[RoleServerJsonType],
         manager: int,
-        mfa_requried: bool,
+        mfa_required: bool,
     ) -> int:
         """Add a role with a name and a list of servers
 
         Args:
-            name (str): The new role's name
-            servers (t.List[RoleServerJsonType]): The new role's servers
+            name: The new role's name
+            servers: The new role's servers
+            manager: The new role's manager
+            mfa_required: The new role's mfa required status
 
         Returns:
             int: The new role's ID
         """
-        role_id: Final[int] = HelperRoles.add_role(name, manager, mfa_requried)
+        role_id: Final[int] = HelperRoles.add_role(name, manager, mfa_required)
         for server in servers:
             PermissionsServers.get_or_create(
                 role_id, server["server_id"], server["permissions"]
