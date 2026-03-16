@@ -294,8 +294,15 @@ class TasksManager:
                 continue
 
             # The following runs for non-reaction tasks.
-            new_job = "error"
-            if schedule.cron_string == "":
+            command_args = [
+                {
+                    "server_id": schedule.server_id.server_id,
+                    "user_id": self.users_controller.get_id_by_name("system"),
+                    "command": schedule.command,
+                    "action_id": schedule.action_id,
+                }
+            ]
+            if schedule.cron_string != "":
                 try:
                     new_job = self.scheduler.add_job(
                         self.controller.management.queue_command,
@@ -303,16 +310,7 @@ class TasksManager:
                             schedule.cron_string, timezone=str(self.tz)
                         ),
                         id=str(schedule.schedule_id),
-                        args=[
-                            {
-                                "server_id": schedule.server_id.server_id,
-                                "user_id": self.users_controller.get_id_by_name(
-                                    "system"
-                                ),
-                                "command": schedule.command,
-                                "action_id": schedule.action_id,
-                            }
-                        ],
+                        args=command_args,
                     )
                 except Exception as e:
                     new_job = "error"
@@ -324,63 +322,27 @@ class TasksManager:
                     self.controller.management_helper.delete_scheduled_task(
                         schedule.schedule_id
                     )
-                continue
+            else:
+                interval = int(schedule.interval)
+                trigger = "interval"
+                trigger_kwargs = {schedule.interval_type: interval}
 
-            match schedule.interval_type:
-                case "hours":
-                    new_job = self.scheduler.add_job(
-                        self.controller.management.queue_command,
-                        "interval",
-                        hours=int(schedule.interval),
-                        id=str(schedule.schedule_id),
-                        args=[
-                            {
-                                "server_id": schedule.server_id.server_id,
-                                "user_id": self.users_controller.get_id_by_name(
-                                    "system"
-                                ),
-                                "command": schedule.command,
-                                "action_id": schedule.action_id,
-                            }
-                        ],
-                    )
-                case "minutes":
-                    new_job = self.scheduler.add_job(
-                        self.controller.management.queue_command,
-                        "interval",
-                        minutes=int(schedule.interval),
-                        id=str(schedule.schedule_id),
-                        args=[
-                            {
-                                "server_id": schedule.server_id.server_id,
-                                "user_id": self.users_controller.get_id_by_name(
-                                    "system"
-                                ),
-                                "command": schedule.command,
-                                "action_id": schedule.action_id,
-                            }
-                        ],
-                    )
-                case "days":
+                if schedule.interval_type == "days":
                     curr_time = schedule.start_time.split(":")
-                    new_job = self.scheduler.add_job(
-                        self.controller.management.queue_command,
-                        "cron",
-                        day="*/" + str(schedule.interval),
-                        hour=curr_time[0],
-                        minute=curr_time[1],
-                        id=str(schedule.schedule_id),
-                        args=[
-                            {
-                                "server_id": schedule.server_id.server_id,
-                                "user_id": self.users_controller.get_id_by_name(
-                                    "system"
-                                ),
-                                "command": schedule.command,
-                                "action_id": schedule.action_id,
-                            }
-                        ],
-                    )
+                    trigger = "cron"
+                    trigger_kwargs = {
+                        "day": f"*/{schedule.interval}",
+                        "hour": curr_time[0],
+                        "minute": curr_time[1],
+                    }
+
+                new_job = self.scheduler.add_job(
+                    self.controller.management.queue_command,
+                    trigger,
+                    id=str(schedule.schedule_id),
+                    args=command_args,
+                    **trigger_kwargs,
+                )
             if new_job != "error":
                 task = self.controller.management.get_scheduled_task_model(
                     int(new_job.id)
