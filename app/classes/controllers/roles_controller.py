@@ -2,7 +2,6 @@ import logging
 from datetime import datetime
 from typing import Final, Iterable, List, Optional, TypedDict, cast
 
-from app.classes.helpers.helpers import Helpers
 from app.classes.models.roles import HelperRoles
 from app.classes.models.server_permissions import PermissionsServers, RoleServers
 
@@ -152,11 +151,9 @@ class RolesController:
         if role_name is not None:
             up_data = {
                 "role_name": role_name,
-                "last_update": Helpers.get_time_as_string(),
                 "manager": manager,
                 "mfa_required": mfa_required,
             }
-            # TODO: do the last_update on the db side
             HelperRoles.update_role(role_id, up_data)
 
     def remove_role(self, role_id):
