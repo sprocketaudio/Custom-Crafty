@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from typing import Final, Iterable, List, Optional, TypedDict, cast
 
 from app.classes.helpers.helpers import Helpers
@@ -11,6 +12,17 @@ logger = logging.getLogger(__name__)
 
 
 class RolesController:
+    class RoleData(TypedDict):
+        role_id: int
+        created: datetime | str
+        last_update: datetime | str
+        role_name: str
+        manager: int | None
+        mfa_required: bool
+
+    class RoleWithServers(RoleData):
+        servers: list[int]
+
     def __init__(self, users_helper, roles_helper):
         self.users_helper = users_helper
         self.roles_helper = roles_helper
@@ -137,10 +149,12 @@ class RolesController:
         """Update a role with a name and a list of servers
 
         Args:
-            role_id (t.Union[str, int]): The ID of the role to be modified
-            role_name (t.Optional[str]): An optional new name for the role
-            servers (t.Optional[t.Iterable[RoleServerJsonType]]): An optional list of servers for the role
-        """  # pylint: disable=line-too-long
+            role_id: The ID of the role to be modified
+            role_name: An optional new name for the role
+            servers: An optional list of servers for the role
+            manager: The manager ID to update with
+            mfa_required: MFA required value to update with
+        """
         logger.debug(f"updating role {role_id} with advanced options")
 
         if servers is not None:
