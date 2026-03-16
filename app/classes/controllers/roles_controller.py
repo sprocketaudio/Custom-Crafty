@@ -1,9 +1,11 @@
 import logging
-from typing import Final, Iterable, List, Optional, TypedDict
+from typing import Final, Iterable, List, Optional, TypedDict, cast
 
 from app.classes.helpers.helpers import Helpers
 from app.classes.models.roles import HelperRoles
 from app.classes.models.server_permissions import PermissionsServers, RoleServers
+
+ServerId = str | int
 
 logger = logging.getLogger(__name__)
 
@@ -68,25 +70,38 @@ class RolesController:
         return HelperRoles.add_role(role_name, manager, mfa_required)
 
     class RoleServerJsonType(TypedDict):
-        server_id: str | int
+        server_id: ServerId
         permissions: str
 
     @staticmethod
     def get_server_ids_and_perms_from_role(
         role_id: str | int,
     ) -> List[RoleServerJsonType]:
-        # FIXME: somehow retrieve only the server ids, not the whole servers
-        return [
-            {
-                "server_id": role_servers.server_id.server_id,
-                "permissions": role_servers.permissions,
-            }
-            for role_servers in (
-                RoleServers.select(
-                    RoleServers.server_id, RoleServers.permissions
-                ).where(RoleServers.role_id == role_id)
+        """Return the server IDs and permission masks associated with a role.
+
+        Args:
+            role_id: The ID of the role whose server permissions should be retrieved.
+
+        Returns:
+            A list of dicts containing the server ID and permission mask for each server
+            associated with the role.
+        """
+        query = (
+            RoleServers.select(RoleServers.server_id, RoleServers.permissions)
+            .where(RoleServers.role_id == role_id)
+            .tuples()
+        )
+
+        result: List[RolesController.RoleServerJsonType] = []
+        for server_id, permissions in query:
+            result.append(
+                RolesController.RoleServerJsonType(
+                    server_id=cast(ServerId, server_id),
+                    permissions=cast(str, permissions),
+                )
             )
-        ]
+
+        return result
 
     @staticmethod
     def add_role_advanced(
