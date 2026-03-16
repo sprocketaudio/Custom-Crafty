@@ -97,7 +97,20 @@ class TasksManager:
         for item in jobs:
             logger.info(f"JOB: {item}")
 
-    def command_watcher(self):
+    def command_watcher(self) -> None:
+        """Process queued server commands in the background
+
+        Polls the management command queue and runs the tasks associated. Right now this
+        is done in a while True loop. We may want to move this to a context aware cancel
+        at some point rather than a simple while True.
+
+        Commands are expected to provide server_id, user_id, and command keys. Backup
+        commands also use action_id. If a queued command references a server that is no
+        longer loaded, the command is logged and discarded.
+
+        Returns:
+            None
+        """
         while True:
             # select any commands waiting to be processed
             command_log.debug(
