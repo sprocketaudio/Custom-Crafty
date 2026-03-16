@@ -44,40 +44,6 @@ class RolesController:
         return HelperRoles.get_role(role_id)
 
     @staticmethod
-    def update_role(role_id: str, role_data=None, permissions_mask: str = "00000000"):
-        if role_data is None:
-            role_data = {}
-        base_data = RolesController.get_role_with_servers(role_id)
-        up_data = {}
-        added_servers = set()
-        removed_servers = set()
-        for key in role_data:
-            if key == "role_id":
-                continue
-            if key == "servers":
-                added_servers = set(role_data["servers"]).difference(
-                    set(base_data["servers"])
-                )
-                removed_servers = set(base_data["servers"]).difference(
-                    set(role_data["servers"])
-                )
-            elif base_data[key] != role_data[key]:
-                up_data[key] = role_data[key]
-        up_data["last_update"] = Helpers.get_time_as_string()
-        logger.debug(
-            f"role: {role_data} +server:{added_servers} -server{removed_servers}"
-        )
-        for server in added_servers:
-            PermissionsServers.get_or_create(role_id, server, permissions_mask)
-        for server in base_data["servers"]:
-            PermissionsServers.update_role_permission(role_id, server, permissions_mask)
-            # TODO: This is horribly inefficient and we should be using bulk queries
-            # but im going for functionality at this point
-        PermissionsServers.delete_roles_permissions(role_id, removed_servers)
-        if up_data:
-            HelperRoles.update_role(role_id, up_data)
-
-    @staticmethod
     def add_role(role_name, manager, mfa_required):
         return HelperRoles.add_role(role_name, manager, mfa_required)
 
@@ -141,7 +107,7 @@ class RolesController:
         return role_id
 
     @staticmethod
-    def update_role_advanced(
+    def update_role(
         role_id: str | int,
         role_name: Optional[str],
         servers: Optional[Iterable[RoleServerJsonType]],
