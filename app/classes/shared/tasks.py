@@ -289,104 +289,108 @@ class TasksManager:
 
         # load schedules from DB
         for schedule in schedules:
-            if schedule.interval != "reaction":
-                new_job = "error"
-                if schedule.cron_string != "":
-                    try:
-                        new_job = self.scheduler.add_job(
-                            self.controller.management.queue_command,
-                            CronTrigger.from_crontab(
-                                schedule.cron_string, timezone=str(self.tz)
-                            ),
-                            id=str(schedule.schedule_id),
-                            args=[
-                                {
-                                    "server_id": schedule.server_id.server_id,
-                                    "user_id": self.users_controller.get_id_by_name(
-                                        "system"
-                                    ),
-                                    "command": schedule.command,
-                                    "action_id": schedule.action_id,
-                                }
-                            ],
-                        )
-                    except Exception as e:
-                        new_job = "error"
-                        Console.error(f"Failed to schedule task with error: {e}.")
-                        Console.warning("Removing failed task from DB.")
-                        logger.error(f"Failed to schedule task with error: {e}.")
-                        logger.warning("Removing failed task from DB.")
-                        # remove items from DB if task fails to add to apscheduler
-                        self.controller.management_helper.delete_scheduled_task(
-                            schedule.schedule_id
-                        )
-                else:
-                    if schedule.interval_type == "hours":
-                        new_job = self.scheduler.add_job(
-                            self.controller.management.queue_command,
-                            "interval",
-                            hours=int(schedule.interval),
-                            id=str(schedule.schedule_id),
-                            args=[
-                                {
-                                    "server_id": schedule.server_id.server_id,
-                                    "user_id": self.users_controller.get_id_by_name(
-                                        "system"
-                                    ),
-                                    "command": schedule.command,
-                                    "action_id": schedule.action_id,
-                                }
-                            ],
-                        )
-                    elif schedule.interval_type == "minutes":
-                        new_job = self.scheduler.add_job(
-                            self.controller.management.queue_command,
-                            "interval",
-                            minutes=int(schedule.interval),
-                            id=str(schedule.schedule_id),
-                            args=[
-                                {
-                                    "server_id": schedule.server_id.server_id,
-                                    "user_id": self.users_controller.get_id_by_name(
-                                        "system"
-                                    ),
-                                    "command": schedule.command,
-                                    "action_id": schedule.action_id,
-                                }
-                            ],
-                        )
-                    elif schedule.interval_type == "days":
-                        curr_time = schedule.start_time.split(":")
-                        new_job = self.scheduler.add_job(
-                            self.controller.management.queue_command,
-                            "cron",
-                            day="*/" + str(schedule.interval),
-                            hour=curr_time[0],
-                            minute=curr_time[1],
-                            id=str(schedule.schedule_id),
-                            args=[
-                                {
-                                    "server_id": schedule.server_id.server_id,
-                                    "user_id": self.users_controller.get_id_by_name(
-                                        "system"
-                                    ),
-                                    "command": schedule.command,
-                                    "action_id": schedule.action_id,
-                                }
-                            ],
-                        )
-                if new_job != "error":
-                    task = self.controller.management.get_scheduled_task_model(
-                        int(new_job.id)
+            # Skip reaction type tasks in the schedule.
+            if schedule.interval == "reaction":
+                continue
+
+            # The following runs for non-reaction tasks.
+            new_job = "error"
+            if schedule.cron_string != "":
+                try:
+                    new_job = self.scheduler.add_job(
+                        self.controller.management.queue_command,
+                        CronTrigger.from_crontab(
+                            schedule.cron_string, timezone=str(self.tz)
+                        ),
+                        id=str(schedule.schedule_id),
+                        args=[
+                            {
+                                "server_id": schedule.server_id.server_id,
+                                "user_id": self.users_controller.get_id_by_name(
+                                    "system"
+                                ),
+                                "command": schedule.command,
+                                "action_id": schedule.action_id,
+                            }
+                        ],
                     )
-                    self.controller.management.update_scheduled_task(
-                        task.schedule_id,
-                        {
-                            "next_run": str(
-                                new_job.next_run_time.strftime("%m/%d/%Y, %H:%M:%S")
-                            )
-                        },
+                except Exception as e:
+                    new_job = "error"
+                    Console.error(f"Failed to schedule task with error: {e}.")
+                    Console.warning("Removing failed task from DB.")
+                    logger.error(f"Failed to schedule task with error: {e}.")
+                    logger.warning("Removing failed task from DB.")
+                    # remove items from DB if task fails to add to apscheduler
+                    self.controller.management_helper.delete_scheduled_task(
+                        schedule.schedule_id
                     )
+            else:
+                if schedule.interval_type == "hours":
+                    new_job = self.scheduler.add_job(
+                        self.controller.management.queue_command,
+                        "interval",
+                        hours=int(schedule.interval),
+                        id=str(schedule.schedule_id),
+                        args=[
+                            {
+                                "server_id": schedule.server_id.server_id,
+                                "user_id": self.users_controller.get_id_by_name(
+                                    "system"
+                                ),
+                                "command": schedule.command,
+                                "action_id": schedule.action_id,
+                            }
+                        ],
+                    )
+                elif schedule.interval_type == "minutes":
+                    new_job = self.scheduler.add_job(
+                        self.controller.management.queue_command,
+                        "interval",
+                        minutes=int(schedule.interval),
+                        id=str(schedule.schedule_id),
+                        args=[
+                            {
+                                "server_id": schedule.server_id.server_id,
+                                "user_id": self.users_controller.get_id_by_name(
+                                    "system"
+                                ),
+                                "command": schedule.command,
+                                "action_id": schedule.action_id,
+                            }
+                        ],
+                    )
+                elif schedule.interval_type == "days":
+                    curr_time = schedule.start_time.split(":")
+                    new_job = self.scheduler.add_job(
+                        self.controller.management.queue_command,
+                        "cron",
+                        day="*/" + str(schedule.interval),
+                        hour=curr_time[0],
+                        minute=curr_time[1],
+                        id=str(schedule.schedule_id),
+                        args=[
+                            {
+                                "server_id": schedule.server_id.server_id,
+                                "user_id": self.users_controller.get_id_by_name(
+                                    "system"
+                                ),
+                                "command": schedule.command,
+                                "action_id": schedule.action_id,
+                            }
+                        ],
+                    )
+            if new_job != "error":
+                task = self.controller.management.get_scheduled_task_model(
+                    int(new_job.id)
+                )
+                self.controller.management.update_scheduled_task(
+                    task.schedule_id,
+                    {
+                        "next_run": str(
+                            new_job.next_run_time.strftime("%m/%d/%Y, %H:%M:%S")
+                        )
+                    },
+                )
         jobs = self.scheduler.get_jobs()
         logger.info("Loaded schedules. Current enabled schedules: ")
         for item in jobs:
