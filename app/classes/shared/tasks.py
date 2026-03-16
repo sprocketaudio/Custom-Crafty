@@ -89,7 +89,9 @@ class TasksManager:
     def get_main_thread_run_status(self):
         return self.main_thread_exiting
 
-    def reload_schedule_from_db(self):
+    @staticmethod
+    def reload_schedule_from_db() -> None:
+        """Reloads schedules using a helper and logs all enabled schedules"""
         jobs = HelpersManagement.get_schedules_enabled()
         logger.info("Reload from DB called. Current enabled schedules: ")
         for item in jobs:
