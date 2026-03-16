@@ -118,7 +118,9 @@ class TasksManager:
                 svr = self.controller.servers.get_server_instance_by_id(
                     cmd["server_id"]
                 )
-            except:
+            # get_server_instance can raise ValueError when no loaded server matches
+            # given server ID. Narrowed scope from just a bare except.
+            except ValueError:
                 logger.error(
                     f"Server value {cmd['server_id']} requested does not exist! "
                     "Purging item from waiting commands."
