@@ -245,11 +245,12 @@ class TasksManager:
         Console.info("Launching realtime thread...")
         self.realtime_thread.start()
 
-    def scheduler_thread(self):
-        schedules = HelpersManagement.get_schedules_enabled()
-        self.scheduler.add_listener(self.schedule_watcher, mask=EVENT_JOB_EXECUTED)
-        self.scheduler.start()
-        self.check_for_updates()
+    def add_scheduler_jobs(self) -> None:
+        """Helper function for scheduler_thread to add jobs to schedule
+
+        Functionality used to be part of scheduler_thread. Pulled this out to simplify
+        that function.
+        """
         self.scheduler.add_job(
             self.check_for_updates,
             "interval",
@@ -278,9 +279,13 @@ class TasksManager:
             id="passkey_challenge_purge",
             start_date=datetime.datetime.now(),
         )
-        # self.scheduler.add_job(
-        #    self.scheduler.print_jobs, "interval", seconds=10, id="-1"
-        # )
+
+    def scheduler_thread(self):
+        schedules = HelpersManagement.get_schedules_enabled()
+        self.scheduler.add_listener(self.schedule_watcher, mask=EVENT_JOB_EXECUTED)
+        self.scheduler.start()
+        self.check_for_updates()
+        self.add_scheduler_jobs()
 
         # load schedules from DB
         for schedule in schedules:
