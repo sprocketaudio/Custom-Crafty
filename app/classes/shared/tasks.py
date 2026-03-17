@@ -533,19 +533,18 @@ class TasksManager:
                 )
         logger.info("Added job. Current enabled schedules: ")
         jobs = self.scheduler.get_jobs()
-        if new_job != "error":
-            task = self.controller.management.get_scheduled_task_model(int(new_job.id))
-            self.controller.management.update_scheduled_task(
-                task.schedule_id,
-                {
-                    "next_run": new_job.next_run_time.strftime(
-                        SCHEDULE_DATE_STRING_FORMAT
-                    )
-                },
-            )
+        if new_job == "error":
+            for item in jobs:
+                logger.info(f"JOB: {item}")
+            return None
+
+        self.controller.management.update_scheduled_task(
+            sch_id,
+            {"next_run": new_job.next_run_time.strftime(SCHEDULE_DATE_STRING_FORMAT)},
+        )
         for item in jobs:
             logger.info(f"JOB: {item}")
-        return task.schedule_id
+        return sch_id
 
     def remove_all_server_tasks(self, server_id):
         schedules = HelpersManagement.get_schedules_by_server(server_id)
@@ -821,9 +820,7 @@ class TasksManager:
                 "cpu_usage"
             ) or host_stats.get(
                 "mem_percent"
-            ) != HelpersManagement.get_latest_hosts_stats().get(
-                "mem_percent"
-            ):
+            ) != HelpersManagement.get_latest_hosts_stats().get("mem_percent"):
                 # Stats are different
 
                 host_stats = HelpersManagement.get_latest_hosts_stats()
