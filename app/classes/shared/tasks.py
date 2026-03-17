@@ -44,6 +44,8 @@ scheduler_intervals = {
     "sunday",
 }
 
+FAILED_DB_IMPORT_MESSAGE = "Removing failed task from DB."
+
 
 class TasksManager:
     controller: Controller
@@ -318,9 +320,9 @@ class TasksManager:
                 )
             except Exception as e:
                 Console.error(f"Failed to schedule task with error: {e}.")
-                Console.warning("Removing failed task from DB.")
+                Console.warning(FAILED_DB_IMPORT_MESSAGE)
                 logger.error(f"Failed to schedule task with error: {e}.")
-                logger.warning("Removing failed task from DB.")
+                logger.warning(FAILED_DB_IMPORT_MESSAGE)
                 # remove items from DB if task fails to add to apscheduler
                 self.controller.management_helper.delete_scheduled_task(schedule_id)
                 return None
@@ -441,9 +443,9 @@ class TasksManager:
                 except Exception as e:
                     new_job = "error"
                     Console.error(f"Failed to schedule task with error: {e}.")
-                    Console.warning("Removing failed task from DB.")
+                    Console.warning(FAILED_DB_IMPORT_MESSAGE)
                     logger.error(f"Failed to schedule task with error: {e}.")
-                    logger.warning("Removing failed task from DB.")
+                    logger.warning(FAILED_DB_IMPORT_MESSAGE)
                     # remove items from DB if task fails to add to apscheduler
                     self.controller.management_helper.delete_scheduled_task(sch_id)
             else:
@@ -597,7 +599,7 @@ class TasksManager:
                 except Exception as e:
                     new_job = "error"
                     Console.error(f"Failed to schedule task with error: {e}.")
-                    Console.info("Removing failed task from DB.")
+                    Console.info(FAILED_DB_IMPORT_MESSAGE)
                     self.controller.management_helper.delete_scheduled_task(sch_id)
             else:
                 if job_data["interval_type"] == "hours":
