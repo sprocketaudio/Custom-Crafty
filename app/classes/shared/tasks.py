@@ -280,7 +280,14 @@ class TasksManager:
             start_date=datetime.datetime.now(),
         )
 
-    def scheduler_thread(self):
+    def scheduler_thread(self) -> None:
+        """Gets list of all scheduled tasks and adds them to the schedule.
+
+        Parses the interval of each task and adds them to the scheduler.
+
+        Returns:
+            None
+        """
         schedules = HelpersManagement.get_schedules_enabled()
         self.scheduler.add_listener(self.schedule_watcher, mask=EVENT_JOB_EXECUTED)
         self.scheduler.start()
