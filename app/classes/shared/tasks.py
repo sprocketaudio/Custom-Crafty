@@ -6,7 +6,7 @@ import os
 import threading
 import time
 from pathlib import Path
-from typing import Any, NotRequired, TypedDict, cast
+from typing import Any, List, NotRequired, TypedDict, cast
 from zoneinfo import ZoneInfoNotFoundError
 
 from apscheduler.events import EVENT_JOB_EXECUTED
@@ -280,7 +280,7 @@ class TasksManager:
         that function.
         """
         self.scheduler.add_job(
-            self.check_for_updates,
+            self.crafty_maintenance,
             "interval",
             hours=12,
             id="update_watcher",
@@ -426,7 +426,7 @@ class TasksManager:
         schedules = HelpersManagement.get_schedules_enabled()
         self.scheduler.add_listener(self.schedule_watcher, mask=EVENT_JOB_EXECUTED)
         self.scheduler.start()
-        self.check_for_updates()
+        self.crafty_maintenance()
         self.add_scheduler_jobs()
         system_user_id = self.users_controller.get_id_by_name("system")
 
@@ -820,7 +820,9 @@ class TasksManager:
                 "cpu_usage"
             ) or host_stats.get(
                 "mem_percent"
-            ) != HelpersManagement.get_latest_hosts_stats().get("mem_percent"):
+            ) != HelpersManagement.get_latest_hosts_stats().get(
+                "mem_percent"
+            ):
                 # Stats are different
 
                 host_stats = HelpersManagement.get_latest_hosts_stats()
@@ -865,7 +867,80 @@ class TasksManager:
                         )
             time.sleep(1)
 
-    def check_for_updates(self):
+    def crafty_maintenance(self) -> None:
+        """Maintenance tasks for Crafty, runs every 12 hours and on startup
+
+        Runs: Update check, Gravitar PFP update, and clearing of import temp dir.
+
+        Returns:
+            None
+        """
+        self.check_for_updates()
+        self.refresh_gravatar()
+        self.clean_import_directory()
+
+    def refresh_gravatar(self) -> None:
+        """Updates user Gravatar PFPs"""
+        logger.info("Refreshing Gravatar PFPs...")
+        for user in HelperUsers.get_all_users():
+            if user.email:
+                HelperUsers.update_user(
+                    user.id, {"pfp": self.helper.get_gravatar_image(user.email)}
+                )
+
+    def clean_import_directory(self) -> None:
+        """Removes all temporary files in Crafty
+
+        Will check for OSError on removal but will not raise errors, only log them.
+
+        Returns:
+            None
+        """
+        # Search for old files in imports
+        self.helper.ensure_dir_exists(
+            os.path.join(self.controller.project_root, "import", "upload")
+        )
+        self.helper.ensure_dir_exists(
+            os.path.join(self.controller.project_root, "temp")
+        )
+
+        # Setup pathlib objects to help iterate over files
+        removals: List[Path] = []
+        temp_path = Path(self.controller.project_root, "temp")
+        import_path = Path(self.controller.project_root, "import", "upload")
+
+        # Check temp path for files
+        for path in temp_path.iterdir():
+            if self.helper.is_file_older_than_x_days(path):
+                removals.append(path)
+
+        # Check import path for files
+        for path in import_path.iterdir():
+            try:
+                path = Path(self.helper.validate_traversal(import_path, path))
+            except ValueError:
+                logger.error("Traversal detected while deleting import file %s", path)
+                continue
+
+            if self.helper.is_file_older_than_x_days(path):
+                removals.append(path)
+
+        # Remove everything found.
+        for path_to_remove in removals:
+            try:
+                if path_to_remove.is_dir():
+                    FileHelpers.del_dirs(path_to_remove)
+                else:
+                    path_to_remove.unlink()
+            except OSError as why:
+                logger.error(f"Error removing file {path_to_remove}: {why}.")
+
+    def check_for_updates(self) -> None:
+        """Checks for updates to crafty
+
+        Returns:
+            None
+        """
         logger.info("Checking for Crafty updates...")
         self.helper.update_available = self.helper.check_remote_version()
         remote = self.helper.update_available
@@ -883,42 +958,6 @@ class TasksManager:
                 "desc": "Release notes are available by clicking this notification.",
                 "link": "https://gitlab.com/crafty-controller/crafty-4/-/releases",
             }
-        logger.info("Refreshing Gravatar PFPs...")
-        for user in HelperUsers.get_all_users():
-            if user.email:
-                HelperUsers.update_user(
-                    user.id, {"pfp": self.helper.get_gravatar_image(user.email)}
-                )
-        # Search for old files in imports
-        self.helper.ensure_dir_exists(
-            os.path.join(self.controller.project_root, "import", "upload")
-        )
-        self.helper.ensure_dir_exists(
-            os.path.join(self.controller.project_root, "temp")
-        )
-        for file in os.listdir(os.path.join(self.controller.project_root, "temp")):
-            if self.helper.is_file_older_than_x_days(
-                os.path.join(self.controller.project_root, "temp", file)
-            ):
-                try:
-                    os.remove(os.path.join(file))
-                except FileNotFoundError:
-                    logger.debug("Could not clear out file from temp directory")
-        import_path = Path(self.controller.project_root, "import", "upload")
-        for file in os.listdir(import_path):
-            file_path = Path(import_path, file).resolve(strict=True)
-            if not self.helper.validate_traversal(import_path, file_path):
-                logger.error(
-                    "Traversal detected while deleting import file %s", file_path
-                )
-            if self.helper.is_file_older_than_x_days(file_path):
-                try:
-                    if Path(file_path).is_dir():
-                        FileHelpers.del_dirs(file_path)
-                    else:
-                        FileHelpers.del_file(file_path)
-                except FileNotFoundError:
-                    logger.debug("Could not clear out file from import directory")
 
     def log_watcher(self):
         self.check_for_old_logs()
