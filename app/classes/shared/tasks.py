@@ -5,10 +5,12 @@ import logging
 import os
 import threading
 import time
+import typing as t
 from pathlib import Path
 from zoneinfo import ZoneInfoNotFoundError
 
 from apscheduler.events import EVENT_JOB_EXECUTED
+from apscheduler.job import Job
 from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -18,7 +20,7 @@ from tzlocal import get_localzone
 from app.classes.controllers.users_controller import UsersController
 from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.helpers.helpers import Helpers
-from app.classes.models.management import HelpersManagement
+from app.classes.models.management import HelpersManagement, Schedules
 from app.classes.models.users import HelperUsers
 from app.classes.shared.console import Console
 from app.classes.shared.main_controller import Controller
@@ -280,6 +282,82 @@ class TasksManager:
             start_date=datetime.datetime.now(),
         )
 
+    def _add_db_schedule(self, schedule: Schedules, system_user_id: int) -> Job | None:
+        """Add a persisted schedule to APScheduler if its trigger is supported.
+
+        Returns:
+            Job added to scheduler if the job is not a reaction task
+            None if the requested scheduled task is a reaction task
+        """
+        schedule_id = t.cast(int, schedule.schedule_id)
+        interval_value = t.cast(int | str, schedule.interval)
+        interval_type = t.cast(str, schedule.interval_type)
+        cron_string = t.cast(str, schedule.cron_string)
+
+        if interval_value == "reaction":
+            return None
+
+        command_args = [
+            {
+                "server_id": schedule.server_id.server_id,
+                "user_id": system_user_id,
+                "command": schedule.command,
+                "action_id": schedule.action_id,
+            }
+        ]
+        if cron_string != "":
+            try:
+                return t.cast(
+                    Job,
+                    self.scheduler.add_job(
+                        self.controller.management.queue_command,
+                        CronTrigger.from_crontab(cron_string, timezone=str(self.tz)),
+                        id=str(schedule_id),
+                        args=command_args,
+                    ),
+                )
+            except Exception as e:
+                Console.error(f"Failed to schedule task with error: {e}.")
+                Console.warning("Removing failed task from DB.")
+                logger.error(f"Failed to schedule task with error: {e}.")
+                logger.warning("Removing failed task from DB.")
+                # remove items from DB if task fails to add to apscheduler
+                self.controller.management_helper.delete_scheduled_task(schedule_id)
+                return None
+
+        if interval_type not in {"hours", "minutes", "days"}:
+            logger.warning(
+                "Skipping schedule %s with unsupported interval_type %r",
+                schedule_id,
+                interval_type,
+            )
+            return None
+
+        interval = int(interval_value)
+        trigger = "interval"
+        trigger_kwargs: dict[str, t.Any] = {interval_type: interval}
+
+        if interval_type == "days":
+            start_time = t.cast(str, schedule.start_time)
+            curr_time = start_time.split(":")
+            trigger = "cron"
+            trigger_kwargs = {
+                "day": f"*/{interval_value}",
+                "hour": curr_time[0],
+                "minute": curr_time[1],
+            }
+
+        return t.cast(
+            Job,
+            self.scheduler.add_job(
+                self.controller.management.queue_command,
+                trigger,
+                id=str(schedule_id),
+                args=command_args,
+                **trigger_kwargs,
+            ),
+        )
+
     def scheduler_thread(self) -> None:
         """Gets list of all scheduled tasks and adds them to the schedule.
 
@@ -293,83 +371,19 @@ class TasksManager:
         self.scheduler.start()
         self.check_for_updates()
         self.add_scheduler_jobs()
+        system_user_id = self.users_controller.get_id_by_name("system")
 
         # load schedules from DB
         for schedule in schedules:
-            # Skip reaction type tasks in the schedule.
-            if schedule.interval == "reaction":
+            new_job = self._add_db_schedule(schedule, system_user_id)
+            if new_job is None:
                 continue
 
-            # The following runs for non-reaction tasks.
-            command_args = [
-                {
-                    "server_id": schedule.server_id.server_id,
-                    "user_id": self.users_controller.get_id_by_name("system"),
-                    "command": schedule.command,
-                    "action_id": schedule.action_id,
-                }
-            ]
-            if schedule.cron_string != "":
-                try:
-                    new_job = self.scheduler.add_job(
-                        self.controller.management.queue_command,
-                        CronTrigger.from_crontab(
-                            schedule.cron_string, timezone=str(self.tz)
-                        ),
-                        id=str(schedule.schedule_id),
-                        args=command_args,
-                    )
-                except Exception as e:
-                    new_job = "error"
-                    Console.error(f"Failed to schedule task with error: {e}.")
-                    Console.warning("Removing failed task from DB.")
-                    logger.error(f"Failed to schedule task with error: {e}.")
-                    logger.warning("Removing failed task from DB.")
-                    # remove items from DB if task fails to add to apscheduler
-                    self.controller.management_helper.delete_scheduled_task(
-                        schedule.schedule_id
-                    )
-            else:
-                if schedule.interval_type not in {"hours", "minutes", "days"}:
-                    logger.warning(
-                        "Skipping schedule %s with unsupported interval_type %r",
-                        schedule.schedule_id,
-                        schedule.interval_type,
-                    )
-                    continue
-
-                interval = int(schedule.interval)
-                trigger = "interval"
-                trigger_kwargs = {schedule.interval_type: interval}
-
-                if schedule.interval_type == "days":
-                    curr_time = schedule.start_time.split(":")
-                    trigger = "cron"
-                    trigger_kwargs = {
-                        "day": f"*/{schedule.interval}",
-                        "hour": curr_time[0],
-                        "minute": curr_time[1],
-                    }
-
-                new_job = self.scheduler.add_job(
-                    self.controller.management.queue_command,
-                    trigger,
-                    id=str(schedule.schedule_id),
-                    args=command_args,
-                    **trigger_kwargs,
-                )
-            if new_job != "error":
-                task = self.controller.management.get_scheduled_task_model(
-                    int(new_job.id)
-                )
-                self.controller.management.update_scheduled_task(
-                    task.schedule_id,
-                    {
-                        "next_run": str(
-                            new_job.next_run_time.strftime("%m/%d/%Y, %H:%M:%S")
-                        )
-                    },
-                )
+            task = self.controller.management.get_scheduled_task_model(int(new_job.id))
+            self.controller.management.update_scheduled_task(
+                task.schedule_id,
+                {"next_run": str(new_job.next_run_time.strftime("%m/%d/%Y, %H:%M:%S"))},
+            )
         jobs = self.scheduler.get_jobs()
         logger.info("Loaded schedules. Current enabled schedules: ")
         for item in jobs:
