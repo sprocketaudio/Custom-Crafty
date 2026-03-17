@@ -45,6 +45,7 @@ scheduler_intervals = {
 }
 
 FAILED_DB_IMPORT_MESSAGE = "Removing failed task from DB."
+SCHEDULE_DATE_STRING_FORMAT = "%m/%d/%Y, %H:%M:%S"
 
 
 class TasksManager:
@@ -384,7 +385,11 @@ class TasksManager:
             task = self.controller.management.get_scheduled_task_model(int(new_job.id))
             self.controller.management.update_scheduled_task(
                 task.schedule_id,
-                {"next_run": str(new_job.next_run_time.strftime("%m/%d/%Y, %H:%M:%S"))},
+                {
+                    "next_run": str(
+                        new_job.next_run_time.strftime(SCHEDULE_DATE_STRING_FORMAT)
+                    )
+                },
             )
         jobs = self.scheduler.get_jobs()
         logger.info("Loaded schedules. Current enabled schedules: ")
@@ -511,7 +516,11 @@ class TasksManager:
                 )
                 self.controller.management.update_scheduled_task(
                     task.schedule_id,
-                    {"next_run": new_job.next_run_time.strftime("%m/%d/%Y, %H:%M:%S")},
+                    {
+                        "next_run": new_job.next_run_time.strftime(
+                            SCHEDULE_DATE_STRING_FORMAT
+                        )
+                    },
                 )
             for item in jobs:
                 logger.info(f"JOB: {item}")
@@ -663,7 +672,11 @@ class TasksManager:
                 )
                 self.controller.management.update_scheduled_task(
                     task.schedule_id,
-                    {"next_run": new_job.next_run_time.strftime("%m/%d/%Y, %H:%M:%S")},
+                    {
+                        "next_run": new_job.next_run_time.strftime(
+                            SCHEDULE_DATE_STRING_FORMAT
+                        )
+                    },
                 )
         else:
             try:
@@ -698,7 +711,7 @@ class TasksManager:
                         {
                             "next_run": self.scheduler.get_job(
                                 event.job_id
-                            ).next_run_time.strftime("%m/%d/%Y, %H:%M:%S")
+                            ).next_run_time.strftime(SCHEDULE_DATE_STRING_FORMAT)
                         },
                     )
                 # check for any child tasks for this. It's kind of backward,
