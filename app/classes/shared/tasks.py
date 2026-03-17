@@ -5,8 +5,8 @@ import logging
 import os
 import threading
 import time
-import typing as t
 from pathlib import Path
+from typing import Any, cast
 from zoneinfo import ZoneInfoNotFoundError
 
 from apscheduler.events import EVENT_JOB_EXECUTED
@@ -289,10 +289,10 @@ class TasksManager:
             Job added to scheduler if the job is not a reaction task
             None if the requested scheduled task is a reaction task
         """
-        schedule_id = t.cast(int, schedule.schedule_id)
-        interval_value = t.cast(int | str, schedule.interval)
-        interval_type = t.cast(str, schedule.interval_type)
-        cron_string = t.cast(str, schedule.cron_string)
+        schedule_id = cast(int, schedule.schedule_id)
+        interval_value = cast(int | str, schedule.interval)
+        interval_type = cast(str, schedule.interval_type)
+        cron_string = cast(str, schedule.cron_string)
 
         if interval_value == "reaction":
             return None
@@ -307,7 +307,7 @@ class TasksManager:
         ]
         if cron_string != "":
             try:
-                return t.cast(
+                return cast(
                     Job,
                     self.scheduler.add_job(
                         self.controller.management.queue_command,
@@ -335,10 +335,10 @@ class TasksManager:
 
         interval = int(interval_value)
         trigger = "interval"
-        trigger_kwargs: dict[str, t.Any] = {interval_type: interval}
+        trigger_kwargs: dict[str, Any] = {interval_type: interval}
 
         if interval_type == "days":
-            start_time = t.cast(str, schedule.start_time)
+            start_time = cast(str, schedule.start_time)
             curr_time = start_time.split(":")
             trigger = "cron"
             trigger_kwargs = {
@@ -347,7 +347,7 @@ class TasksManager:
                 "minute": curr_time[1],
             }
 
-        return t.cast(
+        return cast(
             Job,
             self.scheduler.add_job(
                 self.controller.management.queue_command,
