@@ -6,7 +6,7 @@ import os
 import threading
 import time
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, NotRequired, TypedDict, cast
 from zoneinfo import ZoneInfoNotFoundError
 
 from apscheduler.events import EVENT_JOB_EXECUTED
@@ -46,6 +46,29 @@ scheduler_intervals = {
 
 FAILED_DB_IMPORT_MESSAGE = "Removing failed task from DB."
 SCHEDULE_DATE_STRING_FORMAT = "%m/%d/%Y, %H:%M:%S"
+
+
+class ScheduleJobData(TypedDict):
+    server_id: str
+    action: str
+    interval: int
+    interval_type: str
+    start_time: str
+    command: str | None
+    name: str
+    enabled: bool
+    one_time: bool
+    cron_string: str
+    parent: int | None
+    delay: int
+    action_id: NotRequired[str | None]
+
+
+class QueuedCommandData(TypedDict):
+    server_id: str
+    user_id: int
+    command: str | None
+    action_id: str | None
 
 
 class TasksManager:
@@ -285,6 +308,56 @@ class TasksManager:
             start_date=datetime.datetime.now(),
         )
 
+    def _add_scheduler_command_job(
+        self,
+        sch_id: int,
+        command_data: QueuedCommandData,
+        interval: int | str,
+        interval_type: str,
+        start_time: str,
+        cron_string: str,
+    ) -> Job:
+        """Add a queue_command job to APScheduler from normalized schedule values.
+
+        The caller is responsible for deciding whether reaction or unsupported
+        schedule types should be skipped, and for handling any exceptions raised
+        while creating the scheduler job.
+        """
+        command_args = [command_data]
+        if cron_string != "":
+            return cast(
+                Job,
+                self.scheduler.add_job(
+                    self.controller.management.queue_command,
+                    CronTrigger.from_crontab(cron_string, timezone=str(self.tz)),
+                    id=str(sch_id),
+                    args=command_args,
+                ),
+            )
+
+        trigger = "interval"
+        trigger_kwargs: dict[str, Any] = {interval_type: int(interval)}
+
+        if interval_type == "days":
+            curr_time = start_time.split(":")
+            trigger = "cron"
+            trigger_kwargs = {
+                "day": f"*/{interval}",
+                "hour": curr_time[0],
+                "minute": curr_time[1],
+            }
+
+        return cast(
+            Job,
+            self.scheduler.add_job(
+                self.controller.management.queue_command,
+                trigger,
+                id=str(sch_id),
+                args=command_args,
+                **trigger_kwargs,
+            ),
+        )
+
     def _add_db_schedule(self, schedule: Schedules, system_user_id: int) -> Job | None:
         """Add a persisted schedule to APScheduler if its trigger is supported.
 
@@ -300,24 +373,21 @@ class TasksManager:
         if interval_value == "reaction":
             return None
 
-        command_args = [
-            {
-                "server_id": schedule.server_id.server_id,
-                "user_id": system_user_id,
-                "command": schedule.command,
-                "action_id": schedule.action_id,
-            }
-        ]
+        command_data: QueuedCommandData = {
+            "server_id": schedule.server_id.server_id,
+            "user_id": system_user_id,
+            "command": cast(str | None, schedule.command),
+            "action_id": cast(str | None, schedule.action_id),
+        }
         if cron_string != "":
             try:
-                return cast(
-                    Job,
-                    self.scheduler.add_job(
-                        self.controller.management.queue_command,
-                        CronTrigger.from_crontab(cron_string, timezone=str(self.tz)),
-                        id=str(schedule_id),
-                        args=command_args,
-                    ),
+                return self._add_scheduler_command_job(
+                    schedule_id,
+                    command_data,
+                    interval_value,
+                    interval_type,
+                    cast(str, schedule.start_time),
+                    cron_string,
                 )
             except Exception as e:
                 Console.error(f"Failed to schedule task with error: {e}.")
@@ -336,29 +406,13 @@ class TasksManager:
             )
             return None
 
-        interval = int(interval_value)
-        trigger = "interval"
-        trigger_kwargs: dict[str, Any] = {interval_type: interval}
-
-        if interval_type == "days":
-            start_time = cast(str, schedule.start_time)
-            curr_time = start_time.split(":")
-            trigger = "cron"
-            trigger_kwargs = {
-                "day": f"*/{interval_value}",
-                "hour": curr_time[0],
-                "minute": curr_time[1],
-            }
-
-        return cast(
-            Job,
-            self.scheduler.add_job(
-                self.controller.management.queue_command,
-                trigger,
-                id=str(schedule_id),
-                args=command_args,
-                **trigger_kwargs,
-            ),
+        return self._add_scheduler_command_job(
+            schedule_id,
+            command_data,
+            interval_value,
+            interval_type,
+            cast(str, schedule.start_time),
+            cron_string,
         )
 
     def scheduler_thread(self) -> None:
@@ -396,7 +450,7 @@ class TasksManager:
         for item in jobs:
             logger.info(f"JOB: {item}")
 
-    def schedule_job(self, job_data):
+    def schedule_job(self, job_data: ScheduleJobData) -> int | None:
         sch_id = HelpersManagement.create_scheduled_task(
             job_data["server_id"],
             job_data["action"],
@@ -427,23 +481,23 @@ class TasksManager:
 
         # Let's make sure this can not be mistaken for a reaction
         job_data["parent"] = None
+        system_user_id = self.users_controller.get_id_by_name("system")
+        command_data: QueuedCommandData = {
+            "server_id": job_data["server_id"],
+            "user_id": system_user_id,
+            "command": job_data["command"],
+            "action_id": job_data.get("action_id", None),
+        }
         new_job = "error"
         if job_data["cron_string"] != "":
             try:
-                new_job = self.scheduler.add_job(
-                    self.controller.management.queue_command,
-                    CronTrigger.from_crontab(
-                        job_data["cron_string"], timezone=str(self.tz)
-                    ),
-                    id=str(sch_id),
-                    args=[
-                        {
-                            "server_id": job_data["server_id"],
-                            "user_id": self.users_controller.get_id_by_name("system"),
-                            "command": job_data["command"],
-                            "action_id": job_data.get("action_id", None),
-                        }
-                    ],
+                new_job = self._add_scheduler_command_job(
+                    sch_id,
+                    command_data,
+                    job_data["interval"],
+                    job_data["interval_type"],
+                    job_data["start_time"],
+                    job_data["cron_string"],
                 )
             except Exception as e:
                 new_job = "error"
@@ -454,53 +508,14 @@ class TasksManager:
                 # remove items from DB if task fails to add to apscheduler
                 self.controller.management_helper.delete_scheduled_task(sch_id)
         else:
-            if job_data["interval_type"] == "hours":
-                new_job = self.scheduler.add_job(
-                    self.controller.management.queue_command,
-                    "interval",
-                    hours=int(job_data["interval"]),
-                    id=str(sch_id),
-                    args=[
-                        {
-                            "server_id": job_data["server_id"],
-                            "user_id": self.users_controller.get_id_by_name("system"),
-                            "command": job_data["command"],
-                            "action_id": job_data.get("action_id", None),
-                        }
-                    ],
-                )
-            elif job_data["interval_type"] == "minutes":
-                new_job = self.scheduler.add_job(
-                    self.controller.management.queue_command,
-                    "interval",
-                    minutes=int(job_data["interval"]),
-                    id=str(sch_id),
-                    args=[
-                        {
-                            "server_id": job_data["server_id"],
-                            "user_id": self.users_controller.get_id_by_name("system"),
-                            "command": job_data["command"],
-                            "action_id": job_data.get("action_id", None),
-                        }
-                    ],
-                )
-            elif job_data["interval_type"] == "days":
-                curr_time = job_data["start_time"].split(":")
-                new_job = self.scheduler.add_job(
-                    self.controller.management.queue_command,
-                    "cron",
-                    day="*/" + str(job_data["interval"]),
-                    hour=curr_time[0],
-                    minute=curr_time[1],
-                    id=str(sch_id),
-                    args=[
-                        {
-                            "server_id": job_data["server_id"],
-                            "user_id": self.users_controller.get_id_by_name("system"),
-                            "command": job_data["command"],
-                            "action_id": job_data.get("action_id", None),
-                        }
-                    ],
+            if job_data["interval_type"] in {"hours", "minutes", "days"}:
+                new_job = self._add_scheduler_command_job(
+                    sch_id,
+                    command_data,
+                    job_data["interval"],
+                    job_data["interval_type"],
+                    job_data["start_time"],
+                    job_data["cron_string"],
                 )
         logger.info("Added job. Current enabled schedules: ")
         jobs = self.scheduler.get_jobs()
