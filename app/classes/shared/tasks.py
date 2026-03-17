@@ -451,6 +451,20 @@ class TasksManager:
             logger.info(f"JOB: {item}")
 
     def schedule_job(self, job_data: ScheduleJobData) -> int | None:
+        """Create a new persisted schedule and add it to schedule
+
+        Unlike scheduler_thread, which reloads existing enabled schedules from the
+        database during startup, this method handles a single new schedule payload. It
+        creates the database row first, then immediately adds the schedule.
+
+        Args:
+            job_data: Validated schedule payload for a newly created task.
+
+        Returns:
+            The schedule ID when an enabled non-reaction task is successfully
+            scheduled. Returns None for disabled tasks, reaction tasks, and
+            schedule submissions that fail while being added to APScheduler.
+        """
         sch_id = HelpersManagement.create_scheduled_task(
             job_data["server_id"],
             job_data["action"],
