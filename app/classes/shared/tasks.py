@@ -709,70 +709,68 @@ class TasksManager:
                 )
 
     def schedule_watcher(self, event):
-        if not event.exception:
-            if str(event.job_id).isnumeric():
-                task = self.controller.management.get_scheduled_task_model(
-                    int(event.job_id)
-                )
-                self.controller.management.add_to_audit_log_raw(
-                    "system",
-                    HelperUsers.get_user_id_by_name("system"),
-                    task.server_id,
-                    f"Task with id {task.schedule_id} completed successfully",
-                    "127.0.0.1",
-                )
-                # check if the task is a single run.
-                if task.one_time:
-                    self.remove_job(task.schedule_id)
-                    logger.info("one time task detected. Deleting...")
-                elif task.interval_type != "reaction":
-                    self.controller.management.update_scheduled_task(
-                        task.schedule_id,
-                        {
-                            "next_run": self.scheduler.get_job(
-                                event.job_id
-                            ).next_run_time.strftime(SCHEDULE_DATE_STRING_FORMAT)
-                        },
-                    )
-                # check for any child tasks for this. It's kind of backward,
-                # but this makes DB management a lot easier. One to one
-                # instead of one to many.
-                for schedule in HelpersManagement.get_child_schedules_by_server(
-                    task.schedule_id, task.server_id
-                ):
-                    # event job ID's are strings so we need to look at
-                    # this as the same data type.
-                    if (
-                        str(schedule.parent) == str(event.job_id)
-                        and schedule.interval_type == "reaction"
-                    ):
-                        if schedule.enabled:
-                            delaytime = datetime.datetime.now() + datetime.timedelta(
-                                seconds=schedule.delay
-                            )
-                            self.scheduler.add_job(
-                                self.controller.management.queue_command,
-                                "date",
-                                run_date=delaytime,
-                                id=str(schedule.schedule_id),
-                                args=[
-                                    {
-                                        "server_id": schedule.server_id.server_id,
-                                        "user_id": self.users_controller.get_id_by_name(
-                                            "system"
-                                        ),
-                                        "command": schedule.command,
-                                        "action_id": schedule.action_id,
-                                    }
-                                ],
-                            )
-            else:
-                logger.info(
-                    "Event job ID is not numerical. Assuming it's stats "
-                    "- not stored in DB. Moving on."
-                )
-        else:
+        if event.exception:
             logger.error(f"Task failed with error: {event.exception}")
+            return
+
+        if not str(event.job_id).isnumeric():
+            logger.info(
+                "Event job ID is not numerical. Assuming it's stats "
+                "- not stored in DB. Moving on."
+            )
+            return
+
+        task = self.controller.management.get_scheduled_task_model(int(event.job_id))
+        self.controller.management.add_to_audit_log_raw(
+            "system",
+            HelperUsers.get_user_id_by_name("system"),
+            task.server_id,
+            f"Task with id {task.schedule_id} completed successfully",
+            "127.0.0.1",
+        )
+        # check if the task is a single run.
+        if task.one_time:
+            self.remove_job(task.schedule_id)
+            logger.info("one time task detected. Deleting...")
+        elif task.interval_type != "reaction":
+            self.controller.management.update_scheduled_task(
+                task.schedule_id,
+                {
+                    "next_run": self.scheduler.get_job(
+                        event.job_id
+                    ).next_run_time.strftime(SCHEDULE_DATE_STRING_FORMAT)
+                },
+            )
+        # check for any child tasks for this. It's kind of backward,
+        # but this makes DB management a lot easier. One to one
+        # instead of one to many.
+        for schedule in HelpersManagement.get_child_schedules_by_server(
+            task.schedule_id, task.server_id
+        ):
+            # event job IDs are strings so we need to look at
+            # this as the same data type.
+            if (
+                str(schedule.parent) == str(event.job_id)
+                and schedule.interval_type == "reaction"
+                and schedule.enabled
+            ):
+                delay_time = datetime.datetime.now() + datetime.timedelta(
+                    seconds=schedule.delay
+                )
+                self.scheduler.add_job(
+                    self.controller.management.queue_command,
+                    "date",
+                    run_date=delay_time,
+                    id=str(schedule.schedule_id),
+                    args=[
+                        {
+                            "server_id": schedule.server_id.server_id,
+                            "user_id": self.users_controller.get_id_by_name("system"),
+                            "command": schedule.command,
+                            "action_id": schedule.action_id,
+                        }
+                    ],
+                )
 
     def start_stats_recording(self):
         stats_update_frequency = self.helper.get_setting(
