@@ -606,86 +606,26 @@ class TasksManager:
 
         if job_data["enabled"] and job_data["interval"] != "reaction":
             new_job = "error"
-            if job_data["cron_string"] != "":
-                try:
-                    new_job = self.scheduler.add_job(
-                        self.controller.management.queue_command,
-                        CronTrigger.from_crontab(
-                            job_data["cron_string"], timezone=str(self.tz)
-                        ),
-                        id=str(sch_id),
-                        args=[
-                            {
-                                "server_id": job_data["server_id"],
-                                "user_id": self.users_controller.get_id_by_name(
-                                    "system"
-                                ),
-                                "command": job_data["command"],
-                                "action_id": job_data.get("action_id", None),
-                            }
-                        ],
-                    )
-                except Exception as e:
-                    new_job = "error"
-                    Console.error(f"Failed to schedule task with error: {e}.")
-                    Console.info(FAILED_DB_IMPORT_MESSAGE)
-                    self.controller.management_helper.delete_scheduled_task(sch_id)
-            else:
-                if job_data["interval_type"] == "hours":
-                    new_job = self.scheduler.add_job(
-                        self.controller.management.queue_command,
-                        "cron",
-                        minute=0,
-                        hour="*/" + str(job_data["interval"]),
-                        id=str(sch_id),
-                        args=[
-                            {
-                                "server_id": job_data["server_id"],
-                                "user_id": self.users_controller.get_id_by_name(
-                                    "system"
-                                ),
-                                "command": job_data["command"],
-                                "action_id": job_data.get("action_id", None),
-                            }
-                        ],
-                    )
-                elif job_data["interval_type"] == "minutes":
-                    new_job = self.scheduler.add_job(
-                        self.controller.management.queue_command,
-                        "cron",
-                        minute="*/" + str(job_data["interval"]),
-                        id=str(sch_id),
-                        args=[
-                            {
-                                "server_id": job_data["server_id"],
-                                "user_id": self.users_controller.get_id_by_name(
-                                    "system"
-                                ),
-                                "command": job_data["command"],
-                                "action_id": job_data.get("action_id", None),
-                            }
-                        ],
-                    )
-                elif job_data["interval_type"] == "days":
-                    curr_time = job_data["start_time"].split(":")
-                    new_job = self.scheduler.add_job(
-                        self.controller.management.queue_command,
-                        "cron",
-                        day="*/" + str(job_data["interval"]),
-                        hour=curr_time[0],
-                        minute=curr_time[1],
-                        id=str(sch_id),
-                        args=[
-                            {
-                                "server_id": job_data["server_id"],
-                                "user_id": self.users_controller.get_id_by_name(
-                                    "system"
-                                ),
-                                "command": job_data["command"],
-                                "action_id": job_data.get("action_id", None),
-                            }
-                        ],
-                    )
+            command_data: QueuedCommandData = {
+                "server_id": job_data["server_id"],
+                "user_id": self.users_controller.get_id_by_name("system"),
+                "command": job_data["command"],
+                "action_id": job_data.get("action_id", None),
+            }
+            try:
+                new_job = self._add_scheduler_command_job(
+                    sch_id,
+                    command_data,
+                    job_data["interval"],
+                    job_data["interval_type"],
+                    job_data["start_time"],
+                    job_data["cron_string"],
+                )
+            except Exception as e:
+                new_job = "error"
+                Console.error(f"Failed to schedule task with error: {e}.")
+                Console.info(FAILED_DB_IMPORT_MESSAGE)
+                self.controller.management_helper.delete_scheduled_task(sch_id)
             if new_job != "error":
                 task = self.controller.management.get_scheduled_task_model(
                     int(new_job.id)
