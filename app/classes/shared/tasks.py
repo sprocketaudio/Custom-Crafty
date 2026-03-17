@@ -330,6 +330,14 @@ class TasksManager:
                         schedule.schedule_id
                     )
             else:
+                if schedule.interval_type not in {"hours", "minutes", "days"}:
+                    logger.warning(
+                        "Skipping schedule %s with unsupported interval_type %r",
+                        schedule.schedule_id,
+                        schedule.interval_type,
+                    )
+                    continue
+
                 interval = int(schedule.interval)
                 trigger = "interval"
                 trigger_kwargs = {schedule.interval_type: interval}
