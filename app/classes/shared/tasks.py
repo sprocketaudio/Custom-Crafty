@@ -15,6 +15,7 @@ from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from peewee import DoesNotExist
+from requests.exceptions import JSONDecodeError
 from tzlocal import get_localzone
 
 from app.classes.controllers.users_controller import UsersController
@@ -812,7 +813,10 @@ class TasksManager:
                                 "mounts": self.helper.get_setting("monitored_mounts"),
                             },
                         )
-                    except:
+                    # A quick review of the calls to the disk and mounts is that
+                    # upstream catches any OS probe errors. We should only need to catch
+                    # malformed JSON or missing keys that we are selecting for here.
+                    except (JSONDecodeError, AttributeError, TypeError):
                         WebSocketManager().broadcast_page(
                             "/panel/dashboard",
                             "update_host_stats",
@@ -961,6 +965,11 @@ class TasksManager:
                         log_file_path, logs_delete_after
                     ):
                         os.remove(log_file_path)
+        # A quick look at the sub-calls looks like there are a lot of options for
+        # possible exceptions here. I see TypeError, AttributeError, FileNotFoundError,
+        # NotADirectoryError, etc. For the current state in Crafty we'll need to leave
+        # this as a bare except. We'll need to implement better error handling in lower
+        # level call areas of Crafty to reasonably narrow this scope.
         except:
             logger.debug(
                 "Unable to find project root."
