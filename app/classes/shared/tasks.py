@@ -569,6 +569,23 @@ class TasksManager:
                 f"that doesn't exist from active schedules."
             )
 
+    def _remove_scheduler_job_if_present(
+        self, sch_id: int, missing_log_message: str | None = None
+    ) -> bool:
+        """Remove a scheduler job if it exists.
+
+        Returns:
+            True when the job was removed.
+            False when scheduler had no job for the provided ID.
+        """
+        try:
+            self.scheduler.remove_job(str(sch_id))
+        except JobLookupError:
+            if missing_log_message is not None:
+                logger.info(missing_log_message)
+            return False
+        return True
+
     def update_job(self, sch_id, job_data):
         # Checks to make sure some doofus didn't actually make the newly
         # created task a child of itself.
@@ -592,20 +609,17 @@ class TasksManager:
             else:
                 job = HelpersManagement.get_scheduled_task(sch_id)
                 if job["interval_type"] != "reaction":
-                    self.scheduler.remove_job(str(sch_id))
+                    self._remove_scheduler_job_if_present(sch_id)
                 return
 
-        try:
-            if job_data["interval"] != "reaction":
-                self.scheduler.remove_job(str(sch_id))
-        except JobLookupError:
-            logger.info(
+        if job_data["interval"] != "reaction":
+            self._remove_scheduler_job_if_present(
+                sch_id,
                 "No job found in update job. "
-                "Assuming it was previously disabled. Starting new job."
+                "Assuming it was previously disabled. Starting new job.",
             )
 
         if job_data["enabled"] and job_data["interval"] != "reaction":
-            new_job = "error"
             command_data: QueuedCommandData = {
                 "server_id": job_data["server_id"],
                 "user_id": self.users_controller.get_id_by_name("system"),
@@ -639,14 +653,11 @@ class TasksManager:
                     },
                 )
         else:
-            try:
-                self.scheduler.get_job(str(sch_id))
-                self.scheduler.remove_job(str(sch_id))
-            except:
-                logger.info(
-                    f"APScheduler found no scheduled job on schedule update for "
-                    f"schedule with id: {sch_id} Assuming it was already disabled."
-                )
+            self._remove_scheduler_job_if_present(
+                sch_id,
+                f"APScheduler found no scheduled job on schedule update for "
+                f"schedule with id: {sch_id} Assuming it was already disabled.",
+            )
 
     def schedule_watcher(self, event):
         if event.exception:
