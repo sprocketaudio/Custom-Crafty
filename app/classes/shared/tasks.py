@@ -586,6 +586,32 @@ class TasksManager:
             return False
         return True
 
+    def _normalize_update_job_data(
+        self, sch_id: int, job_data: dict[str, Any]
+    ) -> dict[str, Any] | None:
+        """Extracted confirming of keys in dict from update_job
+
+        Returns:
+            None if dict is not sufficient for update_job
+            Dict data if all checks pass for update_job
+        """
+        required_keys = {"interval", "enabled", "cron_string", "interval_type"}
+        if required_keys.issubset(job_data):
+            return job_data
+
+        if "enabled" not in job_data:
+            return None
+
+        if job_data["enabled"] is True:
+            full_job_data = HelpersManagement.get_scheduled_task(sch_id)
+            full_job_data["server_id"] = full_job_data["server_id"]["server_id"]
+            return full_job_data
+
+        full_job_data = HelpersManagement.get_scheduled_task(sch_id)
+        if full_job_data["interval_type"] != "reaction":
+            self._remove_scheduler_job_if_present(sch_id)
+        return None
+
     def update_job(self, sch_id, job_data):
         # Checks to make sure some doofus didn't actually make the newly
         # created task a child of itself.
@@ -594,23 +620,9 @@ class TasksManager:
             job_data["parent"] = None
         HelpersManagement.update_scheduled_task(sch_id, job_data)
 
-        if not (
-            "interval" in job_data
-            and "enabled" in job_data
-            and "cron_string" in job_data
-            and "interval_type" in job_data
-        ):
-            if "enabled" not in job_data:
-                return
-
-            if job_data["enabled"] is True:
-                job_data = HelpersManagement.get_scheduled_task(sch_id)
-                job_data["server_id"] = job_data["server_id"]["server_id"]
-            else:
-                job = HelpersManagement.get_scheduled_task(sch_id)
-                if job["interval_type"] != "reaction":
-                    self._remove_scheduler_job_if_present(sch_id)
-                return
+        job_data = self._normalize_update_job_data(sch_id, job_data)
+        if job_data is None:
+            return
 
         if job_data["interval"] != "reaction":
             self._remove_scheduler_job_if_present(
