@@ -6,7 +6,7 @@
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Fix dashboard table width to fix ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/992))
 ### Tweaks
 TBD
 <br><br>
