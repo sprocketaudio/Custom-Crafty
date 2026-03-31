@@ -11,6 +11,7 @@ import subprocess
 import html
 import glob
 import json
+import select
 from pathlib import Path
 from zoneinfo import ZoneInfo
 from zoneinfo import ZoneInfoNotFoundError
@@ -133,7 +134,7 @@ class ServerOutBuf:
         self.max_lines = self.helper.get_setting("virtual_terminal_lines")
         self.line_buffer = ""
         ServerOutBuf.lines[self.server_id] = []
-
+    '''
     def process_byte(self, char):
         if char == "\n":
             line = self.line_buffer.rstrip("\r")
@@ -146,22 +147,116 @@ class ServerOutBuf:
                 ServerOutBuf.lines[self.server_id].pop(0)
         else:
             self.line_buffer += char
+    '''
+    def process_line(self, line):
+        linetemp = line.rstrip("\n")
+        new_lines = linetemp.split("\n")
+
+        for tmp in new_lines:
+            ServerOutBuf.lines[self.server_id].append(tmp)
+
+        self.new_line_handler(linetemp)
+
+        # Limit list length to self.max_lines:
+        if len(ServerOutBuf.lines[self.server_id]) > self.max_lines:
+            #ServerOutBuf.lines[self.server_id].pop(len(ServerOutBuf.lines[self.server_id]) - self.max_lines)
+            x = len(ServerOutBuf.lines[self.server_id]) - self.max_lines
+            del ServerOutBuf.lines[self.server_id][:x]
+
+
+    def read_batched(self, batch_size=20, timeout=0.05):
+        fd = self.proc.stdout.fileno()
+
+        text_wrapper = io.TextIOWrapper(
+            self.proc.stdout,
+            encoding="UTF-8",
+            errors="ignore",
+            newline=None,
+            line_buffering=True
+        )
+
+        buffer = []
+        last_data_time = time.time()
+
+        while True:
+            # Prüfen, ob Daten verfügbar sind (non-blocking)
+            rlist, _, _ = select.select([fd], [], [], timeout)
+
+            if rlist:
+                line = text_wrapper.readline()
+
+                if not line:
+                    # EOF erreicht
+                    break
+
+                buffer.append(line)
+                last_data_time = time.time()
+
+                # Batch voll → sofort verarbeiten
+                if len(buffer) >= batch_size:
+                    self.process_line("".join(buffer))
+                    buffer.clear()
+
+            else:
+                # Timeout → alles verarbeiten, was da ist
+                if buffer:
+                    self.process_line("".join(buffer))
+                    buffer.clear()
+
+            # Prozess beendet?
+            if self.proc.poll() is not None:
+                # Rest lesen
+                while True:
+                    line = text_wrapper.readline()
+                    if not line:
+                        break
+                    buffer.append(line)
+
+                if buffer:
+                    self.process_line("".join(buffer))
+
+                break
 
     def check(self):
+        self.read_batched()
+        '''
         text_wrapper = io.TextIOWrapper(
-            self.proc.stdout, encoding="UTF-8", errors="ignore", newline=""
+            self.proc.stdout, encoding="UTF-8", errors="ignore", newline=None, line_buffering=True
         )
         while True:
             if self.proc.poll() is None:
-                char = text_wrapper.read(1)  # modified
-                # TODO: we may want to benchmark reading in blocks and userspace
-                # processing it later, reads are kind of expensive as a syscall
-                self.process_byte(char)
+                i = 0
+                messages = ""
+                ''for i in range(20):
+                    line = text_wrapper.readline()
+                    if not line:
+                        break
+                    messages += line   # modified
+                    # TODO: we may want to benchmark reading in blocks and userspace
+                    # processing it later, reads are kind of expensive as a syscall
+
+                self.process_line(messages)''
+                while flush := text_wrapper.readline():  # modified
+                    messages += flush
+                    if i == 20:
+                        self.process_line(messages)
+                        break
+                    i += 1
+                if messages:
+                    self.process_line(messages)
             else:
-                flush = text_wrapper.read()  # modified
-                for char in flush:
-                    self.process_byte(char)
-                break
+                i = 0
+                messages = ""
+                while flush := text_wrapper.readline():  # modified
+                    messages += flush
+                    if i == 20:
+                        self.process_line(messages)
+                        messages = ""
+                        i = 0
+                    i += 1
+                if messages:
+                    self.process_line(messages)
+                break'''
 
     def new_line_handler(self, new_line):
         new_line = re.sub("(\033\\[(0;)?[0-9]*[A-z]?(;[0-9])?m?)", " ", new_line)
