@@ -134,7 +134,8 @@ class ServerOutBuf:
         self.max_lines = self.helper.get_setting("virtual_terminal_lines")
         self.line_buffer = ""
         ServerOutBuf.lines[self.server_id] = []
-    '''
+
+    """
     def process_byte(self, char):
         if char == "\n":
             line = self.line_buffer.rstrip("\r")
@@ -147,7 +148,8 @@ class ServerOutBuf:
                 ServerOutBuf.lines[self.server_id].pop(0)
         else:
             self.line_buffer += char
-    '''
+    """
+
     def process_line(self, line):
         linetemp = line.rstrip("\n")
         new_lines = linetemp.split("\n")
@@ -159,10 +161,9 @@ class ServerOutBuf:
 
         # Limit list length to self.max_lines:
         if len(ServerOutBuf.lines[self.server_id]) > self.max_lines:
-            #ServerOutBuf.lines[self.server_id].pop(len(ServerOutBuf.lines[self.server_id]) - self.max_lines)
+            # ServerOutBuf.lines[self.server_id].pop(len(ServerOutBuf.lines[self.server_id]) - self.max_lines)
             x = len(ServerOutBuf.lines[self.server_id]) - self.max_lines
             del ServerOutBuf.lines[self.server_id][:x]
-
 
     def read_batched(self, batch_size=20, timeout=0.05):
         fd = self.proc.stdout.fileno()
@@ -172,7 +173,7 @@ class ServerOutBuf:
             encoding="UTF-8",
             errors="ignore",
             newline=None,
-            line_buffering=True
+            line_buffering=True,
         )
 
         buffer = []
@@ -218,8 +219,8 @@ class ServerOutBuf:
                 break
 
     def check(self):
-        self.read_batched(20,0.00)
-        '''
+        self.read_batched(20, 0.00)
+        """
         text_wrapper = io.TextIOWrapper(
             self.proc.stdout, encoding="UTF-8", errors="ignore", newline=None, line_buffering=True
         )
@@ -256,7 +257,7 @@ class ServerOutBuf:
                     i += 1
                 if messages:
                     self.process_line(messages)
-                break'''
+                break"""
 
     def new_line_handler(self, new_line):
         new_line = re.sub("(\033\\[(0;)?[0-9]*[A-z]?(;[0-9])?m?)", " ", new_line)
