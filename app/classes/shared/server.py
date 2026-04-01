@@ -218,7 +218,7 @@ class ServerOutBuf:
                 break
 
     def check(self):
-        self.read_batched()
+        self.read_batched(20,0.00)
         '''
         text_wrapper = io.TextIOWrapper(
             self.proc.stdout, encoding="UTF-8", errors="ignore", newline=None, line_buffering=True
