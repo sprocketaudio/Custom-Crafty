@@ -205,6 +205,10 @@ class UsersController:
         return HelperUsers.get_managed_users(exec_user_id)
 
     @staticmethod
+    def get_managed_users_ids(exec_user_id) -> list:
+        return HelperUsers.get_managed_users_ids(exec_user_id)
+
+    @staticmethod
     def get_managed_roles(exec_user_id):
         return HelperUsers.get_managed_roles(exec_user_id)
 

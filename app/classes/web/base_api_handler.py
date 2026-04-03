@@ -108,10 +108,8 @@ class BaseApiHandler(BaseHandler):
             return True
         if auth_data[4]["superuser"]:
             return True
-        if (
-            EnumPermissionsCrafty.USER_CONFIG in exec_user_crafty_permissions
-            and user_id
-            in self.controller.users.get_managed_users(auth_data[4]["user_id"])
-        ):
+        if EnumPermissionsCrafty.USER_CONFIG in exec_user_crafty_permissions and str(
+            user_id
+        ) in str(self.controller.users.get_managed_users_ids(auth_data[4]["user_id"])):
             return True
         return False
