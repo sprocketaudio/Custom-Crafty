@@ -40,10 +40,7 @@ class APIUsersTOTPIndexHandler(BaseApiHandler):
 
         if str(user_id) in ["@me", str(user["user_id"])]:
             user_id = user["user_id"]
-        elif (
-            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
-            and not auth_data[4]["superuser"]
-        ):
+        elif not self.can_modify_user(exec_user_crafty_permissions, auth_data, user_id):
             return self.finish_json(
                 400,
                 {
@@ -89,10 +86,7 @@ class APIUsersTOTPIndexHandler(BaseApiHandler):
         if str(user_id) in ["@me", str(user["user_id"])]:
             user_id = user["user_id"]
             res_user = self.controller.users.get_user_object(user_id)
-        elif (
-            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
-            and not auth_data[4]["superuser"]
-        ):
+        elif not self.can_modify_user(exec_user_crafty_permissions, auth_data, user_id):
             return self.finish_json(
                 403,
                 {
@@ -164,10 +158,7 @@ class APIUsersTOTPVerifyIndexHandler(BaseApiHandler):
         if str(user_id) in ["@me", str(auth_data[4]["user_id"])]:
             user_id = auth_data[4]["user_id"]
             res_user = self.controller.users.get_user_object(user_id)
-        elif (
-            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
-            and not auth_data[4]["superuser"]
-        ):
+        elif not self.can_modify_user(exec_user_crafty_permissions, auth_data, user_id):
             return self.finish_json(
                 403,
                 {
@@ -235,10 +226,7 @@ class APIUsersTOTPHandler(BaseApiHandler):
         if str(user_id) in ["@me", str(user["user_id"])]:
             user_id = user["user_id"]
             res_user = self.controller.users.get_user_object(user_id)
-        elif (
-            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
-            and not auth_data[4]["superuser"]
-        ):
+        elif not self.can_modify_user(exec_user_crafty_permissions, auth_data, user_id):
             return self.finish_json(
                 400,
                 {
@@ -298,10 +286,7 @@ class APIUsersTOTPHandler(BaseApiHandler):
 
         if str(user_id) in ["@me", str(user["user_id"])]:
             user = self.controller.users.get_user_object(user_id)
-        elif (
-            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
-            and not auth_data[4]["superuser"]
-        ):
+        elif not self.can_modify_user(exec_user_crafty_permissions, auth_data, user_id):
             return self.finish_json(
                 400,
                 {
@@ -365,10 +350,7 @@ class APIUsersTOTPRecovery(BaseApiHandler):
         if str(user_id) in ["@me", str(user["user_id"])]:
             user_id = user["user_id"]
             res_user = self.controller.users.get_user_object(user_id)
-        elif (
-            EnumPermissionsCrafty.USER_CONFIG not in exec_user_crafty_permissions
-            and not auth_data[4]["superuser"]
-        ):
+        elif not self.can_modify_user(exec_user_crafty_permissions, auth_data, user_id):
             return self.finish_json(
                 400,
                 {
