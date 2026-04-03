@@ -134,15 +134,6 @@ class HelperUsers:
         ]
 
     @staticmethod
-    def get_authed_user_ids(exec_user_id) -> t.List[int]:
-        return [
-            user.user_id
-            for user in Users.select(Users.user_id)
-            .where(Users.username != "system" and Users.manager == exec_user_id)
-            .execute()
-        ]
-
-    @staticmethod
     def get_user_lang_by_id(user_id):
         return Users.get(Users.user_id == user_id).lang
 
@@ -168,7 +159,7 @@ class HelperUsers:
         return [
             user.user_id
             for user in Users.select(Users.user_id)
-            .where(Users.manager == exec_user_id)
+            .where(Users.username != "system" and Users.manager == exec_user_id)
             .execute()
         ]
 

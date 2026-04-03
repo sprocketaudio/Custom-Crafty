@@ -38,7 +38,7 @@ class ApiUsersIndexHandler(BaseApiHandler):
                 ]
         elif EnumPermissionsCrafty.USER_CONFIG in exec_user_crafty_permissions:
             if get_only_ids:
-                data = self.controller.users.get_authed_user_ids(
+                data = self.controller.users.get_managed_users_ids(
                     auth_data[4]["user_id"]
                 )
             else:
