@@ -165,6 +165,10 @@ class UsersController:
         return HelperUsers.get_all_user_ids()
 
     @staticmethod
+    def get_authed_user_ids(exec_user_id) -> t.List[int]:
+        return HelperUsers.get_authed_user_ids(exec_user_id)
+
+    @staticmethod
     def get_all_usernames():
         return HelperUsers.get_all_usernames()
 
