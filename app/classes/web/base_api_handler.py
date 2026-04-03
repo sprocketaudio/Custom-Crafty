@@ -104,13 +104,14 @@ class BaseApiHandler(BaseHandler):
         Returns:
             bool: Returns true if user can edit target user
         """
-        if auth_data["user_id"] == user_id or str(user_id) == "@me":
+        if auth_data[4]["user_id"] == user_id or str(user_id) == "@me":
             return True
-        if auth_data["superuser"]:
+        if auth_data[4]["superuser"]:
             return True
         if (
             EnumPermissionsCrafty.USER_CONFIG in exec_user_crafty_permissions
-            and user_id in self.controller.users.get_managed_users(auth_data["user_id"])
+            and user_id
+            in self.controller.users.get_managed_users(auth_data[4]["user_id"])
         ):
             return True
         return False

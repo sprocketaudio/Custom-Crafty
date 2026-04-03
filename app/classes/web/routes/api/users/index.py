@@ -28,7 +28,7 @@ class ApiUsersIndexHandler(BaseApiHandler):
         # GET /api/v2/users?ids=true
         get_only_ids = self.get_query_argument("ids", None) == "true"
 
-        if auth_data["superuser"]:
+        if auth_data[4]["superuser"]:
             if get_only_ids:
                 data = self.controller.users.get_all_user_ids()
             else:
@@ -38,12 +38,14 @@ class ApiUsersIndexHandler(BaseApiHandler):
                 ]
         elif EnumPermissionsCrafty.USER_CONFIG in exec_user_crafty_permissions:
             if get_only_ids:
-                data = self.controller.users.get_authed_user_ids(auth_data["user_id"])
+                data = self.controller.users.get_authed_user_ids(
+                    auth_data[4]["user_id"]
+                )
             else:
                 data = [
                     {key: getattr(user_res, key) for key in PUBLIC_USER_ATTRS}
                     for user_res in self.controller.users.get_managed_users(
-                        auth_data["user_id"]
+                        auth_data[4]["user_id"]
                     ).execute()
                 ]
         else:
