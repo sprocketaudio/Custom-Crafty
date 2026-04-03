@@ -181,7 +181,7 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             )
         if user_id == "@me":
             user_id = user["user_id"]
-        if not (self.can_modify_user(exec_user_crafty_permissions, auth_data, user_id)):
+        if not self.can_modify_user(exec_user_crafty_permissions, auth_data, user_id):
             # If doesn't have perm can't edit other users
             return self.finish_json(
                 400,
