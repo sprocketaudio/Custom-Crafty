@@ -91,7 +91,7 @@ class BaseApiHandler(BaseHandler):
             )
 
     def can_modify_user(
-        self, exec_user_crafty_permissions: list, auth_data: tuple, user_id: int
+        self, exec_user_crafty_permissions: list, auth_data: tuple, user_id: int | str
     ) -> bool:
         """Checks if exec user has permissions to modify target user
 
