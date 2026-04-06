@@ -199,7 +199,7 @@ class ServerOutBuf:
                     self.process_line("".join(buffer))
 
                 break
-        
+
     def new_line_handler(self, new_line):
         new_line = re.sub("(\033\\[(0;)?[0-9]*[A-z]?(;[0-9])?m?)", " ", new_line)
         new_line = re.sub("[A-z]{2}\b\b", "", new_line)
