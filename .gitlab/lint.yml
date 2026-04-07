@@ -20,7 +20,7 @@ yamllint:
 # JSON Linting [https://github.com/zaach/jsonlint]
 jsonlint:
   stage: lint
-  image: registry.gitlab.com/pipeline-components/jsonlint:egde
+  image: registry.gitlab.com/pipeline-components/jsonlint:edge
   tags:
     - saas-linux-medium-amd64
   rules:
