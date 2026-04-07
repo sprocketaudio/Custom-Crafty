@@ -69,7 +69,7 @@ pylint:
         $CI_PIPELINE_SOURCE == "merge_request_event"'
   before_script:
     - apk update
-    - apk add --no-cache gcc python3-dev py3-setuptoolslinux-headers build-base rust cargo
+    - apk add --no-cache gcc python3-dev py3-setuptools linux-headers build-base rust cargo
     # Pillow dependencies https://pillow.readthedocs.io/en/stable/installation/building-from-source.html#external-libraries
     - apk add --no-cache
       tiff-dev jpeg-dev openjpeg-dev zlib-dev freetype-dev lcms2-dev
