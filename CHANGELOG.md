@@ -1,9 +1,12 @@
 # Changelog
 ## --- [4.10.3] - 2026/TBD
+### Refactor
+- Sonar refactor: tasks.py ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/999))
+- Sonar refactor: Roles Controller ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/998))
 ### New features
 TBD
 ### Bug fixes
-TBD
+- Fix dashboard table width to fix ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/992))
 ### Tweaks
 TBD
 <br><br>
