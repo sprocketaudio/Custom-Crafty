@@ -69,7 +69,7 @@ pylint:
         $CI_PIPELINE_SOURCE == "merge_request_event"'
   before_script:
     - apk update
-    - apk add gcc python3-dev linux-headers build-base rust cargo
+    - apk add gcc python3-dev linux-headers build-base rust cargo zlib-dev
     - pip3 install --no-cache-dir -r requirements.txt
   script:
     - pylint --exit-zero --load-plugins=pylint_gitlab --output-format=gitlab-codeclimate:codeclimate.json $(find -type f -name "*.py" ! -path "**/.venv/**" ! -path "**/app/migrations/**")
