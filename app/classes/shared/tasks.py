@@ -6,7 +6,7 @@ import os
 import threading
 import time
 from pathlib import Path
-from typing import Any, List, NotRequired, TypedDict, cast
+from typing import Any, List, Optional, TypedDict, cast
 from zoneinfo import ZoneInfoNotFoundError
 
 from apscheduler.events import EVENT_JOB_EXECUTED
@@ -62,7 +62,7 @@ class ScheduleJobData(TypedDict):
     cron_string: str
     parent: int | None
     delay: int
-    action_id: NotRequired[str | None]
+    action_id: Optional[str | None]
 
 
 class QueuedCommandData(TypedDict):
