@@ -11,6 +11,7 @@ import subprocess
 import html
 import glob
 import json
+import select
 from pathlib import Path
 from zoneinfo import ZoneInfo
 from zoneinfo import ZoneInfoNotFoundError
@@ -136,33 +137,69 @@ class ServerOutBuf:
         self.line_buffer = ""
         ServerOutBuf.lines[self.server_id] = []
 
-    def process_byte(self, char):
-        if char == "\n":
-            line = self.line_buffer.rstrip("\r")
-            ServerOutBuf.lines[self.server_id].append(line)
+    def process_line(self, line):
+        linetemp = line.rstrip("\n")
+        new_lines = linetemp.split("\n")
 
-            self.new_line_handler(line)
-            self.line_buffer = ""
-            # Limit list length to self.max_lines:
-            if len(ServerOutBuf.lines[self.server_id]) > self.max_lines:
-                ServerOutBuf.lines[self.server_id].pop(0)
-        else:
-            self.line_buffer += char
+        for tmp in new_lines:
+            ServerOutBuf.lines[self.server_id].append(tmp)
 
-    def check(self):
+        self.new_line_handler(linetemp)
+
+        # Limit list length to self.max_lines:
+        if len(ServerOutBuf.lines[self.server_id]) > self.max_lines:
+            x = len(ServerOutBuf.lines[self.server_id]) - self.max_lines
+            del ServerOutBuf.lines[self.server_id][:x]
+
+    def check(self, batch_size=20, timeout=0.00):
+        fd = self.proc.stdout.fileno()
+
         text_wrapper = io.TextIOWrapper(
-            self.proc.stdout, encoding="UTF-8", errors="ignore", newline=""
+            self.proc.stdout,
+            encoding="UTF-8",
+            errors="ignore",
+            newline=None,
+            line_buffering=True,
         )
+
+        buffer = []
+
         while True:
-            if self.proc.poll() is None:
-                char = text_wrapper.read(1)  # modified
-                # TODO: we may want to benchmark reading in blocks and userspace
-                # processing it later, reads are kind of expensive as a syscall
-                self.process_byte(char)
+            # Check if new data available (non-blocking)
+            rlist, _, _ = select.select([fd], [], [], timeout)
+
+            if rlist:
+                line = text_wrapper.readline()
+
+                if not line:
+                    # EOF reached
+                    break
+
+                buffer.append(line)
+
+                # Batch size reached -> process buffer
+                if len(buffer) >= batch_size:
+                    self.process_line("".join(buffer))
+                    buffer.clear()
+
             else:
-                flush = text_wrapper.read()  # modified
-                for char in flush:
-                    self.process_byte(char)
+                # Timeout -> process buffer
+                if buffer:
+                    self.process_line("".join(buffer))
+                    buffer.clear()
+
+            # Process terminated?
+            if self.proc.poll() is not None:
+                # read till end and print
+                while True:
+                    line = text_wrapper.readline()
+                    if not line:
+                        break
+                    buffer.append(line)
+
+                if buffer:
+                    self.process_line("".join(buffer))
+
                 break
 
     def new_line_handler(self, new_line):
