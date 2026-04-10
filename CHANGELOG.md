@@ -8,6 +8,7 @@ TBD
 ### Bug fixes
 - Fix dashboard table width to fix ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/992))
 - Improve Terminal performance for noisey servers ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/1005))
+- [`CVE-2026-5652`] Security: Improve Authentication #705 ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/1004))
 ### Tweaks
 TBD
 <br><br>
