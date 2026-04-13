@@ -9,6 +9,7 @@ from app.classes.models.server_permissions import EnumPermissionsServer
 
 from app.classes.web.base_api_handler import BaseApiHandler
 
+
 logger = logging.getLogger(__name__)
 
 task_patch_schema = {

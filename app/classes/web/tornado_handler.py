@@ -26,6 +26,7 @@ from app.classes.web.websocket_handler import WebSocketHandler
 from app.classes.web.static_handler import CustomStaticHandler
 from app.classes.web.status_handler import StatusHandler
 
+
 logger = logging.getLogger(__name__)
 
 

@@ -4,6 +4,7 @@ import logging
 
 from app.classes.web.base_api_handler import BaseApiHandler
 
+
 logger = logging.getLogger(__name__)
 
 

@@ -7,6 +7,7 @@ from app.classes.models.crafty_permissions import (
 )
 from app.classes.web.base_api_handler import BaseApiHandler
 
+
 logger = logging.getLogger(__name__)
 
 

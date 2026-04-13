@@ -7,6 +7,7 @@ from tornado.iostream import StreamClosedError
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.web.base_handler import BaseHandler
 
+
 logger = logging.getLogger(__name__)
 executor = ThreadPoolExecutor(max_workers=4)
 

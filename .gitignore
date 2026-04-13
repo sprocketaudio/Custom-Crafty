@@ -39,5 +39,3 @@ docker/*
 lang_sort_log.txt
 lang_sort.txt
 app/migrations/status
-/.vs
-
