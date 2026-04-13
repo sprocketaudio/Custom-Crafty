@@ -436,14 +436,12 @@ class UsersController:
             theme="anti-lockout",
         )
 
-        Console.yellow(
-            f"""
+        Console.yellow(f"""
             Anti-lockout recovery account enabled!
             {'/' * 74}
             Username: anti-lockout-user
             Password: {lockout_pass}
-            {'/' * 74}"""
-        )
+            {'/' * 74}""")
         self.scheduler.add_job(
             self.stop_anti_lockout,
             "date",
