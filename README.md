@@ -19,7 +19,7 @@
 
 ## Local Run (No Docker)
 ```powershell
-cd D:\Sprocket\Documents\GitHub\Crafty
+cd <path-to-Crafty>
 .venv\Scripts\python.exe main.py
 ```
 
