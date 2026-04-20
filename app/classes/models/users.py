@@ -72,7 +72,7 @@ class ApiKeys(BaseModel):
     name = CharField(default="", unique=True, index=True)
     created = DateTimeField(default=datetime.datetime.now)
     user_id = ForeignKeyField(Users, backref="api_token", index=True)
-    server_permissions = CharField(default="00000000")
+    server_permissions = CharField(default="0000000000")
     crafty_permissions = CharField(default="000")
     full_access = BooleanField(default=False)
 

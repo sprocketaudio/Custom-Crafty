@@ -3,6 +3,7 @@ import datetime
 import typing as t
 from peewee import (
     CharField,
+    TextField,
     DateTimeField,
     BooleanField,
     IntegerField,
@@ -46,6 +47,10 @@ class Servers(BaseModel):
     app_id = IntegerField(null=True)
     count_players = BooleanField(default=True)
     update_watcher = BooleanField(default=False)
+    cpu_affinity = CharField(default="")
+    memory_limit_mib = IntegerField(default=0)
+    server_notes = TextField(default="")
+    telemetry_port = IntegerField(default=0)
 
     class Meta:
         table_name = "servers"
@@ -75,6 +80,9 @@ class HelperServers:
         server_port: int = 25565,
         server_host: str = "127.0.0.1",
         app_id: int = None,
+        cpu_affinity: str = "",
+        memory_limit_mib: int = 0,
+        telemetry_port: int = 0,
     ) -> int:
         """Create a server in the database
 
@@ -114,6 +122,9 @@ class HelperServers:
             type=server_type,
             created_by=created_by,
             app_id=app_id,
+            cpu_affinity=cpu_affinity,
+            memory_limit_mib=memory_limit_mib,
+            telemetry_port=telemetry_port,
         ).server_id
 
     @staticmethod

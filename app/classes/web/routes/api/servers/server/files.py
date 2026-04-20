@@ -12,6 +12,7 @@ from jsonschema.exceptions import ValidationError
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.helpers.helpers import Helpers
 from app.classes.helpers.file_helpers import FileHelpers
+from app.classes.helpers.nbt_helpers import NbtFileHelpers, NbtFileError
 from app.classes.web.base_api_handler import BaseApiHandler
 
 logger = logging.getLogger(__name__)
@@ -34,6 +35,15 @@ files_get_schema = {
         "modified_epoch": {
             "type": "number",
             "error": "typeEpoch",
+            "fill": True,
+        },
+        "editor_encoding": {
+            "type": "string",
+            "enum": [
+                NbtFileHelpers.EDITOR_ENCODING_JSON,
+                NbtFileHelpers.EDITOR_ENCODING_SNBT,
+            ],
+            "error": "typeString",
             "fill": True,
         },
     },
@@ -63,6 +73,15 @@ files_patch_schema = {
         "overwrite": {
             "type": "boolean",
             "error": "typeBoolean",
+            "fill": True,
+        },
+        "editor_encoding": {
+            "type": "string",
+            "enum": [
+                NbtFileHelpers.EDITOR_ENCODING_JSON,
+                NbtFileHelpers.EDITOR_ENCODING_SNBT,
+            ],
+            "error": "typeString",
             "fill": True,
         },
     },
@@ -223,6 +242,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             auth_data[5],
         )
         server_permissions = self.controller.server_perms.get_permissions(mask)
+        has_nbt_read_permission = EnumPermissionsServer.NBT_READ in server_permissions
         if (
             EnumPermissionsServer.FILES not in server_permissions
             and EnumPermissionsServer.BACKUP not in server_permissions
@@ -305,6 +325,9 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                 raw_path = Path(folder, filename).resolve()
                 lib_stat = Path(raw_path).stat()
                 can_open, mime = self.file_helper.probably_can_open_file(str(raw_path))
+                if NbtFileHelpers.can_open_in_editor(str(raw_path)):
+                    can_open = has_nbt_read_permission
+                    mime = NbtFileHelpers.NBT_MIME
                 modified_time = datetime.fromtimestamp(lib_stat.st_mtime)
                 permissions = {
                     "can_read": os.access(raw_path, os.R_OK),
@@ -386,9 +409,32 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         else:
             try:
                 if Path(data["path"]).is_file():
+                    is_nbt_file = NbtFileHelpers.is_nbt_file(data["path"])
+                    editor_encoding = data.get(
+                        "editor_encoding", NbtFileHelpers.EDITOR_ENCODING_JSON
+                    )
+                    if is_nbt_file and not has_nbt_read_permission:
+                        return self.finish_json(
+                            400,
+                            {
+                                "status": "error",
+                                "error": "NOT_AUTHORIZED",
+                                "error_data": self.helper.translation.translate(
+                                    "validators",
+                                    "insufficientPerms",
+                                    auth_data[4]["lang"],
+                                ),
+                            },
+                        )
                     can_open, mime = self.file_helper.probably_can_open_file(
                         data["path"]
                     )
+                    if NbtFileHelpers.can_open_in_editor(data["path"]):
+                        can_open = True
+                        mime = NbtFileHelpers.NBT_MIME
+                    elif is_nbt_file:
+                        can_open = False
+                        mime = NbtFileHelpers.NBT_MIME
                     modified_epoch = Path(data["path"]).stat().st_mtime
                     modified_time = datetime.fromtimestamp(modified_epoch)
                     try:
@@ -401,8 +447,20 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                         "size": Helpers.human_readable_file_size(file_size),
                         "modified_epoch": modified_epoch,
                     }
-                    with open(data["path"], encoding="utf-8") as file:
-                        file_contents = file.read()
+                    if is_nbt_file:
+                        if editor_encoding == NbtFileHelpers.EDITOR_ENCODING_SNBT:
+                            file_contents = NbtFileHelpers.read_as_snbt(data["path"])
+                        else:
+                            file_contents = NbtFileHelpers.read_as_json(data["path"])
+                            editor_encoding = NbtFileHelpers.EDITOR_ENCODING_JSON
+                        attributes["editor_encoding"] = editor_encoding
+                        attributes["editor_encoding_options"] = [
+                            NbtFileHelpers.EDITOR_ENCODING_JSON,
+                            NbtFileHelpers.EDITOR_ENCODING_SNBT,
+                        ]
+                    else:
+                        with open(data["path"], encoding="utf-8") as file:
+                            file_contents = file.read()
                     self.finish_json(
                         200,
                         {
@@ -415,7 +473,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
                     )
                 else:
                     raise OSError("Item is not a valid File")
-            except (UnicodeDecodeError, OSError) as ex:
+            except (UnicodeDecodeError, OSError, NbtFileError) as ex:
                 self.finish_json(
                     400,
                     {"status": "error", "error": "DECODE_ERROR", "error_data": str(ex)},
@@ -494,6 +552,7 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             auth_data[5],
         )
         server_permissions = self.controller.server_perms.get_permissions(mask)
+        has_nbt_write_permission = EnumPermissionsServer.NBT_WRITE in server_permissions
         if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
             return self.finish_json(
@@ -626,14 +685,44 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
             )
         file_path = Helpers.get_os_understandable_path(data["path"])
         file_contents = data["contents"]
+        editor_encoding = data.get("editor_encoding")
         if Path(data["path"]).stat().st_mtime > data.get(
             "modified_epoch", 1.5
         ) and not data.get("overwrite"):
             self.set_status(409)
             return self.finish()
-        # Open the file in write mode and store the content in file_object
-        with open(file_path, "w", encoding="utf-8") as file_object:
-            file_object.write(file_contents)
+        is_nbt_file = NbtFileHelpers.is_nbt_file(data["path"])
+        if is_nbt_file and not has_nbt_write_permission:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
+        backup_path = ""
+        try:
+            if is_nbt_file:
+                if editor_encoding == NbtFileHelpers.EDITOR_ENCODING_SNBT:
+                    backup_path = NbtFileHelpers.write_from_snbt(
+                        file_path, file_contents
+                    )
+                else:
+                    backup_path = NbtFileHelpers.write_from_json(
+                        file_path, file_contents
+                    )
+            else:
+                # Open the file in write mode and store the content in file_object
+                with open(file_path, "w", encoding="utf-8") as file_object:
+                    file_object.write(file_contents)
+        except NbtFileError as ex:
+            return self.finish_json(
+                400,
+                {"status": "error", "error": "NBT_PARSE_ERROR", "error_data": str(ex)},
+            )
 
         # Update file details
         modified_epoch = Path(data["path"]).stat().st_mtime
@@ -643,15 +732,26 @@ class ApiServersServerFilesIndexHandler(BaseApiHandler):
         except (OSError, IOError):
             file_size = 0
         attributes = {
-            "mime": self.file_helper.check_mime_types(data["path"]),
+            "mime": (
+                NbtFileHelpers.NBT_MIME
+                if NbtFileHelpers.can_open_in_editor(data["path"])
+                else self.file_helper.check_mime_types(data["path"])
+            ),
             "modified": modified_time.strftime(HUMAN_TIME_FORMAT),
             "size": Helpers.human_readable_file_size(file_size),
             "modified_epoch": modified_epoch,
         }
+        if is_nbt_file:
+            attributes["nbt_backup_path"] = backup_path
 
         self.controller.management.add_to_audit_log(
             auth_data[4]["user_id"],
-            f"Edited file {data['path']}",
+            (
+                f"Edited NBT file {data['path']} "
+                f"(backup: {backup_path if is_nbt_file else 'n/a'})"
+                if is_nbt_file
+                else f"Edited file {data['path']}"
+            ),
             server_id,
             self.get_remote_ip(),
         )
@@ -1050,6 +1150,20 @@ class ApiServersServerFileDownload(BaseApiHandler):
         server_permissions = self.controller.server_perms.get_permissions(mask)
         if EnumPermissionsServer.FILES not in server_permissions:
             # if the user doesn't have Files permission, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
+        if (
+            NbtFileHelpers.is_nbt_file(str(file_path))
+            and EnumPermissionsServer.NBT_READ not in server_permissions
+        ):
             return self.finish_json(
                 400,
                 {

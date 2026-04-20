@@ -6,6 +6,7 @@ import typing as t
 import json
 import logging
 from pathlib import Path
+from urllib.parse import urlencode
 from zoneinfo import ZoneInfoNotFoundError
 import httpx
 import aiofiles
@@ -119,7 +120,7 @@ class PanelHandler(BaseHandler):
         return permissions_mask
 
     def get_perms_server(self) -> str:
-        permissions_mask: str = "00000000"
+        permissions_mask: str = "0" * len(EnumPermissionsServer)
         for permission in self.controller.server_perms.list_defined_permissions():
             argument = self.get_argument(f"permission_{permission.name}", None)
             if argument is not None:
@@ -368,6 +369,42 @@ class PanelHandler(BaseHandler):
             "superuser": superuser,
             "themes": self.helper.get_themes(),
         }
+        launch_caps = self.helper.launch_capabilities
+        if (
+            not isinstance(launch_caps, dict)
+            or "cpu_affinity" not in launch_caps
+            or "memory_limit" not in launch_caps
+        ):
+            try:
+                launch_caps = self.helper.detect_launch_capabilities()
+            except Exception as e:
+                logger.error("Failed to detect launch capabilities: %s", e)
+                launch_caps = {}
+
+        if not isinstance(launch_caps, dict):
+            launch_caps = {}
+
+        if not isinstance(launch_caps.get("cpu_affinity"), dict):
+            launch_caps["cpu_affinity"] = {}
+        if not isinstance(launch_caps.get("memory_limit"), dict):
+            launch_caps["memory_limit"] = {}
+
+        launch_caps["cpu_affinity"].setdefault("supported", False)
+        launch_caps["cpu_affinity"].setdefault("os", "unavailable")
+        launch_caps["cpu_affinity"].setdefault(
+            "reason", "capability_probe_unavailable"
+        )
+        launch_caps["cpu_affinity"].setdefault("taskset_path", None)
+
+        launch_caps["memory_limit"].setdefault("supported", False)
+        launch_caps["memory_limit"].setdefault("os", "unavailable")
+        launch_caps["memory_limit"].setdefault(
+            "reason", "capability_probe_unavailable"
+        )
+        launch_caps["memory_limit"].setdefault("cgroup_root", None)
+
+        page_data["launch_capabilities"] = launch_caps
+
         try:
             page_data["hosts_data"]["disk_json"] = json.loads(
                 page_data["hosts_data"]["disk_json"].replace("'", '"')
@@ -467,40 +504,89 @@ class PanelHandler(BaseHandler):
             user_order = user_order["server_order"].split(",")
             page_servers = []
             server_ids = []
-            un_used_servers = page_data["servers"]
-            flag = 0
+            un_used_servers = []
+
+            # Normalize per-server status keys and resolve the runtime ID from
+            # server metadata (with stats fallbacks for older payload shapes).
+            for server in page_data["servers"]:
+                stats = server.get("stats")
+                if not isinstance(stats, dict):
+                    stats = {}
+                    server["stats"] = stats
+
+                stats_defaults = {
+                    "running": False,
+                    "cpu": 0,
+                    "mem": 0,
+                    "mem_percent": 0,
+                    "world_size": "",
+                    "int_ping_results": False,
+                    "online": 0,
+                    "max": 0,
+                    "server_port": 0,
+                    "version": "",
+                    "icon": "",
+                    "updating": False,
+                    "importing": False,
+                    "crashed": False,
+                    "waiting_start": False,
+                }
+                for key, default_value in stats_defaults.items():
+                    stats.setdefault(key, default_value)
+
+                server_data = server.get("server_data", {})
+                resolved_server_id = server_data.get("server_id")
+                if resolved_server_id is None:
+                    stats_server_id = stats.get("server_id")
+                    if isinstance(stats_server_id, dict):
+                        resolved_server_id = stats_server_id.get("server_id")
+                    elif stats_server_id is not None:
+                        resolved_server_id = stats_server_id
+                    else:
+                        resolved_server_id = stats.get("id")
+
+                if resolved_server_id is None:
+                    logger.warning(
+                        "Dashboard server payload missing server_id keys: %s", server
+                    )
+                    continue
+
+                resolved_server_id = str(resolved_server_id)
+                server["_resolved_server_id"] = resolved_server_id
+                stats["importing"] = self.controller.servers.get_import_status(
+                    resolved_server_id
+                )
+                try:
+                    stats["updating"] = self.controller.servers.get_update_status(
+                        resolved_server_id
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to get server update status: {e}")
+                    stats["updating"] = False
+                stats["crashed"] = self.controller.servers.is_crashed(
+                    resolved_server_id
+                )
+                try:
+                    stats["waiting_start"] = self.controller.servers.get_waiting_start(
+                        resolved_server_id
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to get server waiting to start: {e}")
+                    stats["waiting_start"] = False
+                un_used_servers.append(server)
+
             for server_id in user_order[:]:
                 for server in un_used_servers[:]:
-                    if flag == 0:
-                        server["stats"]["importing"] = (
-                            self.controller.servers.get_import_status(
-                                str(server["stats"]["server_id"]["server_id"])
-                            )
-                        )
-                        server["stats"]["crashed"] = self.controller.servers.is_crashed(
-                            str(server["stats"]["server_id"]["server_id"])
-                        )
-                        try:
-                            server["stats"]["waiting_start"] = (
-                                self.controller.servers.get_waiting_start(
-                                    str(server["stats"]["server_id"]["server_id"])
-                                )
-                            )
-                        except Exception as e:
-                            logger.error(f"Failed to get server waiting to start: {e}")
-                            server["stats"]["waiting_start"] = False
-
-                    if str(server["server_data"]["server_id"]) == str(server_id):
+                    if str(server.get("_resolved_server_id", "")) == str(server_id):
                         page_servers.append(server)
                         un_used_servers.remove(server)
                         user_order.remove(server_id)
                         break
-                # we only want to set these server stats values once.
-                # We need to update the flag so it only hits that if once.
-                flag += 1
 
             for server in un_used_servers:
-                server_ids.append(str(server["server_data"]["server_id"]))
+                resolved_server_id = str(server.get("_resolved_server_id", ""))
+                if resolved_server_id:
+                    server_ids.append(resolved_server_id)
                 if server not in page_servers:
                     page_servers.append(server)
             for server_id in user_order:
@@ -509,8 +595,16 @@ class PanelHandler(BaseHandler):
                     user_order.remove(server_id)
             page_data["servers"] = page_servers
             for server in page_data["servers"]:
+                resolved_server_id = server.get("_resolved_server_id")
+                if not resolved_server_id:
+                    logger.warning(
+                        "Skipping dashboard server status refresh; missing _resolved_server_id"
+                    )
+                    server["alert"] = False
+                    server["update"] = False
+                    continue
                 server_obj = self.controller.servers.get_server_instance_by_id(
-                    server["server_data"]["server_id"]
+                    resolved_server_id
                 )
                 server["alert"] = server_obj.last_backup_failed
                 server["update"] = (
@@ -582,6 +676,10 @@ class PanelHandler(BaseHandler):
                         "log_path": server_temp_obj["log_path"],
                         "executable": server_temp_obj["executable"],
                         "execution_command": server_temp_obj["execution_command"],
+                        "cpu_affinity": server_temp_obj.get("cpu_affinity", ""),
+                        "memory_limit_mib": server_temp_obj.get("memory_limit_mib", 0),
+                        "telemetry_port": server_temp_obj.get("telemetry_port", 0),
+                        "server_notes": server_temp_obj.get("server_notes", ""),
                         "shutdown_timeout": server_temp_obj["shutdown_timeout"],
                         "stop_command": server_temp_obj["stop_command"],
                         "executable_update_url": server_temp_obj[
@@ -602,11 +700,31 @@ class PanelHandler(BaseHandler):
                     "server_type": "N/A",
                     "cpu": "N/A",
                     "mem": "N/A",
+                    "mem_capacity": "N/A",
+                    "mem_capacity_raw": 0,
                     "int_ping_results": [],
                     "version": "N/A",
                     "desc": "N/A",
                     "started": "False",
+                    "telemetry_tps": False,
+                    "telemetry_mspt": False,
                 }
+            mem_capacity_raw = page_data["server_stats"].get("mem_capacity_raw", 0) or 0
+            if mem_capacity_raw <= 0:
+                configured_limit_mib = page_data["server_data"].get("memory_limit_mib", 0)
+                try:
+                    configured_limit_mib = int(configured_limit_mib)
+                except (TypeError, ValueError):
+                    configured_limit_mib = 0
+                if configured_limit_mib > 0:
+                    mem_capacity_raw = configured_limit_mib * 1024 * 1024
+                    page_data["server_stats"]["mem_capacity_raw"] = mem_capacity_raw
+            if mem_capacity_raw > 0:
+                page_data["server_stats"]["mem_capacity"] = Helpers.human_readable_file_size(
+                    mem_capacity_raw
+                )
+            else:
+                page_data["server_stats"]["mem_capacity"] = "N/A"
             if not self.failed_server:
                 page_data["importing"] = self.controller.servers.get_import_status(
                     server_id
@@ -1851,6 +1969,22 @@ class PanelHandler(BaseHandler):
         elif page == "wiki":
             template = "panel/wiki.html"
         elif page == "edit_file":
+            # Provide a fully rendered fallback URL so navigation works even if
+            # editor JS is cached or fails before it can wire link handlers.
+            edit_server_id = self.get_argument("server_id", "")
+            edit_file_path = self.get_argument("file", "")
+            page_data["edit_file_back_href"] = "#"
+            if edit_server_id:
+                normalized_path = str(edit_file_path).replace("\\", "/").rstrip("/")
+                parent_dir = ""
+                if "/" in normalized_path:
+                    parent_dir = normalized_path.rsplit("/", 1)[0]
+                back_query = {"id": edit_server_id, "subpage": "files"}
+                if parent_dir:
+                    back_query["dir"] = parent_dir
+                page_data["edit_file_back_href"] = (
+                    f"/panel/server_detail?{urlencode(back_query)}#context-container"
+                )
             template = "panel/server_file_edit.html"
         if self.helper.crafty_starting:
             template = "panel/loading.html"

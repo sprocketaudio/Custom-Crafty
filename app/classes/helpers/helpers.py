@@ -189,6 +189,7 @@ class Helpers:
         self.crafty_starting = False
         self.minimum_password_length = 8
         self.crypto_helper = CryptoHelper(self)
+        self.launch_capabilities = {}
 
         self.theme_list = self.load_themes()
 
@@ -940,6 +941,74 @@ class Helpers:
         if Helpers.is_os_windows():
             return ctypes.windll.shell32.IsUserAnAdmin() == 1
         return os.geteuid() == 0
+
+    def detect_launch_capabilities(self):
+        is_linux = sys.platform.startswith("linux")
+        taskset_path = shutil.which("taskset") if is_linux else None
+        affinity_supported = bool(taskset_path)
+        affinity_reason = "ok"
+        if not is_linux:
+            affinity_reason = "non_linux_host"
+        elif not taskset_path:
+            affinity_reason = "taskset_missing"
+
+        memory_caps = {
+            "supported": False,
+            "os": sys.platform,
+            "reason": "non_linux_host",
+            "cgroup_root": None,
+        }
+        if is_linux:
+            cgroup_fs_root = pathlib.Path("/sys/fs/cgroup")
+            controllers_path = cgroup_fs_root / "cgroup.controllers"
+            cgroup_root_raw = (
+                os.environ.get("CRAFTY_MEMORY_CGROUP_ROOT", "").strip()
+                or str(cgroup_fs_root / "crafty")
+            )
+            cgroup_root = pathlib.Path(cgroup_root_raw).resolve(strict=False)
+            memory_caps["cgroup_root"] = str(cgroup_root)
+
+            if not str(cgroup_root).startswith(str(cgroup_fs_root)):
+                memory_caps["reason"] = "invalid_cgroup_root"
+            elif not controllers_path.exists():
+                memory_caps["reason"] = "cgroup_v2_missing"
+            else:
+                try:
+                    controllers = controllers_path.read_text(encoding="utf-8").split()
+                except OSError:
+                    controllers = []
+                if "memory" not in controllers:
+                    memory_caps["reason"] = "memory_controller_missing"
+                else:
+                    probe_name = f".crafty_probe_{os.getpid()}"
+                    probe_dir = cgroup_root / probe_name
+                    try:
+                        cgroup_root.mkdir(parents=True, exist_ok=True)
+                        probe_dir.mkdir(exist_ok=False)
+                        (probe_dir / "memory.max").write_text("max", encoding="utf-8")
+                        probe_dir.rmdir()
+                        memory_caps["supported"] = True
+                        memory_caps["reason"] = "ok"
+                    except OSError:
+                        memory_caps["reason"] = "cgroup_root_unwritable"
+                        with suppress(OSError):
+                            if probe_dir.exists():
+                                probe_dir.rmdir()
+
+        self.launch_capabilities = {
+            "cpu_affinity": {
+                "supported": affinity_supported,
+                "os": sys.platform,
+                "taskset_path": taskset_path,
+                "reason": affinity_reason,
+            },
+            "memory_limit": memory_caps,
+        }
+        logger.info(
+            "Launch capability probe: %s",
+            json.dumps(self.launch_capabilities, ensure_ascii=True, sort_keys=True),
+        )
+        return self.launch_capabilities
 
     def ensure_logging_setup(self):
         log_file = os.path.join(os.path.curdir, "logs", "commander.log")

@@ -599,6 +599,8 @@ class Controller:
             created_by=user_id,
             server_host=monitoring_host,
             server_type=monitoring_type,
+            cpu_affinity=data.get("cpu_affinity", ""),
+            memory_limit_mib=data.get("memory_limit_mib", 0),
         )
         self.management.add_default_backup_config(
             new_server_id,
@@ -717,13 +719,17 @@ class Controller:
                     exec_user["user_id"],
                     False,
                 )
-                self.server_perms.add_role_server(new_server_id, role_id, "11111111")
+                self.server_perms.add_role_server(
+                    new_server_id, role_id, "1" * len(EnumPermissionsServer)
+                )
                 self.users.add_role_to_user(exec_user["user_id"], role_id)
 
         else:
             for role in captured_roles:
                 role_id = role
-                self.server_perms.add_role_server(new_server_id, role_id, "11111111")
+                self.server_perms.add_role_server(
+                    new_server_id, role_id, "1" * len(EnumPermissionsServer)
+                )
 
         return new_server_id
 
@@ -932,6 +938,8 @@ class Controller:
         server_type: str,
         server_host: str = "127.0.0.1",
         app_id: int = None,
+        cpu_affinity: str = "",
+        memory_limit_mib: int = 0,
     ):
         # put data in the db
         new_id = self.servers.create_server(
@@ -947,6 +955,8 @@ class Controller:
             server_port,
             server_host,
             app_id,
+            cpu_affinity,
+            memory_limit_mib,
         )
 
         if not Helpers.check_file_exists(

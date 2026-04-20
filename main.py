@@ -167,12 +167,13 @@ def do_cleanup():
     """
     Checks Crafty's temporary directory and clears it out on boot.
     """
+    temp_dir = os.path.join(controller.project_root, "temp")
     try:
         logger.info("Removing old temp dirs")
-        FileHelpers.del_dirs(os.path.join(controller.project_root, "temp"))
+        FileHelpers.del_dirs(temp_dir)
     except:
         logger.info("Did not find old temp dir.")
-    os.mkdir(os.path.join(controller.project_root, "temp"))
+    os.makedirs(temp_dir, exist_ok=True)
 
 
 def do_version_check():
@@ -358,6 +359,7 @@ if __name__ == "__main__":
     Console.cyan(f"Logging set to: {logger.level}")
     peewee_logger = logging.getLogger("peewee")
     peewee_logger.setLevel(logging.INFO)
+    helper.detect_launch_capabilities()
 
     # print our pretty start message
     do_intro()

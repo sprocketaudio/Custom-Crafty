@@ -2,6 +2,7 @@ import json
 import logging
 
 from jsonschema import ValidationError, validate
+from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.web.base_api_handler import BaseApiHandler
 
 logger = logging.getLogger(__name__)
@@ -86,13 +87,14 @@ class ApiUsersUserKeyHandler(BaseApiHandler):
         )
 
     def patch(self, user_id: str):
+        server_permissions_mask_pattern = rf"^[01]{{{len(EnumPermissionsServer)}}}$"
         user_key_schema = {
             "type": "object",
             "properties": {
                 "name": {"type": "string", "minLength": 3},
                 "server_permissions_mask": {
                     "type": "string",
-                    "pattern": "^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                    "pattern": server_permissions_mask_pattern,
                 },
                 "crafty_permissions_mask": {
                     "type": "string",

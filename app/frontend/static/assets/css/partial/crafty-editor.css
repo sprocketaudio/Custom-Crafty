@@ -12,7 +12,7 @@
 }
 
 #saveButton {
-    width: 50%;
+    min-width: 220px;
 }
 
 .centered {
@@ -35,4 +35,16 @@
 
 .page-title-header {
     margin-bottom: 5px !important;
+}
+
+#save-container {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+}
+
+#nbtEncodingButton {
+    min-width: 220px;
 }

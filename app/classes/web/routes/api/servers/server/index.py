@@ -4,6 +4,15 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from playhouse.shortcuts import model_to_dict
 from app.classes.models.server_permissions import EnumPermissionsServer
+from app.classes.helpers.cpu_affinity import (
+    CpuAffinityValidationError,
+    canonicalize_cpu_affinity,
+    get_effective_cpu_set,
+)
+from app.classes.helpers.memory_limit import (
+    MemoryLimitValidationError,
+    canonicalize_memory_limit_mib,
+)
 from app.classes.web.base_api_handler import BaseApiHandler
 
 logger = logging.getLogger(__name__)
@@ -74,6 +83,29 @@ server_patch_schema = {
             "type": "string",
             "minLength": 1,
             "error": "serverExeCommand",
+        },
+        "cpu_affinity": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "memory_limit_mib": {
+            "type": "integer",
+            "minimum": 0,
+            "error": "typeIntMinVal0",
+            "fill": True,
+        },
+        "telemetry_port": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "error": "typeIntMinVal0",
+            "fill": True,
+        },
+        "server_notes": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
         },
         "java_selection": {
             "type": "string",
@@ -164,6 +196,11 @@ basic_server_patch_schema = {
             "fill": True,
         },
         "java_selection": {
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "server_notes": {
             "type": "string",
             "error": "typeString",
             "fill": True,
@@ -285,6 +322,36 @@ class ApiServersServerIndexHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
+
+        if "cpu_affinity" in data:
+            try:
+                data["cpu_affinity"] = canonicalize_cpu_affinity(
+                    data["cpu_affinity"],
+                    allowed_cpus=get_effective_cpu_set(),
+                )
+            except CpuAffinityValidationError as why:
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_CPU_AFFINITY",
+                        "error_data": str(why),
+                    },
+                )
+        if "memory_limit_mib" in data:
+            try:
+                data["memory_limit_mib"] = canonicalize_memory_limit_mib(
+                    data["memory_limit_mib"]
+                )
+            except MemoryLimitValidationError as why:
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_MEMORY_LIMIT",
+                        "error_data": str(why),
+                    },
+                )
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error

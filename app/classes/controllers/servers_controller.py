@@ -69,6 +69,9 @@ class ServersController(metaclass=Singleton):
         server_port: int = 25565,
         server_host: str = "127.0.0.1",
         app_id: int = None,
+        cpu_affinity: str = "",
+        memory_limit_mib: int = 0,
+        telemetry_port: int = 0,
     ) -> int:
         """Create a server in the database
 
@@ -104,6 +107,9 @@ class ServersController(metaclass=Singleton):
             server_port,
             server_host,
             app_id,
+            cpu_affinity=cpu_affinity,
+            memory_limit_mib=memory_limit_mib,
+            telemetry_port=telemetry_port,
         )
 
     @staticmethod
@@ -364,7 +370,7 @@ class ServersController(metaclass=Singleton):
                 srv: ServerInstance = ServersController().get_server_instance_by_id(
                     server.get("server_id")
                 )
-                latest = srv.stats_helper.get_latest_server_stats()
+                latest = srv.get_raw_server_stats(server.get("server_id"))
                 server_data.append(
                     {
                         "server_data": DatabaseShortcuts.get_data_obj(
@@ -389,7 +395,7 @@ class ServersController(metaclass=Singleton):
 
         for server in authorized_servers:
             srv: ServerInstance = server
-            latest = srv.stats_helper.get_latest_server_stats()
+            latest = srv.get_raw_server_stats(server.server_id)
             key_permissions = PermissionsServers.get_api_key_permissions_list(
                 api_key, server.server_id
             )
@@ -413,7 +419,7 @@ class ServersController(metaclass=Singleton):
 
         for server in authorized_servers:
             srv: ServerInstance = server
-            latest = srv.stats_helper.get_latest_server_stats()
+            latest = srv.get_raw_server_stats(server.server_id)
             # TODO
             user_permissions = PermissionsServers.get_user_id_permissions_list(
                 user_id, server.server_id

@@ -392,6 +392,7 @@
   const rawRamPercent = chartData.ram_percent || [];
   const rawRamGb = chartData.ram_gb || [];
   const rawCpu = chartData.cpu || [];
+  const rawTps = chartData.tps || [];
 
   // Build {x, y} point arrays for time-axis decimation
   // parsing:false requires numeric timestamps (ms) for x values
@@ -415,6 +416,7 @@
   const ramPercentData = timestamps.map((t, i) => ({x: t, y: rawRamPercent[i]}));
   const ramGbData = timestamps.map((t, i) => ({x: t, y: rawRamGb[i]}));
   const cpuData = timestamps.map((t, i) => ({x: t, y: rawCpu[i]}));
+  const tpsData = timestamps.map((t, i) => ({x: t, y: rawTps[i] ?? null}));
 
   // Compute decimation samples based on chart width (~1 point per 3 CSS pixels)
   function getDecimationSamples() {
@@ -460,6 +462,15 @@
           label: "Players",
           data: playerData,
           borderColor: 'rgba(136, 98, 224, .7)',
+          borderWidth: 2,
+          lineTension: 0,
+          spanGaps: false,
+          yAxisID: 'y-right',
+        },
+        {
+          label: "TPS",
+          data: tpsData,
+          borderColor: 'rgba(76, 175, 80, .9)',
           borderWidth: 2,
           lineTension: 0,
           spanGaps: false,
@@ -519,6 +530,8 @@
                 label += parseFloat(context.parsed.y).toFixed(2) + ' GB';
               } else if (context.dataset.label === 'Players') {
                 label += Math.round(context.parsed.y);
+              } else if (context.dataset.label === 'TPS') {
+                label += parseFloat(context.parsed.y).toFixed(2);
               } else {
                 label += context.parsed.y.toFixed(1) + '%';
               }
@@ -547,7 +560,7 @@
           min: 0,
           title: {
             display: true,
-            text: 'Count / GB'
+            text: 'Count / GB / TPS'
           },
           grid: {
             display: false
@@ -645,6 +658,14 @@
       cpuData.push({x: ts, y: data.cpu});
       ramPercentData.push({x: ts, y: data.mem_percent});
       ramGbData.push({x: ts, y: bytesToGB(data.mem_raw)});
+      tpsData.push({
+        x: ts,
+        y: (
+          data.telemetry_tps !== false
+          && data.telemetry_tps !== null
+          && !Number.isNaN(Number(data.telemetry_tps))
+        ) ? Number(data.telemetry_tps) : null
+      });
 
       // Sliding window: trim data older than the selected time range
       if (!zoomed) {
@@ -654,6 +675,7 @@
           ramPercentData.shift();
           ramGbData.shift();
           cpuData.shift();
+          tpsData.shift();
         }
       }
 

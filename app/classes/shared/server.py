@@ -1,9 +1,10 @@
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, suppress
 import os
 import io
 import re
 import shutil
 import time
+import sys
 import datetime
 import threading
 import logging
@@ -34,6 +35,20 @@ from app.classes.models.users import HelperUsers
 from app.classes.models.server_permissions import PermissionsServers
 from app.classes.shared.console import Console
 from app.classes.helpers.helpers import Helpers
+from app.classes.helpers.cpu_affinity import (
+    CpuAffinityValidationError,
+    canonicalize_cpu_affinity,
+    get_effective_cpu_set,
+)
+from app.classes.helpers.memory_limit import (
+    MemoryLimitValidationError,
+    canonicalize_memory_limit_mib,
+)
+from app.classes.helpers.telemetry import (
+    build_telemetry_url,
+    normalize_telemetry_port,
+    parse_telemetry_payload,
+)
 from app.classes.helpers.file_helpers import FileHelpers
 from app.classes.shared.null_writer import NullWriter
 from app.classes.shared.websocket_manager import WebSocketManager
@@ -48,9 +63,9 @@ logger = logging.getLogger(__name__)
 SUCCESSMSG = "SUCCESS! Forge install completed"
 
 
-def extract_backup_info(res):
+def extract_backup_info(res) -> dict:
     if not isinstance(res, dict):
-        return {}, {}
+        return {}
     return {
         "backup_name": res.get("backup_name"),
         "backup_size": str(res.get("backup_size")),
@@ -273,6 +288,11 @@ class ServerInstance:
             id=f"{str(self.server_id)}_update_watcher",
         )
         self.update_available = False
+        self._active_launch_command = []
+        self._active_cpu_affinity = ""
+        self._active_memory_limit_mib = 0
+        self._active_memory_limit_bytes = 0
+        self._active_memory_cgroup_path = ""
 
     # **********************************************************************************
     #                               Minecraft Server Management
@@ -443,6 +463,520 @@ class ServerInstance:
             logger.critical(f"Unable to write/access {self.server_path}")
             Console.critical(f"Unable to write/access {self.server_path}")
 
+    def _launch_server_process(self, command=None, env=None):
+        popen_kwargs = {
+            "cwd": self.server_path,
+            "stdin": subprocess.PIPE,
+            "stdout": subprocess.PIPE,
+            "stderr": subprocess.STDOUT,
+        }
+        if env is not None:
+            popen_kwargs["env"] = env
+        launch_command = command if command is not None else self.server_command
+        self._active_launch_command = list(launch_command or [])
+        return subprocess.Popen(launch_command, **popen_kwargs)
+
+    def _get_configured_cpu_affinity(self):
+        return str(self.settings.get("cpu_affinity", "") or "").strip()
+
+    def _get_cpu_affinity_capability(self):
+        caps = getattr(self.helper, "launch_capabilities", None)
+        cpu_caps = {}
+        if isinstance(caps, dict):
+            cpu_caps = caps.get("cpu_affinity", {}) or {}
+        if not cpu_caps:
+            detected_caps = self.helper.detect_launch_capabilities()
+            cpu_caps = detected_caps.get("cpu_affinity", {}) or {}
+        return cpu_caps
+
+    @staticmethod
+    def _sanitize_server_id_for_cgroup(server_id):
+        return re.sub(r"[^A-Za-z0-9_.-]", "_", str(server_id))
+
+    def _get_configured_memory_limit_mib(self):
+        return canonicalize_memory_limit_mib(self.settings.get("memory_limit_mib", 0))
+
+    def _get_memory_limit_capability(self):
+        caps = getattr(self.helper, "launch_capabilities", None)
+        memory_caps = {}
+        if isinstance(caps, dict):
+            memory_caps = caps.get("memory_limit", {}) or {}
+        if not memory_caps:
+            detected_caps = self.helper.detect_launch_capabilities()
+            memory_caps = detected_caps.get("memory_limit", {}) or {}
+        return memory_caps
+
+    def _build_server_memory_cgroup_path(self, memory_caps):
+        cgroup_root = memory_caps.get("cgroup_root", "")
+        if cgroup_root:
+            root_path = Path(cgroup_root).resolve(strict=False)
+        else:
+            root_path = Path("/sys/fs/cgroup/crafty")
+        server_component = self._sanitize_server_id_for_cgroup(self.server_id)
+        return root_path / f"server-{server_component}"
+
+    def _configure_memory_limit_cgroup(self, memory_limit_mib, memory_caps):
+        cgroup_path = self._build_server_memory_cgroup_path(memory_caps)
+        memory_limit_bytes = int(memory_limit_mib) * 1024 * 1024
+        cgroup_path.mkdir(parents=True, exist_ok=True)
+        (cgroup_path / "memory.max").write_text(str(memory_limit_bytes), encoding="utf-8")
+        with suppress(OSError):
+            memory_oom_group = cgroup_path / "memory.oom.group"
+            if memory_oom_group.exists():
+                memory_oom_group.write_text("1", encoding="utf-8")
+        return str(cgroup_path), memory_limit_bytes
+
+    def _prepare_memory_limit_policy(self, user_id, user_lang):
+        self._active_memory_limit_mib = 0
+        self._active_memory_limit_bytes = 0
+        self._active_memory_cgroup_path = ""
+
+        try:
+            requested_limit_mib = self._get_configured_memory_limit_mib()
+        except MemoryLimitValidationError as ex:
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.ERROR,
+                reason="invalid_memory_limit",
+                configured_memory_limit=self.settings.get("memory_limit_mib", 0),
+                error=str(ex),
+            )
+            self._notify_start_error(user_id, user_lang, f"Memory limit is invalid: {str(ex)}")
+            return False
+
+        if requested_limit_mib <= 0:
+            return True
+
+        memory_caps = self._get_memory_limit_capability()
+        if not memory_caps.get("supported", False):
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.ERROR,
+                reason="memory_limit_unsupported",
+                configured_memory_limit_mib=requested_limit_mib,
+                capability_reason=memory_caps.get("reason", "unknown"),
+                capability_os=memory_caps.get("os", ""),
+                cgroup_root=memory_caps.get("cgroup_root", ""),
+            )
+            self._notify_start_error(
+                user_id,
+                user_lang,
+                "Memory limit requires Linux cgroup v2 memory controller support.",
+            )
+            return False
+
+        try:
+            cgroup_path, memory_limit_bytes = self._configure_memory_limit_cgroup(
+                requested_limit_mib,
+                memory_caps,
+            )
+        except OSError as ex:
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.ERROR,
+                reason="memory_cgroup_config_failed",
+                configured_memory_limit_mib=requested_limit_mib,
+                cgroup_root=memory_caps.get("cgroup_root", ""),
+                error=str(ex),
+            )
+            self._notify_start_error(
+                user_id,
+                user_lang,
+                f"Failed to configure memory cgroup limit: {str(ex)}",
+            )
+            return False
+
+        self._active_memory_limit_mib = requested_limit_mib
+        self._active_memory_limit_bytes = memory_limit_bytes
+        self._active_memory_cgroup_path = cgroup_path
+        self._log_launch_event(
+            "memory_limit_applied",
+            configured_memory_limit_mib=requested_limit_mib,
+            configured_memory_limit_bytes=memory_limit_bytes,
+            cgroup_path=cgroup_path,
+        )
+        return True
+
+    def _attach_process_to_memory_cgroup(self, user_id, user_lang, forge_install=False):
+        if self.process is None or not self._active_memory_cgroup_path:
+            return True
+
+        cgroup_procs_path = Path(self._active_memory_cgroup_path) / "cgroup.procs"
+        try:
+            cgroup_procs_path.write_text(str(self.process.pid), encoding="utf-8")
+        except OSError as ex:
+            self._log_launch_event(
+                "launch_failure",
+                level=logging.ERROR,
+                reason="memory_cgroup_attach_failed",
+                pid=self.process.pid,
+                cgroup_path=self._active_memory_cgroup_path,
+                error=str(ex),
+            )
+            with suppress(Exception):
+                self.process.kill()
+            self.cleanup_server_object()
+            self._notify_start_error(
+                user_id,
+                user_lang,
+                f"Failed to attach process to memory cgroup: {str(ex)}",
+            )
+            if forge_install:
+                self.stats_helper.finish_import()
+            return False
+        return True
+
+    @staticmethod
+    def _read_effective_memory_cgroup(pid):
+        if not isinstance(pid, int):
+            return None
+        if not sys.platform.startswith("linux"):
+            return None
+
+        cgroup_path = Path("/proc", str(pid), "cgroup")
+        try:
+            with open(cgroup_path, "r", encoding="utf-8") as cgroup_file:
+                for line in cgroup_file:
+                    if line.startswith("0::"):
+                        return line.strip().split("::", 1)[1]
+        except OSError:
+            return None
+        return None
+
+    def _log_effective_memory_limit_state(self):
+        if self.process is None or self._active_memory_limit_mib <= 0:
+            return
+
+        effective_cgroup = self._read_effective_memory_cgroup(self.process.pid)
+        if effective_cgroup is None:
+            self._log_launch_event(
+                "memory_limit_verify_unavailable",
+                level=logging.WARNING,
+                pid=self.process.pid,
+                configured_memory_limit_mib=self._active_memory_limit_mib,
+                cgroup_path=self._active_memory_cgroup_path,
+            )
+            return
+
+        self._log_launch_event(
+            "memory_limit_verify",
+            pid=self.process.pid,
+            configured_memory_limit_mib=self._active_memory_limit_mib,
+            configured_memory_limit_bytes=self._active_memory_limit_bytes,
+            cgroup_path=self._active_memory_cgroup_path,
+            effective_cgroup=effective_cgroup,
+        )
+
+    def _resolve_launch_command(self, user_id, user_lang):
+        base_command = list(self.server_command or [])
+        self._active_launch_command = list(base_command)
+        self._active_cpu_affinity = ""
+
+        requested_affinity = self._get_configured_cpu_affinity()
+        if requested_affinity == "":
+            return base_command
+
+        try:
+            canonical_affinity = canonicalize_cpu_affinity(
+                requested_affinity,
+                allowed_cpus=get_effective_cpu_set(),
+            )
+        except CpuAffinityValidationError as ex:
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.ERROR,
+                reason="invalid_cpu_affinity",
+                requested_cpu_affinity=requested_affinity,
+                error=str(ex),
+            )
+            self._notify_start_error(
+                user_id, user_lang, f"CPU affinity is invalid: {str(ex)}"
+            )
+            return None
+
+        cpu_caps = self._get_cpu_affinity_capability()
+        if not cpu_caps.get("supported", False):
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.ERROR,
+                reason="cpu_affinity_unsupported",
+                requested_cpu_affinity=requested_affinity,
+                canonical_cpu_affinity=canonical_affinity,
+                capability_reason=cpu_caps.get("reason", "unknown"),
+                capability_os=cpu_caps.get("os", ""),
+            )
+            self._notify_start_error(
+                user_id, user_lang, "CPU affinity requires Linux + taskset."
+            )
+            return None
+
+        taskset_path = cpu_caps.get("taskset_path") or shutil.which("taskset")
+        if not taskset_path:
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.ERROR,
+                reason="cpu_affinity_taskset_missing",
+                requested_cpu_affinity=requested_affinity,
+                canonical_cpu_affinity=canonical_affinity,
+            )
+            self._notify_start_error(
+                user_id, user_lang, "CPU affinity requires taskset but it is unavailable."
+            )
+            return None
+
+        launch_command = [taskset_path, "--cpu-list", canonical_affinity, *base_command]
+        self._active_launch_command = launch_command
+        self._active_cpu_affinity = canonical_affinity
+        self._log_launch_event(
+            "cpu_affinity_applied",
+            requested_cpu_affinity=requested_affinity,
+            canonical_cpu_affinity=canonical_affinity,
+            taskset_path=taskset_path,
+        )
+        return launch_command
+
+    def _build_launch_event_payload(self, **extra):
+        payload = {
+            "server_id": self.server_id,
+            "server_name": self.name,
+            "server_type": self.settings.get("type"),
+            "cwd": self.server_path,
+            "argv": [str(arg) for arg in (self._active_launch_command or [])],
+        }
+        if self._active_cpu_affinity:
+            payload["active_cpu_affinity"] = self._active_cpu_affinity
+        if self._active_memory_limit_mib > 0:
+            payload["active_memory_limit_mib"] = self._active_memory_limit_mib
+            payload["active_memory_limit_bytes"] = self._active_memory_limit_bytes
+        if self._active_memory_cgroup_path:
+            payload["active_memory_cgroup_path"] = self._active_memory_cgroup_path
+        payload.update(extra)
+        return payload
+
+    @staticmethod
+    def _read_effective_cpu_affinity(pid):
+        if not isinstance(pid, int):
+            return None
+        if not sys.platform.startswith("linux"):
+            return None
+
+        status_path = Path("/proc", str(pid), "status")
+        try:
+            with open(status_path, "r", encoding="utf-8") as status_file:
+                for line in status_file:
+                    if line.startswith("Cpus_allowed_list:"):
+                        return line.split(":", 1)[1].strip()
+        except OSError:
+            return None
+        return None
+
+    def _log_effective_cpu_affinity_state(self):
+        if not self._active_cpu_affinity or self.process is None:
+            return
+
+        effective_affinity = self._read_effective_cpu_affinity(self.process.pid)
+        if effective_affinity is None:
+            self._log_launch_event(
+                "cpu_affinity_verify_unavailable",
+                level=logging.WARNING,
+                pid=self.process.pid,
+                canonical_cpu_affinity=self._active_cpu_affinity,
+            )
+            return
+
+        self._log_launch_event(
+            "cpu_affinity_verify",
+            pid=self.process.pid,
+            canonical_cpu_affinity=self._active_cpu_affinity,
+            effective_cpu_affinity=effective_affinity,
+        )
+
+    def _log_launch_event(self, event_name, level=logging.INFO, **extra):
+        payload = self._build_launch_event_payload(event=event_name, **extra)
+        logger.log(
+            level,
+            "launch_event %s",
+            json.dumps(payload, ensure_ascii=True, sort_keys=True),
+        )
+
+    def _notify_start_error(self, user_id, user_lang, detail, channel="send_error"):
+        if not user_id:
+            return
+        error_message = self.helper.translation.translate(
+            "error", "start-error", user_lang
+        ).format(self.name, detail)
+        WebSocketManager().broadcast_user(
+            user_id,
+            channel,
+            {"error": error_message},
+        )
+
+    @staticmethod
+    def _get_wrapper_policy_mode():
+        mode = os.environ.get("CRAFTY_WRAPPER_POLICY_MODE", "disabled").strip().lower()
+        if mode not in {"disabled", "audit", "enforce"}:
+            logger.warning(
+                "Unknown CRAFTY_WRAPPER_POLICY_MODE value %r. "
+                "Defaulting to 'disabled'.",
+                mode,
+            )
+            return "disabled"
+        return mode
+
+    @staticmethod
+    def _get_wrapper_startup_grace_seconds():
+        default_seconds = 5
+        raw = os.environ.get("CRAFTY_WRAPPER_GRACE_SECONDS")
+        if raw is None:
+            return default_seconds
+        try:
+            grace = int(raw)
+        except ValueError:
+            logger.warning(
+                "Invalid CRAFTY_WRAPPER_GRACE_SECONDS value %r. "
+                "Using default %s.",
+                raw,
+                default_seconds,
+            )
+            return default_seconds
+        return max(1, min(30, grace))
+
+    @staticmethod
+    def _snapshot_process_children(pid):
+        try:
+            process = psutil.Process(pid)
+            children = process.children(recursive=True)
+        except (NoSuchProcess, Exception):
+            return []
+
+        child_data = []
+        for child in children:
+            try:
+                cmdline = " ".join(child.cmdline())
+            except Exception:
+                cmdline = ""
+            try:
+                name = child.name()
+            except Exception:
+                name = ""
+            try:
+                ppid = child.ppid()
+            except Exception:
+                ppid = None
+            child_data.append(
+                {
+                    "pid": child.pid,
+                    "ppid": ppid,
+                    "name": name,
+                    "cmdline": cmdline,
+                }
+            )
+        return child_data
+
+    @staticmethod
+    def _filter_alive_pids(process_data):
+        alive = []
+        for proc in process_data:
+            pid = proc.get("pid")
+            if isinstance(pid, int) and psutil.pid_exists(pid):
+                alive.append(proc)
+        return alive
+
+    def _inspect_wrapper_process_shape(self, parent_pid):
+        grace_seconds = self._get_wrapper_startup_grace_seconds()
+        deadline = time.monotonic() + grace_seconds
+        last_seen_children = []
+
+        while time.monotonic() < deadline:
+            if self.process is None:
+                break
+            if self.process.poll() is None:
+                last_seen_children = self._snapshot_process_children(parent_pid)
+                time.sleep(0.25)
+                continue
+
+            alive_children = self._filter_alive_pids(last_seen_children)
+            return {
+                "grace_seconds": grace_seconds,
+                "parent_pid": parent_pid,
+                "parent_exited_within_window": True,
+                "detached_wrapper_suspected": len(alive_children) > 0,
+                "observed_children": last_seen_children,
+                "alive_children": alive_children,
+            }
+
+        return {
+            "grace_seconds": grace_seconds,
+            "parent_pid": parent_pid,
+            "parent_exited_within_window": False,
+            "detached_wrapper_suspected": False,
+            "observed_children": last_seen_children,
+            "alive_children": [],
+        }
+
+    @staticmethod
+    def _terminate_pid_list(process_data):
+        for proc in process_data:
+            pid = proc.get("pid")
+            if not isinstance(pid, int):
+                continue
+            try:
+                psutil.Process(pid).kill()
+            except NoSuchProcess:
+                continue
+            except Exception:
+                logger.warning("Failed to terminate process %s", pid, exc_info=True)
+
+    def _apply_wrapper_policy(self, user_id, user_lang, forge_install=False):
+        policy_mode = self._get_wrapper_policy_mode()
+        affinity_enforced = bool(self._active_cpu_affinity)
+        memory_limit_enforced = self._active_memory_limit_mib > 0
+        resource_controls_enforced = affinity_enforced or memory_limit_enforced
+        effective_policy_mode = "enforce" if resource_controls_enforced else policy_mode
+        if effective_policy_mode == "disabled" or self.process is None:
+            return True
+
+        inspection = self._inspect_wrapper_process_shape(self.process.pid)
+        if not inspection["detached_wrapper_suspected"]:
+            return True
+
+        self._log_launch_event(
+            "wrapper_policy_detected",
+            level=logging.WARNING,
+            policy_mode=policy_mode,
+            effective_policy_mode=effective_policy_mode,
+            affinity_enforced=affinity_enforced,
+            memory_limit_enforced=memory_limit_enforced,
+            parent_pid=inspection["parent_pid"],
+            grace_seconds=inspection["grace_seconds"],
+            detected_process_tree=inspection["alive_children"],
+        )
+
+        if effective_policy_mode == "audit":
+            return True
+
+        self._terminate_pid_list(inspection["alive_children"])
+        self._log_launch_event(
+            "launch_failure",
+            level=logging.ERROR,
+            reason="unsupported_wrapper_shape",
+            effective_policy_mode=effective_policy_mode,
+            affinity_enforced=affinity_enforced,
+            memory_limit_enforced=memory_limit_enforced,
+            parent_pid=inspection["parent_pid"],
+            grace_seconds=inspection["grace_seconds"],
+            detected_process_tree=inspection["alive_children"],
+        )
+        self.cleanup_server_object()
+        self._notify_start_error(
+            user_id,
+            user_lang,
+            "Unsupported wrapper command shape (fork-and-exit) detected.",
+        )
+        if forge_install:
+            self.stats_helper.finish_import()
+        return False
+
     @callback
     def start_server(self, user_id, forge_install=False):
         # Clear cached game port so it's recomputed from current config
@@ -452,10 +986,20 @@ class ServerInstance:
             user_lang = self.helper.get_setting("language")
         else:
             user_lang = HelperUsers.get_user_lang_by_id(user_id)
+        self._active_launch_command = []
+        self._active_cpu_affinity = ""
+        self._active_memory_limit_mib = 0
+        self._active_memory_limit_bytes = 0
+        self._active_memory_cgroup_path = ""
 
         # Checks if user is currently attempting to move global server
         # dir
         if self.helper.dir_migration:
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.WARNING,
+                reason="dir_migration_in_progress",
+            )
             WebSocketManager().broadcast_user(
                 user_id,
                 "send_error",
@@ -470,6 +1014,11 @@ class ServerInstance:
             return False
 
         if self.stats_helper.get_import_status() and not forge_install:
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.WARNING,
+                reason="import_in_progress",
+            )
             if user_id:
                 WebSocketManager().broadcast_user(
                     user_id,
@@ -486,17 +1035,48 @@ class ServerInstance:
             f"Start command detected. Reloading settings from DB for server {self.name}"
         )
         self.setup_server_run_command()
+        self._active_launch_command = list(self.server_command or [])
+        self._active_cpu_affinity = ""
+        self._active_memory_limit_mib = 0
+        self._active_memory_limit_bytes = 0
+        self._active_memory_cgroup_path = ""
         # fail safe in case we try to start something already running
         if self.check_running():
             logger.error("Server is already running - Cancelling Startup")
             Console.error("Server is already running - Cancelling Startup")
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.WARNING,
+                reason="already_running",
+            )
+            self._notify_start_error(user_id, user_lang, "Server is already running.")
             return False
         if self.check_update():
             logger.error("Server is updating. Terminating startup.")
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.WARNING,
+                reason="update_in_progress",
+            )
+            self._notify_start_error(
+                user_id, user_lang, "Server is updating. Startup was denied."
+            )
             return False
 
-        logger.info(f"Launching Server {self.name} with command {self.server_command}")
-        Console.info(f"Launching Server {self.name} with command {self.server_command}")
+        if not self._prepare_memory_limit_policy(user_id, user_lang):
+            if forge_install:
+                self.stats_helper.finish_import()
+            return False
+
+        launch_command = self._resolve_launch_command(user_id, user_lang)
+        if launch_command is None:
+            if forge_install:
+                self.stats_helper.finish_import()
+            return False
+
+        logger.info(f"Launching Server {self.name} with command {launch_command}")
+        Console.info(f"Launching Server {self.name} with command {launch_command}")
+        server_type = HelperServers.get_server_type_by_id(self.server_id)
 
         # Checks for eula. Creates one if none detected.
         # If EULA is detected and not set to true we offer to set it true.
@@ -516,6 +1096,11 @@ class ServerInstance:
         if forge_install is True:
             e_flag = True
         if not e_flag and self.settings["type"] == "minecraft-java":
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.WARNING,
+                reason="eula_not_accepted",
+            )
             if user_id:
                 WebSocketManager().broadcast_user(
                     user_id, "send_eula_bootbox", {"id": self.server_id}
@@ -537,38 +1122,39 @@ class ServerInstance:
 
         if (
             not Helpers.is_os_windows()
-            and HelperServers.get_server_type_by_id(self.server_id)
-            == "minecraft-bedrock"
+            and server_type == "minecraft-bedrock"
         ):
+            launch_branch = "bedrock_unix"
             logger.info(
                 f"Bedrock and Unix detected for server {self.name}. "
                 f"Switching to appropriate execution string"
             )
             my_env = os.environ
             my_env["LD_LIBRARY_PATH"] = self.server_path
+            self._log_launch_event(
+                "launch_attempt",
+                branch=launch_branch,
+                env_overrides=["LD_LIBRARY_PATH"],
+            )
             try:
-                self.process = subprocess.Popen(
-                    self.server_command,
-                    cwd=self.server_path,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    env=my_env,
+                self.process = self._launch_server_process(command=launch_command, env=my_env)
+                self._log_launch_event(
+                    "launch_spawned",
+                    branch=launch_branch,
+                    pid=self.process.pid,
                 )
             except Exception as ex:
                 logger.error(
                     f"Server {self.name} failed to start with error code: {ex}"
                 )
-                if user_id:
-                    WebSocketManager().broadcast_user(
-                        user_id,
-                        "send_error",
-                        {
-                            "error": self.helper.translation.translate(
-                                "error", "start-error", user_lang
-                            ).format(self.name, ex)
-                        },
-                    )
+                self._log_launch_event(
+                    "launch_failure",
+                    level=logging.ERROR,
+                    reason="spawn_exception",
+                    branch=launch_branch,
+                    error=str(ex),
+                )
+                self._notify_start_error(user_id, user_lang, str(ex))
                 if forge_install:
                     # Reset import status if failed while forge installing
                     self.stats_helper.finish_import()
@@ -578,7 +1164,8 @@ class ServerInstance:
         #               STEAM SERVERS
         # ***********************************************
         # ***********************************************
-        elif HelperServers.get_server_type_by_id(self.server_id) == "steam_cmd":
+        elif server_type == "steam_cmd":
+            launch_branch = "steam_cmd"
             my_env = os.environ
             env_mod = False
             if Helpers.check_file_exists(Path(self.server_path, "env.json")):
@@ -625,48 +1212,59 @@ class ServerInstance:
                     "Launching process for server %s with un-modified environment",
                     self.server_id,
                 )
+            self._log_launch_event(
+                "launch_attempt",
+                branch=launch_branch,
+                env_modified=env_mod,
+            )
             try:
-                self.process = subprocess.Popen(
-                    self.server_command,
-                    cwd=self.server_path,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    env=my_env,
+                self.process = self._launch_server_process(command=launch_command, env=my_env)
+                self._log_launch_event(
+                    "launch_spawned",
+                    branch=launch_branch,
+                    pid=self.process.pid,
                 )
             except Exception as ex:
                 logger.error(
                     f"Server {self.name} failed to start with error code: {ex}"
                 )
-                if user_id:
-                    WebSocketManager().broadcast_user(
-                        user_id,
-                        "send_start_error",
-                        {
-                            "error": self.helper.translation.translate(
-                                "error", "start-error", user_lang
-                            ).format(self.name, ex)
-                        },
-                    )
-                    return
+                self._log_launch_event(
+                    "launch_failure",
+                    level=logging.ERROR,
+                    reason="spawn_exception",
+                    branch=launch_branch,
+                    error=str(ex),
+                )
+                self._notify_start_error(
+                    user_id, user_lang, str(ex), channel="send_start_error"
+                )
+                return False
 
         else:
+            launch_branch = "default"
             logger.debug(
                 "Starting server %s with unknown type %s",
                 self.server_id,
-                HelperServers.get_server_type_by_id(self.server_id),
+                server_type,
             )
+            self._log_launch_event("launch_attempt", branch=launch_branch)
             try:
-                self.process = subprocess.Popen(
-                    self.server_command,
-                    cwd=self.server_path,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
+                self.process = self._launch_server_process(command=launch_command)
+                self._log_launch_event(
+                    "launch_spawned",
+                    branch=launch_branch,
+                    pid=self.process.pid,
                 )
             except Exception as ex:
                 # Checks for java on initial fail
                 if not self.helper.detect_java():
+                    self._log_launch_event(
+                        "launch_failure",
+                        level=logging.ERROR,
+                        reason="java_not_found",
+                        branch=launch_branch,
+                        error=str(ex),
+                    )
                     if user_id:
                         WebSocketManager().broadcast_user(
                             user_id,
@@ -681,20 +1279,27 @@ class ServerInstance:
                 logger.error(
                     f"Server {self.name} failed to start with error code: {ex}"
                 )
-                if user_id:
-                    WebSocketManager().broadcast_user(
-                        user_id,
-                        "send_error",
-                        {
-                            "error": self.helper.translation.translate(
-                                "error", "start-error", user_lang
-                            ).format(self.name, ex)
-                        },
-                    )
+                self._log_launch_event(
+                    "launch_failure",
+                    level=logging.ERROR,
+                    reason="spawn_exception",
+                    branch=launch_branch,
+                    error=str(ex),
+                )
+                self._notify_start_error(user_id, user_lang, str(ex))
                 if forge_install:
                     # Reset import status if failed while forge installing
                     self.stats_helper.finish_import()
                 return False
+
+        if not self._attach_process_to_memory_cgroup(user_id, user_lang, forge_install):
+            return False
+
+        self._log_effective_memory_limit_state()
+        self._log_effective_cpu_affinity_state()
+
+        if not self._apply_wrapper_policy(user_id, user_lang, forge_install):
+            return False
 
         out_buf = ServerOutBuf(self.helper, self.process, self.server_id)
 
@@ -711,6 +1316,10 @@ class ServerInstance:
         if self.process.poll() is None:
             logger.info(f"Server {self.name} running with PID {self.process.pid}")
             Console.info(f"Server {self.name} running with PID {self.process.pid}")
+            self._log_launch_event(
+                "launch_success",
+                pid=self.process.pid,
+            )
             self.is_crashed = False
             self.stats_helper.server_crash_reset()
             self.record_server_stats()
@@ -754,6 +1363,17 @@ class ServerInstance:
             Console.critical(
                 f"Server PID {self.process.pid} died right after starting "
                 f"- is this a server config issue?"
+            )
+            self._log_launch_event(
+                "launch_failure",
+                level=logging.ERROR,
+                reason="early_exit_after_spawn",
+                pid=self.process.pid,
+            )
+            self._notify_start_error(
+                user_id,
+                user_lang,
+                "Process exited immediately after launch.",
             )
 
         if self.settings["crash_detection"]:
@@ -1094,6 +1714,10 @@ class ServerInstance:
         self.is_crashed = False
         self.updating = False
         self.process = None
+        self._active_cpu_affinity = ""
+        self._active_memory_limit_mib = 0
+        self._active_memory_limit_bytes = 0
+        self._active_memory_cgroup_path = ""
 
     def check_running(self):
         # if process is None, we never tried to start
@@ -1789,7 +2413,10 @@ class ServerInstance:
                     "started": raw_ping_result.get("started"),
                     "running": raw_ping_result.get("running"),
                     "cpu": raw_ping_result.get("cpu"),
+                    "cpu_capacity_cores": raw_ping_result.get("cpu_capacity_cores", 0),
                     "mem": raw_ping_result.get("mem"),
+                    "mem_capacity": raw_ping_result.get("mem_capacity"),
+                    "mem_capacity_raw": raw_ping_result.get("mem_capacity_raw"),
                     "mem_percent": raw_ping_result.get("mem_percent"),
                     "world_name": raw_ping_result.get("world_name"),
                     "world_size": raw_ping_result.get("world_size"),
@@ -1802,8 +2429,11 @@ class ServerInstance:
                     "desc": raw_ping_result.get("desc"),
                     "version": raw_ping_result.get("version"),
                     "icon": raw_ping_result.get("icon"),
+                    "telemetry_tps": raw_ping_result.get("telemetry_tps", False),
+                    "telemetry_mspt": raw_ping_result.get("telemetry_mspt", False),
                     "crashed": self.is_crashed,
                     "count_players": self.server_object.count_players,
+                    "server_notes": self.server_object.server_notes,
                 }
             )
 
@@ -1816,8 +2446,11 @@ class ServerInstance:
                     "started": raw_ping_result.get("started"),
                     "running": raw_ping_result.get("running"),
                     "cpu": raw_ping_result.get("cpu"),
+                    "cpu_capacity_cores": raw_ping_result.get("cpu_capacity_cores", 0),
                     "mem": raw_ping_result.get("mem"),
                     "mem_raw": raw_ping_result.get("mem_raw"),
+                    "mem_capacity": raw_ping_result.get("mem_capacity"),
+                    "mem_capacity_raw": raw_ping_result.get("mem_capacity_raw"),
                     "mem_percent": raw_ping_result.get("mem_percent"),
                     "world_name": raw_ping_result.get("world_name"),
                     "world_size": raw_ping_result.get("world_size"),
@@ -1829,9 +2462,12 @@ class ServerInstance:
                     "desc": raw_ping_result.get("desc"),
                     "version": raw_ping_result.get("version"),
                     "icon": raw_ping_result.get("icon"),
+                    "telemetry_tps": raw_ping_result.get("telemetry_tps", False),
+                    "telemetry_mspt": raw_ping_result.get("telemetry_mspt", False),
                     "crashed": self.is_crashed,
                     "created": datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S"),
                     "players_cache": self.player_cache,
+                    "server_notes": self.server_object.server_notes,
                 },
             )
             total_players += int(raw_ping_result.get("online"))
@@ -1908,10 +2544,62 @@ class ServerInstance:
         self._game_port_cache = game_port
         return game_port
 
+    def _get_mod_telemetry(self, host, telemetry_port):
+        """Fetch optional telemetry endpoint exposed by a server-side mod."""
+        normalized_port = normalize_telemetry_port(telemetry_port)
+        if normalized_port == 0:
+            return {
+                "telemetry_tps": False,
+                "telemetry_mspt": False,
+                "telemetry_players": [],
+            }
+
+        telemetry_url = build_telemetry_url(host, normalized_port)
+        try:
+            response = requests.get(telemetry_url, timeout=1)
+            if response.status_code != 200:
+                logger.debug(
+                    "Telemetry query returned non-200 for server %s: %s",
+                    self.server_id,
+                    response.status_code,
+                )
+                return {
+                    "telemetry_tps": False,
+                    "telemetry_mspt": False,
+                    "telemetry_players": [],
+                }
+
+            return parse_telemetry_payload(response.json())
+        except (
+            requests.RequestException,
+            ValueError,
+            json.decoder.JSONDecodeError,
+        ) as ex:
+            logger.debug("Telemetry query failed for server %s: %s", self.server_id, ex)
+            return {
+                "telemetry_tps": False,
+                "telemetry_mspt": False,
+                "telemetry_players": [],
+            }
+
     def get_backup_config(self, backup_id) -> dict:
         if not backup_id:
             return HelpersManagement.get_default_server_backup(self.server_id)
         return HelpersManagement.get_backup_config(backup_id)
+
+    def _get_memory_capacity_bytes(self):
+        try:
+            configured_limit_mib = canonicalize_memory_limit_mib(
+                self.settings.get("memory_limit_mib", 0)
+            )
+        except MemoryLimitValidationError:
+            configured_limit_mib = 0
+        if configured_limit_mib > 0:
+            return configured_limit_mib * 1024 * 1024
+        return int(psutil.virtual_memory().total)
+
+    def _get_memory_capacity_human(self):
+        return Helpers.human_readable_file_size(self._get_memory_capacity_bytes())
 
     def get_servers_stats(self):
         server_type = HelperServers.get_server_type_by_id(self.server_id)
@@ -1923,9 +2611,17 @@ class ServerInstance:
 
         # get our server object, settings and data dictionaries
         self.reload_server_settings()
+        memory_capacity_bytes = self._get_memory_capacity_bytes()
 
         # process stats
-        p_stats = Stats._try_get_process_stats(self.process, self.check_running())
+        p_stats = Stats._try_get_process_stats(
+            self.process,
+            self.check_running(),
+            memory_capacity_bytes=memory_capacity_bytes,
+        )
+        process_memory_capacity = p_stats.get("memory_capacity_raw", 0)
+        if not isinstance(process_memory_capacity, (int, float)) or process_memory_capacity <= 0:
+            process_memory_capacity = memory_capacity_bytes
         internal_ip = server["server_ip"]
         server_port = server["server_port"]
         server_name = server.get("server_name", f"ID#{server_id}")
@@ -1934,6 +2630,16 @@ class ServerInstance:
             server_port,
             server.get("path", ""),
             server.get("execution_command", ""),
+        )
+        running = self.check_running()
+        telemetry_data = (
+            self._get_mod_telemetry(internal_ip, server.get("telemetry_port", 0))
+            if running
+            else {
+                "telemetry_tps": False,
+                "telemetry_mspt": False,
+                "telemetry_players": [],
+            }
         )
 
         logger.debug(f"Pinging server '{server}' on {internal_ip}:{server_port}")
@@ -1961,15 +2667,18 @@ class ServerInstance:
                 ping_data = Stats.parse_server_ping(int_mc_ping)
         # Makes sure we only show stats when a server is online
         # otherwise people have gotten confused.
-        if self.check_running():
+        if running:
             server_stats = {
                 "id": server_id,
                 "started": self.get_start_time(),
-                "running": self.check_running(),
+                "running": running,
                 "cpu": p_stats.get("cpu_usage", 0),
+                "cpu_capacity_cores": p_stats.get("cpu_capacity_cores", 0),
                 "mem": p_stats.get("memory_usage", 0),
                 "mem_raw": p_stats.get("memory_usage_raw", 0),
                 "mem_percent": p_stats.get("mem_percentage", 0),
+                "mem_capacity": Helpers.human_readable_file_size(process_memory_capacity),
+                "mem_capacity_raw": process_memory_capacity,
                 "world_name": server_name,
                 "world_size": self.server_size,
                 "server_port": server_port,
@@ -1981,16 +2690,21 @@ class ServerInstance:
                 "desc": ping_data.get("server_description", False),
                 "version": ping_data.get("server_version", False),
                 "icon": ping_data.get("server_icon"),
+                "telemetry_tps": telemetry_data.get("telemetry_tps", False),
+                "telemetry_mspt": telemetry_data.get("telemetry_mspt", False),
             }
         else:
             server_stats = {
                 "id": server_id,
                 "started": self.get_start_time(),
-                "running": self.check_running(),
+                "running": running,
                 "cpu": p_stats.get("cpu_usage", 0),
+                "cpu_capacity_cores": p_stats.get("cpu_capacity_cores", 0),
                 "mem": p_stats.get("memory_usage", 0),
                 "mem_raw": p_stats.get("memory_usage_raw", 0),
                 "mem_percent": p_stats.get("mem_percentage", 0),
+                "mem_capacity": Helpers.human_readable_file_size(process_memory_capacity),
+                "mem_capacity_raw": process_memory_capacity,
                 "world_name": server_name,
                 "world_size": self.server_size,
                 "server_port": server_port,
@@ -2002,6 +2716,8 @@ class ServerInstance:
                 "desc": False,
                 "version": False,
                 "icon": None,
+                "telemetry_tps": False,
+                "telemetry_mspt": False,
             }
 
         return server_stats
@@ -2044,7 +2760,10 @@ class ServerInstance:
                 "started": False,
                 "running": False,
                 "cpu": 0,
+                "cpu_capacity_cores": 0,
                 "mem": 0,
+                "mem_capacity": 0,
+                "mem_capacity_raw": 0,
                 "mem_percent": 0,
                 "world_name": None,
                 "world_size": None,
@@ -2057,6 +2776,8 @@ class ServerInstance:
                 "desc": False,
                 "version": False,
                 "icon": False,
+                "telemetry_tps": False,
+                "telemetry_mspt": False,
             }
 
         server_stats = {}
@@ -2068,12 +2789,20 @@ class ServerInstance:
 
         # get our server object, settings and data dictionaries
         self.reload_server_settings()
+        memory_capacity_bytes = self._get_memory_capacity_bytes()
 
         # world data
         server_name = server_dt["server_name"]
 
         # process stats
-        p_stats = Stats._try_get_process_stats(self.process, self.check_running())
+        p_stats = Stats._try_get_process_stats(
+            self.process,
+            self.check_running(),
+            memory_capacity_bytes=memory_capacity_bytes,
+        )
+        process_memory_capacity = p_stats.get("memory_capacity_raw", 0)
+        if not isinstance(process_memory_capacity, (int, float)) or process_memory_capacity <= 0:
+            process_memory_capacity = memory_capacity_bytes
 
         internal_ip = server_dt["server_ip"]
         server_port = server_dt["server_port"]
@@ -2082,6 +2811,16 @@ class ServerInstance:
             server_port,
             server_dt.get("path", ""),
             server_dt.get("execution_command", ""),
+        )
+        running = self.check_running()
+        telemetry_data = (
+            self._get_mod_telemetry(internal_ip, server_dt.get("telemetry_port", 0))
+            if running
+            else {
+                "telemetry_tps": False,
+                "telemetry_mspt": False,
+                "telemetry_players": [],
+            }
         )
 
         logger.debug(f"Pinging server '{self.name}' on {internal_ip}:{server_port}")
@@ -2105,15 +2844,18 @@ class ServerInstance:
                 int_data = True
         # Makes sure we only show stats when a server is online
         # otherwise people have gotten confused.
-        if self.check_running():
+        if running:
             server_stats = {
                 "id": server_id,
                 "started": self.get_start_time(),
-                "running": self.check_running(),
+                "running": running,
                 "cpu": p_stats.get("cpu_usage", 0),
+                "cpu_capacity_cores": p_stats.get("cpu_capacity_cores", 0),
                 "mem": p_stats.get("memory_usage", 0),
                 "mem_raw": p_stats.get("memory_usage_raw", 0),
                 "mem_percent": p_stats.get("mem_percentage", 0),
+                "mem_capacity": Helpers.human_readable_file_size(process_memory_capacity),
+                "mem_capacity_raw": process_memory_capacity,
                 "world_name": server_name,
                 "world_size": self.server_size,
                 "server_port": server_port,
@@ -2125,16 +2867,21 @@ class ServerInstance:
                 "desc": ping_data.get("server_description", False),
                 "version": ping_data.get("server_version", False),
                 "icon": ping_data.get("server_icon", False),
+                "telemetry_tps": telemetry_data.get("telemetry_tps", False),
+                "telemetry_mspt": telemetry_data.get("telemetry_mspt", False),
             }
         else:
             server_stats = {
                 "id": server_id,
                 "started": self.get_start_time(),
-                "running": self.check_running(),
+                "running": running,
                 "cpu": p_stats.get("cpu_usage", 0),
+                "cpu_capacity_cores": p_stats.get("cpu_capacity_cores", 0),
                 "mem": p_stats.get("memory_usage", 0),
                 "mem_raw": p_stats.get("memory_usage_raw", 0),
                 "mem_percent": p_stats.get("mem_percentage", 0),
+                "mem_capacity": Helpers.human_readable_file_size(process_memory_capacity),
+                "mem_capacity_raw": process_memory_capacity,
                 "world_name": server_name,
                 "world_size": self.server_size,
                 "server_port": server_port,
@@ -2145,6 +2892,9 @@ class ServerInstance:
                 "players": False,
                 "desc": False,
                 "version": False,
+                "icon": False,
+                "telemetry_tps": False,
+                "telemetry_mspt": False,
             }
 
         return server_stats

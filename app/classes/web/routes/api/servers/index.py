@@ -2,6 +2,15 @@ import logging
 
 from jsonschema import ValidationError, validate
 import orjson
+from app.classes.helpers.cpu_affinity import (
+    CpuAffinityValidationError,
+    canonicalize_cpu_affinity,
+    get_effective_cpu_set,
+)
+from app.classes.helpers.memory_limit import (
+    MemoryLimitValidationError,
+    canonicalize_memory_limit_mib,
+)
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.web.base_api_handler import BaseApiHandler
 
@@ -58,6 +67,25 @@ new_server_schema = {
             "default": "",
             "examples": ["./logs/latest.log", "./proxy.log.0"],
             "error": "typeString",
+            "fill": True,
+        },
+        "cpu_affinity": {
+            "title": "CPU affinity",
+            "description": "Optional Linux CPU set for this server process.",
+            "type": "string",
+            "default": "",
+            "examples": ["0-3", "4,6,8,10"],
+            "error": "typeString",
+            "fill": True,
+        },
+        "memory_limit_mib": {
+            "title": "Memory Limit (MiB)",
+            "description": "Optional absolute memory cap for this server process.",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "examples": [0, 2048, 4096],
+            "error": "typeIntMinVal0",
             "fill": True,
         },
         "crashdetection": {
@@ -924,7 +952,7 @@ class ApiServersIndexHandler(BaseApiHandler):
             _,
             exec_user_crafty_permissions,
             _,
-            _superuser,
+            superuser,
             user,
             _,
         ) = auth_data
@@ -966,6 +994,58 @@ class ApiServersIndexHandler(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
+
+        if "cpu_affinity" in data:
+            if not superuser:
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "NOT_AUTHORIZED",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
+                )
+            try:
+                data["cpu_affinity"] = canonicalize_cpu_affinity(
+                    data.get("cpu_affinity", ""),
+                    allowed_cpus=get_effective_cpu_set(),
+                )
+            except CpuAffinityValidationError as why:
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_CPU_AFFINITY",
+                        "error_data": str(why),
+                    },
+                )
+        if "memory_limit_mib" in data:
+            if not superuser:
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "NOT_AUTHORIZED",
+                        "error_data": self.helper.translation.translate(
+                            "validators", "insufficientPerms", auth_data[4]["lang"]
+                        ),
+                    },
+                )
+            try:
+                data["memory_limit_mib"] = canonicalize_memory_limit_mib(
+                    data.get("memory_limit_mib", 0)
+                )
+            except MemoryLimitValidationError as why:
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_MEMORY_LIMIT",
+                        "error_data": str(why),
+                    },
+                )
         # Check to make sure port is allowable
         if data["monitoring_type"] == "minecraft_java":
             try:

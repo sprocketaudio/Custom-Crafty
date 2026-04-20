@@ -103,6 +103,27 @@
                   }
                 </script>
                 <div class="row">
+                  {% if data['super_user'] %}
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label for="memory_limit_mib">Memory Limit (MiB)
+                        <small class="text-muted ml-1"> - Absolute process memory cap. Use 0 to disable.</small>
+                      </label>
+                      <input type="number" class="form-control" id="memory_limit_mib" name="memory_limit_mib" min="0"
+                        step="1" value="0" placeholder="0">
+                    </div>
+                  </div>
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label for="cpu_affinity">CPU Affinity
+                        <small class="text-muted ml-1"> - Pins this server to specific CPU cores. Requires Linux + taskset.</small>
+                      </label>
+                      <input type="text" class="form-control" id="cpu_affinity" name="cpu_affinity"
+                        placeholder="0-3,6,8">
+                      <small class="form-text text-muted">Examples: 0-3, 4,6,8,10, 2-5,9-11</small>
+                    </div>
+                  </div>
+                  {% end %}
                   <div class="col-sm-12">
                     <div class="form-group">
                       {% include "../panel/parts/role_select.html" %}
@@ -415,6 +436,28 @@
     let formData = new FormData(jarForm);
     //Create an object from the form data entries
     let formDataObject = Object.fromEntries(formData.entries());
+      if (Object.prototype.hasOwnProperty.call(formDataObject, "cpu_affinity")) {
+        const affinityValidation = validateCpuAffinitySyntax(formDataObject.cpu_affinity);
+        if (!affinityValidation.valid) {
+        $('.bootbox-close-button').click();
+        bootbox.alert({
+          title: 'INVALID_CPU_AFFINITY',
+          message: affinityValidation.error
+        });
+        return;
+        }
+      }
+    if (Object.prototype.hasOwnProperty.call(formDataObject, "memory_limit_mib")) {
+      const memoryLimitValidation = validateMemoryLimitMiB(formDataObject.memory_limit_mib);
+      if (!memoryLimitValidation.valid) {
+        $('.bootbox-close-button').click();
+        bootbox.alert({
+          title: 'INVALID_MEMORY_LIMIT',
+          message: memoryLimitValidation.error
+        });
+        return;
+      }
+    }
     console.log(formDataObject);
     let send_data = {
       "name": formDataObject.name,
@@ -431,6 +474,12 @@
           "app_id": formDataObject.app_id,
         }
       }
+    }
+    if (Object.prototype.hasOwnProperty.call(formDataObject, "cpu_affinity")) {
+      send_data.cpu_affinity = formDataObject.cpu_affinity.trim();
+    }
+    if (Object.prototype.hasOwnProperty.call(formDataObject, "memory_limit_mib")) {
+      send_data.memory_limit_mib = formDataObject.memory_limit_mib;
     }
     console.log(send_data);
     // Format the plain form data as JSON
@@ -453,6 +502,53 @@
       return value;
     }
   }
+  function validateCpuAffinitySyntax(rawValue) {
+    const value = (rawValue || "").trim();
+    if (value === "") {
+      return { valid: true, error: "" };
+    }
+
+    const segments = value.split(",");
+    for (const segmentRaw of segments) {
+      const segment = segmentRaw.trim();
+      if (segment === "") {
+        return { valid: false, error: "CPU affinity contains an empty segment." };
+      }
+      if (segment.includes("-")) {
+        const parts = segment.split("-");
+        if (parts.length !== 2 || parts[0].trim() === "" || parts[1].trim() === "") {
+          return { valid: false, error: `Invalid range segment '${segment}'.` };
+        }
+        const start = Number(parts[0].trim());
+        const end = Number(parts[1].trim());
+        if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end < 0) {
+          return { valid: false, error: `Invalid range segment '${segment}'.` };
+        }
+        if (start > end) {
+          return { valid: false, error: `Invalid range '${segment}': start cannot exceed end.` };
+        }
+      } else {
+        const id = Number(segment);
+        if (!Number.isInteger(id) || id < 0) {
+          return { valid: false, error: `Invalid CPU id token '${segment}'.` };
+        }
+      }
+    }
+
+    return { valid: true, error: "" };
+  }
+
+  function validateMemoryLimitMiB(rawValue) {
+    const value = (rawValue ?? "").toString().trim();
+    if (value === "") {
+      return { valid: true, error: "" };
+    }
+    if (!/^\d+$/.test(value)) {
+      return { valid: false, error: "Memory limit must be a non-negative integer (MiB)." };
+    }
+    return { valid: true, error: "" };
+  }
+
   function calcRoles() {
     let role_ids = $('.roles').map(function () {
       if ($(this).is(':checked')) {

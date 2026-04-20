@@ -130,24 +130,44 @@ class Stats:
         }
 
     @staticmethod
-    def _try_get_process_stats(process, running):
+    def _try_get_process_stats(process, running, memory_capacity_bytes=None):
         if running:
             try:
-                return Stats._get_process_stats(process)
+                return Stats._get_process_stats(
+                    process, memory_capacity_bytes=memory_capacity_bytes
+                )
             except Exception as e:
                 logger.debug(
                     f"getting process stats for pid {process.pid} "
                     "failed due to the following error:",
                     exc_info=e,
                 )
-                return {"cpu_usage": -1, "memory_usage": -1, "mem_percentage": -1}
+                return {
+                    "cpu_usage": -1,
+                    "memory_usage": -1,
+                    "mem_percentage": -1,
+                    "cpu_capacity_cores": -1,
+                    "memory_capacity_raw": -1,
+                }
         else:
-            return {"cpu_usage": 0, "memory_usage": 0, "mem_percentage": 0}
+            return {
+                "cpu_usage": 0,
+                "memory_usage": 0,
+                "mem_percentage": 0,
+                "cpu_capacity_cores": 0,
+                "memory_capacity_raw": 0,
+            }
 
     @staticmethod
-    def _get_process_stats(process):
+    def _get_process_stats(process, memory_capacity_bytes=None):
         if process is None:
-            return {"cpu_usage": -1, "memory_usage": -1, "mem_percentage": -1}
+            return {
+                "cpu_usage": -1,
+                "memory_usage": -1,
+                "mem_percentage": -1,
+                "cpu_capacity_cores": -1,
+                "memory_capacity_raw": -1,
+            }
         process_pid = process.pid
         p = psutil.Process(process_pid)
         _dummy = p.cpu_percent()
@@ -155,18 +175,43 @@ class Stats:
         # call it first so we can be more accurate per the docs
         # https://giamptest.readthedocs.io/en/latest/#psutil.Process.cpu_percent
 
-        real_cpu = round(p.cpu_percent(interval=0.5) / psutil.cpu_count(), 2)
+        cpu_capacity = Stats._get_process_cpu_capacity(p)
+        real_cpu = round(p.cpu_percent(interval=0.5) / cpu_capacity, 2)
 
         # this is a faster way of getting data for a process
         with p.oneshot():
             memory_bytes = p.memory_info()[0]
+            memory_capacity = Stats._get_process_memory_capacity(
+                memory_capacity_bytes=memory_capacity_bytes
+            )
             process_stats = {
                 "cpu_usage": real_cpu,
                 "memory_usage": Helpers.human_readable_file_size(memory_bytes),
                 "memory_usage_raw": memory_bytes,
-                "mem_percentage": round(p.memory_percent(), 0),
+                "mem_percentage": round((memory_bytes / memory_capacity) * 100, 2),
+                "cpu_capacity_cores": cpu_capacity,
+                "memory_capacity_raw": memory_capacity,
             }
         return process_stats
+
+    @staticmethod
+    def _get_process_cpu_capacity(process_handle) -> int:
+        # Default to host CPU count when process-specific affinity is unavailable.
+        fallback_capacity = psutil.cpu_count() or 1
+        try:
+            allowed_cpus = process_handle.cpu_affinity()
+        except Exception:
+            return fallback_capacity
+
+        if not allowed_cpus:
+            return fallback_capacity
+        return max(1, len(allowed_cpus))
+
+    @staticmethod
+    def _get_process_memory_capacity(memory_capacity_bytes=None) -> int:
+        if isinstance(memory_capacity_bytes, (int, float)) and memory_capacity_bytes > 0:
+            return max(1, int(memory_capacity_bytes))
+        return max(1, int(psutil.virtual_memory().total))
 
     @staticmethod
     def _try_all_disk_usage():

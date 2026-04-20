@@ -42,6 +42,7 @@ class ServerStats(Model):
     cpu = FloatField(default=0)
     mem = FloatField(default=0)
     mem_percent = FloatField(default=0)
+    mem_capacity_raw = IntegerField(default=0)
     world_name = CharField(default="")
     world_size = CharField(default="")
     server_port = IntegerField(default=25565)
@@ -52,6 +53,7 @@ class ServerStats(Model):
     desc = CharField(default="Unable to Connect")
     icon = CharField(default="")
     version = CharField(default="")
+    telemetry_tps = FloatField(null=True, default=None)
     updating = BooleanField(default=False)
     waiting_start = BooleanField(default=False)
     first_run = BooleanField(default=True)
@@ -286,6 +288,7 @@ class HelperServerStats:
                 ServerStats.cpu: server_stats.get("cpu", 0),
                 ServerStats.mem: server_stats.get("mem_raw", 0),
                 ServerStats.mem_percent: server_stats.get("mem_percent", 0),
+                ServerStats.mem_capacity_raw: server_stats.get("mem_capacity_raw", 0),
                 ServerStats.world_name: server_stats.get("world_name", ""),
                 ServerStats.world_size: server_stats.get("world_size", ""),
                 ServerStats.server_port: server_stats.get("server_port", 0),
@@ -298,6 +301,12 @@ class HelperServerStats:
                 ServerStats.desc: server_stats.get("desc", False),
                 ServerStats.icon: server_stats.get("icon", None),
                 ServerStats.version: server_stats.get("version", False),
+                ServerStats.telemetry_tps: (
+                    server_stats.get("telemetry_tps")
+                    if isinstance(server_stats.get("telemetry_tps"), (int, float))
+                    and not isinstance(server_stats.get("telemetry_tps"), bool)
+                    else None
+                ),
             }
         ).execute(self.database)
 

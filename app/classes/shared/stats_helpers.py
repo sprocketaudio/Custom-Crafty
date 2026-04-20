@@ -45,6 +45,7 @@ class StatsConverter:
             "mem_percent": None,
             "mem": None,
             "cpu": None,
+            "telemetry_tps": None,
         }
 
     @classmethod
@@ -180,6 +181,7 @@ class StatsConverter:
         ram_percent = []
         ram_gb = []
         cpu = []
+        tps = []
 
         for stat in stats:
             # Format date for display
@@ -196,12 +198,14 @@ class StatsConverter:
                 ram_percent.append(None)
                 ram_gb.append(None)
                 cpu.append(None)
+                tps.append(None)
             else:
                 if "minecraft-java" in server_type or "hytale" in server_type:
                     players.append(stat.get("online", 0))
                 ram_percent.append(stat.get("mem_percent", 0))
                 ram_gb.append(StatsConverter.bytes_to_gigabytes(stat.get("mem", 0)))
                 cpu.append(stat.get("cpu", 0))
+                tps.append(stat.get("telemetry_tps", None))
 
         return {
             "players": players,
@@ -209,4 +213,5 @@ class StatsConverter:
             "ram_percent": ram_percent,
             "ram_gb": ram_gb,
             "cpu": cpu,
+            "tps": tps,
         }

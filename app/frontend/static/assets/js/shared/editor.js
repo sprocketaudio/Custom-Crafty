@@ -1,6 +1,12 @@
 const urlParams = new URLSearchParams(globalThis.location.search);
 const serverId = urlParams.get("server_id");
-const path = decodeURIComponent(urlParams.get("file"))
+const rawFileParam = urlParams.get("file") || "";
+let path = rawFileParam;
+try {
+    path = decodeURIComponent(rawFileParam);
+} catch (error) {
+    console.warn("Failed to decode file query parameter, using raw value.", error);
+}
 let modified_epoch = 1.5;
 let serverFileContent = "";
 let themes = { "dark": "ace/theme/monokai", "light": "ace/theme/chrome", "default": "ace/theme/dracula" }
@@ -38,6 +44,119 @@ editor.commands.addCommand({
 });
 
 let is_saved = true;
+let editorEncoding = null;
+let availableEditorEncodings = [];
+
+function getFileParentDir(filePath) {
+    if (!filePath) {
+        return "";
+    }
+
+    const normalizedPath = filePath.replace(/\\/g, "/").replace(/\/+$/, "");
+    const lastSlashIndex = normalizedPath.lastIndexOf("/");
+    if (lastSlashIndex <= 0) {
+        return "";
+    }
+
+    return normalizedPath.substring(0, lastSlashIndex);
+}
+
+function buildFilesPanelUrl() {
+    if (!serverId) {
+        return "";
+    }
+
+    let filesUrl = `/panel/server_detail?id=${encodeURIComponent(serverId)}&subpage=files`;
+    const parentDir = getFileParentDir(path);
+    if (parentDir) {
+        filesUrl += `&dir=${encodeURIComponent(parentDir)}`;
+    }
+
+    return `${filesUrl}#context-container`;
+}
+
+function wireBackToFilesLink() {
+    const $backToFilesLink = $("#backToFilesLink");
+    if (!$backToFilesLink.length) {
+        return;
+    }
+
+    const filesUrl = buildFilesPanelUrl();
+    if (filesUrl) {
+        $backToFilesLink.attr("href", filesUrl);
+        return;
+    }
+
+    if (!$backToFilesLink.attr("href")) {
+        $backToFilesLink.attr("href", "#");
+    }
+    $backToFilesLink.on("click", (e) => {
+        e.preventDefault();
+        globalThis.history.back();
+    });
+}
+
+function applyEditorEncodingMode() {
+    if (editorEncoding === "nbt_json") {
+        setMode("json");
+        return;
+    }
+    if (editorEncoding === "snbt") {
+        setMode("txt");
+    }
+}
+
+function getAlternateEditorEncoding() {
+    if (!Array.isArray(availableEditorEncodings) || !editorEncoding) {
+        return null;
+    }
+    return availableEditorEncodings.find((encoding) => encoding !== editorEncoding) || null;
+}
+
+function updateNbtEncodingButton() {
+    const $nbtEncodingButton = $("#nbtEncodingButton");
+    if (!$nbtEncodingButton.length) {
+        return;
+    }
+
+    const alternateEncoding = getAlternateEditorEncoding();
+    if (!alternateEncoding) {
+        $nbtEncodingButton.addClass("d-none");
+        $nbtEncodingButton.removeAttr("data-next-encoding");
+        return;
+    }
+
+    const isSwitchingToSnbt = alternateEncoding === "snbt";
+    const label = isSwitchingToSnbt
+        ? $("#editor-wrapper").attr("data-switchRawSnbt")
+        : $("#editor-wrapper").attr("data-switchEasyJson");
+
+    $nbtEncodingButton
+        .text(label || alternateEncoding)
+        .attr("data-next-encoding", alternateEncoding)
+        .removeClass("d-none");
+}
+
+function wireNbtEncodingButton() {
+    const $nbtEncodingButton = $("#nbtEncodingButton");
+    if (!$nbtEncodingButton.length) {
+        return;
+    }
+
+    $nbtEncodingButton.off("click").on("click", async function () {
+        const nextEncoding = $(this).attr("data-next-encoding");
+        if (!nextEncoding) {
+            return;
+        }
+        if (!is_saved) {
+            const leaveMsg = $("#saveButton").data("leave") || "You have unsaved changes.";
+            if (!globalThis.confirm(leaveMsg)) {
+                return;
+            }
+        }
+        await get_file(nextEncoding);
+    });
+}
 
 let extensionChanges = [
     {
@@ -71,6 +190,10 @@ let extensionChanges = [
     {
         regex: /^json$/,
         replaceWith: "ace/mode/json",
+    },
+    {
+        regex: /^dat$/,
+        replaceWith: "ace/mode/text",
     },
     {
         regex: /^java$/,
@@ -143,16 +266,20 @@ let extensionChanges = [
 ];
 
 
-async function get_file() {
+async function get_file(requestedEncoding = null) {
     const token = getCookie("_xsrf");
     setFileName(path)
     $("#server_uuid").text(serverId);
+    const requestPayload = { page: "files", path: path };
+    if (requestedEncoding) {
+        requestPayload.editor_encoding = requestedEncoding;
+    }
     let res = await fetch(`/api/v2/servers/${serverId}/files`, {
         method: "POST",
         headers: {
             "X-XSRFToken": token,
         },
-        body: JSON.stringify({ page: "files", path: path }),
+        body: JSON.stringify(requestPayload),
     });
     let responseData = await res.json();
     console.log(responseData);
@@ -162,6 +289,10 @@ async function get_file() {
         editor.session.setValue(responseData.data.content);
         serverFileContent = responseData.data.content;
         modified_epoch = responseData.data.attributes.modified_epoch;
+        editorEncoding = responseData.data.attributes.editor_encoding || null;
+        availableEditorEncodings = responseData.data.attributes.editor_encoding_options || [];
+        updateNbtEncodingButton();
+        applyEditorEncodingMode();
         setSaveStatus(true);
         $("#file_size_sm").text(responseData.data.attributes.size);
         $("#file_type_sm").text(responseData.data.attributes.mime);
@@ -176,6 +307,8 @@ async function get_file() {
 }
 $(document).ready(function () {
     console.log("Getting file")
+    wireBackToFilesLink();
+    wireNbtEncodingButton();
     add_server_name();
     set_editor_font_size(localStorage.getItem("font-size") || 12)
     setKeybinds(localStorage.getItem("keybind") || "null")
@@ -252,13 +385,23 @@ for (let ev of event_types) {
 async function save(overwrite = false) {
     let text = editor.session.getValue();
 
+    const savePayload = {
+        path: path,
+        contents: text,
+        modified_epoch: modified_epoch,
+        overwrite: overwrite,
+    };
+    if (editorEncoding) {
+        savePayload.editor_encoding = editorEncoding;
+    }
+
     const token = getCookie("_xsrf");
     let res = await fetch(`/api/v2/servers/${serverId}/files`, {
         method: "PATCH",
         headers: {
             "X-XSRFToken": token,
         },
-        body: JSON.stringify({ path: path, contents: text, modified_epoch: modified_epoch, overwrite: overwrite }),
+        body: JSON.stringify(savePayload),
     });
     if (res.status === 409) {
         bootbox.prompt({
@@ -277,7 +420,7 @@ async function save(overwrite = false) {
                 if (result === "overwrite") {
                     save(true);
                 } else if (result === "repull") {
-                    get_file();
+                    get_file(editorEncoding);
                 } else {
                     return;
                 }

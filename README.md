@@ -1,5 +1,5 @@
 [![Crafty Logo](app/frontend/static/assets/images/logo_long.svg)](https://craftycontrol.com)
-# Crafty Controller 4.10.3
+# Crafty Controller 4.10.4
 > Python based Control Panel for your Minecraft Server
 
 ## What is Crafty Controller?
@@ -7,6 +7,19 @@ Crafty Controller is a Minecraft Server Control Panel / Launcher. The purpose
 of Crafty Controller is to launch a Minecraft Server in the background and present
 a web interface for the server administrators to interact with their servers. Crafty
 is compatible with Docker, Linux, Windows.
+
+## CurseForge API Integration (This Fork)
+This repository is also used for a Crafty deployment that manages Minecraft modpack
+server updates. The intended CurseForge API integration is to:
+- check selected modpack version metadata
+- download official server files for operator-selected packs (when available)
+- run a guarded update flow: backup server data, purge configured paths, then
+  re-apply operator overlay content (for example `mods/`, `config/`, `kubejs/`)
+
+Safety and distribution rules:
+- if a pack does not provide a server package, the workflow stops and the update is manual
+- the CurseForge API key is operator-provided in local configuration and is not embedded in source
+- only CurseForge-authorized API endpoints/files are used (no scraping or rehosting)
 
 ## Documentation
 Documentation available on [Crafty Docs](https://docs.craftycontrol.com)

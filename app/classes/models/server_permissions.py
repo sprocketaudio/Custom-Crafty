@@ -20,20 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 # **********************************************************************************
-#                                  Role Servers Class
-# **********************************************************************************
-class RoleServers(BaseModel):
-    role_id = ForeignKeyField(Roles, backref="role_server")
-    server_id = ForeignKeyField(Servers, backref="role_server")
-    permissions = CharField(default="00000000")
-
-    class Meta:
-        table_name = "role_servers"
-        primary_key = CompositeKey("role_id", "server_id")
-
-
-# **********************************************************************************
-#                                  Servers Permissions Class
+#                                  Servers Permissions Enum
 # **********************************************************************************
 class EnumPermissionsServer(Enum):
     COMMANDS = 0
@@ -44,11 +31,42 @@ class EnumPermissionsServer(Enum):
     FILES = 5
     CONFIG = 6
     PLAYERS = 7
+    NBT_READ = 8
+    NBT_WRITE = 9
+
+
+# **********************************************************************************
+#                                  Role Servers Class
+# **********************************************************************************
+class RoleServers(BaseModel):
+    role_id = ForeignKeyField(Roles, backref="role_server")
+    server_id = ForeignKeyField(Servers, backref="role_server")
+    permissions = CharField(default="0000000000")
+
+    class Meta:
+        table_name = "role_servers"
+        primary_key = CompositeKey("role_id", "server_id")
 
 
 class PermissionsServers:
+    MASK_LENGTH = len(EnumPermissionsServer)
+    EMPTY_MASK = "0" * MASK_LENGTH
+    FULL_MASK = "1" * MASK_LENGTH
+
+    @staticmethod
+    def normalize_permissions_mask(permission_mask: t.Optional[str]) -> str:
+        if permission_mask is None:
+            return PermissionsServers.EMPTY_MASK
+        normalized_bits = "".join(
+            "1" if bit == "1" else "0" for bit in str(permission_mask)
+        )
+        if len(normalized_bits) < PermissionsServers.MASK_LENGTH:
+            normalized_bits = normalized_bits.ljust(PermissionsServers.MASK_LENGTH, "0")
+        return normalized_bits[: PermissionsServers.MASK_LENGTH]
+
     @staticmethod
     def get_or_create(role_id, server, permissions_mask):
+        permissions_mask = PermissionsServers.normalize_permissions_mask(permissions_mask)
         return RoleServers.get_or_create(
             role_id=role_id, server_id=server, permissions=permissions_mask
         )
@@ -59,6 +77,7 @@ class PermissionsServers:
 
     @staticmethod
     def get_permissions(permissions_mask):
+        permissions_mask = PermissionsServers.normalize_permissions_mask(permissions_mask)
         return [
             permission
             for permission in EnumPermissionsServer.__members__.values()
@@ -67,12 +86,14 @@ class PermissionsServers:
 
     @staticmethod
     def has_permission(permission_mask, permission_tested: EnumPermissionsServer):
+        permission_mask = PermissionsServers.normalize_permissions_mask(permission_mask)
         return permission_mask[permission_tested.value] == "1"
 
     @staticmethod
     def set_permission(
         permission_mask, permission_tested: EnumPermissionsServer, value
     ):
+        permission_mask = PermissionsServers.normalize_permissions_mask(permission_mask)
         list_perms = list(permission_mask)
         list_perms[permission_tested.value] = str(value)
         permission_mask = "".join(list_perms)
@@ -80,10 +101,15 @@ class PermissionsServers:
 
     @staticmethod
     def get_permission(permission_mask, permission_tested: EnumPermissionsServer):
+        permission_mask = PermissionsServers.normalize_permissions_mask(permission_mask)
         return permission_mask[permission_tested.value]
 
     @staticmethod
     def get_token_permissions(permissions_mask, api_permissions_mask):
+        permissions_mask = PermissionsServers.normalize_permissions_mask(permissions_mask)
+        api_permissions_mask = PermissionsServers.normalize_permissions_mask(
+            api_permissions_mask
+        )
         return [
             permission
             for permission in EnumPermissionsServer.__members__.values()
@@ -128,7 +154,10 @@ class PermissionsServers:
         )
 
     @staticmethod
-    def add_role_server(server_id, role_id, rs_permissions="00000000"):
+    def add_role_server(server_id, role_id, rs_permissions=None):
+        if rs_permissions is None:
+            rs_permissions = PermissionsServers.EMPTY_MASK
+        rs_permissions = PermissionsServers.normalize_permissions_mask(rs_permissions)
         servers = RoleServers.insert(
             {
                 RoleServers.server_id: server_id,
@@ -147,7 +176,9 @@ class PermissionsServers:
             .where(RoleServers.server_id == server_id)
             .get()
         )
-        permissions_mask = role_server.permissions
+        permissions_mask = PermissionsServers.normalize_permissions_mask(
+            role_server.permissions
+        )
         return permissions_mask
 
     @staticmethod
@@ -162,7 +193,9 @@ class PermissionsServers:
     def get_role_permissions_list(role_id):
         role_server = RoleServers.get_or_none(RoleServers.role_id == role_id)
         permissions_mask = (
-            "00000000" if role_server is None else role_server.permissions
+            PermissionsServers.EMPTY_MASK
+            if role_server is None
+            else role_server.permissions
         )
         permissions_list = PermissionsServers.get_permissions(permissions_mask)
         return permissions_list
@@ -181,6 +214,7 @@ class PermissionsServers:
 
     @staticmethod
     def update_role_permission(role_id, server_id, permissions_mask):
+        permissions_mask = PermissionsServers.normalize_permissions_mask(permissions_mask)
         RoleServers.update(permissions=permissions_mask).where(
             RoleServers.role_id == role_id, RoleServers.server_id == server_id
         ).execute()
@@ -223,7 +257,7 @@ class PermissionsServers:
     @staticmethod
     def get_user_permissions_mask(user: Users, server_id: str):
         if user.superuser:
-            permissions_mask = "1" * len(EnumPermissionsServer)
+            permissions_mask = PermissionsServers.FULL_MASK
         else:
             roles_list = HelperUsers.get_user_roles_id(user.user_id)
             role_server = (
@@ -235,8 +269,8 @@ class PermissionsServers:
             try:
                 permissions_mask = role_server[0].permissions
             except IndexError:
-                permissions_mask = "0" * len(EnumPermissionsServer)
-        return permissions_mask
+                permissions_mask = PermissionsServers.EMPTY_MASK
+        return PermissionsServers.normalize_permissions_mask(permissions_mask)
 
     @staticmethod
     def get_server_user_list(server_id):
@@ -294,10 +328,15 @@ class PermissionsServers:
             user_permissions_mask = role_server[0].permissions
         except:
             if user["superuser"]:
-                user_permissions_mask = "11111111"
+                user_permissions_mask = PermissionsServers.FULL_MASK
             else:
-                user_permissions_mask = "00000000"
-        key_permissions_mask = key.server_permissions
+                user_permissions_mask = PermissionsServers.EMPTY_MASK
+        user_permissions_mask = PermissionsServers.normalize_permissions_mask(
+            user_permissions_mask
+        )
+        key_permissions_mask = PermissionsServers.normalize_permissions_mask(
+            key.server_permissions
+        )
         permissions_mask = PermissionHelper.combine_masks(
             user_permissions_mask, key_permissions_mask
         )

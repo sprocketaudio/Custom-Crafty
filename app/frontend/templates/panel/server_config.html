@@ -54,6 +54,14 @@
                     placeholder="{{ translate('serverConfig', 'serverName', data['lang']) }}" required>
                 </div>
 
+                <div class="form-group">
+                  <label for="server_notes">Server Notes
+                    <small class="text-muted ml-1"> - Optional per-server notes (ports, reminders, runbook).</small>
+                  </label>
+                  <textarea class="form-control" name="server_notes" id="server_notes" rows="3"
+                    placeholder="Optional notes">{{ data['server_stats']['server_id'].get('server_notes', '') }}</textarea>
+                </div>
+
                 {% if data['super_user'] %}
                 <div class="form-group">
                   <label for="server_path">{{ translate('serverConfig', 'serverPath', data['lang']) }} <small
@@ -102,6 +110,41 @@
                     value="{{ data['server_stats']['server_id']['execution_command']  }}"
                     placeholder="{{ translate('serverConfig', 'serverExecutionCommand', data['lang']) }}" required>
                 </div>
+                <div class="form-group">
+                  <label for="memory_limit_mib">Memory Limit (MiB)
+                    <small class="text-muted ml-1"> - Absolute process memory cap. Use 0 to disable. Requires Linux
+                      cgroup v2 memory controller.</small>
+                  </label>
+                  <input type="number" class="form-control" name="memory_limit_mib" id="memory_limit_mib"
+                    value="{{ data['server_stats']['server_id'].get('memory_limit_mib', 0) }}"
+                    min="0" step="1" placeholder="0"
+                    {% if not data.get('launch_capabilities', {}).get('memory_limit', {}).get('supported', False) %}disabled aria-disabled="true"{% end %}>
+                  {% if not data.get('launch_capabilities', {}).get('memory_limit', {}).get('supported', False) %}
+                  <small class="form-text text-warning">
+                    Unsupported on this host ({{ data.get('launch_capabilities', {}).get('memory_limit', {}).get('os', 'unknown') }} /
+                    {{ data.get('launch_capabilities', {}).get('memory_limit', {}).get('reason', 'unknown') }}). Saving this form forces Memory Limit to 0.
+                  </small>
+                  {% end %}
+                  <div class="invalid-feedback" id="memory_limit_mib_error"></div>
+                </div>
+                <div class="form-group">
+                  <label for="cpu_affinity">CPU Affinity
+                    <small class="text-muted ml-1"> - Pins this server to specific CPU cores. Requires Linux +
+                      taskset.</small>
+                  </label>
+                  <input type="text" class="form-control" name="cpu_affinity" id="cpu_affinity"
+                    value="{{ data['server_stats']['server_id'].get('cpu_affinity', '') }}"
+                    placeholder="0-3,6,8"
+                    {% if not data.get('launch_capabilities', {}).get('cpu_affinity', {}).get('supported', False) %}disabled aria-disabled="true"{% end %}>
+                  {% if not data.get('launch_capabilities', {}).get('cpu_affinity', {}).get('supported', False) %}
+                  <small class="form-text text-warning">
+                    Unsupported on this host ({{ data.get('launch_capabilities', {}).get('cpu_affinity', {}).get('os', 'unknown') }} /
+                    {{ data.get('launch_capabilities', {}).get('cpu_affinity', {}).get('reason', 'unknown') }}). Saving this form clears CPU affinity.
+                  </small>
+                  {% end %}
+                  <small class="form-text text-muted">Examples: 0-3, 4,6,8,10, 2-5,9-11</small>
+                  <div class="invalid-feedback" id="cpu_affinity_error"></div>
+                </div>
                 {% else %}
                 <label for="execution_command">{{ translate('serverConfig', 'serverExecutionCommand', data['lang']) }}
                   <div class="card-header header-sm d-flex justify-content-between align-items-center">
@@ -143,6 +186,15 @@
                     <input type="number" class="form-control" name="server_port" id="server_port" value="{{ data['server_stats']['server_id']['server_port']  }}" step="1" max="65566" min="1" required>
                     <span data-html="true" class="port-hint text-center" title="<i class='ph-fill ph-warning'></i> " , data-content="{{
                         translate('serverConfig', 'statsHint1' , data['lang'])}} <br> <br> <strong>{{ translate('serverConfig', 'statsHint2', data['lang'])}}</strong>" , data-placement="right"></span>
+                  </div>
+                  <div class="form-group">
+                    <label for="telemetry_port">Telemetry Port
+                      <small class="text-muted ml-1"> - Optional. Crafty queries <code>http://&lt;server_ip&gt;:&lt;port&gt;/telemetry</code> for TPS/MSPT while running. Use 0 to disable.</small>
+                    </label>
+                    <input type="number" class="form-control" name="telemetry_port" id="telemetry_port"
+                      value="{{ data['server_stats']['server_id'].get('telemetry_port', 0) }}"
+                      min="0" max="65535" step="1" placeholder="0">
+                    <div class="invalid-feedback" id="telemetry_port_error"></div>
                   </div>
                   {% end %}
 
@@ -535,6 +587,9 @@
     return res.json();
   }
   function replacer(key, value) {
+    if (key == "server_notes") {
+      return value;
+    }
     if (key != "ignored_exits") {
       if (typeof value == "boolean" || key === "executable_update_url" || value === '') {
         return value
@@ -544,6 +599,68 @@
     } else {
       return value;
     }
+  }
+
+  function validateCpuAffinitySyntax(rawValue) {
+    const value = (rawValue || "").trim();
+    if (value === "") {
+      return { valid: true, error: "" };
+    }
+
+    const segments = value.split(",");
+    for (const segmentRaw of segments) {
+      const segment = segmentRaw.trim();
+      if (segment === "") {
+        return { valid: false, error: "CPU affinity contains an empty segment." };
+      }
+      if (segment.includes("-")) {
+        const parts = segment.split("-");
+        if (parts.length !== 2 || parts[0].trim() === "" || parts[1].trim() === "") {
+          return { valid: false, error: `Invalid range segment '${segment}'.` };
+        }
+        const start = Number(parts[0].trim());
+        const end = Number(parts[1].trim());
+        if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end < 0) {
+          return { valid: false, error: `Invalid range segment '${segment}'.` };
+        }
+        if (start > end) {
+          return { valid: false, error: `Invalid range '${segment}': start cannot exceed end.` };
+        }
+      } else {
+        const id = Number(segment);
+        if (!Number.isInteger(id) || id < 0) {
+          return { valid: false, error: `Invalid CPU id token '${segment}'.` };
+        }
+      }
+    }
+
+    return { valid: true, error: "" };
+  }
+
+  function validateMemoryLimitMiB(rawValue) {
+    const value = (rawValue ?? "").toString().trim();
+    if (value === "") {
+      return { valid: true, error: "" };
+    }
+    if (!/^\d+$/.test(value)) {
+      return { valid: false, error: "Memory limit must be a non-negative integer (MiB)." };
+    }
+    return { valid: true, error: "" };
+  }
+
+  function validateTelemetryPort(rawValue) {
+    const value = (rawValue ?? "").toString().trim();
+    if (value === "") {
+      return { valid: true, error: "" };
+    }
+    if (!/^\d+$/.test(value)) {
+      return { valid: false, error: "Telemetry port must be an integer from 0 to 65535." };
+    }
+    const parsed = Number(value);
+    if (!Number.isInteger(parsed) || parsed < 0 || parsed > 65535) {
+      return { valid: false, error: "Telemetry port must be between 0 and 65535." };
+    }
+    return { valid: true, error: "" };
   }
 
   $(document).ready(function () {
@@ -561,6 +678,54 @@
       formDataObject.crash_detection = $("#crash_detection").prop('checked');
       formDataObject.auto_start = $("#auto_start").prop('checked');
       formDataObject.count_players = $("#count_players").prop('checked');
+      if ($("#memory_limit_mib").length) {
+        if ($("#memory_limit_mib").is(":disabled")) {
+          formDataObject.memory_limit_mib = 0;
+          $("#memory_limit_mib").removeClass("is-invalid");
+          $("#memory_limit_mib_error").text("");
+        } else {
+          const memoryLimitValidation = validateMemoryLimitMiB(formDataObject.memory_limit_mib);
+          if (!memoryLimitValidation.valid) {
+            $("#memory_limit_mib").addClass("is-invalid");
+            $("#memory_limit_mib_error").text(memoryLimitValidation.error);
+            return;
+          }
+          if ((formDataObject.memory_limit_mib ?? "").toString().trim() === "") {
+            formDataObject.memory_limit_mib = 0;
+          }
+          $("#memory_limit_mib").removeClass("is-invalid");
+          $("#memory_limit_mib_error").text("");
+        }
+      }
+      if ($("#cpu_affinity").length) {
+        if ($("#cpu_affinity").is(":disabled")) {
+          formDataObject.cpu_affinity = "";
+          $("#cpu_affinity").removeClass("is-invalid");
+          $("#cpu_affinity_error").text("");
+        } else {
+          const affinityValidation = validateCpuAffinitySyntax(formDataObject.cpu_affinity);
+          if (!affinityValidation.valid) {
+            $("#cpu_affinity").addClass("is-invalid");
+            $("#cpu_affinity_error").text(affinityValidation.error);
+            return;
+          }
+          $("#cpu_affinity").removeClass("is-invalid");
+          $("#cpu_affinity_error").text("");
+        }
+      }
+      if ($("#telemetry_port").length) {
+        const telemetryPortValidation = validateTelemetryPort(formDataObject.telemetry_port);
+        if (!telemetryPortValidation.valid) {
+          $("#telemetry_port").addClass("is-invalid");
+          $("#telemetry_port_error").text(telemetryPortValidation.error);
+          return;
+        }
+        if ((formDataObject.telemetry_port ?? "").toString().trim() === "") {
+          formDataObject.telemetry_port = 0;
+        }
+        $("#telemetry_port").removeClass("is-invalid");
+        $("#telemetry_port_error").text("");
+      }
       console.log(formDataObject);
       // Format the plain form data as JSON
       let formDataJsonString = JSON.stringify(formDataObject, replacer);

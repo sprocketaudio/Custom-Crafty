@@ -179,7 +179,7 @@
           <!-- View for Large screen -->
           <div class="table-responsive d-none d-sm-block">
             <style id="column-visibility">
-              {% set all_columns = ['server', 'serverIcon', 'actions', 'cpuUsage', 'memUsage', 'size', 'players', 'port', 'version', 'status'] %}
+              {% set all_columns = ['server', 'serverIcon', 'actions', 'cpuUsage', 'memUsage', 'size', 'players', 'tps', 'port', 'version', 'status'] %}
               {% for col in all_columns %}
                 {% if col not in data['dashboard_columns'] %}
               #servers_table .col-{{ col }} { display: none; }
@@ -196,6 +196,7 @@
                   <th class="col-memUsage" draggable="false">{{ translate('dashboard', 'memUsage', data['lang']) }}</th>
                   <th class="col-size" draggable="false">{{ translate('dashboard', 'size', data['lang']) }}</th>
                   <th class="col-players" draggable="false">{{ translate('dashboard', 'players', data['lang']) }}</th>
+                  <th class="col-tps" draggable="false">TPS</th>
                   <th class="col-port" draggable="false">{{ translate('dashboard', 'port', data['lang']) }}</th>
                   <th class="col-version" draggable="false">{{ translate('dashboard', 'version', data['lang']) }}</th>
                   <th class="col-status" draggable="false">{{ translate('dashboard', 'status', data['lang']) }}</th>
@@ -283,8 +284,9 @@
                     {% end %}
                   </td>
                   <td class="col-cpuUsage" draggable="false" id="server_cpu_{{server['server_data']['server_id']}}">
+                    {% set cpu_cores = server['stats'].get('cpu_capacity_cores', 0) %}
                     <div class="progress mb-1" data-toggle="tooltip" data-placement="top"
-                      title="{{server['stats']['cpu']}}">
+                      title="{{server['stats']['cpu']}}%">
                       <div class="progress-bar
                       {% if server['stats']['cpu'] <= 33 %}
                       bg-success
@@ -296,7 +298,7 @@
                       " role="progressbar" style="width: {{server['stats']['cpu']}}%"
                         aria-valuenow="{{server['stats']['cpu']}}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
-                    {{server['stats']['cpu']}}%
+                    {{ cpu_cores if cpu_cores > 0 else '--' }} Cores - {{server['stats']['cpu']}}%
                   </td>
                   <td class="col-memUsage" draggable="false" id="server_mem_{{server['server_data']['server_id']}}">
                     <div class="progress mb-1" data-toggle="tooltip" data-placement="top"
@@ -335,6 +337,14 @@
                       data-players="{{ server['stats']['online']}}" data-max="{{ server['stats']['max'] }}"
                       data-count="{{server['server_data']['count_players']}}"></span>
                   </td>
+                  <td class="col-tps" draggable="false" id="server_tps_{{server['server_data']['server_id']}}">
+                    {% set dashboard_tps = server['stats'].get('telemetry_tps', False) %}
+                    {% if dashboard_tps is not False and dashboard_tps is not None %}
+                    {{ '%.2f' % dashboard_tps }}
+                    {% else %}
+                    N/A
+                    {% end %}
+                  </td>
                   <td class="col-port" draggable="false" id="server_port_{{server['server_data']['server_id']}}">
                     {{ server['stats'].get('game_port', server['stats']['server_port']) }}
                   </td>
@@ -369,6 +379,7 @@
             <td class="col-memUsage"></td>
             <td class="col-size"></td>
             <td class="col-players"></td>
+            <td class="col-tps"></td>
             <td class="col-port"></td>
             <td class="col-version"></td>
             <td class="col-status"><i class="ph-fill ph-cloud"></i>&nbsp;Unloaded</td>
@@ -522,8 +533,9 @@
                     <div class="col-6">
                       <h6>{{ translate('dashboard', 'cpuUsage', data['lang']) }}</h6>
                       <div id="m_server_cpu_{{server['server_data']['server_id']}}">
+                        {% set m_cpu_cores = server['stats'].get('cpu_capacity_cores', 0) %}
                         <div class="progress mb-1" data-toggle="tooltip" data-placement="top"
-                          title="{{server['stats']['cpu']}}">
+                          title="{{server['stats']['cpu']}}%">
                           <div class="progress-bar
                     {% if server['stats']['cpu'] <= 33 %}
                     bg-success
@@ -535,7 +547,7 @@
                     " role="progressbar" style="width: {{server['stats']['cpu']}}%"
                             aria-valuenow="{{server['stats']['cpu']}}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
-                        {{server['stats']['cpu']}}%
+                        {{ m_cpu_cores if m_cpu_cores > 0 else '--' }} Cores - {{server['stats']['cpu']}}%
                       </div>
                     </div>
                     <div class="col-6">
@@ -724,6 +736,14 @@
     document.querySelector('.dynamicMsg').appendChild(parentEl);
   }
 
+  function formatCpuUsageLabel(cpuCores, cpuPercent) {
+    const numericCores = Number(cpuCores);
+    const coresLabel = Number.isFinite(numericCores) && numericCores > 0
+      ? numericCores
+      : '--';
+    return `${coresLabel} Cores - ${cpuPercent}%`;
+  }
+
   function update_one_server_status(server) {
     /* Mobile view update */
     server_cpu = document.getElementById('server_cpu_' + server.id);
@@ -732,6 +752,7 @@
     server_port = document.getElementById('server_port_' + server.id);
     server_icon = document.getElementById('server_icon_' + server.id);
     server_version = document.getElementById('server_version_' + server.id);
+    server_tps = document.getElementById('server_tps_' + server.id);
     server_desc = document.getElementById('server_desc_' + server.id);
     server_online_status = document.getElementById('server_running_status_' + server.id);
     server_players = document.getElementById('server_players_' + server.id);
@@ -757,8 +778,9 @@
       cpu_status = "bg-warning";
     }
 
-    server_cpu.innerHTML = `<div class="progress mb-1" data-toggle="tooltip" data-placement="top" title="` + server.cpu + `"><div class="progress-bar ` + cpu_status + `" role="progressbar" style="width: ` + server.cpu + `%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div>` + server.cpu + `%`;
-    m_server_cpu.innerHTML = `<div class="progress mb-1" data-toggle="tooltip" data-placement="top" title="` + server.cpu + `"><div class="progress-bar ` + cpu_status + `" role="progressbar" style="width: ` + server.cpu + `%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div>` + server.cpu + `%`;
+    const cpuLabel = formatCpuUsageLabel(server.cpu_capacity_cores, server.cpu);
+    server_cpu.innerHTML = `<div class="progress mb-1" data-toggle="tooltip" data-placement="top" title="` + server.cpu + `%"><div class="progress-bar ` + cpu_status + `" role="progressbar" style="width: ` + server.cpu + `%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div>` + cpuLabel;
+    m_server_cpu.innerHTML = `<div class="progress mb-1" data-toggle="tooltip" data-placement="top" title="` + server.cpu + `%"><div class="progress-bar ` + cpu_status + `" role="progressbar" style="width: ` + server.cpu + `%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div>` + cpuLabel;
 
 
     /* Update Memory */
@@ -796,6 +818,17 @@
     }
     if (m_server_version) {
       m_server_version.innerHTML = server.version;
+    }
+    if (server_tps) {
+      if (
+        server.telemetry_tps !== false
+        && server.telemetry_tps !== null
+        && !Number.isNaN(Number(server.telemetry_tps))
+      ) {
+        server_tps.innerHTML = Number(server.telemetry_tps).toFixed(2);
+      } else {
+        server_tps.innerHTML = "N/A";
+      }
     }
 
     /* Update Server Infos */
@@ -1161,6 +1194,7 @@
       { key: 'memUsage', label: "{{ translate('dashboard', 'memUsage', data['lang']) }}", locked: false },
       { key: 'size', label: "{{ translate('dashboard', 'size', data['lang']) }}", locked: false },
       { key: 'players', label: "{{ translate('dashboard', 'players', data['lang']) }}", locked: false },
+      { key: 'tps', label: "TPS", locked: false },
       { key: 'port', label: "{{ translate('dashboard', 'port', data['lang']) }}", locked: false },
       { key: 'version', label: "{{ translate('dashboard', 'version', data['lang']) }}", locked: false },
       { key: 'status', label: "{{ translate('dashboard', 'status', data['lang']) }}", locked: true },

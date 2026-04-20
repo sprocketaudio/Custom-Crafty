@@ -36,7 +36,7 @@ class ServerPermsController:
         return PermissionsServers.get_role_permissions_dict(role_id)
 
     @staticmethod
-    def add_role_server(server_id, role_id, rs_permissions="00000000"):
+    def add_role_server(server_id, role_id, rs_permissions=None):
         return PermissionsServers.add_role_server(server_id, role_id, rs_permissions)
 
     @staticmethod
@@ -68,10 +68,16 @@ class ServerPermsController:
     @staticmethod
     def get_lowest_api_perm_mask(user_server_permissions_mask, api_key_permssions_mask):
         mask = ""
+        user_server_permissions_mask = PermissionsServers.normalize_permissions_mask(
+            user_server_permissions_mask
+        )
         # If this isn't an API key we'll know the request came from basic
         # authentication and ignore the API key permissions mask.
         if not api_key_permssions_mask:
             return user_server_permissions_mask
+        api_key_permssions_mask = PermissionsServers.normalize_permissions_mask(
+            api_key_permssions_mask
+        )
         for _index, (user_perm, api_perm) in enumerate(
             zip(user_server_permissions_mask, api_key_permssions_mask)
         ):

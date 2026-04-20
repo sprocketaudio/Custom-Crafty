@@ -32,13 +32,21 @@
             <b>{{ translate('serverStats', 'cpuUsage', data['lang']) }}:</b> <span id="cpu">{{
               data['server_stats']['cpu'] }}%</span> <br />
             <b>{{ translate('serverStats', 'memUsage', data['lang']) }}:</b> <span id="mem">{{
-              data['server_stats']['mem'] }}</span> <br />
+              data['server_stats']['mem'] }} / {{ data['server_stats'].get('mem_capacity', 'N/A') }}</span> <br />
             {% if data['server_stats']['int_ping_results'] %}
             <b>{{ translate('serverStats', 'players', data['lang']) }}:</b> <span id="players">{{
               data['server_stats']['online'] }} / {{ data['server_stats']['max'] }}</span><br />
             {% else %}
             <b>{{ translate('serverStats', 'players', data['lang']) }}:</b> <span id="players">0/0</span><br />
             {% end %}
+            {% set tps_val = data['server_stats'].get('telemetry_tps', False) %}
+            <b>TPS:</b> <span id="telemetry_tps">
+              {% if tps_val is not False and tps_val is not None %}
+              {{ '%.2f' % tps_val }}
+              {% else %}
+              N/A
+              {% end %}
+            </span><br />
           </div>
 
           <div class="col-sm-5">
@@ -55,6 +63,9 @@
               class="input_motd">{{ translate('serverStats', 'unableToConnect', data['lang']) }}</span> <br />
             {% end %}
             <b>Server Type: <span class="text-info">{{data['server_stats']['server_type']}}</span></b>
+            <br />
+            <b>Server Notes:</b> <span id="server_notes" style="white-space: pre-wrap;">{{
+              data['server_stats']['server_id'].get('server_notes', '') }}</span>
 
           </div>
         </div>
@@ -155,8 +166,10 @@
     server_cpu = document.getElementById('cpu');
     server_mem = document.getElementById('mem');
     server_players = document.getElementById('players');
+    server_telemetry_tps = document.getElementById('telemetry_tps');
     server_version = document.getElementById('version');
     server_input_motd = document.getElementById('input_motd');
+    server_notes = document.getElementById('server_notes');
 
     /* TODO Update each element */
     if (server.running) {
@@ -203,13 +216,26 @@
     }
 
     server_cpu.innerHTML = server.cpu + ` %`;
-    server_mem.innerHTML = server.mem;
+    const memUsed = server.mem !== undefined ? server.mem : "0 MB";
+    const memCapacity = server.mem_capacity !== undefined ? server.mem_capacity : "N/A";
+    server_mem.innerHTML = `${memUsed} / ${memCapacity}`;
 
     if (server.int_ping_results) {
       server_players.innerHTML = server.online + `/` + server.max;
     }
     else {
       server_players.innerHTML = `0/0`;
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(server, "telemetry_tps")
+      && server.telemetry_tps !== false
+      && server.telemetry_tps !== null
+      && !Number.isNaN(Number(server.telemetry_tps))
+    ) {
+      server_telemetry_tps.innerHTML = Number(server.telemetry_tps).toFixed(2);
+    } else {
+      server_telemetry_tps.innerHTML = "N/A";
     }
 
     if (server.version) {
@@ -219,6 +245,10 @@
     else {
       server_version.innerHTML = `{{ translate('serverStats', 'unableToConnect', data['lang']) }}`;
       server_input_motd.innerHTML = `{{ translate('serverStats', 'unableToConnect', data['lang']) }}`;
+    }
+
+    if (server_notes && Object.prototype.hasOwnProperty.call(server, "server_notes")) {
+      server_notes.innerText = server.server_notes || "";
     }
 
     initParser('input_motd', 'input_motd');

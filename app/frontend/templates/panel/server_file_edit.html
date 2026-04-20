@@ -10,6 +10,8 @@ end %} {% block content %}
     data-cancel='{{translate("serverFiles", "cancel", data["lang"])}}'
     data-overwrite='{{translate("serverFiles", "overwrite", data["lang"])}}'
     data-repull='{{translate("serverFiles", "repull", data["lang"])}}'
+    data-switchEasyJson="Switch to Easy JSON"
+    data-switchRawSnbt="Switch to Raw SNBT"
     data-unsupported="{{translate('serverFiles', 'unsupportedLanguage', data['lang'])}}">
     <!-- Page Title Header Starts-->
     <div class="row page-title-header centered">
@@ -34,6 +36,11 @@ end %} {% block content %}
                 "modified",
                 data["lang"])}}: <span id="file_modified_sm"></span> </small>
         </div>
+        <div id="editor-nav" class="info-flex">
+            <a id="backToFilesLink" href="{{ data.get('edit_file_back_href', '#') }}" class="btn btn-outline-primary">
+                <i class="ph-bold ph-arrow-u-left-up"></i>&nbsp;&nbsp;Back to Files
+            </a>
+        </div>
     </div>
     <div id="warning" class="d-none row centered">
         <h5><i class="ph-fill ph-warning"></i>&nbsp;{{
@@ -54,6 +61,7 @@ end %} {% block content %}
                     data-leave='{{translate("serverFilesEditor", "unsavedChanges" , data["lang"])}}' onclick="save()">
                     <i class="ph-fill ph-floppy-disk"></i>&nbsp;&nbsp;<span id="saveButtonText"></span>
                 </button>
+                <button id="nbtEncodingButton" class="btn btn-outline-info d-none" type="button"></button>
             </div>
         </div>
     </div>

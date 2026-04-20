@@ -2,7 +2,10 @@ from jsonschema import ValidationError, validate
 import orjson
 from peewee import DoesNotExist, IntegrityError
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
+from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.web.base_api_handler import BaseApiHandler
+
+SERVER_PERMISSIONS_MASK_PATTERN = rf"^[01]{{{len(EnumPermissionsServer)}}}$"
 
 modify_role_schema = {
     "type": "object",
@@ -27,7 +30,7 @@ modify_role_schema = {
                     },
                     "permissions": {
                         "type": "string",
-                        "pattern": r"^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "pattern": SERVER_PERMISSIONS_MASK_PATTERN,
                         "error": "roleServerPerms",
                     },
                 },
@@ -63,7 +66,7 @@ basic_modify_role_schema = {
                     },
                     "permissions": {
                         "type": "string",
-                        "pattern": r"^[01]{8}$",  # 8 bits, see EnumPermissionsServer
+                        "pattern": SERVER_PERMISSIONS_MASK_PATTERN,
                         "error": "roleServerPerms",
                     },
                 },
