@@ -37,6 +37,7 @@ from app.classes.web.routes.api.servers.server.history import (
     ApiServersServerHistoryHandler,
 )
 from app.classes.web.routes.api.servers.server.stdin import ApiServersServerStdinHandler
+from app.classes.web.routes.api.servers.server.ops import ApiServersServerOpsHandler
 from app.classes.web.routes.api.servers.server.tasks.index import (
     ApiServersServerTasksIndexHandler,
 )
@@ -466,6 +467,11 @@ def api_handlers(handler_args):
         (
             r"/api/v2/servers/([a-z0-9-]+)/stdin/?",
             ApiServersServerStdinHandler,
+            handler_args,
+        ),
+        (
+            r"/api/v2/servers/([a-z0-9-]+)/ops/?",
+            ApiServersServerOpsHandler,
             handler_args,
         ),
         (

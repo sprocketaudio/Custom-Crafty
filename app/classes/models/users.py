@@ -44,6 +44,7 @@ class Users(BaseModel):
     manager = IntegerField(default=None, null=True)
     pfp = CharField(default="/static/assets/images/faces-clipart/pic-3.png")
     theme = CharField(default="default")
+    datetime_format = CharField(default="auto")
     cleared_notifs = CharField(default="default")
     disable_password_auth = BooleanField(default=False)
     dashboard_columns = CharField(

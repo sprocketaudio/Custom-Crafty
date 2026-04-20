@@ -1019,6 +1019,25 @@ class PanelHandler(BaseHandler):
 
                 return html
 
+            def format_created_date(
+                entries: t.List[t.Dict[str, t.Any]],
+                source_key: str,
+                target_key: str,
+            ) -> t.List[t.Dict[str, t.Any]]:
+                for entry in entries:
+                    created = entry.get(source_key)
+                    if not created:
+                        entry[target_key] = "Unknown"
+                        continue
+                    try:
+                        temp_date = datetime.datetime.strptime(
+                            created, "%Y-%m-%d %H:%M:%S %z"
+                        )
+                        entry[target_key] = temp_date.strftime("%Y/%m/%d %H:%M:%S")
+                    except (TypeError, ValueError):
+                        entry[target_key] = str(created)
+                return entries
+
             if subpage == "admin_controls":
                 if (
                     not page_data["permissions"]["Players"]
@@ -1027,8 +1046,17 @@ class PanelHandler(BaseHandler):
                     if not superuser:
                         self.redirect("/panel/error?error=Unauthorized access")
                 page_data["banned_players_html"] = get_banned_players_html()
-                page_data["banned_players"] = (
-                    self.controller.servers.get_banned_players(server_id)
+                page_data["banned_players"] = self.controller.servers.get_banned_players(
+                    server_id
+                )
+                page_data["banned_ips"] = self.controller.servers.get_banned_ips(
+                    server_id
+                )
+                page_data["whitelist_players"] = (
+                    self.controller.servers.get_whitelist_players(server_id)
+                )
+                page_data["ops_players"] = self.controller.servers.get_ops_players(
+                    server_id
                 )
                 server_instance = self.controller.servers.get_server_instance_by_id(
                     server_id
@@ -1037,10 +1065,12 @@ class PanelHandler(BaseHandler):
 
                 for player in page_data["banned_players"]:
                     player["banned"] = True
-                    temp_date = datetime.datetime.strptime(
-                        player["created"], "%Y-%m-%d %H:%M:%S %z"
-                    )
-                    player["banned_on"] = (temp_date).strftime("%Y/%m/%d %H:%M:%S")
+                page_data["banned_players"] = format_created_date(
+                    page_data["banned_players"], "created", "banned_on"
+                )
+                page_data["banned_ips"] = format_created_date(
+                    page_data["banned_ips"], "created", "banned_on"
+                )
 
             template = f"panel/server_{subpage}.html"
 

@@ -160,6 +160,18 @@ data['lang']) }}{% end %}
                           {% end %}
                         </select>
                       </div>
+                      <div class="form-group">
+                        <label class="form-label" for="datetime_format">{{ translate('userConfig', 'dateTimeFormat', data['lang'])
+                          }}</label>
+                        <select class="form-select form-control form-control-lg select-css" id="datetime_format"
+                          name="datetime_format" form="user_form">
+                          {% set current_datetime_format = data['user'].get('datetime_format', 'auto') %}
+                          <option value="auto" {% if current_datetime_format == 'auto' %}selected{% end %}>{{ translate('userConfig', 'dateTimeFormatAuto', data['lang']) }}</option>
+                          <option value="en_GB" {% if current_datetime_format == 'en_GB' %}selected{% end %}>{{ translate('userConfig', 'dateTimeFormatUK', data['lang']) }}</option>
+                          <option value="en_US" {% if current_datetime_format == 'en_US' %}selected{% end %}>{{ translate('userConfig', 'dateTimeFormatUS', data['lang']) }}</option>
+                          <option value="iso_8601" {% if current_datetime_format == 'iso_8601' %}selected{% end %}>{{ translate('userConfig', 'dateTimeFormatISO', data['lang']) }}</option>
+                        </select>
+                      </div>
                       {% if data['superuser'] %}
                       <div class="form-group">
                         <label class="form-label" for="manager">{{ translate('userConfig', 'selectManager',

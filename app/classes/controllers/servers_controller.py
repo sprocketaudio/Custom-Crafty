@@ -598,6 +598,51 @@ class ServersController(metaclass=Singleton):
     #                                    Servers Helpers Methods
     # **********************************************************************************
     @staticmethod
+    def _get_server_json_path(server_id: str, filename: str) -> str:
+        srv = ServersController().get_server_instance_by_id(server_id)
+        stats = srv.stats_helper.get_server_stats()
+        server_path = stats["server_id"]["path"]
+        return os.path.join(server_path, filename)
+
+    @staticmethod
+    def _load_server_json_list(server_id: str, filename: str) -> t.List[t.Dict[str, t.Any]]:
+        path = ServersController._get_server_json_path(server_id, filename)
+
+        try:
+            with open(
+                Helpers.get_os_understandable_path(path), encoding="utf-8"
+            ) as file:
+                content = json.load(file)
+        except FileNotFoundError:
+            return []
+        except Exception as ex:
+            logger.error(ex)
+            return []
+
+        if isinstance(content, list):
+            return content
+        return []
+
+    @staticmethod
+    def _write_server_json_list(
+        server_id: str, filename: str, content: t.List[t.Dict[str, t.Any]]
+    ) -> bool:
+        path = ServersController._get_server_json_path(server_id, filename)
+
+        try:
+            with open(
+                Helpers.get_os_understandable_path(path),
+                mode="w",
+                encoding="utf-8",
+            ) as file:
+                json.dump(content, file, ensure_ascii=False, indent=2)
+                file.write("\n")
+        except Exception as ex:
+            logger.error(ex)
+            return False
+        return True
+
+    @staticmethod
     def get_cached_players(server_id):
         srv = ServersController().get_server_instance_by_id(server_id)
         stats = srv.stats_helper.get_server_stats()
@@ -618,22 +663,58 @@ class ServersController(metaclass=Singleton):
 
     @staticmethod
     def get_banned_players(server_id):
-        srv = ServersController().get_server_instance_by_id(server_id)
-        stats = srv.stats_helper.get_server_stats()
-        server_path = stats["server_id"]["path"]
-        path = os.path.join(server_path, "banned-players.json")
+        return ServersController._load_server_json_list(server_id, "banned-players.json")
 
-        try:
-            with open(
-                Helpers.get_os_understandable_path(path), encoding="utf-8"
-            ) as file:
-                content = file.read()
-                file.close()
-        except Exception as ex:
-            logger.error(ex)
-            return {}
+    @staticmethod
+    def get_banned_ips(server_id):
+        return ServersController._load_server_json_list(server_id, "banned-ips.json")
 
-        return json.loads(content)
+    @staticmethod
+    def get_whitelist_players(server_id):
+        return ServersController._load_server_json_list(server_id, "whitelist.json")
+
+    @staticmethod
+    def get_ops_players(server_id):
+        return ServersController._load_server_json_list(server_id, "ops.json")
+
+    @staticmethod
+    def update_ops_player_entry(
+        server_id: str,
+        name: t.Optional[str] = None,
+        uuid: t.Optional[str] = None,
+        level: t.Optional[int] = None,
+        bypasses_player_limit: t.Optional[bool] = None,
+    ) -> t.Optional[t.Dict[str, t.Any]]:
+        ops_players = ServersController.get_ops_players(server_id)
+        if not ops_players:
+            return None
+
+        target_index = None
+        lowered_name = name.lower() if isinstance(name, str) else None
+        for index, entry in enumerate(ops_players):
+            entry_uuid = str(entry.get("uuid", ""))
+            entry_name = str(entry.get("name", "")).lower()
+            if uuid and entry_uuid == str(uuid):
+                target_index = index
+                break
+            if lowered_name and entry_name == lowered_name:
+                target_index = index
+                break
+
+        if target_index is None:
+            return None
+
+        if level is not None:
+            ops_players[target_index]["level"] = int(level)
+        if bypasses_player_limit is not None:
+            ops_players[target_index]["bypassesPlayerLimit"] = bool(
+                bypasses_player_limit
+            )
+
+        if not ServersController._write_server_json_list(server_id, "ops.json", ops_players):
+            return None
+
+        return ops_players[target_index]
 
     def check_for_old_logs(self):
         servers = HelperServers.get_all_defined_servers()

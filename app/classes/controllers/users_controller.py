@@ -108,6 +108,12 @@ class UsersController:
                 "error": "typeString",
                 "fill": True,
             },
+            "datetime_format": {
+                "type": "string",
+                "enum": ["auto", "en_GB", "en_US", "iso_8601"],
+                "error": "enumErr",
+                "fill": True,
+            },
             "permissions": {
                 "type": "array",
                 "error": "typeList",

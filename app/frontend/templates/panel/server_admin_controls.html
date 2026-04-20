@@ -103,6 +103,39 @@
     console.log(responseData);
   }
 
+  async function autosaveOpEntry(inputEl, fieldName) {
+    const token = getCookie("_xsrf");
+    const payload = {
+      name: inputEl.dataset.playerName || "",
+      uuid: inputEl.dataset.playerUuid || "",
+    };
+
+    if (fieldName === "level") {
+      payload.level = Number.parseInt(inputEl.value, 10);
+    } else if (fieldName === "bypassesPlayerLimit") {
+      payload.bypassesPlayerLimit = !!inputEl.checked;
+    } else {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/v2/servers/${serverId}/ops`, {
+        method: 'PATCH',
+        headers: {
+          'X-XSRFToken': token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+      });
+      const responseData = await res.json();
+      if (!res.ok || responseData.status !== "ok") {
+        console.error("Failed to autosave OP entry", responseData);
+      }
+    } catch (error) {
+      console.error("Failed to autosave OP entry", error);
+    }
+  }
+
 
 </script>
 

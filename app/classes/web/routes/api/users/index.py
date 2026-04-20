@@ -151,6 +151,7 @@ class ApiUsersIndexHandler(BaseApiHandler):
         roles = data.get("roles", None)
         hints = data.get("hints", True)
         theme = data.get("theme", "default")
+        datetime_format = data.get("datetime_format", "auto")
 
         if username.lower() in ["system", ""]:
             return self.finish_json(
@@ -236,7 +237,12 @@ class ApiUsersIndexHandler(BaseApiHandler):
         )
         self.controller.users.update_user(
             user_id,
-            {"roles": roles, "lang": lang, "hints": hints},
+            {
+                "roles": roles,
+                "lang": lang,
+                "hints": hints,
+                "datetime_format": datetime_format,
+            },
             {
                 "permissions_mask": permissions_mask,
                 "server_quantity": server_quantity,

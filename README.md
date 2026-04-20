@@ -17,6 +17,39 @@
   and automatic backup on NBT save.
 - Optional CurseForge API integration work for modpack update workflows.
 
+## Player Management Enhancements
+- Expanded page layout with dedicated sections for:
+  - players
+  - OP entries
+  - whitelist entries
+  - IP bans
+  - banned players
+- Added direct action controls for common moderation/admin tasks:
+  - `OP` / `De-OP`
+  - `Ban` / `Unban`
+  - `IP Ban` / `Pardon IP`
+  - `Kick`
+  - `Whitelist add/remove`
+- OP entries now support inline autosave edits:
+  - level dropdown (`1-4`)
+  - bypass limit toggle (styled switch)
+- Added player head icons in player-management lists for faster scanning.
+
+## Log Viewer Enhancements
+- Added selectable log folder + source workflow (folder first, then source list).
+- Source list now shows `Name | Last Modified | Path`.
+- Added server-side full-log search with pagination controls.
+- Added support for reading archived `.gz` logs directly.
+- Detected log folders include standard logs plus:
+  - `logs/`
+  - `crash-reports/`
+  - `kubejs/logs/`
+- Per-user datetime format preference for log source timestamps:
+  - `Browser / Auto`
+  - `United Kingdom (DD/MM/YYYY 24h)`
+  - `United States (MM/DD/YYYY 12h)`
+  - `ISO 8601 (YYYY-MM-DD 24h)`
+
 ## Local Run (No Docker)
 ```powershell
 cd <path-to-Crafty>

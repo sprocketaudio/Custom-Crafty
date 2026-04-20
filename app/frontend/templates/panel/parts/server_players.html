@@ -1,100 +1,339 @@
-<div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
-    <h2>{{ translate('serverPlayerManagement', 'players', data['lang']) }}:</h2>
-    <div class="table-responsive ">
-        <table class="table no-scroll">
-            <thead class="thead">
-                <tr>
-                    <th scope="col-5">Player</th>
-                    <th scope="col-4">Status</th>
-                    <th scope="col-3">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="player-body">
-                {% for player in data['cached_players'] %}
-                <tr id="playerItem-{{ player['name'] }}" class="playerItem-- text-center">
-                    <td class=" no-scroll">
-                        <strong> {{ player['name'] }}</strong>
-                    </td>
-                    {% if player['status'] == 'Online' %}
-                    <td class="no-scroll col-5"><span class="text-success"><i class="ph ph-cell-signal-full"></i> {{
-                            player['status'] }}</span></td>
-                    {% elif player['status'] == 'Offline' %}
-                    <td class="no-scroll col-4"><span class="text-warning"><i class="ph ph-x-circle"></i><span
-                                class="d-md-none ">&nbsp;{{
-                                player['status'] }}</span><span class="d-none d-md-inline"> Last connection :<br> {{
-                                player['last_seen'] }}</span></span></td>
-                    {% end %}
-                    <td class="no-scroll col-3">
-                        {% if data['server_stats']['running'] %}
-                        <div class="row">
-                            <div class="col"><button onclick="send_command_to_server(`ban {{ player['name'] }}`)"
-                                    type="button" class="btn btn-danger">Ban</button></div>
-                            <div class="col"><button onclick="send_command_to_server(`kick {{ player['name'] }}`)"
-                                    type="button" class="btn btn-outline-danger">Kick</button></div>
-                            {% if data['server_stats']['server_type'] == "hytale" %}
-                            <div class="col"><button onclick="send_command_to_server(`op add {{ player['name'] }}`)"
-                                    type="button" class="btn btn-warning">OP</button></div>
-                            <div class="col"><button onclick="send_command_to_server(`op remove {{ player['name'] }}`)"
-                                    type="button" class="btn btn-outline-warning">De-OP</button></div>
+<style>
+    .ops-table th,
+    .ops-table td {
+        vertical-align: middle;
+    }
+
+    .op-level-select {
+        min-width: 90px;
+    }
+
+    .op-bypass-cell {
+        text-align: center;
+        vertical-align: middle !important;
+    }
+
+    .op-switch-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 1.5rem;
+    }
+
+    .op-toggle {
+        position: relative;
+        display: inline-block;
+        width: 2.2rem;
+        height: 1.2rem;
+        margin: 0;
+        transform: translateY(1px);
+    }
+
+    .op-toggle-input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .op-toggle-slider {
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        background-color: #8d3a3a;
+        border: 1px solid #8d3a3a;
+        cursor: pointer;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .op-toggle-slider::before {
+        content: "";
+        position: absolute;
+        width: 0.95rem;
+        height: 0.95rem;
+        border-radius: 50%;
+        background-color: #ffffff;
+        left: 0.08rem;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: transform 0.15s ease;
+    }
+
+    .op-toggle-input:checked + .op-toggle-slider {
+        background-color: #2ea66c;
+        border-color: #2ea66c;
+    }
+
+    .op-toggle-input:checked + .op-toggle-slider::before {
+        transform: translate(1rem, -50%);
+    }
+
+    .op-toggle-input:focus + .op-toggle-slider {
+        box-shadow: 0 0 0 0.12rem rgba(46, 166, 108, 0.35);
+    }
+
+    .player-head {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+        border-radius: 4px;
+        vertical-align: middle;
+        image-rendering: pixelated;
+    }
+</style>
+
+<div class="col-12">
+    <div class="row">
+        <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+            <h2>{{ translate('serverPlayerManagement', 'players', data['lang']) }}:</h2>
+            <div class="table-responsive">
+                <table class="table no-scroll">
+                    <thead class="thead">
+                        <tr>
+                            <th scope="col-5">Player</th>
+                            <th scope="col-4">Status</th>
+                            <th scope="col-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="player-body">
+                        {% for player in data['cached_players'] %}
+                        <tr id="playerItem-{{ player['name'] }}" class="playerItem-- text-center">
+                            <td class="no-scroll">
+                                <strong>
+                                    <img class="player-head" src="https://mc-heads.net/avatar/{{ player.get('name', '') }}/20"
+                                        alt="{{ player.get('name', 'Player') }}" loading="lazy"
+                                        onerror="this.style.display='none';">
+                                    {{ player['name'] }}
+                                </strong>
+                            </td>
+                            {% if player['status'] == 'Online' %}
+                            <td class="no-scroll col-5"><span class="text-success"><i class="ph ph-cell-signal-full"></i>
+                                    {{ player['status'] }}</span></td>
+                            {% elif player['status'] == 'Offline' %}
+                            <td class="no-scroll col-4"><span class="text-warning"><i class="ph ph-x-circle"></i><span
+                                        class="d-md-none">&nbsp;{{ player['status'] }}</span><span class="d-none d-md-inline">
+                                        Last connection :<br>{{ player['last_seen'] }}</span></span></td>
                             {% end %}
-                        </div>
-                        {% else %}
-                        <span> Unavailable <br>(Server Offline)</span>
+                            <td class="no-scroll col-3">
+                                {% if data['server_stats']['running'] %}
+                                <div class="row">
+                                    {% if data['server_stats']['server_type'] == "hytale" %}
+                                    <div class="col"><button onclick="send_command_to_server(`op add {{ player['name'] }}`)"
+                                            type="button" class="btn btn-warning">OP</button></div>
+                                    <div class="col"><button onclick="send_command_to_server(`op remove {{ player['name'] }}`)"
+                                            type="button" class="btn btn-outline-warning">De-OP</button></div>
+                                    {% else %}
+                                    <div class="col"><button onclick="send_command_to_server(`op {{ player['name'] }}`)"
+                                            type="button" class="btn btn-warning">OP</button></div>
+                                    <div class="col"><button onclick="send_command_to_server(`deop {{ player['name'] }}`)"
+                                            type="button" class="btn btn-outline-warning">De-OP</button></div>
+                                    {% end %}
+                                    <div class="col"><button onclick="send_command_to_server(`ban {{ player['name'] }}`)"
+                                            type="button" class="btn btn-danger">Ban</button></div>
+                                    <div class="col"><button onclick="send_command_to_server(`ban-ip {{ player['name'] }}`)"
+                                            type="button" class="btn btn-outline-danger">IP Ban</button></div>
+                                    <div class="col"><button onclick="send_command_to_server(`kick {{ player['name'] }}`)"
+                                            type="button" class="btn btn-outline-danger">Kick</button></div>
+                                    <div class="col"><button
+                                            onclick="send_command_to_server(`whitelist add {{ player['name'] }}`)"
+                                            type="button" class="btn btn-info">Whitelist +</button></div>
+                                    <div class="col"><button
+                                            onclick="send_command_to_server(`whitelist remove {{ player['name'] }}`)"
+                                            type="button" class="btn btn-outline-info">Whitelist -</button></div>
+                                </div>
+                                {% else %}
+                                <span>Unavailable <br>(Server Offline)</span>
+                                {% end %}
+                            </td>
+                        </tr>
                         {% end %}
-                    </td>
-                </tr>
-                {% end %}
-            </tbody>
-        </table>
-    </div>
-</div>
-<div class="col-xl-6 col-lg-12 no-scroll">
-    <h2>{{ translate('serverPlayerManagement', 'bannedPlayers', data['lang']) }}:</h2>
-    <div class="d-none d-lg-block table-responsive">
-        <table class="table no-scroll w-100">
-            <thead class="thead">
-                <tr>
-                    <th scope="col">Player</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Reason</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for player in data['banned_players'] %}
-                <tr id="playerItem-{{ player }}" class="playerItem--">
-                    <td><strong> {{ player['name'] }}</strong></td>
-                    <td>Banned on {{ player['banned_on'] }}</td>
-                    <td>Banned by : {{ player.get('source', '') }} <br />Reason : {{ player.get('reason', 'None') }}
-                    </td>
-                    <td class="buttons">
-                        <button onclick="send_command_to_server(`pardon {{ player['name'] }}`)" type="button"
-                            class="btn btn-danger">Unban</button>
-                    </td>
-                </tr>
-                {% end %}
-            </tbody>
-        </table>
-    </div>
-    <div class="d-block d-lg-none table-responsive">
-        <table class="table no-scroll">
-            <thead class="thead ">
-                <tr>
-                    <th scope="col">Player</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for player in data['banned_players'] %}
-                <tr id="playerItem-{{ player }}" class="playerItem--">
-                    <td><strong> {{ player['name'] }}</strong></td>
-                    <td class="buttons">
-                        <button onclick="send_command_to_server(`pardon {{ player['name'] }} `)" type="button"
-                            class="btn btn-danger">Unban</button>
-                    </td>
-                </tr>
-                {% end %}
-            </tbody>
-        </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-12 no-scroll">
+            <h2>OP Entries:</h2>
+            <div class="table-responsive">
+                <table class="table no-scroll w-100 ops-table">
+                    <thead class="thead">
+                        <tr>
+                            <th scope="col">Player</th>
+                            <th scope="col">Level</th>
+                            <th scope="col" class="text-center">Bypass Limit</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in data['ops_players'] %}
+                        <tr id="opItem-{{ player.get('name', '') }}" class="playerItem--">
+                            <td>
+                                <strong>
+                                    <img class="player-head"
+                                        src="https://mc-heads.net/avatar/{{ player.get('uuid', player.get('name', '')) }}/20"
+                                        alt="{{ player.get('name', 'Player') }}" loading="lazy"
+                                        onerror="this.style.display='none';">
+                                    {{ player.get('name', 'Unknown') }}
+                                </strong>
+                            </td>
+                            <td>
+                                <select class="form-control form-control-sm op-level-select"
+                                    data-player-name="{{ player.get('name', '') }}"
+                                    data-player-uuid="{{ player.get('uuid', '') }}"
+                                    onchange="autosaveOpEntry(this, 'level')">
+                                    {% for level in [1, 2, 3, 4] %}
+                                    <option value="{{ level }}" {% if player.get('level', 4) == level %}selected{% end %}>
+                                        {{ level }}
+                                    </option>
+                                    {% end %}
+                                </select>
+                            </td>
+                            <td class="op-bypass-cell">
+                                <div class="op-switch-wrap">
+                                    <label class="op-toggle">
+                                        <input class="op-toggle-input" type="checkbox"
+                                            data-player-name="{{ player.get('name', '') }}"
+                                            data-player-uuid="{{ player.get('uuid', '') }}"
+                                            {% if player.get('bypassesPlayerLimit', False) %}checked{% end %}
+                                            onchange="autosaveOpEntry(this, 'bypassesPlayerLimit')">
+                                        <span class="op-toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="buttons">
+                                {% if data['server_stats']['server_type'] == "hytale" %}
+                                <button onclick="send_command_to_server(`op remove {{ player.get('name', '') }}`)" type="button"
+                                    class="btn btn-outline-warning">De-OP</button>
+                                {% else %}
+                                <button onclick="send_command_to_server(`deop {{ player.get('name', '') }}`)" type="button"
+                                    class="btn btn-outline-warning">De-OP</button>
+                                {% end %}
+                            </td>
+                        </tr>
+                        {% end %}
+                        {% if not data['ops_players'] %}
+                        <tr class="playerItem--">
+                            <td colspan="4"><em>No OP entries found.</em></td>
+                        </tr>
+                        {% end %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-12 no-scroll mt-4">
+            <h2>Whitelist Entries:</h2>
+            <div class="table-responsive">
+                <table class="table no-scroll w-100">
+                    <thead class="thead">
+                        <tr>
+                            <th scope="col">Player</th>
+                            <th scope="col">UUID</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in data['whitelist_players'] %}
+                        <tr id="whitelistItem-{{ player.get('name', '') }}" class="playerItem--">
+                            <td>
+                                <strong>
+                                    <img class="player-head"
+                                        src="https://mc-heads.net/avatar/{{ player.get('uuid', player.get('name', '')) }}/20"
+                                        alt="{{ player.get('name', 'Player') }}" loading="lazy"
+                                        onerror="this.style.display='none';">
+                                    {{ player.get('name', 'Unknown') }}
+                                </strong>
+                            </td>
+                            <td>{{ player.get('uuid', 'N/A') }}</td>
+                            <td class="buttons">
+                                <button onclick="send_command_to_server(`whitelist remove {{ player.get('name', '') }}`)"
+                                    type="button" class="btn btn-outline-info">Remove</button>
+                            </td>
+                        </tr>
+                        {% end %}
+                        {% if not data['whitelist_players'] %}
+                        <tr class="playerItem--">
+                            <td colspan="3"><em>No whitelist entries found.</em></td>
+                        </tr>
+                        {% end %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-12 no-scroll mt-4">
+            <h2>{{ translate('serverPlayerManagement', 'bannedPlayers', data['lang']) }}:</h2>
+            <div class="table-responsive">
+                <table class="table no-scroll w-100">
+                    <thead class="thead">
+                        <tr>
+                            <th scope="col">Player</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Reason</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in data['banned_players'] %}
+                        <tr id="playerItem-{{ player.get('name', '') }}" class="playerItem--">
+                            <td>
+                                <strong>
+                                    <img class="player-head" src="https://mc-heads.net/avatar/{{ player.get('name', '') }}/20"
+                                        alt="{{ player.get('name', 'Player') }}" loading="lazy"
+                                        onerror="this.style.display='none';">
+                                    {{ player.get('name', 'Unknown') }}
+                                </strong>
+                            </td>
+                            <td>Banned on {{ player.get('banned_on', 'Unknown') }}</td>
+                            <td>Banned by: {{ player.get('source', '') }} <br>Reason: {{ player.get('reason', 'None') }}</td>
+                            <td class="buttons">
+                                <button onclick="send_command_to_server(`pardon {{ player.get('name', '') }}`)" type="button"
+                                    class="btn btn-danger">Unban</button>
+                            </td>
+                        </tr>
+                        {% end %}
+                        {% if not data['banned_players'] %}
+                        <tr class="playerItem--">
+                            <td colspan="4"><em>No player bans found.</em></td>
+                        </tr>
+                        {% end %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-12 no-scroll mt-4">
+            <h2>Blacklist Entries (IP Bans):</h2>
+            <div class="table-responsive">
+                <table class="table no-scroll w-100">
+                    <thead class="thead">
+                        <tr>
+                            <th scope="col">IP</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Reason</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ipban in data['banned_ips'] %}
+                        <tr id="ipBanItem-{{ ipban.get('ip', '') }}" class="playerItem--">
+                            <td><strong>{{ ipban.get('ip', 'Unknown') }}</strong></td>
+                            <td>Banned on {{ ipban.get('banned_on', 'Unknown') }}</td>
+                            <td>Banned by: {{ ipban.get('source', '') }} <br>Reason: {{ ipban.get('reason', 'None') }}</td>
+                            <td class="buttons">
+                                <button onclick="send_command_to_server(`pardon-ip {{ ipban.get('ip', '') }}`)" type="button"
+                                    class="btn btn-outline-danger">Unban IP</button>
+                            </td>
+                        </tr>
+                        {% end %}
+                        {% if not data['banned_ips'] %}
+                        <tr class="playerItem--">
+                            <td colspan="4"><em>No IP bans found.</em></td>
+                        </tr>
+                        {% end %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>

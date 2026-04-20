@@ -45,12 +45,56 @@
               </div>
             </div>
             <br />
-            <label for="ignore">{{ translate('serverDetails', 'filter', data['lang']) }}</label>
-            <input type="text" class="form-control" name="ignore" id="searchbox" value="" required>
+
+            <div class="row">
+              <div class="col-lg-4 col-md-12">
+                <label for="log-source-select">Log Source</label>
+                <div class="input-group">
+                  <select id="log-source-select" class="form-control"></select>
+                  <div class="input-group-append">
+                    <button id="refresh-log-sources" class="btn btn-outline-secondary" type="button">Refresh List</button>
+                  </div>
+                </div>
+                <small class="text-muted">Name | Last Modified | Path</small>
+              </div>
+              <div class="col-lg-3 col-md-12">
+                <label for="log-folder-picker">Log Folder</label>
+                <select id="log-folder-picker" class="form-control">
+                  <option value="">All detected folders</option>
+                </select>
+              </div>
+              <div class="col-lg-3 col-md-12">
+                <label for="log-search-query">Search Entire Selected Log</label>
+                <div class="input-group">
+                  <input type="text" id="log-search-query" class="form-control" placeholder="Type text and click Search">
+                  <div class="input-group-append">
+                    <button id="run-log-search" class="btn btn-primary" type="button">Search</button>
+                    <button id="clear-log-search" class="btn btn-outline-secondary" type="button">Clear Search</button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-2 col-md-12">
+                <label for="log-page-size">Page Size</label>
+                <select id="log-page-size" class="form-control">
+                  <option value="100">100</option>
+                  <option value="200" selected>200</option>
+                  <option value="500">500</option>
+                  <option value="1000">1000</option>
+                </select>
+              </div>
+            </div>
+
             <br />
+            <div class="d-flex flex-wrap align-items-center" style="gap:8px;">
+              <button id="refresh-log-page" class="btn btn-outline-info btn-sm" type="button">Reload Page</button>
+              <button id="prev-log-page" class="btn btn-outline-light btn-sm" type="button">&laquo; Prev</button>
+              <button id="next-log-page" class="btn btn-outline-light btn-sm" type="button">Next &raquo;</button>
+              <span id="log-page-meta" class="small text-muted"></span>
+            </div>
+
             <br />
-            <h4>{{ translate('serverDetails', 'filterList', data['lang']) }}</h4>
-            <ul id="ignored-words" class="list-group"></ul>
+            <label for="hide-filter-box">Filter Logs (Remove lines with word)</label>
+            <input type="text" class="form-control" name="ignore" id="hide-filter-box" value="" required>
             <br />
           </div>
         </div>
@@ -65,6 +109,31 @@
     display: none;
     position: fixed !important;
   }
+
+  #refresh-log-sources,
+  #clear-log-search {
+    color: #d7dbea !important;
+  }
+
+  #refresh-log-sources:hover,
+  #clear-log-search:hover,
+  #clear-log-search:hover {
+    color: #000000 !important;
+  }
+
+  #refresh-log-sources:focus,
+  #refresh-log-sources:active,
+  #refresh-log-sources.active,
+  #clear-log-search:focus,
+  #clear-log-search:active,
+  #clear-log-search.active {
+    color: #d7dbea !important;
+  }
+
+  #refresh-log-sources:disabled,
+  #clear-log-search:disabled {
+    color: #b7bdd2 !important;
+  }
 </style>
 <!-- content-wrapper ends -->
 
@@ -72,152 +141,432 @@
 
 {% block js %}
 <script>
-  // ##### Log Filter Block #####
   let lines = [];
   let words = [];
-  if (localStorage.getItem("words")) {
-    try {
-      words = JSON.parse(localStorage.getItem("words"));
-    } catch {
-      words = [];
+  const serverId = new URLSearchParams(document.location.search).get('id');
+  const userDateTimeFormat = "{{ data['user_data'].get('datetime_format', 'auto') }}";
+  const logState = {
+    source: "",
+    folder: "",
+    query: "",
+    page: 1,
+    pageSize: 200,
+    totalPages: 1,
+    totalLines: 0
+  };
+  let allLogSources = [];
+
+  try {
+    if (localStorage.getItem("words")) {
+      words = JSON.parse(localStorage.getItem("words")) || [];
     }
+  } catch {
+    words = [];
   }
 
-  function hideFilteredWords() {
-    for (let i = 0; i < lines.length; i++) {
-      // Reinitialise line visibility
-      lines[i].classList.remove("is-hidden");
-
-      // If we have no words to filter, continue.
-      if (!words.length) continue;
-
-      // If we find our target word hide the line
-      if (words.some(ai => lines[i].textContent.toLowerCase().includes(ai))) {
-        lines[i].classList.add("is-hidden");
-      }
-    }
+  function getCookie(name) {
+    var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+    return r ? r[1] : undefined;
   }
 
   function sanitize(string) {
     return string.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '');
   }
 
-  function deleteWord(item) {
-    let safe_item = sanitize(item);
-    words.splice(words.indexOf(item), 1);
-    if (safe_item) $("#" + safe_item.replaceAll(" ", "-")).remove();
+  function scrollToBottom() {
+    const logview = $('#virt_console');
+    if (logview.length) {
+      logview.scrollTop(logview[0].scrollHeight - logview.height());
+    }
+  }
 
+  function hideFilteredWords() {
+    for (let i = 0; i < lines.length; i++) {
+      lines[i].classList.remove("is-hidden");
+      if (!words.length) continue;
+      if (words.some(ai => lines[i].textContent.toLowerCase().includes(ai))) {
+        lines[i].classList.add("is-hidden");
+      }
+    }
+  }
+
+  function deleteWord(item) {
+    const safeItem = sanitize(item);
+    words.splice(words.indexOf(item), 1);
+    if (safeItem) $("#" + safeItem.replaceAll(" ", "-")).remove();
     hideFilteredWords();
     localStorage.setItem("words", JSON.stringify(words));
   }
 
-  //A little delay
-  let typingTimer;
-  let typeInterval = 500;
-  let searchInput = document.getElementById('searchbox');
-  searchInput.addEventListener('keyup', (e) => {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(hideFilteredWords, typeInterval);
+  function populateWords() {
+    $("#ignored-words").html("");
+    words.forEach(word => {
+      const safeWord = sanitize(word);
+      $("#ignored-words").append(
+        `<li id=${safeWord.replaceAll(" ", "-")} class="list-group-item">` +
+        "<div class='text-sm d-flex justify-content-between align-items-center'>" +
+        `${word}&nbsp;<button class='btn btn-danger' onclick='deleteWord("${word}")'>` +
+        "<i class='ph-fill ph-trash-simple'></i></button></div></li>"
+      );
+    });
+  }
 
-    // Return/Enter key press otherwise bail
-    if (e.keyCode !== 13) return;
+  function renderLogLines(values) {
+    let html = ``;
+    for (const value of values || []) {
+      html += `<span class='box'>${value}<br /></span>`;
+    }
+    $('#virt_console').html(html);
+    scrollToBottom();
+    lines = document.querySelectorAll('.box');
+    hideFilteredWords();
+  }
 
-    let word = document.getElementById("searchbox").value;
-    document.getElementById("searchbox").value = "";
-    word = word.toLowerCase();
+  function updatePageMeta() {
+    const pageMeta = document.getElementById("log-page-meta");
+    const prevBtn = document.getElementById("prev-log-page");
+    const nextBtn = document.getElementById("next-log-page");
+
+    pageMeta.textContent =
+      `Page ${logState.page} / ${logState.totalPages} | ${logState.totalLines} matching line(s)`;
+    prevBtn.disabled = logState.page <= 1;
+    nextBtn.disabled = logState.page >= logState.totalPages;
+  }
+
+  function normalizePath(pathValue) {
+    return String(pathValue || "").trim().replaceAll("\\", "/");
+  }
+
+  function formatIsoLocal(datetimeValue) {
+    const year = datetimeValue.getFullYear();
+    const month = String(datetimeValue.getMonth() + 1).padStart(2, "0");
+    const day = String(datetimeValue.getDate()).padStart(2, "0");
+    const hour = String(datetimeValue.getHours()).padStart(2, "0");
+    const minute = String(datetimeValue.getMinutes()).padStart(2, "0");
+    const second = String(datetimeValue.getSeconds()).padStart(2, "0");
+    return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+  }
+
+  function formatSourceModified(epochSeconds) {
+    const numericValue = Number(epochSeconds);
+    if (!Number.isFinite(numericValue) || numericValue <= 0) return "unknown";
+    const datetimeValue = new Date(numericValue * 1000);
+
+    if (userDateTimeFormat === "iso_8601") {
+      return formatIsoLocal(datetimeValue);
+    }
+
+    let locale = undefined;
+    let hour12 = false;
+    if (userDateTimeFormat === "en_GB") {
+      locale = "en-GB";
+      hour12 = false;
+    } else if (userDateTimeFormat === "en_US") {
+      locale = "en-US";
+      hour12 = true;
+    }
+
+    return new Intl.DateTimeFormat(locale, {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: hour12
+    }).format(datetimeValue);
+  }
+
+  function getSourceFolder(sourcePath) {
+    const normalized = normalizePath(sourcePath);
+    if (!normalized) return "";
+    const slashIndex = normalized.lastIndexOf("/");
+    if (slashIndex < 0) return ".";
+    const folder = normalized.slice(0, slashIndex);
+    return folder || ".";
+  }
+
+  function syncFolderPicker(folderPath) {
+    const folderPicker = document.getElementById("log-folder-picker");
+    if (!folderPicker) return;
+    folderPicker.value = normalizePath(folderPath);
+  }
+
+  function populateFolderPicker() {
+    const picker = document.getElementById("log-folder-picker");
+    if (!picker) return;
+
+    const folders = new Set();
+    for (const entry of allLogSources) {
+      folders.add(getSourceFolder(entry.path));
+    }
+
+    const ordered = Array.from(folders).sort((a, b) => a.localeCompare(b));
+    picker.innerHTML = '<option value="">All detected folders</option>';
+    for (const folderPath of ordered) {
+      const option = document.createElement("option");
+      option.value = folderPath;
+      option.textContent = folderPath === "." ? "(root)" : folderPath;
+      picker.appendChild(option);
+    }
+    syncFolderPicker(logState.folder);
+  }
+
+  function applySourceOptions(preferredSource = "") {
+    const select = document.getElementById("log-source-select");
+    const selectedFolder = normalizePath(logState.folder);
+    const filteredSources = allLogSources.filter((entry) => {
+      if (!selectedFolder) return true;
+      return getSourceFolder(entry.path) === selectedFolder;
+    });
+
+    select.innerHTML = "";
+    for (const entry of filteredSources) {
+      const option = document.createElement("option");
+      option.value = entry.path;
+      option.textContent = `${entry.name} | ${formatSourceModified(entry.modified)} | ${entry.path}`;
+      select.appendChild(option);
+    }
+
+    const normalizedPreferred = normalizePath(preferredSource);
+    const hasPreferred = filteredSources.some(
+      (entry) => normalizePath(entry.path) === normalizedPreferred
+    );
+
+    if (hasPreferred) {
+      logState.source = normalizedPreferred;
+      select.value = normalizedPreferred;
+      return;
+    }
+
+    if (filteredSources.length > 0) {
+      logState.source = filteredSources[0].path;
+      select.value = logState.source;
+      return;
+    }
+
+    logState.source = "";
+    const noOption = document.createElement("option");
+    noOption.value = "";
+    noOption.textContent = "No log files found in selected folder";
+    select.appendChild(noOption);
+    select.value = "";
+  }
+
+  async function fetchLogSources(preferredSource = "") {
+    const token = getCookie("_xsrf");
+    const res = await fetch(`/api/v2/servers/${serverId}/logs?file=true&list=true`, {
+      method: 'GET',
+      headers: {
+        'X-XSRFToken': token
+      },
+    });
+    const responseData = await res.json();
+    if (responseData.status !== "ok") {
+      throw new Error(responseData.error_data || "Failed to load log list");
+    }
+
+    if (!Array.isArray(responseData.data)) {
+      throw new Error("Invalid log source response. Please restart Crafty and reload this page.");
+    }
+
+    const normalizedSources = [];
+    for (const entry of responseData.data) {
+      if (typeof entry === "string") {
+        // Old backend response shape (returned log lines instead of sources).
+        continue;
+      }
+      if (!entry || typeof entry !== "object") {
+        continue;
+      }
+      const path = String(entry.path || "").trim();
+      if (!path) {
+        continue;
+      }
+      const name = String(entry.name || path.split("/").pop() || path);
+      const modified = Number(entry.modified || 0);
+      normalizedSources.push({
+        path,
+        name,
+        modified
+      });
+    }
+
+    if (!normalizedSources.length) {
+      throw new Error(
+        "Log source list is unavailable from the API. Restart Crafty so the new logs backend is loaded."
+      );
+    }
+
+    allLogSources = normalizedSources;
+
+    const candidateSource = preferredSource || logState.source || responseData.active_source || "";
+    if (candidateSource) logState.source = normalizePath(candidateSource);
+    if (!logState.source && allLogSources.length > 0) {
+      logState.source = allLogSources[0].path;
+    }
+
+    if (!logState.folder) {
+      logState.folder = getSourceFolder(logState.source);
+    }
+
+    populateFolderPicker();
+    syncFolderPicker(logState.folder);
+    applySourceOptions(logState.source);
+  }
+
+  async function loadLogPage() {
+    const token = getCookie("_xsrf");
+    const params = new URLSearchParams();
+    params.set("file", "true");
+    params.set("colors", "true");
+    params.set("page", String(logState.page));
+    params.set("page_size", String(logState.pageSize));
+    if (logState.source) params.set("source", logState.source);
+    if (logState.query) params.set("query", logState.query);
+
+    const res = await fetch(`/api/v2/servers/${serverId}/logs?${params.toString()}`, {
+      method: 'GET',
+      headers: {
+        'X-XSRFToken': token
+      },
+    });
+    const responseData = await res.json();
+    if (responseData.status !== "ok") {
+      throw new Error(responseData.error_data || "Failed to load logs");
+    }
+
+    renderLogLines(responseData.data);
+
+    const pagination = responseData.pagination || {};
+    logState.page = Number(pagination.page || logState.page || 1);
+    logState.pageSize = Number(pagination.page_size || logState.pageSize || 200);
+    logState.totalPages = Number(pagination.total_pages || 1);
+    logState.totalLines = Number(pagination.total_lines || 0);
+    logState.source = pagination.source || logState.source || "";
+    const sourceFolder = getSourceFolder(logState.source);
+    if (sourceFolder && sourceFolder !== logState.folder) {
+      logState.folder = sourceFolder;
+      populateFolderPicker();
+      syncFolderPicker(logState.folder);
+    }
+    applySourceOptions(logState.source);
+    updatePageMeta();
+  }
+
+  function addHideWordFromInput() {
+    const hideInput = document.getElementById("hide-filter-box");
+    let word = (hideInput.value || "").toLowerCase();
+    hideInput.value = "";
     word = word.replace(/[`'"]/gi, " ");
-
-    let safe_word = sanitize(word).trimLeft();
+    const safeWord = sanitize(word).trimLeft();
 
     if (word.includes("\\n")) {
       window.alert("Nice try...");
       return;
     }
-
-    if (!safe_word) {
+    if (!safeWord) {
       window.alert("Illegal character detected");
       return;
     }
+    if (words.includes(safeWord)) return;
 
-    if (words.includes(safe_word)) return;
-
-    // Display filtered word
     words.push(word);
-    $("#ignored-words").append(
-      `<li id=${safe_word.replaceAll(" ", "-")} class="list-group-item">` +
-      "<div class='text-sm d-flex justify-content-between align-items-center'>" +
-      `${word}&nbsp;<button class='btn btn-danger' onclick='deleteWord("${word}")' >` +
-      "<i class='ph-fill ph-trash-simple'></i></button></div></li>"
-    );
-
-    // Set word filters in browser cache
+    populateWords();
+    hideFilteredWords();
     localStorage.setItem("words", JSON.stringify(words));
-  });
+  }
 
-  function populateWords() {
-    words.map(word => {
-      let safe_word = sanitize(word);
+  function applySearch() {
+    const searchInput = document.getElementById("log-search-query");
+    logState.query = (searchInput.value || "").trim();
+    logState.page = 1;
+    loadLogPage().catch(showLogError);
+  }
 
-      $("#ignored-words").append(
-        `<li id=${safe_word.replaceAll(" ", "-")}  class="list-group-item">` +
-        "<div class='text-sm d-flex justify-content-between align-items-center'>" +
-        `${word}&nbsp;<button class='btn btn-danger' onclick='deleteWord("${word}")' >` +
-        "<i class='ph-fill ph-trash-simple'></i></button></div></li>"
-      );
+  function clearSearch() {
+    const searchInput = document.getElementById("log-search-query");
+    searchInput.value = "";
+    logState.query = "";
+    logState.page = 1;
+    loadLogPage().catch(showLogError);
+  }
+
+  function showLogError(error) {
+    const message = error && error.message ? error.message : String(error);
+    bootbox.alert({
+      title: "Log Error",
+      message
     });
   }
-  // ##### End Log Filter Block #####
 
-  // Used to get cookies from browser - this is part of tornados xsrf protection
-  // (it's for extra security)
-  function getCookie(name) {
-    var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
-    return r ? r[1] : undefined;
-  }
-
-  // Reset Scroll
-  function scroll() {
-    var logview = $('#virt_console');
-    if (logview.length)
-      logview.scrollTop(logview[0].scrollHeight - logview.height());
-  }
-
-  // Populate logs and filter if present
-  const serverId = new URLSearchParams(document.location.search).get('id')
-  async function get_server_log() {
-    const token = getCookie("_xsrf")
-    let colors = true;
-    if (!$("#stop_scroll").is(':checked')) {
-      let res = await fetch(`/api/v2/servers/${serverId}/logs?colors=${colors}&file=true`, {
-        method: 'GET',
-        headers: {
-          'X-XSRFToken': token
-        },
-      });
-      let responseData = await res.json();
-      let html = ``
-      if (responseData.status === "ok") {
-        for (let value of responseData.data) {
-          html += `<span class='box'>${value}<br /></span>`
-        }
-        console.log('Got Log From Server')
-        $('#virt_console').html(html);
-        scroll();
-        lines = document.querySelectorAll('.box');
-        hideFilteredWords();
-      } else {
-
-        bootbox.alert({
-          title: responseData.error,
-          message: responseData.error_data
-        });
-      }
-    }
-  }
   $(document).ready(function () {
-    console.log("ready!");
-    get_server_log();
+    const hideFilterInput = document.getElementById("hide-filter-box");
+    const searchInput = document.getElementById("log-search-query");
+    const sourceSelect = document.getElementById("log-source-select");
+    const pageSizeSelect = document.getElementById("log-page-size");
+    const folderPicker = document.getElementById("log-folder-picker");
+
+    let typingTimer;
+    const typeInterval = 500;
+    hideFilterInput.addEventListener('keyup', (e) => {
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(hideFilteredWords, typeInterval);
+      if (e.keyCode === 13) addHideWordFromInput();
+    });
+
+    searchInput.addEventListener('keyup', (e) => {
+      if (e.keyCode === 13) applySearch();
+    });
+
+    sourceSelect.addEventListener('change', () => {
+      logState.source = sourceSelect.value || "";
+      if (logState.source) {
+        logState.folder = getSourceFolder(logState.source);
+        populateFolderPicker();
+        syncFolderPicker(logState.folder);
+      }
+      logState.page = 1;
+      loadLogPage().catch(showLogError);
+    });
+
+    pageSizeSelect.addEventListener('change', () => {
+      const value = Number(pageSizeSelect.value || 200);
+      logState.pageSize = Number.isFinite(value) ? value : 200;
+      logState.page = 1;
+      loadLogPage().catch(showLogError);
+    });
+
+    document.getElementById("run-log-search").addEventListener("click", applySearch);
+    document.getElementById("clear-log-search").addEventListener("click", clearSearch);
+    document.getElementById("refresh-log-page").addEventListener("click", () => {
+      loadLogPage().catch(showLogError);
+    });
+    document.getElementById("refresh-log-sources").addEventListener("click", () => {
+      fetchLogSources(logState.source).catch(showLogError);
+    });
+    document.getElementById("prev-log-page").addEventListener("click", () => {
+      if (logState.page <= 1) return;
+      logState.page -= 1;
+      loadLogPage().catch(showLogError);
+    });
+    document.getElementById("next-log-page").addEventListener("click", () => {
+      if (logState.page >= logState.totalPages) return;
+      logState.page += 1;
+      loadLogPage().catch(showLogError);
+    });
+    folderPicker.addEventListener("change", () => {
+      logState.folder = normalizePath(folderPicker.value);
+      applySourceOptions();
+      if (!logState.source) return;
+      logState.page = 1;
+      loadLogPage().catch(showLogError);
+    });
+
     populateWords();
+    fetchLogSources()
+      .then(() => loadLogPage())
+      .catch(showLogError);
   });
 </script>
 {% end %}
