@@ -10,6 +10,11 @@
 ## What This Repo Is For
 - Running Crafty locally on Windows/Linux for Minecraft server management.
 - Tracking private customizations (UI, metrics, limits, permissions, telemetry).
+- Custom launch controls:
+  - per-server CPU affinity
+  - hard RAM cap (`memory_limit_mib`)
+- NBT editor support for `.dat` files with split permissions (`NBT_READ` / `NBT_WRITE`)
+  and automatic backup on NBT save.
 - Optional CurseForge API integration work for modpack update workflows.
 
 ## Local Run (No Docker)
