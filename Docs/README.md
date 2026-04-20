@@ -45,6 +45,8 @@ Scope:
   - Operator rollout, verification, troubleshooting, and rollback guide for CPU affinity.
 - `13-absolute-memory-limit-plan.md`
   - Phased plan for Linux absolute per-server RAM limits, UI/API changes, lifecycle enforcement, and memory-reporting normalization.
+- `14-curseforge-modpack-update-spec.md`
+  - End-to-end feature specification for CurseForge-backed modpack updates (profile config, safe apply pipeline, purge/overlay behavior, and loader alignment).
 
 ## Notes on Accuracy and Uncertainty
 - Function names and file paths are referenced directly from the source at documentation time.
