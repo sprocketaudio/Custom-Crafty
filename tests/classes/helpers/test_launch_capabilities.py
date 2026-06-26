@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -27,6 +28,15 @@ def test_detect_launch_capabilities_supports_writable_memory_cgroup(monkeypatch,
     monkeypatch.setattr(
         "app.classes.helpers.helpers.shutil.which", lambda _name: "/usr/bin/taskset"
     )
+    real_rmdir = Path.rmdir
+
+    def fake_rmdir(self):
+        if self.name.startswith(".crafty_probe_") and self.joinpath("memory.max").exists():
+            shutil.rmtree(self)
+            return
+        return real_rmdir(self)
+
+    monkeypatch.setattr(Path, "rmdir", fake_rmdir)
     monkeypatch.setattr(
         helpers_module,
         "pathlib",
@@ -68,6 +78,15 @@ def test_detect_launch_capabilities_accepts_preenabled_memory_controller(monkeyp
     monkeypatch.setattr(
         "app.classes.helpers.helpers.shutil.which", lambda _name: "/usr/bin/taskset"
     )
+    real_rmdir = Path.rmdir
+
+    def fake_rmdir(self):
+        if self.name.startswith(".crafty_probe_") and self.joinpath("memory.max").exists():
+            shutil.rmtree(self)
+            return
+        return real_rmdir(self)
+
+    monkeypatch.setattr(Path, "rmdir", fake_rmdir)
     monkeypatch.setattr(
         helpers_module,
         "pathlib",

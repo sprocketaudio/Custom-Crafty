@@ -1000,7 +1000,6 @@ class Helpers:
                         probe_dir.mkdir(exist_ok=False)
                         probe_memory_max = probe_dir / "memory.max"
                         probe_memory_max.write_text("max", encoding="utf-8")
-                        probe_memory_max.unlink()
                         probe_dir.rmdir()
                         memory_caps["supported"] = True
                         memory_caps["reason"] = "ok"
