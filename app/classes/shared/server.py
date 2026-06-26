@@ -529,7 +529,10 @@ class ServerInstance:
     @staticmethod
     def _enable_memory_controller_for_children(cgroup_root: Path):
         subtree_control = cgroup_root / "cgroup.subtree_control"
-        if subtree_control.exists():
+        if not subtree_control.exists():
+            return
+        enabled = subtree_control.read_text(encoding="utf-8").split()
+        if "memory" not in enabled:
             subtree_control.write_text("+memory", encoding="utf-8")
 
     def _configure_memory_limit_cgroup(self, memory_limit_mib, memory_caps):

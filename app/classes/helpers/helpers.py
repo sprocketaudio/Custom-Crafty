@@ -942,6 +942,15 @@ class Helpers:
             return ctypes.windll.shell32.IsUserAnAdmin() == 1
         return os.geteuid() == 0
 
+    @staticmethod
+    def ensure_memory_controller_enabled(cgroup_path):
+        subtree_control = cgroup_path / "cgroup.subtree_control"
+        if not subtree_control.exists():
+            return
+        enabled = subtree_control.read_text(encoding="utf-8").split()
+        if "memory" not in enabled:
+            subtree_control.write_text("+memory", encoding="utf-8")
+
     def detect_launch_capabilities(self):
         with suppress(OSError):
             self.prepare_memory_cgroup_root()
@@ -987,9 +996,7 @@ class Helpers:
                     probe_dir = cgroup_root / probe_name
                     try:
                         cgroup_root.mkdir(parents=True, exist_ok=True)
-                        subtree_control = cgroup_root / "cgroup.subtree_control"
-                        if subtree_control.exists():
-                            subtree_control.write_text("+memory", encoding="utf-8")
+                        self.ensure_memory_controller_enabled(cgroup_root)
                         probe_dir.mkdir(exist_ok=False)
                         probe_memory_max = probe_dir / "memory.max"
                         probe_memory_max.write_text("max", encoding="utf-8")
@@ -1428,14 +1435,10 @@ class Helpers:
                 f"{os.getpid()}\n", encoding="utf-8"
             )
 
-        subtree_control = service_cgroup / "cgroup.subtree_control"
-        if subtree_control.exists():
-            subtree_control.write_text("+memory", encoding="utf-8")
+        self.ensure_memory_controller_enabled(service_cgroup)
 
         cgroup_root.mkdir(parents=True, exist_ok=True)
-        root_subtree_control = cgroup_root / "cgroup.subtree_control"
-        if root_subtree_control.exists():
-            root_subtree_control.write_text("+memory", encoding="utf-8")
+        self.ensure_memory_controller_enabled(cgroup_root)
         return True
 
     @staticmethod
