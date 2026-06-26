@@ -52,7 +52,7 @@
             <div id="login-form-background" class="auto-form-wrapper login-modal">
               <div id="login_opacity" data-value="{{ data['login_opacity'] }}" hidden></div>
               <div class="text-center auto-form-logo">
-                <img src="/static/assets/images/Crafty-Sprocket.png" alt="SprocketGames Crafty logo">
+                <img class="sprocket-login-logo" src="/static/assets/images/Crafty-Sprocket.png" alt="SprocketGames Crafty logo">
               </div>
               <form id="login-form">
                 {% raw xsrf_form_html() %}
@@ -353,6 +353,11 @@
       background-color: rgb(34, 36, 55) !important;
       color: lightgray;
       text-align: center;
+    }
+
+    .sprocket-login-logo {
+      max-width: 40%;
+      height: auto;
     }
   </style>
 </body>

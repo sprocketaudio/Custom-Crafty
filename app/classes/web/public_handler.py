@@ -7,6 +7,15 @@ logger = logging.getLogger(__name__)
 auth_log = logging.getLogger("auth")
 
 
+def is_anti_lockout_user(exec_user):
+    return (
+        exec_user
+        and len(exec_user) >= 3
+        and isinstance(exec_user[2], dict)
+        and exec_user[2].get("username") == "anti-lockout-user"
+    )
+
+
 class PublicHandler(BaseHandler):
     def get(self, page=None):
         # pylint: disable=no-member
@@ -50,7 +59,7 @@ class PublicHandler(BaseHandler):
             exec_user = self.get_current_user()
             self.clear_cookie("token")
             # Delete anti-lockout-user on lockout...it's one time use
-            if exec_user[2]["username"] == "anti-lockout-user":
+            if is_anti_lockout_user(exec_user):
                 self.controller.users.stop_anti_lockout()
             # self.clear_cookie("user")
             # self.clear_cookie("user_data")
