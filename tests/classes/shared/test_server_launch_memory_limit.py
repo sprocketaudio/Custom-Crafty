@@ -171,3 +171,25 @@ def test_configure_memory_limit_cgroup_enables_memory_controller_for_children(tm
     assert memory_limit_bytes == 1024 * 1024 * 1024
     assert (cgroup_root / "cgroup.subtree_control").read_text(encoding="utf-8") == "+memory"
     assert Path(cgroup_path, "memory.max").read_text(encoding="utf-8") == str(memory_limit_bytes)
+
+
+def test_get_memory_limit_capability_refreshes_cached_unsupported_result():
+    stale_capability = {
+        "supported": False,
+        "reason": "cgroup_root_unwritable",
+        "os": "linux",
+        "cgroup_root": "/sys/fs/cgroup/crafty",
+    }
+    refreshed_capability = {
+        "supported": True,
+        "reason": "ok",
+        "os": "linux",
+        "cgroup_root": "/sys/fs/cgroup/system.slice/custom-crafty.service/crafty",
+    }
+    instance, _launch_events, _start_errors = _build_server_instance(1024, stale_capability)
+    instance.helper.launch_capabilities = {"memory_limit": stale_capability}
+    instance.helper.detect_launch_capabilities = lambda: {"memory_limit": refreshed_capability}
+
+    result = instance._get_memory_limit_capability()
+
+    assert result == refreshed_capability

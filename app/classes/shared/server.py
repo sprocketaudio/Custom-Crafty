@@ -495,7 +495,7 @@ class ServerInstance:
         cpu_caps = {}
         if isinstance(caps, dict):
             cpu_caps = caps.get("cpu_affinity", {}) or {}
-        if not cpu_caps:
+        if not cpu_caps or not cpu_caps.get("supported", False):
             detected_caps = self.helper.detect_launch_capabilities()
             cpu_caps = detected_caps.get("cpu_affinity", {}) or {}
         return cpu_caps
@@ -512,7 +512,7 @@ class ServerInstance:
         memory_caps = {}
         if isinstance(caps, dict):
             memory_caps = caps.get("memory_limit", {}) or {}
-        if not memory_caps:
+        if not memory_caps or not memory_caps.get("supported", False):
             detected_caps = self.helper.detect_launch_capabilities()
             memory_caps = detected_caps.get("memory_limit", {}) or {}
         return memory_caps

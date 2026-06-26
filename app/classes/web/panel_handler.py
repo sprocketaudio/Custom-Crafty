@@ -428,6 +428,8 @@ class PanelHandler(BaseHandler):
             not isinstance(launch_caps, dict)
             or "cpu_affinity" not in launch_caps
             or "memory_limit" not in launch_caps
+            or not launch_caps.get("cpu_affinity", {}).get("supported", False)
+            or not launch_caps.get("memory_limit", {}).get("supported", False)
         ):
             try:
                 launch_caps = self.helper.detect_launch_capabilities()
