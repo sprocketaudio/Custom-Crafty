@@ -943,6 +943,9 @@ class Helpers:
         return os.geteuid() == 0
 
     def detect_launch_capabilities(self):
+        with suppress(OSError):
+            self.prepare_memory_cgroup_root()
+
         is_linux = sys.platform.startswith("linux")
         taskset_path = shutil.which("taskset") if is_linux else None
         affinity_supported = bool(taskset_path)
@@ -1388,6 +1391,52 @@ class Helpers:
     @staticmethod
     def is_os_windows():
         return os.name == "nt"
+
+    @staticmethod
+    def get_self_cgroup_v2_path() -> str:
+        try:
+            with open("/proc/self/cgroup", encoding="utf-8") as cgroup_file:
+                for line in cgroup_file:
+                    if line.startswith("0::"):
+                        return line.strip().split(":", 2)[2]
+        except OSError:
+            return ""
+        return ""
+
+    def prepare_memory_cgroup_root(self):
+        if not sys.platform.startswith("linux"):
+            return False
+
+        cgroup_root_raw = os.environ.get("CRAFTY_MEMORY_CGROUP_ROOT", "").strip()
+        if not cgroup_root_raw:
+            return False
+
+        cgroup_root = pathlib.Path(cgroup_root_raw).resolve(strict=False)
+        service_cgroup = cgroup_root.parent
+        current_relative = self.get_self_cgroup_v2_path()
+        if not current_relative:
+            return False
+
+        service_relative = str(service_cgroup).removeprefix("/sys/fs/cgroup")
+        if not service_relative.startswith("/"):
+            service_relative = f"/{service_relative}"
+
+        if current_relative == service_relative:
+            host_cgroup = service_cgroup / "crafty-host"
+            host_cgroup.mkdir(parents=True, exist_ok=True)
+            (host_cgroup / "cgroup.procs").write_text(
+                f"{os.getpid()}\n", encoding="utf-8"
+            )
+
+        subtree_control = service_cgroup / "cgroup.subtree_control"
+        if subtree_control.exists():
+            subtree_control.write_text("+memory", encoding="utf-8")
+
+        cgroup_root.mkdir(parents=True, exist_ok=True)
+        root_subtree_control = cgroup_root / "cgroup.subtree_control"
+        if root_subtree_control.exists():
+            root_subtree_control.write_text("+memory", encoding="utf-8")
+        return True
 
     @staticmethod
     def is_env_docker():
