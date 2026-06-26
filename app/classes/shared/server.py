@@ -457,20 +457,22 @@ class ServerInstance:
         # let's do some quick checking to make sure things actually exists
         full_path = os.path.join(self.server_path, server_exec_path)
         if not Helpers.check_file_exists(full_path):
-            logger.critical(
-                f"Server executable path: {full_path} does not seem to exist"
-            )
-            Console.critical(
-                f"Server executable path: {full_path} does not seem to exist"
-            )
+            error = f"Server executable path: {full_path} does not seem to exist"
+            logger.critical(error)
+            Console.critical(error)
+            raise FileNotFoundError(error)
 
         if not Helpers.check_path_exists(self.server_path):
-            logger.critical(f"Server path: {self.server_path} does not seem to exits")
-            Console.critical(f"Server path: {self.server_path} does not seem to exits")
+            error = f"Server path: {self.server_path} does not seem to exits"
+            logger.critical(error)
+            Console.critical(error)
+            raise FileNotFoundError(error)
 
         if not Helpers.check_writeable(self.server_path):
-            logger.critical(f"Unable to write/access {self.server_path}")
-            Console.critical(f"Unable to write/access {self.server_path}")
+            error = f"Unable to write/access {self.server_path}"
+            logger.critical(error)
+            Console.critical(error)
+            raise PermissionError(error)
 
     def _launch_server_process(self, command=None, env=None):
         popen_kwargs = {
@@ -1043,7 +1045,19 @@ class ServerInstance:
         logger.info(
             f"Start command detected. Reloading settings from DB for server {self.name}"
         )
-        self.setup_server_run_command()
+        try:
+            self.setup_server_run_command()
+        except (FileNotFoundError, PermissionError) as ex:
+            self._log_launch_event(
+                "launch_blocked",
+                level=logging.ERROR,
+                reason="invalid_launch_path",
+                error=str(ex),
+            )
+            self._notify_start_error(user_id, user_lang, str(ex))
+            if forge_install:
+                self.stats_helper.finish_import()
+            return False
         self._active_launch_command = list(self.server_command or [])
         self._active_cpu_affinity = ""
         self._active_memory_limit_mib = 0

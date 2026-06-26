@@ -1,6 +1,9 @@
 import ast
 from pathlib import Path
 
+import pytest
+
+from app.classes.shared.server import ServerInstance
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 SERVER_FILE = PROJECT_ROOT / "app" / "classes" / "shared" / "server.py"
@@ -95,3 +98,29 @@ def test_command_watcher_dispatches_start_and_restart_to_lifecycle_methods():
 
     assert "run_threaded_server" in dispatch_found.get("start_server", set())
     assert "restart_threaded_server" in dispatch_found.get("restart_server", set())
+
+
+def test_setup_server_run_command_raises_when_executable_missing(monkeypatch):
+    instance = ServerInstance.__new__(ServerInstance)
+    instance.settings = {
+        "executable": "installer-1.21.1.jar",
+        "execution_command": "java -jar installer-1.21.1.jar nogui",
+        "path": "/tmp/crafty-missing-server",
+    }
+    instance.helper = type("HelperStub", (), {"is_os_windows": lambda self: False})()
+
+    monkeypatch.setattr(
+        "app.classes.shared.server.Helpers.get_os_understandable_path",
+        lambda value: value,
+    )
+    monkeypatch.setattr(
+        "app.classes.shared.server.Helpers.cmdparse",
+        lambda _command: ["java", "-jar", "installer-1.21.1.jar", "nogui"],
+    )
+    monkeypatch.setattr(
+        "app.classes.shared.server.Helpers.check_file_exists",
+        lambda _path: False,
+    )
+
+    with pytest.raises(FileNotFoundError, match="Server executable path: .* does not seem to exist"):
+        instance.setup_server_run_command()
