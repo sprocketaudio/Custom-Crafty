@@ -526,9 +526,18 @@ class ServerInstance:
         server_component = self._sanitize_server_id_for_cgroup(self.server_id)
         return root_path / f"server-{server_component}"
 
+    @staticmethod
+    def _enable_memory_controller_for_children(cgroup_root: Path):
+        subtree_control = cgroup_root / "cgroup.subtree_control"
+        if subtree_control.exists():
+            subtree_control.write_text("+memory", encoding="utf-8")
+
     def _configure_memory_limit_cgroup(self, memory_limit_mib, memory_caps):
         cgroup_path = self._build_server_memory_cgroup_path(memory_caps)
         memory_limit_bytes = int(memory_limit_mib) * 1024 * 1024
+        cgroup_root = cgroup_path.parent
+        cgroup_root.mkdir(parents=True, exist_ok=True)
+        self._enable_memory_controller_for_children(cgroup_root)
         cgroup_path.mkdir(parents=True, exist_ok=True)
         (cgroup_path / "memory.max").write_text(str(memory_limit_bytes), encoding="utf-8")
         with suppress(OSError):

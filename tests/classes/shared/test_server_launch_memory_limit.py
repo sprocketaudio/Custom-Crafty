@@ -1,5 +1,6 @@
 import logging
 from types import SimpleNamespace
+from pathlib import Path
 
 import pytest
 
@@ -151,3 +152,22 @@ def test_attach_process_to_memory_cgroup_blocks_on_write_failure(monkeypatch):
     assert launch_events[-1]["reason"] == "memory_cgroup_attach_failed"
     assert "permission denied" in start_errors[-1]["detail"]
 
+
+def test_configure_memory_limit_cgroup_enables_memory_controller_for_children(tmp_path):
+    capability = {
+        "supported": True,
+        "reason": "ok",
+        "os": "linux",
+        "cgroup_root": str(tmp_path / "crafty"),
+    }
+    instance, _launch_events, _start_errors = _build_server_instance(1024, capability)
+
+    cgroup_root = Path(capability["cgroup_root"])
+    cgroup_root.mkdir(parents=True)
+    (cgroup_root / "cgroup.subtree_control").write_text("", encoding="utf-8")
+
+    cgroup_path, memory_limit_bytes = instance._configure_memory_limit_cgroup(1024, capability)
+
+    assert memory_limit_bytes == 1024 * 1024 * 1024
+    assert (cgroup_root / "cgroup.subtree_control").read_text(encoding="utf-8") == "+memory"
+    assert Path(cgroup_path, "memory.max").read_text(encoding="utf-8") == str(memory_limit_bytes)

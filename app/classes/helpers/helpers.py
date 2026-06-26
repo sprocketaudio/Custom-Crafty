@@ -984,6 +984,9 @@ class Helpers:
                     probe_dir = cgroup_root / probe_name
                     try:
                         cgroup_root.mkdir(parents=True, exist_ok=True)
+                        subtree_control = cgroup_root / "cgroup.subtree_control"
+                        if subtree_control.exists():
+                            subtree_control.write_text("+memory", encoding="utf-8")
                         probe_dir.mkdir(exist_ok=False)
                         probe_memory_max = probe_dir / "memory.max"
                         probe_memory_max.write_text("max", encoding="utf-8")
