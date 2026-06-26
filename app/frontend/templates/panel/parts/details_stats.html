@@ -79,6 +79,7 @@
 <script src="/static/assets/js/motd.js"></script>
 <script>
   const userDateTimeFormat = "{{ data['user_data'].get('datetime_format', 'auto') }}";
+  const detailsServerId = new URLSearchParams(document.location.search).get('id');
 
   function formatIsoLocal(datetimeValue) {
     const year = datetimeValue.getFullYear();
@@ -352,7 +353,7 @@
     //}
   });
   async function add_server_name() {
-    let res = await fetch(`/api/v2/servers/${serverId}`, {
+    let res = await fetch(`/api/v2/servers/${detailsServerId}`, {
       method: 'GET',
       headers: {
         'X-XSRFToken': token

@@ -134,7 +134,7 @@
   let lines = [];
   let words = [];
   const serverId = new URLSearchParams(document.location.search).get('id');
-  const userDateTimeFormat = "{{ data['user_data'].get('datetime_format', 'auto') }}";
+  const logUserDateTimeFormat = "{{ data['user_data'].get('datetime_format', 'auto') }}";
   const logState = {
     source: "",
     folder: "",
@@ -257,16 +257,16 @@
     if (!Number.isFinite(numericValue) || numericValue <= 0) return "unknown";
     const datetimeValue = new Date(numericValue * 1000);
 
-    if (userDateTimeFormat === "iso_8601") {
+    if (logUserDateTimeFormat === "iso_8601") {
       return formatIsoLocal(datetimeValue);
     }
 
     let locale = undefined;
     let hour12 = false;
-    if (userDateTimeFormat === "en_GB") {
+    if (logUserDateTimeFormat === "en_GB") {
       locale = "en-GB";
       hour12 = false;
-    } else if (userDateTimeFormat === "en_US") {
+    } else if (logUserDateTimeFormat === "en_US") {
       locale = "en-US";
       hour12 = true;
     }
