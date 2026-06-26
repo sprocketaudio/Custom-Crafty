@@ -2,6 +2,7 @@ import html
 import gzip
 import logging
 import math
+import os
 import pathlib
 import re
 import typing as t
@@ -74,22 +75,49 @@ class ApiServersServerLogsHandler(BaseApiHandler):
         }
 
         found: t.Dict[str, dict] = {}
+
+        def add_log_file(file_path: pathlib.Path) -> None:
+            if file_path.suffix.lower() not in self.LOG_FILE_SUFFIXES:
+                return
+            try:
+                stat = file_path.stat()
+            except OSError as ex:
+                logger.warning("Skipping unreadable log file %s: %s", file_path, ex)
+                return
+            rel_path = self._relative_log_path(server_root, file_path)
+            found[rel_path] = {
+                "path": rel_path,
+                "name": file_path.name,
+                "size": int(stat.st_size),
+                "modified": int(stat.st_mtime),
+            }
+
+        add_log_file(configured_log_path)
         for log_dir in candidate_dirs:
             if not log_dir.exists() or not log_dir.is_dir():
                 continue
-            for file_path in log_dir.rglob("*"):
-                if not file_path.is_file():
-                    continue
-                if file_path.suffix.lower() not in self.LOG_FILE_SUFFIXES:
-                    continue
-                rel_path = self._relative_log_path(server_root, file_path)
-                stat = file_path.stat()
-                found[rel_path] = {
-                    "path": rel_path,
-                    "name": file_path.name,
-                    "size": int(stat.st_size),
-                    "modified": int(stat.st_mtime),
-                }
+            for dirpath, dirnames, filenames in os.walk(
+                log_dir,
+                onerror=lambda ex: logger.warning(
+                    "Skipping unreadable log directory %s: %s", log_dir, ex
+                ),
+            ):
+                current_dir = pathlib.Path(dirpath)
+                safe_dirnames = []
+                for dirname in dirnames:
+                    child_dir = current_dir / dirname
+                    try:
+                        child_dir.stat()
+                    except OSError as ex:
+                        logger.warning(
+                            "Skipping unreadable log directory %s: %s", child_dir, ex
+                        )
+                        continue
+                    safe_dirnames.append(dirname)
+                dirnames[:] = safe_dirnames
+
+                for filename in filenames:
+                    add_log_file(current_dir / filename)
 
         logs = list(found.values())
         logs.sort(key=lambda item: item.get("modified", 0), reverse=True)
