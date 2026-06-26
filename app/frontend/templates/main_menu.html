@@ -79,8 +79,28 @@
           {% end %}
           {% for s in data['menu_servers'] %}
           <li class="nav-item">
-            <a class="nav-link" href="/panel/server_detail?id={{s['server_id']}}"><i class="ph-fill ph-hard-drives"></i> &nbsp;
-              {{s['server_name']}}</a>
+            <a class="nav-link" href="/panel/server_detail?id={{s['server_id']}}">
+              {% if data.get('server_stats') and data['server_stats'].get('server_id') and s['server_id'] == data['server_stats']['server_id'].get('server_id') and data['server_stats'].get('icon') and data['server_stats']['icon'] not in ('', 'False', 'None') %}
+              <img
+                src="data:image/png;base64,{{ data['server_stats']['icon'] }}"
+                alt="Server icon"
+                style="width:16px;height:16px;object-fit:cover;border-radius:3px;vertical-align:middle;"
+              />
+              {% elif s.get('sidebar_icon') %}
+              <img
+                src="data:image/png;base64,{{ s['sidebar_icon'] }}"
+                alt="Server icon"
+                style="width:16px;height:16px;object-fit:cover;border-radius:3px;vertical-align:middle;"
+              />
+              {% else %}
+              <img
+                src="/static/assets/images/pack.png"
+                alt="Server icon"
+                style="width:16px;height:16px;object-fit:cover;border-radius:3px;vertical-align:middle;"
+              />
+              {% end %}
+              &nbsp; {{s['server_name']}}
+            </a>
           </li>
           {% end %}
 
@@ -88,14 +108,6 @@
       </div>
     </li>
 
-    {% if data['superuser'] %}
-    <li class="nav-item">
-      <a class="nav-link" href="/panel/wiki">
-        <i class="ph-fill ph-info"></i> &nbsp;
-        <span class="menu-title">{{ translate('sidebar', 'inApp', data['lang']) }}</span>
-      </a>
-    </li>
-    {% end %}
     <li class="nav-item">
       <a class="nav-link panel-settings" href="/panel/panel_config">
         <i class="ph-fill ph-gear"></i>&nbsp;

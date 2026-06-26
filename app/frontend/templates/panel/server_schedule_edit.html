@@ -9,21 +9,7 @@
 
 <div class="content-wrapper">
 
-  <!-- Page Title Header Starts-->
-  <div class="row page-title-header">
-    <div class="col-12">
-      <div class="page-header">
-        <h4 class="page-title">
-          {{ translate('serverDetails', 'serverDetails', data['lang']) }} - {{
-          data['server_stats']['server_id']['server_name'] }}
-          <br />
-          <small>UUID: {{ data['server_stats']['server_id']['server_id'] }}</small>
-        </h4>
-      </div>
-    </div>
-
-  </div>
-  <!-- Page Title Header Ends-->
+  {% include "parts/server_page_title.html" %}
 
   {% include "parts/details_stats.html" %}
 
@@ -464,3 +450,6 @@
   </script>
 
   {% end %}
+
+
+

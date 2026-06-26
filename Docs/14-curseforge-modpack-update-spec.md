@@ -3,7 +3,34 @@
 ## Purpose
 Define a production-safe implementation for modpack update automation in Crafty Update Center using the CurseForge API, with explicit backup, purge, overlay restore, and loader-alignment behavior.
 
-This document is a feature specification only. It does not indicate completed implementation.
+This document started as a feature specification and now also tracks current implementation status.
+
+## Implementation Status (2026-04-23)
+Implemented:
+- Per-server CurseForge config fields in `servers`:
+  - `cf_project_id`
+  - `cf_file_id`
+  - `cf_purge_paths`
+  - `cf_overlay_dir`
+- Global CurseForge API key storage in `crafty_settings.curseforge_api_key`.
+- API endpoints:
+  - `PATCH /api/v2/servers/{id}/update/config/` now accepts the fields above.
+  - `GET/PATCH /api/v2/crafty/config/curseforge/` for superuser key management.
+- New queued action `update_modpack` wired in task runner.
+- `ServerInstance.modpack_upgrade()` pipeline:
+  - backup gate,
+  - optional stop if running,
+  - CurseForge file resolution (pinned file or latest likely server pack),
+  - purge configured paths,
+  - unzip archive into server root,
+  - optional overlay merge,
+  - Forge/NeoForge loader sync when version metadata is detected,
+  - restart if server was previously running.
+- Update Center UI now includes a CurseForge Modpack Update section.
+
+Not implemented yet:
+- Structured run history tables (`server_modpack_runs`).
+- Release-channel selection (current flow is pinned file ID or latest matching server-pack heuristic).
 
 ## Scope
 In-scope:
@@ -191,7 +218,7 @@ On failure after destructive phase: leave backup available and clearly mark manu
 Add action dispatch:
 - API action: `update_modpack`
 - queue consumer (`TasksManager.command_watcher`) branch:
-  - `case "update_modpack": svr.run_threaded_modpack_update(user_id)`
+  - `case "update_modpack": svr.modpack_upgrade()`
 
 ## Global Configuration Additions
 
@@ -339,7 +366,7 @@ Use structured reason codes for UI and logs:
 ## Rollout Plan
 - Phase 1: data model + profile API + UI form (no apply).
 - Phase 2: latest-check API + UI status.
-- Phase 3: apply pipeline without loader alignment.
+- Phase 3: apply pipeline with script/library-based loader alignment.
 - Phase 4: Forge/NeoForge alignment integration.
 - Phase 5: polish (run history, richer telemetry, optional scheduled checks).
 

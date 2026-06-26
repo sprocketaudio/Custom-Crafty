@@ -51,6 +51,10 @@ class Servers(BaseModel):
     memory_limit_mib = IntegerField(default=0)
     server_notes = TextField(default="")
     telemetry_port = IntegerField(default=0)
+    cf_project_id = IntegerField(default=0)
+    cf_file_id = IntegerField(default=0)
+    cf_purge_paths = TextField(default="mods\nconfig\ndefaultconfigs\nkubejs")
+    cf_overlay_dir = CharField(default="")
 
     class Meta:
         table_name = "servers"

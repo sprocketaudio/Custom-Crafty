@@ -56,6 +56,14 @@ class ManagementController:
         HelpersManagement.set_cookie_secret(key)
 
     @staticmethod
+    def set_curseforge_api_key(key):
+        HelpersManagement.set_curseforge_api_key(key)
+
+    @staticmethod
+    def get_curseforge_api_key():
+        return HelpersManagement.get_curseforge_api_key()
+
+    @staticmethod
     def add_crafty_row():
         HelpersManagement.create_crafty_row()
 

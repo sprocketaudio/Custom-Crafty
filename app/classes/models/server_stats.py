@@ -87,7 +87,13 @@ class HelperServerStats:
                 "crafty_server_stats.sqlite",
             )
             self.database = SqliteDatabase(
-                db_file, pragmas={"journal_mode": "wal", "cache_size": -1024 * 10}
+                db_file,
+                pragmas={
+                    "journal_mode": "wal",
+                    "cache_size": -1024 * 10,
+                    "busy_timeout": 5000,
+                    "synchronous": 1,
+                },
             )
             if not os.path.exists(db_file):
                 try:
@@ -121,7 +127,13 @@ class HelperServerStats:
                 "crafty_server_stats.sqlite",
             )
             self.database = SqliteDatabase(
-                db_file, pragmas={"journal_mode": "wal", "cache_size": -1024 * 10}
+                db_file,
+                pragmas={
+                    "journal_mode": "wal",
+                    "cache_size": -1024 * 10,
+                    "busy_timeout": 5000,
+                    "synchronous": 1,
+                },
             )
         except Exception as ex:
             logger.warning(

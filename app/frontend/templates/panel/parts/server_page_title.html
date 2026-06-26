@@ -1,0 +1,26 @@
+<!-- Page Title Header Starts-->
+<div class="row page-title-header">
+  <div class="col-12">
+    <div class="page-header">
+      <h4 class="page-title">
+        {% if data['server_stats'].get('icon') and data['server_stats']['icon'] not in ('', 'False', 'None') %}
+        <img
+          src="data:image/png;base64,{{ data['server_stats']['icon'] }}"
+          alt="Server icon"
+          style="width: 34px; height: 34px; object-fit: cover; border-radius: 5px; margin-right: 10px;"
+        />
+        {% else %}
+        <img
+          src="/static/assets/images/pack.png"
+          alt="Server icon"
+          style="width: 34px; height: 34px; object-fit: cover; border-radius: 5px; margin-right: 10px;"
+        />
+        {% end %}
+        <span style="font-size: 1.15em;">{{ data['server_stats']['server_id']['server_name'] }}</span>
+        <br />
+        <small>UUID: {{ data['server_stats']['server_id']['server_id'] }}</small>
+      </h4>
+    </div>
+  </div>
+</div>
+<!-- Page Title Header Ends-->

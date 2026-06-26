@@ -137,11 +137,11 @@ class FileHelpers:
 
         if not headers:
             headers = {
-                "User-Agent": (
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/58.0.3029.110 Safari/537.3"
-                )
+                "User-Agent": "CraftyController",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive",
+                "Accept": "*/*",
+                "Cache-Control": "no-cache",
             }
         req = urllib.request.Request(url, headers=headers)
 
@@ -176,7 +176,7 @@ class FileHelpers:
                                     "download_progress",
                                     round(progress, 1),
                                 )
-                    return True
+                return True
             except (urllib.error.URLError, ssl.SSLError) as e:
                 logger.warning(f"SSL File Get - Attempt {attempt+1} failed: {e}")
                 time.sleep(backoff_factor**attempt)
@@ -532,13 +532,18 @@ class FileHelpers:
         Returns:
             str | PurePosixPath: returns the original file name or new file name
         """
+        archive_path = pathlib.PurePosixPath(file)
         if base_include_path:  # Rewrite path of zip_ref_info if we have a base include
             try:
-                rel = pathlib.PurePosixPath(file).relative_to(base_include_path)
-                return str(rel)
+                archive_path = pathlib.PurePosixPath(file).relative_to(
+                    pathlib.PurePosixPath(base_include_path)
+                )
             except ValueError:
                 logger.debug("%s is not relative to %s", file, base_include_path)
-        return str(file)
+        parts = [
+            part for part in archive_path.parts if part not in ("", ".", "..", "/")
+        ]
+        return str(pathlib.PurePosixPath(*parts))
 
     def unzip_file(
         self,
@@ -582,9 +587,17 @@ class FileHelpers:
                     # Skip directory entries
                     if info.is_dir():
                         continue
-                    target = Path(destination_path, file).resolve()
+                    archive_internal_name = self.get_archive_internal_name(
+                        file, base_include_path
+                    )
+                    target = Path(destination_path, archive_internal_name).resolve()
                     try:
-                        self.helper.validate_traversal(destination_path, target)
+                        traversal_validator = (
+                            self.helper.validate_traversal
+                            if self.helper
+                            else Helpers.validate_traversal
+                        )
+                        traversal_validator(destination_path, target)
                     except ValueError:
                         self.send_percentage(server_users, 100, proc_id, True)
                         return logger.error("Traversal detected. Dumping out.")
@@ -592,9 +605,7 @@ class FileHelpers:
                     if self.should_extract(
                         file, base_include_path, ignored_names, server_update
                     ):
-                        info.filename = self.get_archive_internal_name(
-                            file, base_include_path
-                        )
+                        info.filename = archive_internal_name
                         try:
                             zip_ref.extract(info, destination_path)
                         except FileNotFoundError:

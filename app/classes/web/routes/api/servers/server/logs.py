@@ -17,6 +17,7 @@ ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 class ApiServersServerLogsHandler(BaseApiHandler):
     DEFAULT_PAGE_SIZE = 200
     MAX_PAGE_SIZE = 2000
+    MAX_LINES_LIMIT = 10000
     MAX_LISTED_LOGS = 1000
     LOG_FILE_SUFFIXES = {".log", ".txt", ".out", ".gz"}
 
@@ -129,6 +130,30 @@ class ApiServersServerLogsHandler(BaseApiHandler):
         use_html = self.get_query_argument("html", None) == "true"
         # GET /api/v2/servers/server/logs?list=true
         list_sources = self.get_query_argument("list", None) == "true"
+        requested_lines_arg = self.get_query_argument("lines", None)
+        requested_lines: t.Optional[int] = None
+        if requested_lines_arg is not None:
+            try:
+                requested_lines = int(requested_lines_arg)
+            except (TypeError, ValueError):
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_LINES_LIMIT",
+                        "error_data": "lines must be an integer.",
+                    },
+                )
+            if requested_lines < 1:
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_LINES_LIMIT",
+                        "error_data": "lines must be greater than 0.",
+                    },
+                )
+            requested_lines = min(requested_lines, self.MAX_LINES_LIMIT)
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
@@ -149,8 +174,15 @@ class ApiServersServerLogsHandler(BaseApiHandler):
             auth_data[5],
         )
         server_permissions = self.controller.server_perms.get_permissions(mask)
-        if EnumPermissionsServer.LOGS not in server_permissions:
-            # if the user doesn't have Logs permission, return an error
+
+        has_terminal_perm = EnumPermissionsServer.TERMINAL in server_permissions
+        has_logs_perm = EnumPermissionsServer.LOGS in server_permissions
+        if (
+            not has_terminal_perm
+            and not has_logs_perm
+            or (not has_terminal_perm and not read_log_file)
+            or (not has_logs_perm and read_log_file)
+        ):
             return self.finish_json(
                 400,
                 {
@@ -239,7 +271,7 @@ class ApiServersServerLogsHandler(BaseApiHandler):
                         },
                     )
             else:
-                log_lines = self.helper.get_setting("max_log_lines")
+                log_lines = requested_lines or self.helper.get_setting("max_log_lines")
                 raw_lines = self.helper.tail_file(log_source_path, log_lines)
                 raw_lines = [line.rstrip("\r\n") for line in raw_lines]
                 total_lines = len(raw_lines)
@@ -249,6 +281,8 @@ class ApiServersServerLogsHandler(BaseApiHandler):
                 query = ""
         else:
             raw_lines = ServerOutBuf.lines.get(server_id, [])
+            if requested_lines is not None:
+                raw_lines = raw_lines[-requested_lines:]
             total_lines = len(raw_lines)
             total_pages = 1
             page = 1

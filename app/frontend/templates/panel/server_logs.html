@@ -9,21 +9,7 @@
 
 <div class="content-wrapper">
 
-  <!-- Page Title Header Starts-->
-  <div class="row page-title-header">
-    <div class="col-12">
-      <div class="page-header">
-        <h4 class="page-title">
-          {{ translate('serverDetails', 'serverDetails', data['lang']) }} - {{
-          data['server_stats']['server_id']['server_name'] }}
-          <br />
-          <small>UUID: {{ data['server_stats']['server_id']['server_id'] }}</small>
-        </h4>
-      </div>
-    </div>
-
-  </div>
-  <!-- Page Title Header Ends-->
+  {% include "parts/server_page_title.html" %}
 
   {% include "parts/details_stats.html" %}
 
@@ -33,10 +19,10 @@
       <div class="card">
         <div class="card-body  pt-0">
           <span class="d-none d-sm-block">
-            {% include "parts/server_controls_list.html %}
+            {% include "parts/server_controls_list.html" %}
           </span>
           <span class="d-block d-sm-none">
-            {% include "parts/m_server_controls_list.html %}
+            {% include "parts/m_server_controls_list.html" %}
           </span>
 
           <div class="col-md-12">
@@ -134,6 +120,10 @@
   #clear-log-search:disabled {
     color: #b7bdd2 !important;
   }
+
+  #virt_console .box {
+    color: #d7dbea;
+  }
 </style>
 <!-- content-wrapper ends -->
 
@@ -159,6 +149,10 @@
   try {
     if (localStorage.getItem("words")) {
       words = JSON.parse(localStorage.getItem("words")) || [];
+      if (!Array.isArray(words)) words = [];
+      words = words
+        .map((w) => String(w || "").toLowerCase().trim())
+        .filter((w) => w.length > 0);
     }
   } catch {
     words = [];
@@ -174,17 +168,19 @@
   }
 
   function scrollToBottom() {
-    const logview = $('#virt_console');
-    if (logview.length) {
-      logview.scrollTop(logview[0].scrollHeight - logview.height());
-    }
+    const logview = document.getElementById("virt_console");
+    if (!logview) return;
+    logview.scrollTop = Math.max(0, logview.scrollHeight - logview.clientHeight);
   }
 
   function hideFilteredWords() {
+    const activeWords = words
+      .map((w) => String(w || "").toLowerCase().trim())
+      .filter((w) => w.length > 0);
     for (let i = 0; i < lines.length; i++) {
       lines[i].classList.remove("is-hidden");
-      if (!words.length) continue;
-      if (words.some(ai => lines[i].textContent.toLowerCase().includes(ai))) {
+      if (!activeWords.length) continue;
+      if (activeWords.some(ai => lines[i].textContent.toLowerCase().includes(ai))) {
         lines[i].classList.add("is-hidden");
       }
     }
@@ -193,21 +189,28 @@
   function deleteWord(item) {
     const safeItem = sanitize(item);
     words.splice(words.indexOf(item), 1);
-    if (safeItem) $("#" + safeItem.replaceAll(" ", "-")).remove();
+    if (safeItem) {
+      const row = document.getElementById(safeItem.replaceAll(" ", "-"));
+      if (row) row.remove();
+    }
     hideFilteredWords();
     localStorage.setItem("words", JSON.stringify(words));
   }
 
   function populateWords() {
-    $("#ignored-words").html("");
+    const ignoredWords = document.getElementById("ignored-words");
+    if (!ignoredWords) return;
+    ignoredWords.innerHTML = "";
     words.forEach(word => {
       const safeWord = sanitize(word);
-      $("#ignored-words").append(
-        `<li id=${safeWord.replaceAll(" ", "-")} class="list-group-item">` +
+      const li = document.createElement("li");
+      li.id = safeWord.replaceAll(" ", "-");
+      li.className = "list-group-item";
+      li.innerHTML =
         "<div class='text-sm d-flex justify-content-between align-items-center'>" +
-        `${word}&nbsp;<button class='btn btn-danger' onclick='deleteWord("${word}")'>` +
-        "<i class='ph-fill ph-trash-simple'></i></button></div></li>"
-      );
+        `${word}&nbsp;<button class='btn btn-danger' data-delete-word='${safeWord}'>` +
+        "<i class='ph-fill ph-trash-simple'></i></button></div>";
+      ignoredWords.appendChild(li);
     });
   }
 
@@ -216,7 +219,9 @@
     for (const value of values || []) {
       html += `<span class='box'>${value}<br /></span>`;
     }
-    $('#virt_console').html(html);
+    const virtConsole = document.getElementById("virt_console");
+    if (!virtConsole) return;
+    virtConsole.innerHTML = html;
     scrollToBottom();
     lines = document.querySelectorAll('.box');
     hideFilteredWords();
@@ -355,19 +360,38 @@
 
   async function fetchLogSources(preferredSource = "") {
     const token = getCookie("_xsrf");
-    const res = await fetch(`/api/v2/servers/${serverId}/logs?file=true&list=true`, {
+    const listParams = new URLSearchParams();
+    listParams.set("file", "true");
+    listParams.set("list", "true");
+    listParams.set("_ts", String(Date.now()));
+    const res = await fetch(`/api/v2/servers/${serverId}/logs?${listParams.toString()}`, {
       method: 'GET',
+      cache: 'no-store',
       headers: {
         'X-XSRFToken': token
       },
     });
-    const responseData = await res.json();
+    let responseData = null;
+    try {
+      responseData = await res.json();
+    } catch (_error) {
+      responseData = null;
+    }
+    if (!responseData || typeof responseData !== "object") {
+      allLogSources = [];
+      applySourceOptions(preferredSource || logState.source || "");
+      return;
+    }
     if (responseData.status !== "ok") {
-      throw new Error(responseData.error_data || "Failed to load log list");
+      allLogSources = [];
+      applySourceOptions(preferredSource || logState.source || "");
+      return;
     }
 
     if (!Array.isArray(responseData.data)) {
-      throw new Error("Invalid log source response. Please restart Crafty and reload this page.");
+      allLogSources = [];
+      applySourceOptions(preferredSource || logState.source || "");
+      return;
     }
 
     const normalizedSources = [];
@@ -393,9 +417,10 @@
     }
 
     if (!normalizedSources.length) {
-      throw new Error(
-        "Log source list is unavailable from the API. Restart Crafty so the new logs backend is loaded."
-      );
+      allLogSources = [];
+      logState.source = normalizePath(preferredSource || logState.source || "");
+      applySourceOptions(logState.source);
+      return;
     }
 
     allLogSources = normalizedSources;
@@ -424,16 +449,79 @@
     params.set("page_size", String(logState.pageSize));
     if (logState.source) params.set("source", logState.source);
     if (logState.query) params.set("query", logState.query);
+    params.set("_ts", String(Date.now()));
 
     const res = await fetch(`/api/v2/servers/${serverId}/logs?${params.toString()}`, {
       method: 'GET',
+      cache: 'no-store',
       headers: {
         'X-XSRFToken': token
       },
     });
-    const responseData = await res.json();
-    if (responseData.status !== "ok") {
-      throw new Error(responseData.error_data || "Failed to load logs");
+    let responseData = null;
+    try {
+      responseData = await res.json();
+    } catch (_error) {
+      responseData = null;
+    }
+    if (!responseData || responseData.status !== "ok") {
+      // Legacy/compatibility fallback: try simple file tail without pagination.
+      const legacyParams = new URLSearchParams();
+      legacyParams.set("file", "true");
+      legacyParams.set("colors", "true");
+      legacyParams.set("lines", String(logState.pageSize || 200));
+      if (logState.source) legacyParams.set("source", logState.source);
+      legacyParams.set("_ts", String(Date.now()));
+      const legacyRes = await fetch(`/api/v2/servers/${serverId}/logs?${legacyParams.toString()}`, {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          'X-XSRFToken': token
+        },
+      });
+      let legacyData = null;
+      try {
+        legacyData = await legacyRes.json();
+      } catch (_error) {
+        legacyData = null;
+      }
+      if (legacyData && legacyData.status === "ok" && Array.isArray(legacyData.data)) {
+        renderLogLines(legacyData.data);
+        logState.page = 1;
+        logState.totalPages = 1;
+        logState.totalLines = legacyData.data.length;
+        updatePageMeta();
+        return;
+      }
+
+      const fallbackParams = new URLSearchParams();
+      fallbackParams.set("colors", "true");
+      fallbackParams.set("lines", String(logState.pageSize || 200));
+      fallbackParams.set("_ts", String(Date.now()));
+      const fallbackRes = await fetch(`/api/v2/servers/${serverId}/logs?${fallbackParams.toString()}`, {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          'X-XSRFToken': token
+        },
+      });
+      let fallbackData = null;
+      try {
+        fallbackData = await fallbackRes.json();
+      } catch (_error) {
+        fallbackData = null;
+      }
+      if (!fallbackData || fallbackData.status !== "ok") {
+        const responseError = responseData && responseData.error_data ? responseData.error_data : "";
+        const fallbackError = fallbackData && fallbackData.error_data ? fallbackData.error_data : "";
+        throw new Error(responseError || fallbackError || "Failed to load logs");
+      }
+      renderLogLines(fallbackData.data);
+      logState.page = 1;
+      logState.totalPages = 1;
+      logState.totalLines = Array.isArray(fallbackData.data) ? fallbackData.data.length : 0;
+      updatePageMeta();
+      return;
     }
 
     renderLogLines(responseData.data);
@@ -471,7 +559,7 @@
     }
     if (words.includes(safeWord)) return;
 
-    words.push(word);
+    words.push(safeWord);
     populateWords();
     hideFilteredWords();
     localStorage.setItem("words", JSON.stringify(words));
@@ -494,13 +582,17 @@
 
   function showLogError(error) {
     const message = error && error.message ? error.message : String(error);
-    bootbox.alert({
-      title: "Log Error",
-      message
-    });
+    if (window.bootbox && typeof window.bootbox.alert === "function") {
+      window.bootbox.alert({
+        title: "Log Error",
+        message
+      });
+      return;
+    }
+    window.alert(message);
   }
 
-  $(document).ready(function () {
+  document.addEventListener("DOMContentLoaded", function () {
     const hideFilterInput = document.getElementById("hide-filter-box");
     const searchInput = document.getElementById("log-search-query");
     const sourceSelect = document.getElementById("log-source-select");
@@ -509,64 +601,105 @@
 
     let typingTimer;
     const typeInterval = 500;
-    hideFilterInput.addEventListener('keyup', (e) => {
-      clearTimeout(typingTimer);
-      typingTimer = setTimeout(hideFilteredWords, typeInterval);
-      if (e.keyCode === 13) addHideWordFromInput();
-    });
+    if (hideFilterInput) {
+      hideFilterInput.addEventListener('keyup', (e) => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(hideFilteredWords, typeInterval);
+        if (e.keyCode === 13) addHideWordFromInput();
+      });
+    }
 
-    searchInput.addEventListener('keyup', (e) => {
-      if (e.keyCode === 13) applySearch();
-    });
+    if (searchInput) {
+      searchInput.addEventListener('keyup', (e) => {
+        if (e.keyCode === 13) applySearch();
+      });
+    }
 
-    sourceSelect.addEventListener('change', () => {
-      logState.source = sourceSelect.value || "";
-      if (logState.source) {
-        logState.folder = getSourceFolder(logState.source);
-        populateFolderPicker();
-        syncFolderPicker(logState.folder);
-      }
-      logState.page = 1;
-      loadLogPage().catch(showLogError);
-    });
+    if (sourceSelect) {
+      sourceSelect.addEventListener('change', () => {
+        logState.source = sourceSelect.value || "";
+        if (logState.source) {
+          logState.folder = getSourceFolder(logState.source);
+          populateFolderPicker();
+          syncFolderPicker(logState.folder);
+        }
+        logState.page = 1;
+        loadLogPage().catch(showLogError);
+      });
+    }
 
-    pageSizeSelect.addEventListener('change', () => {
-      const value = Number(pageSizeSelect.value || 200);
-      logState.pageSize = Number.isFinite(value) ? value : 200;
-      logState.page = 1;
-      loadLogPage().catch(showLogError);
-    });
+    if (pageSizeSelect) {
+      pageSizeSelect.addEventListener('change', () => {
+        const value = Number(pageSizeSelect.value || 200);
+        logState.pageSize = Number.isFinite(value) ? value : 200;
+        logState.page = 1;
+        loadLogPage().catch(showLogError);
+      });
+    }
 
-    document.getElementById("run-log-search").addEventListener("click", applySearch);
-    document.getElementById("clear-log-search").addEventListener("click", clearSearch);
-    document.getElementById("refresh-log-page").addEventListener("click", () => {
-      loadLogPage().catch(showLogError);
-    });
-    document.getElementById("refresh-log-sources").addEventListener("click", () => {
-      fetchLogSources(logState.source).catch(showLogError);
-    });
-    document.getElementById("prev-log-page").addEventListener("click", () => {
-      if (logState.page <= 1) return;
-      logState.page -= 1;
-      loadLogPage().catch(showLogError);
-    });
-    document.getElementById("next-log-page").addEventListener("click", () => {
-      if (logState.page >= logState.totalPages) return;
-      logState.page += 1;
-      loadLogPage().catch(showLogError);
-    });
-    folderPicker.addEventListener("change", () => {
-      logState.folder = normalizePath(folderPicker.value);
-      applySourceOptions();
-      if (!logState.source) return;
-      logState.page = 1;
-      loadLogPage().catch(showLogError);
-    });
+    const runSearchBtn = document.getElementById("run-log-search");
+    if (runSearchBtn) runSearchBtn.addEventListener("click", applySearch);
+
+    const clearSearchBtn = document.getElementById("clear-log-search");
+    if (clearSearchBtn) clearSearchBtn.addEventListener("click", clearSearch);
+
+    const refreshPageBtn = document.getElementById("refresh-log-page");
+    if (refreshPageBtn) {
+      refreshPageBtn.addEventListener("click", () => {
+        loadLogPage().catch(showLogError);
+      });
+    }
+
+    const refreshSourcesBtn = document.getElementById("refresh-log-sources");
+    if (refreshSourcesBtn) {
+      refreshSourcesBtn.addEventListener("click", () => {
+        fetchLogSources(logState.source).catch(showLogError);
+      });
+    }
+
+    const prevPageBtn = document.getElementById("prev-log-page");
+    if (prevPageBtn) {
+      prevPageBtn.addEventListener("click", () => {
+        if (logState.page <= 1) return;
+        logState.page -= 1;
+        loadLogPage().catch(showLogError);
+      });
+    }
+
+    const nextPageBtn = document.getElementById("next-log-page");
+    if (nextPageBtn) {
+      nextPageBtn.addEventListener("click", () => {
+        if (logState.page >= logState.totalPages) return;
+        logState.page += 1;
+        loadLogPage().catch(showLogError);
+      });
+    }
+
+    if (folderPicker) {
+      folderPicker.addEventListener("change", () => {
+        logState.folder = normalizePath(folderPicker.value);
+        applySourceOptions();
+        if (!logState.source) return;
+        logState.page = 1;
+        loadLogPage().catch(showLogError);
+      });
+    }
 
     populateWords();
     fetchLogSources()
+      .catch(() => { })
       .then(() => loadLogPage())
       .catch(showLogError);
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!target) return;
+      const button = target.closest("[data-delete-word]");
+      if (!button) return;
+      deleteWord(button.getAttribute("data-delete-word") || "");
+    });
   });
 </script>
 {% end %}
+
+
+

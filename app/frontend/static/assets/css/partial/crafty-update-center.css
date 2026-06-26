@@ -18,3 +18,16 @@
 #update_executable {
     justify-content: center;
 }
+
+/* Keep Big Bucket fields flush with the rest of Update Center inputs */
+.content-wrapper #basic,
+.content-wrapper #advanced {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.content-wrapper #basic > .col-sm-12,
+.content-wrapper #basic .col-sm-12 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}

@@ -9,23 +9,9 @@
 
 <div class="content-wrapper">
 
-  <!-- Page Title Header Starts-->
-  <div class="row page-title-header">
-    <div class="col-12">
-      <div class="page-header">
-        <h4 class="page-title">
-          {{ translate('serverDetails', 'serverDetails', data['lang']) }} - {{
-          data['server_stats']['server_id']['server_name'] }}
-          <br />
-          <small>UUID: {{ data['server_stats']['server_id']['server_id'] }}</small>
-        </h4>
-      </div>
-    </div>
+  {% include "parts/server_page_title.html" %}
 
-  </div>
-  <!-- Page Title Header Ends-->
-
-  {% include "parts/details_stats.html %}
+  {% include "parts/details_stats.html" %}
 
   <div class="row">
 
@@ -34,10 +20,10 @@
         <div class="card-body  pt-0">
 
           <span class="d-none d-sm-block">
-            {% include "parts/server_controls_list.html %}
+            {% include "parts/server_controls_list.html" %}
           </span>
           <span class="d-block d-sm-none">
-            {% include "parts/m_server_controls_list.html %}
+            {% include "parts/m_server_controls_list.html" %}
           </span>
 
           <div class="col-md-12">
@@ -48,6 +34,20 @@
             <div class="input-group">
               <div id="virt_console">
               </div>
+            </div>
+            <br />
+            <div class="d-flex flex-wrap align-items-end" style="gap:8px;">
+              <div>
+                <label for="console-lines-limit">Console Lines</label>
+                <select id="console-lines-limit" class="form-control">
+                  <option value="200">200</option>
+                  <option value="500">500</option>
+                  <option value="1000" selected>1000</option>
+                  <option value="2000">2000</option>
+                  <option value="5000">5000</option>
+                </select>
+              </div>
+              <button id="reload-console" class="btn btn-outline-info btn-sm" type="button">Reload Console</button>
             </div>
             <br />
 
@@ -66,6 +66,7 @@
                 data['lang']) %}</button>
               <button onclick="" id="stop-btn" class="btn btn-danger m-1 flex-grow-1 term-btn disabled">{{ translate('serverTerm', 'stop', data['lang'])
                 }}</button>
+              <button onclick="" id="kill-btn" class="btn btn-outline-danger m-1 flex-grow-1 term-btn disabled">{{ translate('dashboard', 'kill', data['lang']) }}</button>
             </div>
             {% elif data['server_stats']['updating']%}
             <div id="update_control_buttons" class="mt-4 flex-wrap d-flex justify-content-between justify-content-md-center align-items-center px-5 px-md-0">
@@ -73,8 +74,9 @@
                 translate('serverTerm', 'updating', data['lang']) }}</button>
               <button onclick="" id="restart-btn" class="btn btn-outline-primary m-1 flex-grow-1 term-btn disabled">{% raw translate('serverTerm', 'restart',
                 data['lang']) %}</button>
-              <button onclick="" id="stop-btn" class="btn btn-danger m-1 flex-grow-1 term-btn disabled">{{ translate('serverTerm', 'stop', data['lang'])
+              <button onclick="send_command(serverId, 'stop_server');" id="stop-btn" class="btn btn-danger m-1 flex-grow-1 term-btn">{{ translate('serverTerm', 'stop', data['lang'])
                 }}</button>
+              <button onclick="confirm_kill_server();" id="kill-btn" class="btn btn-outline-danger m-1 flex-grow-1 term-btn">{{ translate('dashboard', 'kill', data['lang']) }}</button>
             </div>
             {% elif data['waiting_start'] %}
             <div id="control_buttons" class="mt-4 flex-wrap d-flex justify-content-between justify-content-md-center align-items-center px-5 px-md-0">
@@ -84,6 +86,7 @@
                 data['lang']) %}</button>
               <button onclick="" id="stop-btn" class="btn btn-danger m-1 flex-grow-1 term-btn disabled">{{ translate('serverTerm', 'stop', data['lang'])
                 }}</button>
+              <button onclick="" id="kill-btn" class="btn btn-outline-danger m-1 flex-grow-1 term-btn disabled">{{ translate('dashboard', 'kill', data['lang']) }}</button>
             </div>
             {% elif data['importing'] %}
             <div id="control_buttons" class="mt-4 flex-wrap d-flex justify-content-between justify-content-md-center align-items-center px-5 px-md-0">
@@ -94,6 +97,7 @@
                 data['lang']) %}</button>
               <button onclick="" id="stop-btn" class="btn btn-danger m-1 flex-grow-1 term-btn disabled">{{ translate('serverTerm', 'stop', data['lang'])
                 }}</button>
+              <button onclick="" id="kill-btn" class="btn btn-outline-danger m-1 flex-grow-1 term-btn disabled">{{ translate('dashboard', 'kill', data['lang']) }}</button>
             </div>
             {% else %}
             <div id="control_buttons" class="mt-4 flex-wrap d-flex justify-content-between justify-content-md-center align-items-center px-5 px-md-0">
@@ -101,6 +105,7 @@
               <button onclick="send_command(serverId, 'restart_server');" id="restart-btn" class="btn btn-outline-primary m-1 flex-grow-1 term-btn">{% raw translate('serverTerm', 'restart', data['lang'])
                 %}</button>
               <button onclick="send_command(serverId, 'stop_server');" id="stop-btn" class="btn btn-danger m-1 flex-grow-1 term-btn">{{ translate('serverTerm', 'stop', data['lang']) }}</button>
+              <button onclick="confirm_kill_server();" id="kill-btn" class="btn btn-outline-danger m-1 flex-grow-1 term-btn">{{ translate('dashboard', 'kill', data['lang']) }}</button>
             </div>
             {% end %}
             {% end %}
@@ -125,11 +130,25 @@
       startBtn.setAttribute('disabled', 'disabled');
       restartBtn.removeAttribute('disabled');
       stopBtn.removeAttribute('disabled');
+      if (killBtn) {
+        killBtn.removeAttribute('disabled');
+      }
     }
     if (command == 'stop_server') {
       startBtn.removeAttribute('disabled');
       restartBtn.setAttribute('disabled', 'disabled');
       stopBtn.setAttribute('disabled', 'disabled');
+      if (killBtn) {
+        killBtn.setAttribute('disabled', 'disabled');
+      }
+    }
+    if (command == 'kill_server') {
+      startBtn.removeAttribute('disabled');
+      restartBtn.setAttribute('disabled', 'disabled');
+      stopBtn.setAttribute('disabled', 'disabled');
+      if (killBtn) {
+        killBtn.setAttribute('disabled', 'disabled');
+      }
     }
     //<!--  this getCookie function is in base.html-->
     const token = getCookie("_xsrf");
@@ -151,17 +170,48 @@
     }
   }
 
-  if (webSocket) {
-    webSocket.on('update_button_status', function (updateButton) {
-      if (updateButton.isUpdating) {
-        if (updateButton.server_id == serverId) {
-          console.log(updateButton.isUpdating)
-          document.getElementById('control_buttons').innerHTML = '<button onclick="" id="start-btn" class="btn btn-primary m-1 flex-grow-1 term-btn">{{ translate("serverTerm", "updating", data["lang"]) }}</button><button onclick="" id="restart-btn" class="btn btn-outline-primary m-1 flex-grow-1 term-btn">{% raw translate("serverTerm", "restart", data["lang"]) %}</button><button onclick="" id="stop-btn" class="btn btn-danger m-1 flex-grow-1 term-btn disabled">{{ translate("serverTerm", "stop", data["lang"]) }}</button>';
+  function confirm_kill_server() {
+    bootbox.confirm({
+      title: "{{ translate('dashboard', 'kill', data['lang']) }}",
+      message: "This will kill the server process and all child processes immediately. This can corrupt files. Continue?",
+      buttons: {
+        confirm: {
+          label: "{{ translate('dashboard', 'kill', data['lang']) }}",
+          className: 'btn-danger'
+        },
+        cancel: {
+          label: "{{ translate('serverBackups', 'cancel', data['lang']) }}",
+          className: 'btn-secondary'
+        }
+      },
+      callback: function (result) {
+        if (result) {
+          send_command(serverId, 'kill_server');
         }
       }
-      else if (updateButton.server_id == serverId) {
+    });
+  }
+
+  if (webSocket) {
+    webSocket.on('update_button_status', function (updateButton) {
+      if (updateButton.server_id != serverId) {
+        return;
+      }
+      if (updateButton.isUpdating) {
+        if (startBtn) {
+          startBtn.setAttribute('disabled', 'disabled');
+        }
+        if (restartBtn) {
+          restartBtn.setAttribute('disabled', 'disabled');
+        }
+        if (stopBtn && online) {
+          stopBtn.removeAttribute('disabled');
+        }
+        if (killBtn && online) {
+          killBtn.removeAttribute('disabled');
+        }
+      } else {
         window.location.reload()
-        document.getElementById('update_control_buttons').innerHTML = '<button onclick="send_command(serverId, "start_server");" id="start-btn" class="btn btn-primary m-1 flex-grow-1 term-btn">{{ translate("serverTerm", "start", data["lang"]) }}</button><button onclick="send_command(serverId, "restart_server");" id="restart-btn" class="btn btn-outline-primary m-1 flex-grow-1 term-btn">{% raw translate("serverTerm", "restart", data["lang"]) %}</button><button onclick="" id="stop-btn" class="btn btn-danger m-1 flex-grow-1 term-btn disabled">{{ translate("serverTerm", "stop", data["lang"]) }}</button>';
       }
     });
   }
@@ -172,16 +222,23 @@
   let startBtn = document.querySelector('#start-btn');
   let restartBtn = document.querySelector('#restart-btn');
   let stopBtn = document.querySelector('#stop-btn');
+  let killBtn = document.querySelector('#kill-btn');
 
   //{% if data['permissions']['Commands'] in data['user_permissions'] %}
   if (online) {
     startBtn.setAttribute('disabled', 'disabled');
     restartBtn.removeAttribute('disabled');
     stopBtn.removeAttribute('disabled');
+    if (killBtn) {
+      killBtn.removeAttribute('disabled');
+    }
   } else {
     startBtn.removeAttribute('disabled');
     restartBtn.setAttribute('disabled', 'disabled');
     stopBtn.setAttribute('disabled', 'disabled');
+    if (killBtn) {
+      killBtn.setAttribute('disabled', 'disabled');
+    }
   }
 
   if (webSocket) {
@@ -191,31 +248,57 @@
   }
   //{% end %}
 
-  async function get_server_log() {
-    const token = getCookie("_xsrf")
-    let colors = true;
-    let res = await fetch(`/api/v2/servers/${serverId}/logs?colors=${colors}`, {
+  function getConsoleLinesLimit() {
+    const linesSelect = document.getElementById("console-lines-limit");
+    const fallbackLines = 1000;
+    if (!linesSelect) return fallbackLines;
+    const selectedLines = Number(linesSelect.value || fallbackLines);
+    if (!Number.isFinite(selectedLines) || selectedLines < 1) return fallbackLines;
+    return selectedLines;
+  }
+
+  function renderServerLog(responseData) {
+    let html = ``;
+    if (responseData.status !== "ok") {
+      return false;
+    }
+    for (const value of responseData.data || []) {
+      html += `<span class='box'>${value}<br /></span>`;
+    }
+    $('#virt_console').html(html);
+    scrollConsole();
+    return true;
+  }
+
+  async function fetchConsoleLogSnapshot(lines, preferFile = true) {
+    const token = getCookie("_xsrf");
+    const colors = true;
+    const query = preferFile
+      ? `/api/v2/servers/${serverId}/logs?file=true&colors=${colors}&lines=${lines}`
+      : `/api/v2/servers/${serverId}/logs?colors=${colors}&lines=${lines}`;
+    const res = await fetch(query, {
       method: 'GET',
       headers: {
         'X-XSRFToken': token
       },
     });
-    let responseData = await res.json();
-    let html = ``
-    if (responseData.status === "ok") {
-      for (let value of responseData.data) {
-        html += `<span class='box'>${value}<br /></span>`
-      }
-      console.log('Got Log From Server')
-      $('#virt_console').html(html);
-      scrollConsole();
-    } else {
+    return res.json();
+  }
 
-      bootbox.alert({
-        title: responseData.error,
-        message: responseData.error_data
-      });
+  async function get_server_log() {
+    const lines = getConsoleLinesLimit();
+    let responseData = await fetchConsoleLogSnapshot(lines, true);
+    if (!renderServerLog(responseData)) {
+      responseData = await fetchConsoleLogSnapshot(lines, false);
+      if (!renderServerLog(responseData)) {
+        bootbox.alert({
+          title: responseData.error,
+          message: responseData.error_data
+        });
+        return;
+      }
     }
+    console.log('Got Log From Server')
   }
 
 
@@ -241,6 +324,8 @@
   $(document).ready(function () {
     console.log("ready!");
     get_server_log()
+    $("#reload-console").on("click", get_server_log);
+    $("#console-lines-limit").on("change", get_server_log);
 
     webSocket.on('vterm_new_line', new_line_handler)
   });
@@ -354,3 +439,6 @@
 </script>
 
 {% end %}
+
+
+

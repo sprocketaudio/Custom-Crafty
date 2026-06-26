@@ -1,5 +1,8 @@
 import logging
 import json
+import re
+import xml.etree.ElementTree as ET
+import requests
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from playhouse.shortcuts import model_to_dict
@@ -43,10 +46,43 @@ update_schema = {
             "error": "typeString",
             "fill": True,
         },
+        "mc_version": {
+            "title": "Minecraft/Base Version",
+            "type": "string",
+            "minLength": 1,
+            "error": "typeString",
+            "fill": True,
+        },
         "update_watcher": {
             "title": "Enable Update Notifications",
             "type": "boolean",
             "error": "typeBool",
+            "fill": True,
+        },
+        "cf_project_id": {
+            "title": "CurseForge Project ID",
+            "type": "integer",
+            "minimum": 0,
+            "error": "typeIntMinVal0",
+            "fill": True,
+        },
+        "cf_file_id": {
+            "title": "CurseForge File ID",
+            "type": "integer",
+            "minimum": 0,
+            "error": "typeIntMinVal0",
+            "fill": True,
+        },
+        "cf_purge_paths": {
+            "title": "CurseForge Purge Paths",
+            "type": "string",
+            "error": "typeString",
+            "fill": True,
+        },
+        "cf_overlay_dir": {
+            "title": "CurseForge Overlay Directory",
+            "type": "string",
+            "error": "typeString",
             "fill": True,
         },
     },
@@ -298,6 +334,11 @@ class ApiServersServerIndexHandler(BaseApiHandler):
             return self.finish_json(
                 400, {"status": "error", "error": "INVALID_JSON", "error_data": str(e)}
             )
+        logger.info(
+            "Server update config patch requested for %s with keys: %s",
+            server_id,
+            list(data.keys()),
+        )
 
         try:
             # prevent general users from becoming bad actors
@@ -496,6 +537,220 @@ class ApiServersServerIndexHandler(BaseApiHandler):
 
 
 class ApiServersServerUpdateConfig(BaseApiHandler):
+    FORGE_MAVEN_METADATA_URL = (
+        "https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml"
+    )
+    NEOFORGE_MAVEN_METADATA_URL = (
+        "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml"
+    )
+
+    @staticmethod
+    def _fetch_maven_versions(metadata_url: str) -> list[str]:
+        response = requests.get(metadata_url, timeout=10)
+        response.raise_for_status()
+        root = ET.fromstring(response.text)
+        versions = [
+            version_node.text.strip()
+            for version_node in root.findall(".//version")
+            if version_node.text and version_node.text.strip()
+        ]
+        return versions
+
+    @staticmethod
+    def _is_safe_version_token(value: str) -> bool:
+        return bool(re.fullmatch(r"[0-9A-Za-z._-]+", value))
+
+    @staticmethod
+    def _extract_neoforge_branch(default_loader: str) -> str:
+        parts = default_loader.split(".")
+        if len(parts) < 2:
+            return ""
+        if not parts[0].isdigit() or not parts[1].isdigit():
+            return ""
+        return f"{parts[0]}.{parts[1]}."
+
+    def _resolve_catalog_build_versions(
+        self, jar_type: str, mc_version: str, default_loader: str
+    ) -> list[dict]:
+        default_entries = []
+        if default_loader:
+            default_entries.append(
+                {
+                    "value": default_loader,
+                    "label": default_loader,
+                    "source": "bigbucket",
+                }
+            )
+
+        try:
+            if jar_type == "forge-installer":
+                if not self._is_safe_version_token(mc_version):
+                    return default_entries
+                prefix = f"{mc_version}-"
+                versions = self._fetch_maven_versions(self.FORGE_MAVEN_METADATA_URL)
+                matched = [version for version in versions if version.startswith(prefix)]
+                matched.reverse()
+                if not matched:
+                    return default_entries
+                return [
+                    {
+                        "value": version,
+                        "label": f"{version[len(prefix):]} ({version})",
+                        "source": "forge-maven",
+                    }
+                    for version in matched
+                ]
+
+            if jar_type == "neoforge-installer":
+                versions = self._fetch_maven_versions(self.NEOFORGE_MAVEN_METADATA_URL)
+                branch_prefix = self._extract_neoforge_branch(default_loader)
+                if branch_prefix:
+                    matched = [
+                        version for version in versions if version.startswith(branch_prefix)
+                    ]
+                else:
+                    matched = versions[:]
+                matched.reverse()
+                if not matched:
+                    return default_entries
+                return [
+                    {
+                        "value": version,
+                        "label": version,
+                        "source": "neoforge-maven",
+                    }
+                    for version in matched
+                ]
+        except Exception as why:
+            logger.warning(
+                "Failed to resolve remote build versions for %s (%s): %s",
+                jar_type,
+                mc_version,
+                why,
+            )
+
+        return default_entries
+
+    def _build_direct_loader_url(
+        self, jar_type: str, selected_version: str, mc_version: str
+    ) -> str | None:
+        if jar_type == "forge-installer":
+            if not selected_version:
+                return None
+            if not self._is_safe_version_token(selected_version):
+                return None
+            combined_version = selected_version
+            if "-" not in combined_version:
+                if not mc_version or not self._is_safe_version_token(mc_version):
+                    return None
+                combined_version = f"{mc_version}-{selected_version}"
+            installer_name = f"forge-{combined_version}-installer.jar"
+            return (
+                "https://maven.minecraftforge.net/net/minecraftforge/forge/"
+                f"{combined_version}/{installer_name}"
+            )
+
+        if jar_type == "neoforge-installer":
+            if not selected_version or not self._is_safe_version_token(selected_version):
+                return None
+            installer_name = f"neoforge-{selected_version}-installer.jar"
+            return (
+                "https://maven.neoforged.net/releases/net/neoforged/neoforge/"
+                f"{selected_version}/{installer_name}"
+            )
+
+        return None
+
+    def get(self, server_id: str):
+        auth_data = self.authenticate_user()
+        if not auth_data:
+            return
+
+        if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
+                auth_data[4]["user_id"], server_id
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.CONFIG not in server_permissions:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
+
+        category = str(self.get_query_argument("category", "")).strip()
+        jar_type = str(self.get_query_argument("type", "")).strip()
+        mc_version = str(self.get_query_argument("mc_version", "")).strip()
+        if not category or not jar_type or not mc_version:
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "INVALID_PARAMS",
+                    "error_data": "category, type and mc_version are required.",
+                },
+            )
+
+        try:
+            with open(self.helper.big_bucket_minecraft_cache, "r", encoding="utf-8") as f:
+                big_bucket = json.load(f)
+            versions = (
+                big_bucket.get("categories", {})
+                .get(category, {})
+                .get("types", {})
+                .get(jar_type, {})
+                .get("versions", {})
+            )
+        except Exception as why:
+            return self.finish_json(
+                500,
+                {
+                    "status": "error",
+                    "error": "CACHE_ERROR",
+                    "error_data": str(why),
+                },
+            )
+
+        version_meta = versions.get(mc_version, {})
+        default_loader = str(version_meta.get("loader_version", "") or "").strip()
+        build_versions = self._resolve_catalog_build_versions(
+            jar_type, mc_version, default_loader
+        )
+        if not build_versions:
+            # Fallback for types that do not expose separate loader builds.
+            build_versions = [
+                {"value": mc_version, "label": mc_version, "source": "catalog"}
+            ]
+
+        return self.finish_json(
+            200,
+            {
+                "status": "ok",
+                "data": {
+                    "build_versions": build_versions,
+                    "default_loader": default_loader,
+                },
+            },
+        )
+
     def patch(self, server_id: str):
         auth_data = self.authenticate_user()
         if not auth_data:
@@ -503,6 +758,24 @@ class ApiServersServerUpdateConfig(BaseApiHandler):
 
         if server_id not in [str(x["server_id"]) for x in auth_data[0]]:
             # if the user doesn't have access to the server, return an error
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "NOT_AUTHORIZED",
+                    "error_data": self.helper.translation.translate(
+                        "validators", "insufficientPerms", auth_data[4]["lang"]
+                    ),
+                },
+            )
+        mask = self.controller.server_perms.get_lowest_api_perm_mask(
+            self.controller.server_perms.get_user_permissions_mask(
+                auth_data[4]["user_id"], server_id
+            ),
+            auth_data[5],
+        )
+        server_permissions = self.controller.server_perms.get_permissions(mask)
+        if EnumPermissionsServer.CONFIG not in server_permissions:
             return self.finish_json(
                 400,
                 {
@@ -540,31 +813,73 @@ class ApiServersServerUpdateConfig(BaseApiHandler):
                     "error_data": f"{str(err)}",
                 },
             )
-        big_bucket = {}
         server_obj = self.controller.servers.get_server_obj(server_id)
-        with open(self.helper.big_bucket_minecraft_cache, "r", encoding="utf-8") as f:
-            big_bucket = json.load(f)
         if "version" in data:
-            server_details = data.get("version").split("|")
-            try:
-                url = big_bucket["categories"][server_details[0]]["types"][
-                    server_details[1]
-                ]["versions"][server_details[2]]["url"]
-            except KeyError as why:
+            big_bucket = {}
+            with open(
+                self.helper.big_bucket_minecraft_cache, "r", encoding="utf-8"
+            ) as f:
+                big_bucket = json.load(f)
+            selected_version = str(data.get("version", "") or "").strip()
+            category = str(data.get("category", "") or "").strip()
+            jar_type = str(data.get("type", "") or "").strip()
+            mc_version = str(data.get("mc_version", "") or "").strip()
+
+            # Backward compatibility with old "category|type|version" payloads.
+            if selected_version.count("|") == 2 and not category and not jar_type:
+                category, jar_type, selected_version = selected_version.split("|", 2)
+            # Backward compatibility with "type" still sent as "category|type".
+            if "|" in jar_type:
+                maybe_category, maybe_type = jar_type.split("|", 1)
+                if not category:
+                    category = maybe_category
+                jar_type = maybe_type
+
+            if not category or not jar_type or not selected_version:
                 return self.finish_json(
-                    500,
+                    400,
                     {
                         "status": "error",
-                        "error": "KEY ERROR",
-                        "error_data": f"{str(why)}",
+                        "error": "INVALID_UPDATE_SELECTION",
+                        "error_data": "category, type and version are required.",
                     },
                 )
-            server_obj.executable_update_url = url[0]
-        server_instance = self.controller.servers.get_server_instance_by_id(server_id)
+
+            url = None
+            try:
+                url = (
+                    big_bucket["categories"][category]["types"][jar_type]["versions"][
+                        selected_version
+                    ]["url"][0]
+                )
+            except KeyError:
+                url = self._build_direct_loader_url(
+                    jar_type=jar_type,
+                    selected_version=selected_version,
+                    mc_version=mc_version,
+                )
+                if not url:
+                    return self.finish_json(
+                        400,
+                        {
+                            "status": "error",
+                            "error": "INVALID_UPDATE_SELECTION",
+                            "error_data": (
+                                "Selected version is not available in catalog and "
+                                "could not be resolved as a Forge/NeoForge build."
+                            ),
+                        },
+                    )
+            server_obj.executable_update_url = url
+        for key in ("cf_project_id", "cf_file_id", "cf_purge_paths", "cf_overlay_dir"):
+            if key in data:
+                setattr(server_obj, key, data[key])
         if "update_watcher" in data:
             server_obj.update_watcher = data.get("update_watcher")
 
         self.controller.servers.update_server(server_obj)
+        self.controller.servers.refresh_server_settings(server_id)
+        server_instance = self.controller.servers.get_server_instance_by_id(server_id)
 
         self.controller.management.add_to_audit_log(
             auth_data[4]["user_id"],
@@ -578,6 +893,12 @@ class ApiServersServerUpdateConfig(BaseApiHandler):
             200,
             {
                 "status": "ok",
-                "data": {"executable_update_url": server_obj.executable_update_url},
+                "data": {
+                    "executable_update_url": server_obj.executable_update_url,
+                    "cf_project_id": server_obj.cf_project_id,
+                    "cf_file_id": server_obj.cf_file_id,
+                    "cf_purge_paths": server_obj.cf_purge_paths,
+                    "cf_overlay_dir": server_obj.cf_overlay_dir,
+                },
             },
         )

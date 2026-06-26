@@ -2,6 +2,7 @@
 import time
 import datetime
 import os
+import base64
 import typing as t
 import json
 import logging
@@ -49,6 +50,38 @@ HUMANIZED_INDEX_FILE = "humanized_index.json"
 
 
 class PanelHandler(BaseHandler):
+    @staticmethod
+    def _normalize_sidebar_icon(icon_value: t.Any) -> t.Optional[str]:
+        if icon_value in (None, False):
+            return None
+        if isinstance(icon_value, bytes):
+            icon_value = icon_value.decode("utf-8", errors="ignore")
+        icon_text = str(icon_value).strip()
+        if icon_text in ("", "False", "None", "b''"):
+            return None
+        return icon_text
+
+    @staticmethod
+    def _get_sidebar_server_icon(server_path: str) -> t.Optional[str]:
+        if not server_path:
+            return None
+
+        try:
+            icon_path = Path(server_path).resolve(strict=False) / "server-icon.png"
+        except Exception:
+            return None
+
+        if not icon_path.is_file():
+            return None
+
+        try:
+            if icon_path.stat().st_size <= 0:
+                return None
+            with icon_path.open("rb") as icon_file:
+                return base64.b64encode(icon_file.read()).decode("utf-8")
+        except Exception:
+            return None
+
     def get_user_roles(self) -> t.Dict[str, list]:
         user_roles = {}
         for user_id in self.controller.users.get_all_user_ids():
@@ -312,6 +345,27 @@ class PanelHandler(BaseHandler):
         if exec_user["username"] == "anti-lockout-user":
             page = "panel_config"
 
+        menu_servers = []
+        for menu_server in defined_servers:
+            enriched = dict(menu_server)
+            sidebar_icon = None
+            server_id = str(enriched.get("server_id", ""))
+            server_obj = self.controller.servers.get_server_obj_optional(server_id)
+            if server_obj:
+                try:
+                    latest_stats = server_obj.stats_helper.get_latest_server_stats()
+                    sidebar_icon = self._normalize_sidebar_icon(
+                        latest_stats.get("icon")
+                    )
+                except Exception:
+                    sidebar_icon = None
+
+            if not sidebar_icon:
+                sidebar_icon = self._get_sidebar_server_icon(enriched.get("path", ""))
+
+            enriched["sidebar_icon"] = sidebar_icon
+            menu_servers.append(enriched)
+
         page_data: t.Dict[str, t.Any] = {
             # todo: make this actually pull and compare version data
             "mfa": token_data.get(
@@ -345,7 +399,7 @@ class PanelHandler(BaseHandler):
                     - len(self.controller.servers.list_running_servers())
                 ),
             },
-            "menu_servers": defined_servers,
+            "menu_servers": menu_servers,
             "hosts_data": self.controller.management.get_latest_hosts_stats(),
             "show_contribute": self.helper.get_setting("show_contribute_link", True),
             "error": error,
@@ -1148,6 +1202,21 @@ class PanelHandler(BaseHandler):
                 )
 
             page_data["active_link"] = "panel_config"
+            if superuser:
+                curseforge_api_key = (
+                    self.controller.management.get_curseforge_api_key() or ""
+                )
+                page_data["curseforge_api_configured"] = bool(curseforge_api_key)
+                page_data["curseforge_api_masked"] = ""
+                if curseforge_api_key:
+                    if len(curseforge_api_key) <= 8:
+                        page_data["curseforge_api_masked"] = "*" * len(
+                            curseforge_api_key
+                        )
+                    else:
+                        page_data["curseforge_api_masked"] = (
+                            f"{curseforge_api_key[:4]}...{curseforge_api_key[-4:]}"
+                        )
             template = "panel/panel_config.html"
 
         elif page == "config_json":

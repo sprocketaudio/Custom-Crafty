@@ -367,7 +367,13 @@ if __name__ == "__main__":
     helper.create_session_file(ignore=args.ignore)
     # start the database
     database = peewee.SqliteDatabase(
-        helper.db_path, pragmas={"journal_mode": "wal", "cache_size": -1024 * 10}
+        helper.db_path,
+        pragmas={
+            "journal_mode": "wal",
+            "cache_size": -1024 * 10,
+            "busy_timeout": 5000,
+            "synchronous": 1,
+        },
     )
     database_proxy.initialize(database)
     Helpers.ensure_dir_exists(

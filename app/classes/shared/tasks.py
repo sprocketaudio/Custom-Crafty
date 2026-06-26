@@ -198,6 +198,8 @@ class TasksManager:
                         )
                 case "update_executable":
                     svr.server_upgrade()
+                case "update_modpack":
+                    svr.modpack_upgrade()
                 case _:
                     svr.send_command(command)
 

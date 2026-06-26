@@ -1,8 +1,10 @@
 import json
 import logging
+from peewee import DoesNotExist
 
 from app.classes.shared.singleton import Singleton
 from app.classes.shared.console import Console
+from app.classes.models.server_permissions import PermissionsServers
 from app.classes.models.users import HelperUsers
 
 logger = logging.getLogger(__name__)
@@ -88,8 +90,20 @@ class WebSocketManager(metaclass=Singleton):
 
         self.broadcast_with_fn(filter_fn, event_type, data)
 
-    def broadcast_page_params(self, page: str, params: dict, event_type: str, data):
+    def broadcast_page_params(
+        self, page: str, params: dict, event_type: str, data, **kwargs
+    ):
         def filter_fn(client):
+            required_permission = kwargs.get("required_permission")
+            if required_permission:
+                try:
+                    user_perms = PermissionsServers.get_user_id_permissions_list(
+                        client.get_user_id(), params.get("id", "")
+                    )
+                except DoesNotExist:
+                    user_perms = []
+                if required_permission not in user_perms:
+                    return False
             if client.page != page:
                 return False
             for key, param in params.items():

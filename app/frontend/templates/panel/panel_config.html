@@ -314,6 +314,36 @@
             </div>
           </div>
           {% end %}
+          {% if data['superuser'] %}
+          <div class="row" id="curseforge-api">
+            <div class="col-md-12 col-sm-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-header header-sm d-flex justify-content-between align-items-center">
+                  <h4 class="card-title"><i class="ph-fill ph-key"></i> CurseForge API</h4>
+                </div>
+                <div class="card-body">
+                  <div class="form-group mb-0">
+                    <label for="cf_api_key_global">Global CurseForge API Key</label>
+                    <div class="input-group">
+                      <input type="password" id="cf_api_key_global" class="form-control"
+                        placeholder="Paste API key (leave empty to clear)">
+                      <div class="input-group-append">
+                        <button id="save_cf_api_key_global" class="btn btn-outline-warning" type="button">Save Key</button>
+                      </div>
+                    </div>
+                    <small id="cf_api_status_global" class="text-muted">
+                      {% if data.get('curseforge_api_configured', False) %}
+                      Configured: {{ data.get('curseforge_api_masked', '') }}
+                      {% else %}
+                      Not configured
+                      {% end %}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% end %}
         </div>
       </div>
     </div>
@@ -441,6 +471,34 @@
   $('#file').change(function () {
     if ($('#file').val()) {
       $('#upload-button').prop("disabled", false);
+    }
+  });
+
+  $("#save_cf_api_key_global").on("click", async function () {
+    const apiKey = ($("#cf_api_key_global").val() || "").trim();
+    try {
+      const res = await fetch(`/api/v2/crafty/config/curseforge/`, {
+        method: 'PATCH',
+        headers: {
+          'X-XSRFToken': token
+        },
+        body: JSON.stringify({ "api_key": apiKey }),
+      });
+      const responseData = await res.json();
+      if (responseData.status === "ok") {
+        $("#cf_api_key_global").val("");
+        $("#cf_api_status_global").text(responseData.data.configured ? "Configured" : "Not configured");
+        return;
+      }
+      bootbox.alert({
+        title: responseData.error,
+        message: responseData.error_data
+      });
+    } catch (err) {
+      bootbox.alert({
+        title: "Unable to save API key",
+        message: String(err.message || err),
+      });
     }
   });
 </script>

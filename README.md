@@ -1,10 +1,12 @@
 [![Crafty Logo](app/frontend/static/assets/images/logo_long.svg)](https://craftycontrol.com)
-# Custom Crafty Controller 4.10.4
+# Custom Crafty Controller 4.10.6
 > Private custom build for local server management.
 
 ## Version Lineage
-- **Current local/custom version:** `4.10.4`
+- **Current local/custom version:** `4.10.6`
 - **Upstream base used for this custom line:** `Crafty v4.10.3`
+- **Upstream fixes selectively backported through:** `Crafty v4.10.6`
+- **Next upstream delta to review:** `Crafty v4.10.7` terminal-buffer CPU fix (`4aa2bc7e`).
 - This repo is intentionally customized beyond upstream for private use.
 
 ## What This Repo Is For
@@ -15,7 +17,7 @@
   - hard RAM cap (`memory_limit_mib`)
 - NBT editor support for `.dat` files with split permissions (`NBT_READ` / `NBT_WRITE`)
   and automatic backup on NBT save.
-- Optional CurseForge API integration work for modpack update workflows.
+- CurseForge modpack updater in Update Center (API key + per-server profile).
 
 ## Player Management Enhancements
 - Expanded page layout with dedicated sections for:
@@ -56,14 +58,21 @@ cd <path-to-Crafty>
 .venv\Scripts\python.exe main.py
 ```
 
-## CurseForge API Scope (Planned/Partial)
-- Query selected modpack metadata and versions.
-- Download server packages when available.
-- Run a guarded update flow:
+## CurseForge API Scope (Implemented Baseline)
+- Store global CurseForge API key (superuser).
+- Configure per-server update profile:
+  - project ID
+  - optional pinned file ID
+  - purge paths
+  - overlay directory (relative to server root)
+- Run guarded update flow from Update Center:
   - backup
   - purge configured paths
-  - re-apply local overlay content (`mods/`, `config/`, `kubejs/`, etc.)
-- If a pack has no server package, update remains manual.
+  - extract server zip
+  - re-apply local overlay content
+  - align Forge/NeoForge loader metadata when detected from the extracted pack
+  - restart if the server was running before update
+- If no server zip exists for a pack, update remains manual.
 
 ## Upstream Reference
 - Upstream project: https://gitlab.com/crafty-controller/crafty-4

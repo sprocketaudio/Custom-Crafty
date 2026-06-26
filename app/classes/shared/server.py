@@ -8,10 +8,13 @@ import sys
 import datetime
 import threading
 import logging
+import stat
 import subprocess
 import html
 import glob
 import json
+import zipfile
+import base64
 from pathlib import Path
 from zoneinfo import ZoneInfo
 from zoneinfo import ZoneInfoNotFoundError
@@ -32,7 +35,7 @@ from app.classes.models.servers import HelperServers, Servers
 from app.classes.models.server_stats import HelperServerStats
 from app.classes.models.management import HelpersManagement, HelpersWebhooks
 from app.classes.models.users import HelperUsers
-from app.classes.models.server_permissions import PermissionsServers
+from app.classes.models.server_permissions import EnumPermissionsServer, PermissionsServers
 from app.classes.shared.console import Console
 from app.classes.helpers.helpers import Helpers
 from app.classes.helpers.cpu_affinity import (
@@ -61,6 +64,8 @@ with redirect_stderr(NullWriter()):
 
 logger = logging.getLogger(__name__)
 SUCCESSMSG = "SUCCESS! Forge install completed"
+CURSEFORGE_API_BASE = "https://api.curseforge.com/v1"
+DEFAULT_CURSEFORGE_PURGE_PATHS = ("mods", "config", "defaultconfigs", "kubejs")
 
 
 def extract_backup_info(res) -> dict:
@@ -195,6 +200,7 @@ class ServerOutBuf:
                 {"id": self.server_id},
                 "vterm_new_line",
                 {"line": highlighted + "<br />"},
+                required_permission=EnumPermissionsServer.TERMINAL,
             )
 
 
@@ -244,6 +250,9 @@ class ServerInstance:
         self.stats_helper = HelperServerStats(self.server_id)
         self.last_backup_failed = False
         self.server_registry = CollectorRegistry()
+        self._local_icon_cache_path = None
+        self._local_icon_cache_mtime = None
+        self._local_icon_cache_data = False
 
         try:
             with open(
@@ -1385,9 +1394,12 @@ class ServerInstance:
                 f"Server {self.name} has crash detection enabled "
                 f"- starting watcher task"
             )
-
             self.server_scheduler.add_job(
-                self.detect_crash, "interval", seconds=30, id=f"c_{self.server_id}"
+                self.detect_crash,
+                "interval",
+                seconds=30,
+                id=f"c_{self.server_id}",
+                replace_existing=True,
             )
 
         # If this is a forge install we'll call the watcher to do the things
@@ -1601,10 +1613,16 @@ class ServerInstance:
             )
             try:
                 self.server_scheduler.add_job(
-                    self.detect_crash, "interval", seconds=30, id=f"c_{self.server_id}"
+                    self.detect_crash,
+                    "interval",
+                    seconds=30,
+                    id=f"c_{self.server_id}",
+                    replace_existing=True,
                 )
-            except:
-                logger.info(f"Job with id c_{self.server_id} already running...")
+            except Exception as why:
+                logger.warning(
+                    "Failed to start crash watcher for %s: %s", self.server_id, why
+                )
 
     def stop_threaded_server(self):
         self.stop_server()
@@ -1631,7 +1649,12 @@ class ServerInstance:
                 )
         if self.settings["stop_command"]:
             logger.info(f"Stop command requested for {self.settings['server_name']}.")
-            self.send_command(self.settings["stop_command"])
+            if not self.send_command(self.settings["stop_command"]):
+                logger.warning(
+                    "Stop command failed for %s; terminating process directly.",
+                    self.server_id,
+                )
+                self.process.terminate()
             self.write_player_cache()
         else:
             # windows will need to be handled separately for Ctrl+C
@@ -1734,13 +1757,29 @@ class ServerInstance:
         if not self.check_running() and command.lower() != "start":
             logger.warning(f'Server not running, unable to send command "{command}"')
             return False
+        if self.process is None or self.process.stdin is None:
+            logger.warning(
+                'No writable stdin for server %s, unable to send command "%s"',
+                self.server_id,
+                command,
+            )
+            return False
         Console.info(f"COMMAND TIME: {command}")
         logger.debug(f"Sending command {command} to server")
 
-        # send it
-        self.process.stdin.write(f"{command}\n".encode("utf-8"))
-        self.process.stdin.flush()
-        return True
+        try:
+            # send it
+            self.process.stdin.write(f"{command}\n".encode("utf-8"))
+            self.process.stdin.flush()
+            return True
+        except (BrokenPipeError, OSError, ValueError) as why:
+            logger.warning(
+                'Failed to send command "%s" to server %s: %s',
+                command,
+                self.server_id,
+                why,
+            )
+            return False
 
     @callback
     def crash_detected(self, name):
@@ -2073,6 +2112,861 @@ class ServerInstance:
         )
         update_thread.start()
 
+    @callback
+    def modpack_upgrade(self):
+        self.stats_helper.set_update(True)
+        update_thread = threading.Thread(
+            target=self.threaded_modpack_update,
+            daemon=True,
+            name=f"modpack_update_{self.name}",
+        )
+        update_thread.start()
+
+    def threaded_modpack_update(self):
+        server_users = PermissionsServers.get_server_user_list(self.server_id)
+        was_started = False
+        update_succeeded = False
+        msg_prefix = f"[Modpack Update: {self.name}] "
+        progress_state = {"value": 0}
+
+        def broadcast_progress(progress: int, stage: str, state: str = "running"):
+            bounded = max(0, min(100, int(progress)))
+            progress_state["value"] = bounded
+            payload = {
+                "server_id": self.server_id,
+                "progress": bounded,
+                "stage": stage,
+                "state": state,
+            }
+            for user in server_users:
+                WebSocketManager().broadcast_user_page_params(
+                    "/panel/server_detail",
+                    {"id": self.server_id},
+                    user,
+                    "modpack_update_progress",
+                    payload,
+                )
+
+        def notify_step(message: str, progress: int | None = None):
+            full_message = f"{msg_prefix}{message}"
+            logger.info("Modpack update [%s]: %s", self.server_id, message)
+            for user in server_users:
+                WebSocketManager().broadcast_user(
+                    user,
+                    "notification",
+                    full_message,
+                )
+            if progress is not None:
+                broadcast_progress(progress, message, "running")
+
+        def notify_error(message: str):
+            full_message = f"{msg_prefix}ERROR: {message}"
+            for user in server_users:
+                WebSocketManager().broadcast_user(
+                    user,
+                    "notification",
+                    full_message,
+                )
+            broadcast_progress(max(progress_state["value"], 1), message, "error")
+
+        try:
+            self.reload_server_settings()
+            notify_step("Starting update.", 1)
+            project_id = int(self.settings.get("cf_project_id") or 0)
+            file_id = int(self.settings.get("cf_file_id") or 0)
+            api_key = (self.management_helper.get_curseforge_api_key() or "").strip()
+            notify_step(
+                f"Loaded config (project_id={project_id}, pinned_file_id={file_id}).",
+                5,
+            )
+
+            if project_id <= 0:
+                raise RuntimeError(
+                    "CurseForge Project ID is not configured. Save a valid project ID first."
+                )
+            if not api_key:
+                raise RuntimeError(
+                    "CurseForge API key is not configured. Add it in Update Center."
+                )
+
+            if len(self.management_helper.get_backups_by_server(self.server_id, True)) <= 0:
+                raise RuntimeError(
+                    "Backup config does not exist for this server. Canceling update."
+                )
+
+            backup_config = HelpersManagement.get_default_server_backup(self.server_id)
+
+            if self.check_running():
+                was_started = True
+                if str(self.settings.get("type", "")).startswith("minecraft"):
+                    notify_step("Saving world data before stopping server.", 8)
+                    logger.info("Sending save-all flush before modpack update stop.")
+                    self.send_command("save-all flush")
+                    time.sleep(2)
+                notify_step("Stopping server before backup.", 12)
+                logger.info(
+                    "Server with PID %s is running. Sending shutdown command.",
+                    self.process.pid,
+                )
+                self.stop_threaded_server()
+                if self.check_running():
+                    raise RuntimeError("Server did not stop cleanly; canceling update.")
+                notify_step("Server stopped.", 18)
+
+            ws_params = {
+                "isUpdating": self.check_update(),
+                "server_id": self.server_id,
+                "wasRunning": was_started,
+                "string": (
+                    f'<a data-id="{self.server_id}" class=""> MODPACK UPDATING...</a>'
+                ),
+            }
+            for user in server_users:
+                WebSocketManager().broadcast_user_page(
+                    "/panel/server_detail", user, "update_button_status", ws_params
+                )
+
+            notify_step("Starting backup.", 20)
+            self.server_backup_threader(backup_config["backup_id"], True)
+
+            backing_up = True
+            while backing_up:
+                backing_up = self.check_backup_by_id(backup_config["backup_id"])
+                time.sleep(2)
+
+            backup_status = json.loads(
+                HelpersManagement.get_backup_config(backup_config["backup_id"])["status"]
+            )["status"]
+            if backup_status == "Failed":
+                raise RuntimeError("Backup failed. Canceling modpack update.")
+            notify_step("Backup completed. Resolving CurseForge file.", 40)
+
+            target_file = self._resolve_curseforge_file_metadata(
+                project_id=project_id,
+                pinned_file_id=file_id,
+                api_key=api_key,
+            )
+            if not target_file:
+                raise RuntimeError(
+                    "No server pack file was found for this project. Update this pack manually."
+                )
+            logger.info(
+                "Modpack update selected CurseForge file for project %s: id=%s name=%s",
+                project_id,
+                target_file.get("id"),
+                target_file.get("fileName") or target_file.get("displayName"),
+            )
+            notify_step(
+                "Selected file "
+                f"{target_file.get('id')} ({target_file.get('fileName') or target_file.get('displayName')}).",
+                48,
+            )
+
+            download_url = target_file.get("downloadUrl")
+            if not download_url:
+                notify_step("Resolving download URL.", 54)
+                download_url = self._get_curseforge_download_url(
+                    project_id=project_id,
+                    file_id=target_file["id"],
+                    api_key=api_key,
+                )
+            if not download_url:
+                raise RuntimeError(
+                    "CurseForge did not provide a downloadable server archive URL."
+                )
+
+            notify_step("Downloading modpack archive.", 55)
+            archive_name = target_file.get("fileName") or f"{target_file['id']}.zip"
+            archive_name = os.path.basename(archive_name)
+            if not archive_name.lower().endswith(".zip"):
+                archive_name = f"{archive_name}.zip"
+
+            staging_root = Path(self.helper.root_dir, "temp", "curseforge_updates")
+            self.helper.ensure_dir_exists(staging_root)
+            staging_dir = Path(staging_root, self.server_id)
+            if staging_dir.exists():
+                shutil.rmtree(staging_dir, ignore_errors=True)
+            self.helper.ensure_dir_exists(staging_dir)
+
+            downloaded = FileHelpers.ssl_get_file(
+                download_url,
+                str(staging_dir),
+                archive_name,
+                headers={
+                    "x-api-key": api_key,
+                    "User-Agent": "Crafty-Controller/4.x",
+                },
+            )
+            if not downloaded:
+                raise RuntimeError("Failed to download the selected CurseForge file.")
+            notify_step("Download completed.", 85)
+
+            archive_path = Path(staging_dir, archive_name)
+            if not zipfile.is_zipfile(archive_path):
+                raise RuntimeError(
+                    "Downloaded file is not a valid ZIP archive. Update manually."
+                )
+            notify_step("Archive validation passed.", 88)
+
+            server_root = Path(
+                Helpers.get_os_understandable_path(self.settings["path"])
+            ).resolve()
+            purge_paths = self._parse_curseforge_purge_paths(
+                self.settings.get("cf_purge_paths", "")
+            )
+            notify_step("Purging configured paths.", 90)
+            self._purge_modpack_paths(server_root, purge_paths)
+            notify_step("Configured purge completed.", 92)
+            if str(self.settings.get("type", "")).startswith("minecraft"):
+                notify_step("Cleaning Java runtime artifacts.", 93)
+                self._purge_java_runtime_state(server_root)
+                notify_step("Java runtime cleanup completed.", 94)
+
+            notify_step("Extracting archive into server directory.", 95)
+            self.file_helper.unzip_file(
+                str(archive_path),
+                str(server_root),
+                self.server_id,
+                True,
+            )
+            notify_step("Extraction completed.", 97)
+            notify_step("Ensuring Forge/NeoForge loader version from pack.", 98)
+            self._sync_pack_loader_version(server_root, notify_step)
+            notify_step("Loader version sync completed.", 99)
+
+            overlay_setting = str(self.settings.get("cf_overlay_dir", "")).strip()
+            if overlay_setting:
+                notify_step("Applying overlay files.", 99)
+                self._apply_modpack_overlay(server_root, overlay_setting)
+                notify_step("Overlay merge completed.", 99)
+
+            update_succeeded = True
+            self.management_helper.add_to_audit_log_raw(
+                "Alert",
+                "-1",
+                self.server_id,
+                "Modpack update finished for " + self.name,
+                self.settings["server_ip"],
+            )
+            for user in server_users:
+                WebSocketManager().broadcast_user(
+                    user,
+                    "notification",
+                    "Modpack update finished for " + self.name,
+                )
+            broadcast_progress(100, "Update complete.", "success")
+            logger.info(
+                "Modpack update finished for %s using project %s file %s",
+                self.name,
+                project_id,
+                target_file.get("id"),
+            )
+        except Exception as why:
+            logger.error("Modpack update failed for %s: %s", self.name, why, exc_info=True)
+            notify_error(str(why))
+            self.management_helper.add_to_audit_log_raw(
+                "Alert",
+                "-1",
+                self.server_id,
+                "Modpack update failed for " + self.name + f": {why}",
+                self.settings.get("server_ip", "127.0.0.1"),
+            )
+        finally:
+            self.stats_helper.set_update(False)
+            if update_succeeded and was_started:
+                notify_step("Restarting server.", 100)
+                self.run_threaded_server(HelperUsers.get_user_id_by_name("system"))
+            for user in server_users:
+                WebSocketManager().broadcast_user_page(
+                    "/panel/server_detail",
+                    user,
+                    "update_button_status",
+                    {
+                        "isUpdating": self.check_update(),
+                        "server_id": self.server_id,
+                        "wasRunning": was_started,
+                    },
+                )
+                if update_succeeded:
+                    WebSocketManager().broadcast_user_page(
+                        user, "/panel/dashboard", "send_start_reload", {}
+                    )
+                WebSocketManager().broadcast_user(
+                    user,
+                    "remove_spinner",
+                    {"server_id": self.server_id},
+                )
+
+    def _resolve_curseforge_file_metadata(
+        self, project_id: int, pinned_file_id: int, api_key: str
+    ) -> dict | None:
+        if pinned_file_id > 0:
+            response = self._curseforge_request(
+                f"/mods/{project_id}/files/{pinned_file_id}", api_key
+            )
+            return response.get("data")
+
+        response = self._curseforge_request(f"/mods/{project_id}/files", api_key)
+        files = response.get("data", [])
+        selected = self._select_latest_server_pack_file(files)
+        if selected:
+            return selected
+
+        # Fallback: many client files expose a serverPackFileId pointing to
+        # an additional server archive that may not be explicitly flagged.
+        files_by_id = {}
+        for file_data in files:
+            try:
+                file_id = int(file_data.get("id"))
+            except (TypeError, ValueError):
+                continue
+            files_by_id[file_id] = file_data
+
+        sorted_files = sorted(
+            files,
+            key=lambda file_data: file_data.get("fileDate") or "",
+            reverse=True,
+        )
+        for file_data in sorted_files:
+            try:
+                server_pack_file_id = int(file_data.get("serverPackFileId") or 0)
+            except (TypeError, ValueError):
+                server_pack_file_id = 0
+            if server_pack_file_id <= 0:
+                continue
+
+            if server_pack_file_id in files_by_id:
+                return files_by_id[server_pack_file_id]
+
+            try:
+                server_pack_response = self._curseforge_request(
+                    f"/mods/{project_id}/files/{server_pack_file_id}", api_key
+                )
+                server_pack_data = server_pack_response.get("data")
+                if server_pack_data:
+                    return server_pack_data
+            except Exception as why:
+                logger.warning(
+                    "Failed to resolve CurseForge serverPackFileId %s for project %s: %s",
+                    server_pack_file_id,
+                    project_id,
+                    why,
+                )
+
+        return None
+
+    def _curseforge_request(self, endpoint: str, api_key: str) -> dict:
+        headers = {"x-api-key": api_key}
+        response = requests.get(
+            f"{CURSEFORGE_API_BASE}{endpoint}",
+            headers=headers,
+            timeout=20,
+        )
+        if response.status_code in (401, 403):
+            raise RuntimeError("CurseForge API authentication failed.")
+        if response.status_code == 404:
+            raise RuntimeError("CurseForge project/file was not found.")
+        if response.status_code == 429:
+            raise RuntimeError("CurseForge API rate limit reached. Try again later.")
+        if response.status_code >= 500:
+            raise RuntimeError("CurseForge API is currently unavailable.")
+        response.raise_for_status()
+        try:
+            return response.json()
+        except ValueError:
+            return {"data": response.text.strip().strip('"')}
+
+    @staticmethod
+    def _select_latest_server_pack_file(files: list) -> dict | None:
+        if not files:
+            return None
+
+        sorted_files = sorted(
+            files,
+            key=lambda file_data: file_data.get("fileDate") or "",
+            reverse=True,
+        )
+        for file_data in sorted_files:
+            if ServerInstance._looks_like_server_pack_file(file_data):
+                return file_data
+        return None
+
+    @staticmethod
+    def _looks_like_server_pack_file(file_data: dict) -> bool:
+        if file_data.get("isServerPack"):
+            return True
+
+        file_name = str(file_data.get("fileName", "") or "").lower()
+        display_name = str(file_data.get("displayName", "") or "").lower()
+
+        for candidate in (file_name, display_name):
+            if not candidate:
+                continue
+            normalized = re.sub(r"[^a-z0-9]+", " ", candidate).strip()
+            tokens = set(normalized.split())
+
+            if "serverpack" in candidate or "server pack" in candidate:
+                return True
+            if "serverfiles" in candidate or "server files" in candidate:
+                return True
+            if candidate.startswith("server"):
+                return True
+            if "server" in tokens and (
+                {"pack", "file", "files", "dedicated"} & tokens
+            ):
+                return True
+            if re.search(r"\bserver[-_ ]\d", candidate):
+                return True
+
+        return False
+
+    def _get_curseforge_download_url(
+        self, project_id: int, file_id: int, api_key: str
+    ) -> str:
+        response = self._curseforge_request(
+            f"/mods/{project_id}/files/{file_id}/download-url", api_key
+        )
+        return response.get("data", "")
+
+    @staticmethod
+    def _parse_curseforge_purge_paths(raw_paths: str) -> list[str]:
+        if not raw_paths.strip():
+            return list(DEFAULT_CURSEFORGE_PURGE_PATHS)
+
+        parsed = []
+        for line in raw_paths.splitlines():
+            for chunk in line.split(","):
+                clean = chunk.strip().replace("\\", "/").strip("/")
+                if clean and clean not in parsed:
+                    parsed.append(clean)
+        return parsed
+
+    def _purge_modpack_paths(self, server_root: Path, purge_paths: list[str]) -> None:
+        for rel_path in purge_paths:
+            clean = rel_path.strip().replace("\\", "/")
+            if clean in ("", ".", ".."):
+                raise RuntimeError("Invalid purge path in modpack configuration.")
+            if clean.startswith("../") or "/../" in clean:
+                raise RuntimeError("Purge path traversal is not allowed.")
+
+            target = Path(self.helper.validate_traversal(server_root, clean)).resolve()
+            if target == server_root:
+                raise RuntimeError("Refusing to purge the full server directory.")
+            if not target.exists():
+                continue
+            if target.is_symlink() or target.is_file():
+                target.unlink(missing_ok=True)
+            else:
+                try:
+                    shutil.rmtree(target, onerror=self._rmtree_onerror_clear_readonly)
+                except PermissionError as why:
+                    # On Windows the root directory itself may remain protected even
+                    # after children are removed. Fallback to purging contents only.
+                    logger.warning(
+                        "Failed removing directory %s directly (%s). "
+                        "Falling back to content-only purge.",
+                        target,
+                        why,
+                    )
+                    self._purge_directory_contents(target)
+                    try:
+                        remaining_entry = next(target.iterdir())
+                    except StopIteration:
+                        continue
+                    raise RuntimeError(
+                        f"Unable to fully purge path '{clean}' due to lock/permissions "
+                        f"(example locked entry: {remaining_entry.name})."
+                    ) from why
+
+    @staticmethod
+    def _rmtree_onerror_clear_readonly(func, path, exc_info):
+        with suppress(Exception):
+            os.chmod(path, stat.S_IWRITE)
+        func(path)
+
+    def _purge_directory_contents(self, target: Path) -> None:
+        for entry in target.iterdir():
+            if entry.is_symlink() or entry.is_file():
+                with suppress(FileNotFoundError):
+                    entry.unlink()
+            else:
+                shutil.rmtree(entry, onerror=self._rmtree_onerror_clear_readonly)
+
+    def _purge_java_runtime_state(self, server_root: Path) -> None:
+        runtime_targets = [
+            server_root / "libraries",
+            server_root / "startserver.bat",
+            server_root / "startserver.sh",
+            server_root / "run.bat",
+            server_root / "run.sh",
+        ]
+
+        for target in runtime_targets:
+            if not target.exists():
+                continue
+            if target.is_symlink() or target.is_file():
+                target.unlink(missing_ok=True)
+            else:
+                shutil.rmtree(target, onerror=self._rmtree_onerror_clear_readonly)
+
+        for pattern in (
+            "forge-*-installer.jar",
+            "forge-*.jar",
+            "neoforge-*-installer.jar",
+            "neoforge-*.jar",
+        ):
+            for candidate in server_root.glob(pattern):
+                if candidate.is_file() or candidate.is_symlink():
+                    candidate.unlink(missing_ok=True)
+
+    def _apply_modpack_overlay(self, server_root: Path, overlay_setting: str) -> None:
+        overlay_candidate = Path(overlay_setting)
+        if overlay_candidate.is_absolute():
+            raise RuntimeError("Overlay directory must be a relative server path.")
+
+        overlay_root = Path(
+            self.helper.validate_traversal(server_root, overlay_setting)
+        ).resolve()
+        if not overlay_root.exists():
+            raise RuntimeError(
+                f"Overlay directory does not exist: {overlay_setting}"
+            )
+        if not overlay_root.is_dir():
+            raise RuntimeError(
+                f"Overlay path is not a directory: {overlay_setting}"
+            )
+
+        for entry in overlay_root.iterdir():
+            destination = Path(self.helper.validate_traversal(server_root, entry.name))
+            if entry.is_dir():
+                shutil.copytree(entry, destination, dirs_exist_ok=True)
+            else:
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(entry, destination)
+
+    def _sync_pack_loader_version(self, server_root: Path, notify_step=None) -> None:
+        loader_info = self._detect_pack_loader_requirement(server_root)
+        if not loader_info:
+            if notify_step:
+                notify_step(
+                    "No explicit Forge/NeoForge version metadata found in pack scripts."
+                )
+            return
+
+        loader_kind, loader_version = loader_info
+        if notify_step:
+            notify_step(f"Detected {loader_kind} version {loader_version}.")
+
+        if loader_kind == "neoforge":
+            self._ensure_neoforge_installed(server_root, loader_version, notify_step)
+        elif loader_kind == "forge":
+            self._ensure_forge_installed(server_root, loader_version, notify_step)
+        else:
+            raise RuntimeError(f"Unsupported loader type detected: {loader_kind}")
+
+        self._update_loader_launch_config(server_root, loader_kind, loader_version)
+
+    def _detect_pack_loader_requirement(
+        self, server_root: Path
+    ) -> tuple[str, str] | None:
+        script_candidates = [
+            server_root / "startserver.bat",
+            server_root / "startserver.sh",
+        ]
+        script_text = ""
+        for script_path in script_candidates:
+            if script_path.exists() and script_path.is_file():
+                try:
+                    script_text = script_path.read_text(encoding="utf-8", errors="ignore")
+                    break
+                except OSError:
+                    continue
+
+        if script_text:
+            neoforge_patterns = [
+                r"(?im)^\s*set\s+NEOFORGE_VERSION\s*=\s*\"?([0-9A-Za-z._-]+)\"?",
+                r"(?im)^\s*NEOFORGE_VERSION\s*=\s*\"?([0-9A-Za-z._-]+)\"?",
+                r"(?im)libraries[\\/]+net[\\/]+neoforged[\\/]+neoforge[\\/]+([0-9A-Za-z._-]+)[\\/]+",
+            ]
+            for pattern in neoforge_patterns:
+                match = re.search(pattern, script_text)
+                if match:
+                    return ("neoforge", match.group(1))
+
+            forge_patterns = [
+                r"(?im)libraries[\\/]+net[\\/]+minecraftforge[\\/]+forge[\\/]+([0-9A-Za-z._-]+)[\\/]+",
+                r"(?im)^\s*set\s+FORGE_VERSION\s*=\s*\"?([0-9A-Za-z._-]+)\"?",
+                r"(?im)^\s*FORGE_VERSION\s*=\s*\"?([0-9A-Za-z._-]+)\"?",
+            ]
+            for pattern in forge_patterns:
+                match = re.search(pattern, script_text)
+                if match:
+                    return ("forge", match.group(1))
+
+        args_file = "win_args.txt" if self.helper.is_os_windows() else "unix_args.txt"
+        fallback_matches: list[tuple[float, str, str]] = []
+
+        neoforge_root = server_root / "libraries" / "net" / "neoforged" / "neoforge"
+        if neoforge_root.exists() and neoforge_root.is_dir():
+            for args_path in neoforge_root.glob(f"*/{args_file}"):
+                if not args_path.is_file():
+                    continue
+                try:
+                    modified = args_path.stat().st_mtime
+                except OSError:
+                    modified = 0.0
+                fallback_matches.append((modified, "neoforge", args_path.parent.name))
+
+        forge_root = server_root / "libraries" / "net" / "minecraftforge" / "forge"
+        if forge_root.exists() and forge_root.is_dir():
+            for args_path in forge_root.glob(f"*/{args_file}"):
+                if not args_path.is_file():
+                    continue
+                try:
+                    modified = args_path.stat().st_mtime
+                except OSError:
+                    modified = 0.0
+                fallback_matches.append((modified, "forge", args_path.parent.name))
+
+        if fallback_matches:
+            fallback_matches.sort(key=lambda item: item[0], reverse=True)
+            _, loader_kind, loader_version = fallback_matches[0]
+            return (loader_kind, loader_version)
+
+        return None
+
+    def _resolve_java_binary_for_loader_install(self) -> str:
+        execution_command = str(self.settings.get("execution_command", "") or "").strip()
+        if execution_command:
+            parsed = Helpers.cmdparse(execution_command)
+            if parsed:
+                java_candidate = parsed[0].replace("\\/", "/")
+                if "java" in os.path.basename(java_candidate).lower():
+                    return java_candidate
+        return "java"
+
+    @staticmethod
+    def _quote_command_token(token: str) -> str:
+        if not token:
+            return token
+        if token.startswith('"') and token.endswith('"'):
+            return token
+        if " " in token:
+            return f'"{token}"'
+        return token
+
+    def _ensure_neoforge_installed(
+        self, server_root: Path, version: str, notify_step=None
+    ) -> None:
+        args_rel = (
+            f"libraries/net/neoforged/neoforge/{version}/"
+            f"{'win_args.txt' if self.helper.is_os_windows() else 'unix_args.txt'}"
+        )
+        args_path = server_root / Path(args_rel)
+        if args_path.exists():
+            if notify_step:
+                notify_step(f"NeoForge {version} already installed.")
+            return
+
+        installer_name = f"neoforge-{version}-installer.jar"
+        installer_path = server_root / installer_name
+        if not installer_path.exists():
+            installer_url = (
+                "https://maven.neoforged.net/releases/net/neoforged/"
+                f"neoforge/{version}/{installer_name}"
+            )
+            if notify_step:
+                notify_step(f"Downloading NeoForge installer {version}.")
+            downloaded = FileHelpers.ssl_get_file(
+                installer_url,
+                str(server_root),
+                installer_name,
+                headers={"User-Agent": "Crafty-Controller/4.x"},
+            )
+            if not downloaded or not installer_path.exists():
+                raise RuntimeError(
+                    f"Failed to download NeoForge installer for version {version}."
+                )
+
+        java_bin = self._resolve_java_binary_for_loader_install()
+        if notify_step:
+            notify_step(f"Installing NeoForge {version}.")
+        run_result = subprocess.run(
+            [java_bin, "-jar", installer_name, "-installServer"],
+            cwd=str(server_root),
+            capture_output=True,
+            text=True,
+            timeout=900,
+            check=False,
+        )
+        if run_result.returncode != 0:
+            output_tail = (run_result.stdout or "")[-2000:]
+            error_tail = (run_result.stderr or "")[-2000:]
+            raise RuntimeError(
+                "NeoForge installer failed. "
+                f"stdout: {output_tail or '<empty>'} stderr: {error_tail or '<empty>'}"
+            )
+        if not args_path.exists():
+            raise RuntimeError(
+                f"NeoForge installer completed but args file was not created: {args_rel}"
+            )
+
+    def _ensure_forge_installed(
+        self, server_root: Path, version: str, notify_step=None
+    ) -> None:
+        args_rel = (
+            f"libraries/net/minecraftforge/forge/{version}/"
+            f"{'win_args.txt' if self.helper.is_os_windows() else 'unix_args.txt'}"
+        )
+        args_path = server_root / Path(args_rel)
+        if args_path.exists():
+            if notify_step:
+                notify_step(f"Forge {version} already installed.")
+            return
+
+        installer_name = f"forge-{version}-installer.jar"
+        installer_path = server_root / installer_name
+        if not installer_path.exists():
+            installer_url = (
+                "https://maven.minecraftforge.net/net/minecraftforge/"
+                f"forge/{version}/{installer_name}"
+            )
+            if notify_step:
+                notify_step(f"Downloading Forge installer {version}.")
+            downloaded = FileHelpers.ssl_get_file(
+                installer_url,
+                str(server_root),
+                installer_name,
+                headers={"User-Agent": "Crafty-Controller/4.x"},
+            )
+            if not downloaded or not installer_path.exists():
+                raise RuntimeError(
+                    f"Failed to download Forge installer for version {version}."
+                )
+
+        java_bin = self._resolve_java_binary_for_loader_install()
+        if notify_step:
+            notify_step(f"Installing Forge {version}.")
+        run_result = subprocess.run(
+            [java_bin, "-jar", installer_name, "-installServer"],
+            cwd=str(server_root),
+            capture_output=True,
+            text=True,
+            timeout=900,
+            check=False,
+        )
+        if run_result.returncode != 0:
+            output_tail = (run_result.stdout or "")[-2000:]
+            error_tail = (run_result.stderr or "")[-2000:]
+            raise RuntimeError(
+                "Forge installer failed. "
+                f"stdout: {output_tail or '<empty>'} stderr: {error_tail or '<empty>'}"
+            )
+        if not args_path.exists():
+            raise RuntimeError(
+                f"Forge installer completed but args file was not created: {args_rel}"
+            )
+
+    def _update_loader_launch_config(
+        self, server_root: Path, loader_kind: str, version: str
+    ) -> None:
+        java_bin = self._quote_command_token(self._resolve_java_binary_for_loader_install())
+        args_file = "win_args.txt" if self.helper.is_os_windows() else "unix_args.txt"
+        trailing = " %*" if self.helper.is_os_windows() else ""
+
+        if loader_kind == "neoforge":
+            args_rel = f"libraries/net/neoforged/neoforge/{version}/{args_file}"
+            executable_rel = (
+                f"libraries/net/neoforged/neoforge/{version}/"
+                f"neoforge-{version}-server.jar"
+            )
+        else:
+            args_rel = f"libraries/net/minecraftforge/forge/{version}/{args_file}"
+            executable_rel = self._detect_forge_executable_rel(server_root, version)
+
+        if not (server_root / Path(args_rel)).exists():
+            raise RuntimeError(f"Expected loader args file missing after install: {args_rel}")
+
+        server_obj: Servers = HelperServers.get_server_obj(self.server_id)
+        server_obj.executable = executable_rel.replace("\\", "/")
+        server_obj.execution_command = (
+            f"{java_bin} @user_jvm_args.txt @{args_rel} nogui{trailing}"
+        )
+        HelperServers.update_server(server_obj)
+        self.reload_server_settings()
+
+    @staticmethod
+    def _detect_forge_executable_rel(server_root: Path, version: str) -> str:
+        candidates = [
+            server_root / f"forge-{version}-shim.jar",
+            server_root / f"forge-{version}-server.jar",
+            server_root / f"forge-{version}.jar",
+            server_root / "libraries" / "net" / "minecraftforge" / "forge" / version / f"forge-{version}-server.jar",
+        ]
+        for candidate in candidates:
+            if candidate.exists():
+                return candidate.relative_to(server_root).as_posix()
+        return f"forge-{version}-server.jar"
+
+    @staticmethod
+    def _normalize_icon_payload(icon_value):
+        if icon_value in (None, False):
+            return False
+        if isinstance(icon_value, bytes):
+            icon_value = icon_value.decode("utf-8", errors="ignore")
+        icon_text = str(icon_value).strip()
+        if icon_text in ("", "False", "None", "b''"):
+            return False
+        return icon_text
+
+    def _get_local_server_icon_b64(self, server_path):
+        if not server_path:
+            return False
+        try:
+            server_root = Path(
+                Helpers.get_os_understandable_path(server_path)
+            ).resolve()
+        except Exception:
+            return False
+
+        icon_path = server_root / "server-icon.png"
+        if not icon_path.exists() or not icon_path.is_file():
+            self._local_icon_cache_path = str(icon_path)
+            self._local_icon_cache_mtime = None
+            self._local_icon_cache_data = False
+            return False
+
+        try:
+            icon_mtime = icon_path.stat().st_mtime
+        except OSError:
+            return False
+
+        if (
+            self._local_icon_cache_path == str(icon_path)
+            and self._local_icon_cache_mtime == icon_mtime
+        ):
+            return self._local_icon_cache_data
+
+        try:
+            icon_bytes = icon_path.read_bytes()
+        except OSError:
+            return False
+
+        if not icon_bytes:
+            return False
+
+        icon_b64 = base64.b64encode(icon_bytes).decode("ascii")
+        self._local_icon_cache_path = str(icon_path)
+        self._local_icon_cache_mtime = icon_mtime
+        self._local_icon_cache_data = icon_b64
+        return icon_b64
+
+    def _resolve_server_icon(self, server_path, ping_icon):
+        normalized_ping_icon = self._normalize_icon_payload(ping_icon)
+        if normalized_ping_icon:
+            return normalized_ping_icon
+        return self._get_local_server_icon_b64(server_path) or False
+
     def write_player_cache(self):
         write_json = {}
         for item in self.player_cache:
@@ -2210,12 +3104,66 @@ class ServerInstance:
         server_type = HelperServers.get_server_type_by_id(self.server_id)
         # lets download the files
         if server_type == "minecraft-java":
-            jar_dir = os.path.dirname(current_executable)
-            jar_file_name = os.path.basename(current_executable)
-
-            downloaded = FileHelpers.ssl_get_file(
-                self.settings["executable_update_url"], jar_dir, jar_file_name
+            update_url = str(self.settings.get("executable_update_url", "") or "").strip()
+            server_root = Path(
+                Helpers.get_os_understandable_path(self.settings["path"])
+            ).resolve()
+            neoforge_match = re.search(
+                r"/net/neoforged/neoforge/([0-9A-Za-z._-]+)/neoforge-\1-installer\.jar$",
+                update_url,
+                re.IGNORECASE,
             )
+            forge_match = re.search(
+                r"/net/minecraftforge/forge/([0-9A-Za-z._-]+)/forge-\1-installer\.jar$",
+                update_url,
+                re.IGNORECASE,
+            )
+
+            downloaded = False
+            try:
+                if neoforge_match:
+                    loader_version = neoforge_match.group(1)
+                    logger.info(
+                        "Executable update detected NeoForge installer URL. "
+                        "Installing version %s and updating launch config.",
+                        loader_version,
+                    )
+                    logger.info(
+                        "Executable update resetting Java runtime artifacts before NeoForge install."
+                    )
+                    self._purge_java_runtime_state(server_root)
+                    self._ensure_neoforge_installed(server_root, loader_version)
+                    self._update_loader_launch_config(
+                        server_root, "neoforge", loader_version
+                    )
+                    downloaded = True
+                elif forge_match:
+                    loader_version = forge_match.group(1)
+                    logger.info(
+                        "Executable update detected Forge installer URL. "
+                        "Installing version %s and updating launch config.",
+                        loader_version,
+                    )
+                    logger.info(
+                        "Executable update resetting Java runtime artifacts before Forge install."
+                    )
+                    self._purge_java_runtime_state(server_root)
+                    self._ensure_forge_installed(server_root, loader_version)
+                    self._update_loader_launch_config(server_root, "forge", loader_version)
+                    downloaded = True
+                else:
+                    jar_dir = os.path.dirname(current_executable)
+                    jar_file_name = os.path.basename(current_executable)
+                    downloaded = FileHelpers.ssl_get_file(
+                        update_url, jar_dir, jar_file_name
+                    )
+            except Exception as why:
+                logger.error(
+                    "Executable update failed while processing installer/direct URL: %s",
+                    why,
+                    exc_info=True,
+                )
+                downloaded = False
         elif self.server_object.type == "hytale":
             self.import_helper.download_install_hytale(self.server_path, self.server_id)
             downloaded = True
@@ -2689,7 +3637,10 @@ class ServerInstance:
                 "players": ping_data.get("players", False),
                 "desc": ping_data.get("server_description", False),
                 "version": ping_data.get("server_version", False),
-                "icon": ping_data.get("server_icon"),
+                "icon": self._resolve_server_icon(
+                    server.get("path", ""),
+                    ping_data.get("server_icon"),
+                ),
                 "telemetry_tps": telemetry_data.get("telemetry_tps", False),
                 "telemetry_mspt": telemetry_data.get("telemetry_mspt", False),
             }
@@ -2715,7 +3666,7 @@ class ServerInstance:
                 "players": False,
                 "desc": False,
                 "version": False,
-                "icon": None,
+                "icon": self._resolve_server_icon(server.get("path", ""), False),
                 "telemetry_tps": False,
                 "telemetry_mspt": False,
             }
@@ -2866,7 +3817,10 @@ class ServerInstance:
                 "players": ping_data.get("players", False),
                 "desc": ping_data.get("server_description", False),
                 "version": ping_data.get("server_version", False),
-                "icon": ping_data.get("server_icon", False),
+                "icon": self._resolve_server_icon(
+                    server_dt.get("path", ""),
+                    ping_data.get("server_icon", False),
+                ),
                 "telemetry_tps": telemetry_data.get("telemetry_tps", False),
                 "telemetry_mspt": telemetry_data.get("telemetry_mspt", False),
             }
@@ -2892,7 +3846,7 @@ class ServerInstance:
                 "players": False,
                 "desc": False,
                 "version": False,
-                "icon": False,
+                "icon": self._resolve_server_icon(server_dt.get("path", ""), False),
                 "telemetry_tps": False,
                 "telemetry_mspt": False,
             }

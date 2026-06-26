@@ -8,301 +8,551 @@
 {% block content %}
 <div class="content-wrapper">
 
-    <!-- Page Title Header Starts-->
-    <div class="row page-title-header">
-        <div class="col-12">
-            <div class="page-header">
-                <h4 class="page-title">
-                    {{ translate('serverDetails', 'serverDetails', data['lang']) }} - {{
-                    data['server_stats']['server_id']['server_name'] }}
-                    <br />
-                    <small>UUID: {{ data['server_stats']['server_id']['server_id'] }}</small>
-                </h4>
-            </div>
-        </div>
+  {% include "parts/server_page_title.html" %}
 
-    </div>
-    <!-- Page Title Header Ends-->
-
-    {% include "parts/details_stats.html %}
+    {% include "parts/details_stats.html" %}
 
     <div class="row">
         <div class="col-sm-12 grid-margin">
             <div class="card">
-                <div class="card-body  pt-0">
+                <div class="card-body pt-0">
                     <span class="d-none d-sm-block">
-                        {% include "parts/server_controls_list.html %}
+                        {% include "parts/server_controls_list.html" %}
                     </span>
                     <span class="d-block d-sm-none">
-                        {% include "parts/m_server_controls_list.html %}
+                        {% include "parts/m_server_controls_list.html" %}
                     </span>
-                    <div class="row">
-                        <div class="col-md-9 col-sm-12">
+
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h4 class="card-title mb-3">Executable Update</h4>
                             {% if data['server_stats']['server_type'] == "minecraft-java" %}
-                            <div id="selectHead" class="form-adapability">
+                            <div id="selectHead" class="mb-3">
                                 <select id="ba" class="form-control">
-                                    <option value="0">Basic</option>
+                                    <option value="0">Catalog Mode</option>
                                     {% if data['super_user'] %}
-                                    <option value="1">Advanced</option>
+                                    <option value="1">Custom URL Mode</option>
                                     {% end %}
                                 </select>
+                                <small class="text-muted">Catalog Mode picks from Big Bucket versions. Custom URL Mode lets you set a direct executable URL.</small>
                             </div>
                             {% end %}
-                            <br>
+
                             <div id="basic">
                                 {% if data['server_stats']['server_type'] == "minecraft-java" %}
-                                <div
-                                    class="card-header header-sm d-flex justify-content-between align-items-center form-adapability">
-                                    <span id="update-url" class="text-secondary" style="font-size: .9vw;">{{
-                                        data['server_stats']['server_id']['executable_update_url'] }}</span> 🔒
-                                </div>
-                                <br>
-                                {% include "../panel/parts/big_bucket_wiz.html" %}
+                                {% include "../panel/parts/big_bucket_wiz_update_center.html" %}
                                 {% end %}
                             </div>
-                            <div id="advanced" class="d-none form-adapability">
-                                {% if data['super_user'] %}
-                                {% if data['server_stats']['server_type'] == "minecraft-java" %}
+
+                            <div id="advanced" class="d-none">
+                                {% if data['super_user'] and data['server_stats']['server_type'] == "minecraft-java" %}
                                 <div class="form-group">
-                                    <label for="executable_update_url">{{ translate('serverConfig', 'exeUpdateURL',
-                                        data['lang']) }}
-                                        <small class="text-muted ml-1"> - {{ translate('serverConfig',
-                                            'exeUpdateURLDesc',
-                                            data['lang'])
-                                            }}</small> </label>
-                                    <input type="text" class="form-control" name="executable_update_url"
-                                        id="executable_update_url"
-                                        value="{{ data['server_stats']['server_id']['executable_update_url']  }}"
+                                    <label for="executable_update_url">
+                                        {{ translate('serverConfig', 'exeUpdateURL', data['lang']) }}
+                                        <small class="text-muted ml-1">- {{ translate('serverConfig', 'exeUpdateURLDesc', data['lang']) }}</small>
+                                    </label>
+                                    <input type="text" class="form-control" name="executable_update_url" id="executable_update_url"
+                                        value="{{ data['server_stats']['server_id']['executable_update_url'] }}"
                                         placeholder="{{ translate('serverConfig', 'exeUpdateURL', data['lang']) }}">
                                 </div>
                                 {% end %}
-                                {% end %}
                             </div>
+
                             {% if data['super_user'] %}
-                            <div class="form-group form-adapability">
-                                <label for="executable">{{ translate('serverConfig', 'serverExecutable',
-                                    data['lang'])
-                                    }}
-                                    <small class="text-muted ml-1"> - {{ translate('serverConfig',
-                                        'serverExecutableDesc',
-                                        data['lang'])
-                                        }}</small> </label>
+                            <div class="form-group">
+                                <label for="executable">
+                                    {{ translate('serverConfig', 'serverExecutable', data['lang']) }}
+                                    <small class="text-muted ml-1">- {{ translate('serverConfig', 'serverExecutableDesc', data['lang']) }}</small>
+                                </label>
                                 <input type="text" class="form-control" name="executable" id="executable"
-                                    value="{{ data['server_stats']['server_id']['executable']  }}"
-                                    placeholder="{{ translate('serverConfig', 'serverExecutable', data['lang']) }}"
-                                    required>
+                                    value="{{ data['server_stats']['server_id']['executable'] }}"
+                                    placeholder="{{ translate('serverConfig', 'serverExecutable', data['lang']) }}" required>
                             </div>
-                            {% end %}
-                        </div>
-                        <div class="col-sm-3 grid-margin">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title text-center">Update Information
-                                    </h4>
-                                    <blockquote class="blockquote">
-                                        {% if data['server_stats']['server_type'] == "minecraft-java" %}
-                                        <div class="form-group">
-                                            <div class="custom-control custom-switch">
-                                                <input type="checkbox" class="custom-control-input" id="update_watcher"
-                                                    name="update_watcher" {% if data['server_data']['update_watcher'] %}
-                                                    checked="" {% end %} value="1">
-                                                <label class="custom-control-label" for="update_watcher">&nbsp;&nbsp;{{
-                                                    translate('serverUpdate',
-                                                    'monitorUpdate', data['lang']) }}</label>
-                                            </div>
-                                        </div>
-                                        {% end %}
-                                        <p class="mb-0">
-                                            {% if data["server_data"]["update_watcher"] %}
-                                            {% if not data['update'] %}
-                                            {{
-                                            translate('serverUpdate',
-                                            'upToDate', data['lang']) }} ✅
-                                            {% else %}
-                                            {{
-                                            translate('serverUpdate',
-                                            'newVersion', data['lang']) }} ⚠️
-                                            {% end %}
-                                            <br>
-                                            <br>
-                                            Next Check: {{ data['update_next_run']}}
-                                            <br>
-                                            <br>
-                                            {% end %}
-                                            Current Executable: <br> <span id="span_executable"> {{
-                                                data['server_data']['executable'] }} </span>
-                                            <br>
-                                            <br>
-                                        </p>
-                                        <div>
-                                            <button onclick="send_command(serverId, 'update_executable');"
-                                                id="update_executable" class="btn btn-outline-warning">{{
-                                                translate('serverConfig',
-                                                'update', data['lang']) }}</button>
-                                        </div>
-                                        <br>
-                                        <div class="download-progress progress d-none" role="progressbar"
-                                            id="download-progress">
-                                            <div class="progress-bar progress-bar-striped progress-bar-animated"
-                                                id="download-progress-bar" style="width:0%;" aria-valuenow="0"
-                                                aria-valuemin="0" aria-valuemax="100">0%</div>
-                                        </div>
-                                    </blockquote>
+                            <div class="form-group">
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button id="submit_executable" class="btn btn-outline-success mr-2 mb-2">Save Executable Update Settings</button>
+                                    <button id="update_executable" class="btn btn-outline-warning mb-2">
+                                        Update Executable
+                                    </button>
                                 </div>
                             </div>
+                            {% end %}
+
+                            <div class="mt-4">
+                                <h4 class="card-title">CurseForge Modpack Update</h4>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="cf_project_id">Project ID</label>
+                                        <input type="number" min="0" class="form-control" id="cf_project_id"
+                                            value="{{ data['server_data'].get('cf_project_id', 0) }}">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="cf_file_id">Pinned File ID (optional)</label>
+                                        <input type="number" min="0" class="form-control" id="cf_file_id"
+                                            value="{{ data['server_data'].get('cf_file_id', 0) }}">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cf_purge_paths">Purge Paths (comma/newline separated, relative to server root)</label>
+                                    <textarea class="form-control" id="cf_purge_paths" rows="4">{{ data['server_data'].get('cf_purge_paths', 'mods\nconfig\ndefaultconfigs\nkubejs') }}</textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cf_overlay_dir">Overlay Directory (relative to server root)</label>
+                                    <input type="text" class="form-control" id="cf_overlay_dir"
+                                        value="{{ data['server_data'].get('cf_overlay_dir', '') }}"
+                                        placeholder="example: .crafty_overlay">
+                                </div>
+
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button id="save_modpack_config" class="btn btn-outline-success mr-2 mb-2" type="button">
+                                        Save Modpack Config
+                                    </button>
+                                    <button id="run_modpack_update" class="btn btn-outline-warning mb-2" type="button">
+                                        Run Modpack Update
+                                    </button>
+                                </div>
+                                <div class="download-progress progress d-none mt-2" role="progressbar" id="download-progress">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                        id="download-progress-bar" style="width:0%;" aria-valuenow="0"
+                                        aria-valuemin="0" aria-valuemax="100">0%</div>
+                                </div>
+                                <small id="update_progress_stage" class="text-muted d-block mt-2"></small>
+                            </div>
                         </div>
-                        <div class="col-sm-9 grid-margin">
-                            <button id="submit" class="btn btn-outline-success full">Submit</button>
-                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <link rel="stylesheet" href="../../static/assets/css/partial/crafty-update-center.css">
-    {% end %}
-    {% block js %}
-    <script>
-        const serverId = new URLSearchParams(document.location.search).get('id')
-        $("#ba").on("change", function () {
-            if ($("#ba").val() === "0") {
-                $("#advanced").addClass("d-none");
-                $("#basic").removeClass("d-none");
-            } else {
-                $("#basic").addClass("d-none");
-                $("#advanced").removeClass("d-none");
+</div>
+{% end %}
+
+{% block js %}
+<script>
+    var serverId = new URLSearchParams(document.location.search).get('id');
+    let activeUpdateMode = null;
+    const catalogSelectionStorageKey = `update_center_catalog_state_${serverId}`;
+
+    function getXsrfToken() {
+        if (typeof getCookie === "function") {
+            return getCookie("_xsrf");
+        }
+        return "";
+    }
+
+    async function parseResponseJson(res) {
+        try {
+            return await res.json();
+        } catch (err) {
+            const text = await res.text();
+            throw new Error(text || `HTTP ${res.status}`);
+        }
+    }
+
+    async function apiFetch(url, method, payload, extraHeaders = {}) {
+        const options = {
+            method: method,
+            headers: {
+                'X-XSRFToken': getXsrfToken(),
+                'Content-Type': 'application/json',
+                ...extraHeaders,
+            },
+        };
+        if (payload !== undefined) {
+            options.body = JSON.stringify(payload);
+        }
+        const res = await fetch(url, options);
+        const responseData = await parseResponseJson(res);
+        if (responseData.status !== "ok") {
+            throw new Error(responseData.error_data || responseData.error || "Request failed");
+        }
+        return responseData;
+    }
+
+    function toNumberPercent(value) {
+        if (typeof value === "number") {
+            return value;
+        }
+        if (typeof value === "string") {
+            const parsed = parseFloat(value.replace("%", "").trim());
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+        return 0;
+    }
+
+    function setUpdateProgress(percent, stage = "", state = "running") {
+        const bounded = Math.max(0, Math.min(100, toNumberPercent(percent)));
+        const rounded = Math.round(bounded);
+        const progressBar = $("#download-progress-bar");
+        $("#download-progress").removeClass("d-none");
+        progressBar.css("width", bounded + "%");
+        progressBar.attr("aria-valuenow", rounded);
+        progressBar.text(rounded + "%");
+        progressBar.removeClass("bg-danger bg-success bg-warning progress-bar-animated");
+        if (state === "error") {
+            progressBar.addClass("bg-danger");
+        } else if (state === "success") {
+            progressBar.addClass("bg-success");
+        } else {
+            progressBar.addClass("bg-warning progress-bar-animated");
+        }
+        $("#update_progress_stage").text(stage || "");
+    }
+
+    function getCatalogSelectionState() {
+        const category = ($("#server_jar").val() || "").trim();
+        const typeRaw = ($("#server_type").val() || "").trim();
+        const typeParts = String(typeRaw).split("|");
+        const type = typeParts.length === 2 ? typeParts[1] : typeRaw;
+        const mcVersion = ($("#server").val() || "").trim();
+        const buildVersion = ($("#server_build").val() || "").trim();
+        if (!category || !type || !mcVersion || !buildVersion) {
+            return null;
+        }
+        return {
+            category: category,
+            type: type,
+            mc_version: mcVersion,
+            build_version: buildVersion,
+        };
+    }
+
+    function persistCatalogSelectionState() {
+        const state = getCatalogSelectionState();
+        if (!state) {
+            return;
+        }
+        localStorage.setItem(catalogSelectionStorageKey, JSON.stringify(state));
+    }
+
+    function loadCatalogSelectionState() {
+        try {
+            const raw = localStorage.getItem(catalogSelectionStorageKey);
+            if (!raw) {
+                return null;
             }
-        });
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== "object") {
+                return null;
+            }
+            return parsed;
+        } catch (err) {
+            return null;
+        }
+    }
 
-        async function send_command(serverId, command) {
-            //<!--  this getCookie function is in base.html-->
-            const token = getCookie("_xsrf");
-            $("#download-progress").removeClass("d-none");
+    async function restoreCatalogSelectionState() {
+        const state = loadCatalogSelectionState();
+        if (!state) {
+            return;
+        }
+        if (!state.category || !state.type) {
+            return;
+        }
 
-            let res = await fetch(`/api/v2/servers/${serverId}/action/${command}`, {
-                method: 'POST',
-                headers: {
-                    'token': token,
-                },
-            });
-            let responseData = await res.json();
-            if (responseData.status === "ok") {
-                console.log("Command received successfully")
-            } else {
-                bootbox.alert({
-                    title: responseData.error,
-                    message: responseData.error_data
-                });
+        const serverJarEl = document.getElementById("server_jar");
+        const serverTypeEl = document.getElementById("server_type");
+        const serverVersionEl = document.getElementById("server");
+        const serverBuildEl = document.getElementById("server_build");
+        if (!serverJarEl || !serverTypeEl || !serverVersionEl || !serverBuildEl) {
+            return;
+        }
+
+        const categoryOption = Array.from(serverJarEl.options).find(
+            (option) => option.value === state.category
+        );
+        if (!categoryOption) {
+            return;
+        }
+
+        serverJarEl.value = state.category;
+        if (typeof serverJarChange === "function") {
+            serverJarChange(serverJarEl);
+        }
+
+        const combinedType = `${state.category}|${state.type}`;
+        const typeOption = Array.from(serverTypeEl.options).find(
+            (option) => option.value === combinedType
+        );
+        if (!typeOption) {
+            return;
+        }
+        serverTypeEl.value = combinedType;
+        if (typeof serverTypeChange === "function") {
+            serverTypeChange(serverTypeEl);
+        }
+
+        if (state.mc_version) {
+            const mcOption = Array.from(serverVersionEl.options).find(
+                (option) => option.value === state.mc_version
+            );
+            if (mcOption) {
+                serverVersionEl.value = state.mc_version;
+                if (typeof serverVersionChange === "function") {
+                    await serverVersionChange(serverVersionEl);
+                }
             }
         }
 
-        $("#update_watcher").on("change", async function () {
-            let payload = JSON.stringify({ "update_watcher": $("#update_watcher").prop('checked') })
-            let res = await fetch(`/api/v2/servers/${serverId}/update/config/`, {
-                method: 'PATCH',
-                body: payload,
-                headers: {
-                    'X-XSRFToken': token
+        if (state.build_version) {
+            const buildOption = Array.from(serverBuildEl.options).find(
+                (option) => option.value === state.build_version
+            );
+            if (buildOption) {
+                serverBuildEl.value = state.build_version;
+            }
+        }
+    }
+
+    $("#ba").on("change", function () {
+        if ($("#ba").val() === "0") {
+            $("#advanced").addClass("d-none");
+            $("#basic").removeClass("d-none");
+        } else {
+            $("#basic").addClass("d-none");
+            $("#advanced").removeClass("d-none");
+        }
+    });
+
+    async function sendCommand(command) {
+        if (command === "update_modpack") {
+            activeUpdateMode = "modpack";
+            setUpdateProgress(1, "Queued modpack update", "running");
+        } else if (command === "update_executable") {
+            activeUpdateMode = "executable";
+            setUpdateProgress(1, "Queued executable update", "running");
+        } else {
+            $("#download-progress").removeClass("d-none");
+        }
+        try {
+            const res = await fetch(`/api/v2/servers/${serverId}/action/${command}`, {
+                method: 'POST',
+                headers: { 'X-XSRFToken': getXsrfToken() },
+            });
+            const responseData = await parseResponseJson(res);
+            if (responseData.status !== "ok") {
+                throw new Error(responseData.error_data || responseData.error || "Command failed");
+            }
+        } catch (err) {
+            setUpdateProgress(
+                toNumberPercent($("#download-progress-bar").attr("aria-valuenow") || 1),
+                String(err.message || err),
+                "error"
+            );
+            bootbox.alert({
+                title: "Request failed",
+                message: String(err.message || err),
+            });
+        }
+    }
+
+    function confirmExecutableUpdateStart() {
+        bootbox.confirm({
+            title: "Confirm Executable Update",
+            message: "This can stop the server and modify executable files. Continue with executable update?",
+            buttons: {
+                confirm: {
+                    label: "Update Executable",
+                    className: "btn btn-outline-warning"
                 },
-            });
-            let responseData = await res.json();
-            if (responseData.status === "ok") {
-                console.log("good")
-                location.reload();
-
-            } else {
-
-                bootbox.alert({
-                    title: responseData.error,
-                    message: responseData.error_data
-                });
+                cancel: {
+                    label: "Cancel",
+                    className: "btn btn-secondary"
+                }
+            },
+            callback: function (result) {
+                if (!result) {
+                    return;
+                }
+                sendCommand("update_executable");
             }
         });
+    }
 
-        $("#submit").on("click", async function () {
+    function confirmModpackUpdateStart(onConfirm) {
+        bootbox.confirm({
+            title: "Confirm Modpack Update",
+            message: "This is destructive: configured paths will be purged before extraction. Continue with modpack update?",
+            buttons: {
+                confirm: {
+                    label: "Run Modpack Update",
+                    className: "btn btn-outline-warning"
+                },
+                cancel: {
+                    label: "Cancel",
+                    className: "btn btn-secondary"
+                }
+            },
+            callback: function (result) {
+                if (!result) {
+                    return;
+                }
+                if (typeof onConfirm === "function") {
+                    onConfirm();
+                }
+            }
+        });
+    }
+
+    $("#submit_executable").on("click", async function () {
+        try {
             if ($("#ba").val() === "0") {
-                let payload = { "category": $("#server_jar").val(), "type": $("#server_type").val(), "version": $("#server").val() }
-                let formDataJsonString = JSON.stringify(payload);
-                if ($("#server_jar").val() && $("#server_type").val() && $("#server").val()) { //Only send the first payload if it exists
-                    let res = await fetch(`/api/v2/servers/${serverId}/update/config/`, {
-                        method: 'PATCH',
-                        body: formDataJsonString,
-                        headers: {
-                            'X-XSRFToken': token
-                        },
-                    });
-                    let responseData = await res.json()
-                    if (responseData.status === "ok") {
-                        $("#update-url").text(responseData.data["executable_update_url"])
-
-                    } else {
-
-                        bootbox.alert({
-                            title: responseData.error,
-                            message: responseData.error_data
-                        });
-                    }
+                const selectedCatalogVersion = $("#server_build").val() || $("#server").val();
+                const selectedTypeRaw = $("#server_type").val() || "";
+                const selectedTypeParts = String(selectedTypeRaw).split("|");
+                const selectedType = selectedTypeParts.length === 2 ? selectedTypeParts[1] : selectedTypeRaw;
+                if (!$("#server_jar").val() || !$("#server_type").val() || !selectedCatalogVersion || !$("#server").val()) {
+                    throw new Error("Select Server Type, Server Select, Minecraft/Base Version, and Executable Build Version before saving.");
                 }
-                payload = { "executable": $("#executable").val() };
-                formDataJsonString = JSON.stringify(payload);
-                let res1 = await fetch(`/api/v2/servers/${serverId}/`, {
-                    method: 'PATCH',
-                    body: formDataJsonString,
-                    headers: {
-                        'X-XSRFToken': token
-                    },
+                await apiFetch(`/api/v2/servers/${serverId}/update/config/`, "PATCH", {
+                    category: $("#server_jar").val(),
+                    type: selectedType,
+                    mc_version: $("#server").val(),
+                    version: selectedCatalogVersion
                 });
-                let responseData1 = await res1.json()
-                if (responseData1.status === "ok") {
-                    $("#span_executable").text($("#executable").val())
-
-                } else {
-
-                    bootbox.alert({
-                        title: responseData1.error,
-                        message: responseData1.error_data
+                persistCatalogSelectionState();
+                if ($("#executable").length && $("#executable").val()) {
+                    await apiFetch(`/api/v2/servers/${serverId}/`, "PATCH", {
+                        executable: $("#executable").val()
                     });
                 }
             } else {
-                let payload = { "executable_update_url": $("#executable_update_url").val(), "executable": $("#executable").val() }
-                let formDataJsonString = JSON.stringify(payload)
-                let res = await fetch(`/api/v2/servers/${serverId}/`, {
-                    method: 'PATCH',
-                    body: formDataJsonString,
-                    headers: {
-                        'X-XSRFToken': token
-                    },
+                await apiFetch(`/api/v2/servers/${serverId}/`, "PATCH", {
+                    executable_update_url: $("#executable_update_url").val(),
+                    executable: $("#executable").val()
                 });
-                let responseData = await res.json()
-                if (responseData.status === "ok") {
-                    $("#update-url").text(responseData.data["executable_update_url"])
-
-                } else {
-
-                    bootbox.alert({
-                        title: responseData.error,
-                        message: responseData.error_data
-                    });
-                }
             }
-        });
-        $(document).ready(function () {
-            webSocket.on('remove_spinner', function (data) {
-                globalThis.location.href = `/panel/server_detail?id=${data.server_id}&subpage=term`
+        } catch (err) {
+            bootbox.alert({
+                title: "Unable to save executable settings",
+                message: String(err.message || err),
             });
+        }
+    });
+
+    async function saveModpackConfig() {
+        if (!serverId) {
+            bootbox.alert({
+                title: "Unable to save modpack config",
+                message: "Missing server ID in URL.",
+            });
+            return false;
+        }
+        const projectId = parseInt($("#cf_project_id").val() || "0", 10);
+        const fileId = parseInt($("#cf_file_id").val() || "0", 10);
+        const payload = {
+            cf_project_id: Number.isNaN(projectId) ? 0 : projectId,
+            cf_file_id: Number.isNaN(fileId) ? 0 : fileId,
+            cf_purge_paths: $("#cf_purge_paths").val() || "",
+            cf_overlay_dir: ($("#cf_overlay_dir").val() || "").trim()
+        };
+        try {
+            const response = await apiFetch(`/api/v2/servers/${serverId}/update/config/`, "PATCH", payload);
+            if (response.data) {
+                $("#cf_project_id").val(response.data.cf_project_id || 0);
+                $("#cf_file_id").val(response.data.cf_file_id || 0);
+                $("#cf_purge_paths").val(response.data.cf_purge_paths || "");
+                $("#cf_overlay_dir").val(response.data.cf_overlay_dir || "");
+            }
+            return true;
+        } catch (err) {
+            bootbox.alert({
+                title: "Unable to save modpack config",
+                message: String(err.message || err),
+            });
+            return false;
+        }
+    }
+
+    async function saveModpackConfigClick() {
+        await saveModpackConfig();
+    }
+
+    async function runModpackUpdateClick() {
+        const saved = await saveModpackConfig();
+        if (!saved) {
+            return;
+        }
+        confirmModpackUpdateStart(function () {
+            sendCommand("update_modpack");
+        });
+    }
+
+    $(document).ready(function () {
+        $("#update_progress_stage").text("Idle");
+
+        $(document).on("click", "#save_modpack_config", function (event) {
+            event.preventDefault();
+            saveModpackConfigClick();
         });
 
-        webSocket.on('backup_status', function (backup) {
-            let progress = backup.percent;
-            try {
-                if (progress < 100) {
-                    $("#download-progress").removeClass("d-none");
-                    $("#download-progress-bar").css("width", progress);
-                    $("#download-progress-bar").text(progress);
-                }
-            } catch {
-                console.log("Could not find dom element for update")
-            }
+        $(document).on("click", "#run_modpack_update", function (event) {
+            event.preventDefault();
+            runModpackUpdateClick();
         });
-    </script>
-    {% end %}
+
+        $(document).on("click", "#update_executable", function (event) {
+            event.preventDefault();
+            confirmExecutableUpdateStart();
+        });
+
+        if (webSocket && typeof webSocket.on === "function") {
+            webSocket.on('remove_spinner', function (data) {
+                if (!data || String(data.server_id) !== String(serverId)) {
+                    return;
+                }
+                setUpdateProgress(100, "Task finished.", "success");
+                activeUpdateMode = null;
+            });
+
+            webSocket.on('backup_status', function (backup) {
+                if (activeUpdateMode !== "modpack") {
+                    return;
+                }
+                const progress = backup.percent;
+                if (typeof progress === "undefined" || progress === null) {
+                    return;
+                }
+                const mapped = 20 + (toNumberPercent(progress) * 0.20);
+                setUpdateProgress(mapped, `Backup ${Math.round(toNumberPercent(progress))}%`, "running");
+            });
+
+            webSocket.on('download_progress', function (progress) {
+                const numeric = toNumberPercent(progress);
+                if (activeUpdateMode === "modpack") {
+                    const mapped = 55 + (numeric * 0.30);
+                    setUpdateProgress(mapped, `Download ${Math.round(numeric)}%`, "running");
+                } else {
+                    setUpdateProgress(numeric, `Download ${Math.round(numeric)}%`, "running");
+                }
+            });
+
+            webSocket.on('modpack_update_progress', function (data) {
+                if (!data || String(data.server_id) !== String(serverId)) {
+                    return;
+                }
+                activeUpdateMode = "modpack";
+                setUpdateProgress(
+                    data.progress,
+                    data.stage || "Working...",
+                    data.state || "running"
+                );
+            });
+        }
+
+        if ($("#ba").val() === "0") {
+            restoreCatalogSelectionState();
+        }
+    });
+</script>
+{% end %}
+
+
+
+

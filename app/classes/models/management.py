@@ -30,6 +30,7 @@ class CraftySettings(BaseModel):
     id = AutoField()
     secret_api_key = CharField(default="")
     cookie_secret = CharField(default="")
+    curseforge_api_key = CharField(default="")
     login_photo = CharField(default="login_1.jpg")
     login_opacity = IntegerField(default=100)
     master_server_dir = CharField(default="")
@@ -185,6 +186,7 @@ class HelpersManagement:
             {
                 CraftySettings.secret_api_key: "",
                 CraftySettings.cookie_secret: "",
+                CraftySettings.curseforge_api_key: "",
                 CraftySettings.login_photo: "login_1.jpg",
                 CraftySettings.login_opacity: 100,
             }
@@ -219,6 +221,21 @@ class HelpersManagement:
         CraftySettings.update({CraftySettings.cookie_secret: key}).where(
             CraftySettings.id == 1
         ).execute()
+
+    @staticmethod
+    def set_curseforge_api_key(key):
+        CraftySettings.update({CraftySettings.curseforge_api_key: key}).where(
+            CraftySettings.id == 1
+        ).execute()
+
+    @staticmethod
+    def get_curseforge_api_key():
+        settings = (
+            CraftySettings.select(CraftySettings.curseforge_api_key)
+            .where(CraftySettings.id == 1)
+            .first()
+        )
+        return settings.curseforge_api_key
 
     # **********************************************************************************
     #                                  Config Methods

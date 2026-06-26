@@ -9,6 +9,41 @@ body.sidebar-icon-only .navbar-toggler .mdi-chevron-double-left {
     display: none;
 }
 
+/* Top-left brand logo tuning */
+.navbar.default-layout .navbar-brand-wrapper .navbar-brand img {
+    width: 220px;
+    max-width: 100%;
+    position: relative;
+    top: -30px;
+}
+
+.navbar.default-layout .navbar-brand-wrapper .brand-logo-mini img {
+    width: 56px;
+    max-width: 100%;
+    position: relative;
+    top: -2px;
+}
+
+.navbar.default-layout .navbar-brand-wrapper .no-logo-link {
+    pointer-events: none;
+    cursor: default;
+}
+
+.navbar.default-layout .navbar-brand-wrapper .no-logo-link img {
+    pointer-events: none;
+}
+
+/* Keep sidebar menu clear of enlarged custom logo area */
+.sidebar .nav {
+    padding-top: 22px;
+}
+
+/* Collapsed sidebar needs its own mini logo placement */
+.sidebar-icon-only .navbar.default-layout .navbar-brand-wrapper .brand-logo-mini img {
+    width: 44px;
+    top: 6px;
+}
+
 /**************************************************************/
 
 /**************************************************************/
