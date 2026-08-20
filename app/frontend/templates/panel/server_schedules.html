@@ -116,6 +116,10 @@
                               class="btn btn-info">
                               <i class="ph-fill ph-pencil-simple"></i>
                             </button>
+                            <button data-sch="{{ schedule.schedule_id }}" class="btn btn-success run_now_button"
+                              title="{{ translate('serverSchedules', 'runNow', data['lang']) }}">
+                              <i class="ph-fill ph-play" aria-hidden="true"></i>
+                            </button>
                             <button data-sch={{ schedule.schedule_id }} class="btn btn-danger del_button">
                               <i class="ph-fill ph-trash-simple" aria-hidden="true"></i>
                             </button>
@@ -434,6 +438,23 @@
       globalThis.location.reload();
     }
   }
+
+  $(".run_now_button").click(async function () {
+    const button = $(this);
+    const schId = button.data('sch');
+    if (!confirm("{{ translate('serverSchedules', 'confirmRunNow', data['lang']) }}")) return;
+    button.prop('disabled', true);
+    try {
+      const response = await fetch(`/api/v2/servers/${serverId}/tasks/${schId}/run`, {
+        method: 'POST',
+        headers: { 'X-XSRFToken': getCookie('_xsrf') }
+      });
+      const payload = await response.json();
+      bootbox.alert(response.ok ? "{{ translate('serverSchedules', 'taskQueued', data['lang']) }}" : (payload.error_data || payload.error));
+    } finally {
+      button.prop('disabled', false);
+    }
+  });
 
 </script>
 

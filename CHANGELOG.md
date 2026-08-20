@@ -6,6 +6,11 @@
 - Clear the importing state when a Forge or NeoForge installer exits unsuccessfully.
 - Convert wizard JVM memory values from GiB to MiB and reject heaps that exceed a configured server memory cap.
 - Security: reject traversal attempts in server, import, background, and chunked upload paths.
+- Display Hytale ban data correctly and hide Minecraft-only moderation controls for Hytale servers.
+- Add a permission-checked “Run Now” action for scheduled tasks.
+- Security: restrict profile-image uploads to a conservative image MIME allowlist.
+- Prevent update checks from failing on non-timeout request errors; cap `session.log` at 1 GiB;
+  and retain reaction schedules when edited.
 - Keep active players first in player management and sort entries by most recently seen.
 ### Tweaks
 - Reorganize player-management tables: players first, OPs beside whitelist entries, and player bans beside IP bans.

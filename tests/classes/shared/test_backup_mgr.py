@@ -1,9 +1,11 @@
 from pathlib import Path
 from unittest.mock import MagicMock, Mock
+from zipfile import ZipFile
 
 import pytest
 
 from app.classes.shared.backup_mgr import BackupManager
+from app.classes.helpers.file_helpers import FileHelpers
 
 
 @pytest.mark.parametrize(
@@ -145,6 +147,33 @@ def test_validate_backup_location_success(test_case: tuple[str, str]):
     assert (
         mgr.validate_backup_location(mock_server_instance, mock_backup_config) is True
     )
+
+
+def test_make_backup_excludes_nested_directory_on_all_path_styles(monkeypatch, tmp_path):
+    source = tmp_path / "server"
+    excluded = source / "world" / "region"
+    included = source / "config"
+    excluded.mkdir(parents=True)
+    included.mkdir(parents=True)
+    (excluded / "r.0.0.mca").write_text("excluded", encoding="utf-8")
+    (included / "server.properties").write_text("included", encoding="utf-8")
+
+    monkeypatch.setattr(
+        "app.classes.helpers.file_helpers.WebSocketManager",
+        lambda: MagicMock(),
+    )
+    helper = FileHelpers(MagicMock(human_readable_file_size=lambda _size: "1 B"))
+    archive_stem = tmp_path / "backup"
+
+    assert helper.make_backup(
+        str(archive_stem), str(source), ["world/region"], "server", 1
+    )
+
+    with ZipFile(str(archive_stem) + ".zip") as archive:
+        names = archive.namelist()
+
+    assert any(name.endswith("config/server.properties") for name in names)
+    assert not any(name.endswith("world/region/r.0.0.mca") for name in names)
 
 
 @pytest.mark.parametrize(

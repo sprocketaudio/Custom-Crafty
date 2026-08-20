@@ -680,6 +680,9 @@
         "no": "No",
         "no-schedule": "There are currently no schedules for this server. To get started, click",
         "scheduledTasks": "Scheduled Tasks",
+        "runNow": "Run Now",
+        "confirmRunNow": "This will immediately execute this task's action. Continue?",
+        "taskQueued": "Task has been queued for execution.",
         "yes": "Yes"
     },
     "serverStats": {

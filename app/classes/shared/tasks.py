@@ -627,14 +627,14 @@ class TasksManager:
         if job_data is None:
             return
 
-        if job_data["interval"] != "reaction":
+        if job_data["interval_type"] != "reaction":
             self._remove_scheduler_job_if_present(
                 sch_id,
                 "No job found in update job. "
                 "Assuming it was previously disabled. Starting new job.",
             )
 
-        if job_data["enabled"] and job_data["interval"] != "reaction":
+        if job_data["enabled"] and job_data["interval_type"] != "reaction":
             command_data: QueuedCommandData = {
                 "server_id": job_data["server_id"],
                 "user_id": self.users_controller.get_id_by_name("system"),
@@ -673,6 +673,24 @@ class TasksManager:
                 f"APScheduler found no scheduled job on schedule update for "
                 f"schedule with id: {sch_id} Assuming it was already disabled.",
             )
+
+    def run_task_now(self, schedule_id, user_id, server_id):
+        """Queue a schedule's configured command immediately after ownership checks."""
+        task = self.controller.management.get_scheduled_task(schedule_id)
+        task_server_id = task["server_id"]
+        if isinstance(task_server_id, dict):
+            task_server_id = task_server_id["server_id"]
+        if str(task_server_id) != str(server_id):
+            raise ValueError(f"Task {schedule_id} does not belong to server {server_id}")
+
+        self.controller.management.queue_command(
+            {
+                "server_id": task_server_id,
+                "user_id": user_id,
+                "command": task["command"],
+                "action_id": task.get("action_id"),
+            }
+        )
 
     def schedule_watcher(self, event):
         if event.exception:

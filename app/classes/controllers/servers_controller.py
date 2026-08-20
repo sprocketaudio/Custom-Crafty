@@ -16,6 +16,7 @@ from app.classes.helpers.helpers import Helpers
 from app.classes.shared.main_models import DatabaseShortcuts
 
 from app.classes.remote_stats.stats import Stats
+from app.classes.servers import hytale
 
 from app.classes.models.servers import HelperServers
 from app.classes.models.users import HelperUsers, ApiKeys
@@ -663,6 +664,9 @@ class ServersController(metaclass=Singleton):
 
     @staticmethod
     def get_banned_players(server_id):
+        if HelperServers.get_server_type_by_id(server_id) == "hytale":
+            server_data = HelperServers.get_server_data_by_id(server_id)
+            return hytale.get_banned_players(server_data["path"])
         return ServersController._load_server_json_list(server_id, "banned-players.json")
 
     @staticmethod

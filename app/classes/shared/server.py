@@ -3356,7 +3356,7 @@ class ServerInstance:
                     "Server version check failed. Invalid url: %s",
                     self.server_object.executable_update_url,
                 )
-        except TimeoutError as why:
+        except (TimeoutError, requests.exceptions.RequestException) as why:
             self.update_available = False
             return logger.error("Could not capture remote URL hash with error %s", why)
         remote_hash = None

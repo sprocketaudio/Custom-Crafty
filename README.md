@@ -3,11 +3,20 @@
 > Private custom build for local server management.
 
 ## Version Lineage
-- **Current local/custom version:** `4.10.8`
-- **Upstream base used for this custom line:** `Crafty v4.10.3`
-- **Upstream fixes selectively backported through:** `Crafty v4.10.8` (including upload-path security hardening).
-- **Next upstream delta to review:** `Crafty v4.10.7` terminal-buffer CPU fix (`4aa2bc7e`) and non-security 4.10.8 fixes.
-- This repo is intentionally customized beyond upstream for private use.
+- **Current custom release:** `4.10.8` — up to date with official Crafty `v4.10.8`.
+- **Historical upstream merge base:** `Crafty v4.10.3` (`0443b939`). This is the shared
+  ancestry of the custom line, not the effective feature/fix level.
+- **Upstream status:** up to date with `v4.10.8`; this custom fork uses equivalent custom
+  implementations where an upstream refactor would conflict with local features.
+- **Ported custom release scope:** Forge/NeoForge build selection and installer recovery; JVM
+  memory validation; upload hardening; schedule Run Now; Hytale-aware player controls; player
+  ordering/layout; telemetry; CPU affinity and memory caps.
+- **Intentional divergence from upstream:** shared player-management and upload-route refactors,
+  translations/CI churn, and architecture-only cleanup are not merged where they would overwrite
+  or complicate custom behavior.
+- **Future update rule:** compare the next official upstream release against this section and
+  selectively port security fixes and compatible behavior; do not use the `4.10.3` merge base as
+  an indicator that all intervening work is missing.
 
 ## What This Repo Is For
 - Running Crafty locally on Windows/Linux for Minecraft server management.
@@ -21,6 +30,10 @@
 - Forge/NeoForge creation uses the selected loader build, safe argument-vector launches on Linux,
   and JVM heap values entered in GiB are converted to MiB before launch.
 - Upload destinations and chunk staging paths are constrained to their approved roots.
+- Player-management controls adapt to the server game type; Hytale bans use Hytale's own data and commands.
+- Schedules can be manually queued from the Schedule page, subject to the existing Schedule permission.
+- Profile image uploads accept only a small raster-image allowlist; update checks tolerate
+  request failures without breaking the watcher.
 
 ## Player Management Enhancements
 - Expanded page layout with dedicated sections for:

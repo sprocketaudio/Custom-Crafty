@@ -39,6 +39,7 @@
       "class": "logging.handlers.RotatingFileHandler",
       "formatter": "commander",
       "filename": "logs/session.log",
+      "maxBytes": 1073741824,
       "backupCount": 0,
       "encoding": "utf8"
     },
