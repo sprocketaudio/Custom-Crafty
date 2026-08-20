@@ -36,6 +36,7 @@ from app.classes.shared.authentication import Authentication
 from app.classes.shared.console import Console
 from app.classes.helpers.helpers import Helpers
 from app.classes.helpers.file_helpers import FileHelpers
+from app.classes.helpers.memory_limit import validate_java_heap_sizes
 from app.classes.shared.import_helper import ImportHelpers
 from app.classes.big_bucket.bigbucket import BigBucket
 from app.classes.shared.websocket_manager import WebSocketManager
@@ -449,7 +450,10 @@ class Controller:
                 if create_data["type"] in MODDED_TYPES:  # Modded types need version
                     # because that's how we create the execution command.
                     # This needs to be changed in the future. Too messy.
-                    server_file = f"{create_data['type']}-{create_data['version']}.jar"
+                    loader_version = create_data.get(
+                        "loader_version", create_data["version"]
+                    )
+                    server_file = f"{create_data['type']}-{loader_version}.jar"
 
                 # Create an EULA file
                 if "agree_to_eula" in create_data:
@@ -469,10 +473,13 @@ class Controller:
             min_mem = create_data["mem_min"]
             max_mem = create_data["mem_max"]
 
-            full_jar_path = os.path.join(new_server_path, server_file)
+            min_mem_mib, max_mem_mib = validate_java_heap_sizes(
+                min_mem,
+                max_mem,
+                int(data.get("memory_limit_mib", 0) or 0),
+            )
 
-            def _gibs_to_mibs(gibs: float) -> str:
-                return str(int(gibs * 1024))
+            full_jar_path = os.path.join(new_server_path, server_file)
 
             def _wrap_jar_if_windows():
                 return f'"{server_file}"' if Helpers.is_os_windows() else server_file
@@ -482,33 +489,33 @@ class Controller:
                     # Let's check for and setup for install server commands
                     if create_data["type"] in MODDED_TYPES:
                         server_command = (
-                            f"java -Xms{Helpers.float_to_string(min_mem)}M "
-                            f"-Xmx{Helpers.float_to_string(max_mem)}M "
+                            f"java -Xms{min_mem_mib}M "
+                            f"-Xmx{max_mem_mib}M "
                             f'-jar "{server_file}" --installServer'
                         )
                     else:
                         server_command = (
-                            f"java -Xms{Helpers.float_to_string(min_mem)}M "
-                            f"-Xmx{Helpers.float_to_string(max_mem)}M "
+                            f"java -Xms{min_mem_mib}M "
+                            f"-Xmx{max_mem_mib}M "
                             f'-jar "{server_file}" nogui'
                         )
                 else:
                     if create_data["type"] in MODDED_TYPES:
                         server_command = (
-                            f"java -Xms{Helpers.float_to_string(min_mem)}M "
-                            f"-Xmx{Helpers.float_to_string(max_mem)}M "
+                            f"java -Xms{min_mem_mib}M "
+                            f"-Xmx{max_mem_mib}M "
                             f"-jar {server_file} --installServer"
                         )
                     else:
                         server_command = (
-                            f"java -Xms{Helpers.float_to_string(min_mem)}M "
-                            f"-Xmx{Helpers.float_to_string(max_mem)}M "
+                            f"java -Xms{min_mem_mib}M "
+                            f"-Xmx{max_mem_mib}M "
                             f"-jar {server_file} nogui"
                         )
             else:
                 server_command = (
-                    f"java -Xms{_gibs_to_mibs(min_mem)}M "
-                    f"-Xmx{_gibs_to_mibs(max_mem)}M "
+                    f"java -Xms{min_mem_mib}M "
+                    f"-Xmx{max_mem_mib}M "
                     f"-jar {_wrap_jar_if_windows()} nogui"
                 )
 
@@ -624,6 +631,14 @@ class Controller:
                     create_data["version"],
                     full_jar_path,
                     new_server_id,
+                    (
+                        self.big_bucket.get_loader_fetch_url(
+                            create_data["type"], create_data["loader_version"]
+                        )
+                        if create_data["type"] in MODDED_TYPES
+                        and create_data.get("loader_version")
+                        else None
+                    ),
                 )
             elif root_create_data["create_type"] == "import_server":
                 existing_archive_path = self.file_helper.get_absolute_path(

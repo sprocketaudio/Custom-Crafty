@@ -1,7 +1,10 @@
 import logging
+import re
+import xml.etree.ElementTree as ET
 
 from jsonschema import ValidationError, validate
 import orjson
+import requests
 from app.classes.helpers.cpu_affinity import (
     CpuAffinityValidationError,
     canonicalize_cpu_affinity,
@@ -10,6 +13,7 @@ from app.classes.helpers.cpu_affinity import (
 from app.classes.helpers.memory_limit import (
     MemoryLimitValidationError,
     canonicalize_memory_limit_mib,
+    validate_java_heap_sizes,
 )
 from app.classes.models.crafty_permissions import EnumPermissionsCrafty
 from app.classes.web.base_api_handler import BaseApiHandler
@@ -25,6 +29,7 @@ ARCHIVE_PATH_DESCRIPTION = "Path to internal zip folder"
 ARCHIVE_PATH_EXAMPLE = "server_files/my_server/"
 MIN_MEM = "Minimum JVM memory (in GiBs)"
 MAX_MEM = "Maximum JVM memory (in GiBs)"
+MODDED_INSTALLERS = ("forge-installer", "neoforge-installer")
 
 new_server_schema = {
     "definitions": {},
@@ -264,6 +269,14 @@ new_server_schema = {
                             "title": "Server JAR Version",
                             "type": "string",
                             "examples": ["1.18.2"],
+                            "minLength": 1,
+                            "error": "typeString",
+                            "fill": True,
+                        },
+                        "loader_version": {
+                            "title": "Forge/NeoForge loader build",
+                            "type": "string",
+                            "pattern": r"^[0-9A-Za-z._-]+$",
                             "minLength": 1,
                             "error": "typeString",
                             "fill": True,
@@ -935,10 +948,65 @@ new_server_schema = {
 
 
 class ApiServersIndexHandler(BaseApiHandler):
+    FORGE_MAVEN_METADATA_URL = (
+        "https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml"
+    )
+    NEOFORGE_MAVEN_METADATA_URL = (
+        "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml"
+    )
+
+    @staticmethod
+    def _loader_versions(jar_type: str, mc_version: str) -> list[str]:
+        if not re.fullmatch(r"[0-9.]+", mc_version):
+            return []
+        metadata_url = (
+            ApiServersIndexHandler.FORGE_MAVEN_METADATA_URL
+            if jar_type == "forge-installer"
+            else ApiServersIndexHandler.NEOFORGE_MAVEN_METADATA_URL
+        )
+        try:
+            response = requests.get(metadata_url, timeout=10)
+            response.raise_for_status()
+            versions = [
+                node.text.strip()
+                for node in ET.fromstring(response.text).findall(".//version")
+                if node.text and node.text.strip()
+            ]
+            if jar_type == "forge-installer":
+                prefix = f"{mc_version}-"
+            else:
+                version_parts = mc_version.split(".")
+                prefix = ".".join(version_parts[1:]) + "."
+            return [version for version in reversed(versions) if version.startswith(prefix)]
+        except (requests.RequestException, ET.ParseError) as why:
+            logger.warning("Unable to retrieve %s builds: %s", jar_type, why)
+            return []
+
     def get(self):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
+
+        jar_type = str(self.get_query_argument("loader_type", "")).strip()
+        mc_version = str(self.get_query_argument("mc_version", "")).strip()
+        if jar_type:
+            if EnumPermissionsCrafty.SERVER_CREATION not in auth_data[1]:
+                return self.finish_json(
+                    400,
+                    {"status": "error", "error": "NOT_AUTHORIZED"},
+                )
+            if jar_type not in MODDED_INSTALLERS:
+                return self.finish_json(
+                    400,
+                    {"status": "error", "error": "INVALID_LOADER_TYPE"},
+                )
+            return self.finish_json(
+                200,
+                {
+                    "status": "ok",
+                    "data": {"build_versions": self._loader_versions(jar_type, mc_version)},
+                },
+            )
 
         # TODO: limit some columns for specific permissions
 
@@ -995,6 +1063,29 @@ class ApiServersIndexHandler(BaseApiHandler):
                 },
             )
 
+        try:
+            create_data = data["minecraft_java_create_data"][
+                "download_jar_create_data"
+            ]
+            if (
+                create_data["type"] in MODDED_INSTALLERS
+                and not create_data.get("loader_version")
+            ):
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "LOADER_BUILD_REQUIRED",
+                        "error_data": (
+                            "Select the exact Forge or NeoForge build before "
+                            "creating this server."
+                        ),
+                    },
+                )
+        except KeyError:
+            # This is a non-Java or Java-import creation request.
+            pass
+
         if "cpu_affinity" in data:
             if not superuser:
                 return self.finish_json(
@@ -1043,6 +1134,26 @@ class ApiServersIndexHandler(BaseApiHandler):
                     {
                         "status": "error",
                         "error": "INVALID_MEMORY_LIMIT",
+                        "error_data": str(why),
+                    },
+                )
+        if data["create_type"] == "minecraft_java":
+            try:
+                root_create_data = data["minecraft_java_create_data"]
+                create_data = root_create_data[
+                    root_create_data["create_type"] + "_create_data"
+                ]
+                validate_java_heap_sizes(
+                    create_data["mem_min"],
+                    create_data["mem_max"],
+                    data.get("memory_limit_mib", 0),
+                )
+            except MemoryLimitValidationError as why:
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_JAVA_MEMORY",
                         "error_data": str(why),
                     },
                 )

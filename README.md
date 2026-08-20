@@ -1,12 +1,12 @@
 [![Crafty Logo](app/frontend/static/assets/images/logo_long.svg)](https://craftycontrol.com)
-# Custom Crafty Controller 4.10.6
+# Custom Crafty Controller 4.10.8
 > Private custom build for local server management.
 
 ## Version Lineage
-- **Current local/custom version:** `4.10.6`
+- **Current local/custom version:** `4.10.8`
 - **Upstream base used for this custom line:** `Crafty v4.10.3`
-- **Upstream fixes selectively backported through:** `Crafty v4.10.6`
-- **Next upstream delta to review:** `Crafty v4.10.7` terminal-buffer CPU fix (`4aa2bc7e`).
+- **Upstream fixes selectively backported through:** `Crafty v4.10.8` (including upload-path security hardening).
+- **Next upstream delta to review:** `Crafty v4.10.7` terminal-buffer CPU fix (`4aa2bc7e`) and non-security 4.10.8 fixes.
 - This repo is intentionally customized beyond upstream for private use.
 
 ## What This Repo Is For
@@ -18,6 +18,9 @@
 - NBT editor support for `.dat` files with split permissions (`NBT_READ` / `NBT_WRITE`)
   and automatic backup on NBT save.
 - CurseForge modpack updater in Update Center (API key + per-server profile).
+- Forge/NeoForge creation uses the selected loader build, safe argument-vector launches on Linux,
+  and JVM heap values entered in GiB are converted to MiB before launch.
+- Upload destinations and chunk staging paths are constrained to their approved roots.
 
 ## Player Management Enhancements
 - Expanded page layout with dedicated sections for:

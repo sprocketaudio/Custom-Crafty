@@ -1,4 +1,16 @@
 # Changelog
+## --- [4.10.8] - 2026/08/20
+### New features
+- Let operators select the exact Forge or NeoForge installer build when creating a modded server.
+### Bug fixes
+- Clear the importing state when a Forge or NeoForge installer exits unsuccessfully.
+- Convert wizard JVM memory values from GiB to MiB and reject heaps that exceed a configured server memory cap.
+- Security: reject traversal attempts in server, import, background, and chunked upload paths.
+- Keep active players first in player management and sort entries by most recently seen.
+### Tweaks
+- Reorganize player-management tables: players first, OPs beside whitelist entries, and player bans beside IP bans.
+<br><br>
+
 ## --- [4.10.3] - 2026/04/13
 ### Refactor
 - Sonar refactor: tasks.py ([Merge Request](https://gitlab.com/crafty-controller/crafty-4/-/merge_requests/999))

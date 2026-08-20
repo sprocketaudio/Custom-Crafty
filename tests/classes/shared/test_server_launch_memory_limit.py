@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+import app.classes.shared.server as server_module
 from app.classes.shared.server import ServerInstance
 
 
@@ -193,3 +194,28 @@ def test_get_memory_limit_capability_refreshes_cached_unsupported_result():
     result = instance._get_memory_limit_capability()
 
     assert result == refreshed_capability
+
+
+def test_failed_forge_installer_clears_import_status_without_reconfiguring(monkeypatch):
+    instance = ServerInstance.__new__(ServerInstance)
+    instance.server_id = "srv-forge-failure"
+    instance.process = SimpleNamespace(poll=lambda: 1)
+    completed_imports = []
+    instance.stats_helper = SimpleNamespace(
+        finish_import=lambda: completed_imports.append(True)
+    )
+
+    monkeypatch.setattr(
+        server_module.PermissionsServers,
+        "get_server_user_list",
+        lambda _server_id: [],
+    )
+    monkeypatch.setattr(
+        server_module.HelperServers,
+        "get_server_obj",
+        lambda _server_id: pytest.fail("failed installer must not reconfigure server"),
+    )
+
+    instance.forge_install_watcher()
+
+    assert completed_imports == [True]

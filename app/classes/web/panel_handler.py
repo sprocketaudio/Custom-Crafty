@@ -51,6 +51,27 @@ HUMANIZED_INDEX_FILE = "humanized_index.json"
 
 class PanelHandler(BaseHandler):
     @staticmethod
+    def _sort_cached_players(players: t.Iterable[t.Mapping[str, t.Any]]) -> list[dict]:
+        """Show active players first, then order each group by most recently seen."""
+
+        def last_seen_value(player: t.Mapping[str, t.Any]) -> float:
+            try:
+                return datetime.datetime.strptime(
+                    str(player.get("last_seen", "")), "%d/%m/%Y %H:%M"
+                ).timestamp()
+            except (TypeError, ValueError, OverflowError):
+                return float("-inf")
+
+        return sorted(
+            (dict(player) for player in players),
+            key=lambda player: (
+                0 if player.get("status") == "Online" else 1,
+                -last_seen_value(player),
+                str(player.get("name", "")).casefold(),
+            ),
+        )
+
+    @staticmethod
     def _normalize_sidebar_icon(icon_value: t.Any) -> t.Optional[str]:
         if icon_value in (None, False):
             return None
@@ -1117,7 +1138,9 @@ class PanelHandler(BaseHandler):
                 server_instance = self.controller.servers.get_server_instance_by_id(
                     server_id
                 )
-                page_data["cached_players"] = server_instance.player_cache
+                page_data["cached_players"] = self._sort_cached_players(
+                    server_instance.player_cache
+                )
 
                 for player in page_data["banned_players"]:
                     player["banned"] = True

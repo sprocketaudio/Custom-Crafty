@@ -439,6 +439,15 @@
         }
       }
       console.log(formDataObject);
+      const selectedVersionParts = formDataObject.version.split("|");
+      if (["forge-installer", "neoforge-installer"].includes(selectedVersionParts[1]) && !formDataObject.loader_version) {
+        $('.bootbox-close-button').click();
+        bootbox.alert({
+          title: 'LOADER_BUILD_REQUIRED',
+          message: 'Wait for the compatible loader builds, then select the exact Forge or NeoForge build to install.'
+        });
+        return;
+      }
       let send_data = {
         "name": formDataObject.name,
         "roles": calcRoles(),
@@ -451,14 +460,17 @@
         "minecraft_java_create_data": {
           "create_type": "download_jar",
           "download_jar_create_data": {
-            "category": formDataObject.version.split("|")[0],
-            "type": formDataObject.version.split("|")[1],
-            "version": formDataObject.version.split("|")[2],
+            "category": selectedVersionParts[0],
+            "type": selectedVersionParts[1],
+            "version": selectedVersionParts[2],
             "mem_min": formDataObject.mem_min,
             "mem_max": formDataObject.mem_max,
             "server_properties_port": formDataObject.port
           }
         }
+      }
+      if (formDataObject.loader_version) {
+        send_data.minecraft_java_create_data.download_jar_create_data.loader_version = formDataObject.loader_version;
       }
       if (Object.prototype.hasOwnProperty.call(formDataObject, "cpu_affinity")) {
         send_data.cpu_affinity = formDataObject.cpu_affinity.trim();

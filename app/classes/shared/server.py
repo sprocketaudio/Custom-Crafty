@@ -1456,6 +1456,31 @@ class ServerInstance:
             else:
                 # Process has exited. Lets do some work to setup the new
                 # run command.
+                exit_code = self.process.poll()
+                if exit_code != 0:
+                    # An installer failure must not be reported as a completed
+                    # import. In particular, keep the installer in place so the
+                    # operator can inspect its output and retry after fixing the
+                    # underlying problem.
+                    logger.error(
+                        "Forge/NeoForge installer for server %s exited with code %s.",
+                        self.server_id,
+                        exit_code,
+                    )
+                    Console.error(
+                        "Forge/NeoForge installer failed with exit code "
+                        f"{exit_code}."
+                    )
+                    self.stats_helper.finish_import()
+                    server_users = PermissionsServers.get_server_user_list(
+                        self.server_id
+                    )
+                    for user in server_users:
+                        WebSocketManager().broadcast_user(
+                            user, "send_start_reload", {}
+                        )
+                    break
+
                 # Let's grab the server object we're going to update.
                 server_obj: Servers = HelperServers.get_server_obj(self.server_id)
 
@@ -3028,6 +3053,7 @@ class ServerInstance:
         if not self.check_running():
             return
         server_players = self.get_formatted_server_players()
+        existing_players = {player["name"]: player for player in self.player_cache}
         for p in self.player_cache[:]:
             if p["status"] == "Online" and p["name"] not in server_players:
                 p["status"] = "Offline"
@@ -3038,13 +3064,15 @@ class ServerInstance:
             if player == "Anonymous Player":
                 # Skip Anonymous Player
                 continue
-            if player in self.player_cache:
-                self.player_cache.remove(player)
+            existing_player = existing_players.get(player, {})
+            last_seen = existing_player.get("last_seen")
+            if existing_player.get("status") != "Online" or not last_seen:
+                last_seen = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
             self.player_cache.append(
                 {
                     "name": player,
                     "status": "Online",
-                    "last_seen": datetime.datetime.now().strftime("%d/%m/%Y %H:%M"),
+                    "last_seen": last_seen,
                 }
             )
 

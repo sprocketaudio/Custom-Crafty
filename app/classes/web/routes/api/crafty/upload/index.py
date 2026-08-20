@@ -52,6 +52,25 @@ class ApiFilesUploadHandler(BaseApiHandler):
             self.upload_locks[key] = asyncio.Lock()
         return self.upload_locks[key]
 
+    def _validate_upload_paths(self) -> None:
+        """Fail closed unless the upload and its temporary chunks stay in scope."""
+        if not self.filename or Path(self.filename).name != self.filename:
+            raise ValueError("Upload filename must not contain a path.")
+
+        upload_root = Path(self.upload_dir).resolve()
+        self.helper.validate_traversal(upload_root, upload_root / self.filename)
+
+        if self.chunked:
+            if not self.file_id or not str(self.file_id).strip():
+                raise ValueError("Chunked uploads require a file ID.")
+            chunk_index = getattr(self, "chunk_index", None)
+            if chunk_index is not None and not str(chunk_index).isdigit():
+                raise ValueError("Chunked upload index must be numeric.")
+            temp_root = Path(self.controller.project_root, "temp").resolve()
+            self.temp_dir = self.helper.validate_traversal(
+                temp_root, temp_root / str(self.file_id)
+            )
+
     async def post(self, server_id=None):
         auth_data = self.authenticate_user()
         if not auth_data:
@@ -136,17 +155,22 @@ class ApiFilesUploadHandler(BaseApiHandler):
         # Get the headers from the request
         self.chunk_hash = self.request.headers.get("chunkHash", 0)
         self.file_id = self.request.headers.get("fileId")
-        self.chunked = self.request.headers.get("chunked", False)
+        self.chunked = self.request.headers.get("chunked", "").lower() == "true"
         self.filename = self.request.headers.get("fileName", None)
         try:
             file_size = int(self.request.headers.get("fileSize", None))
             total_chunks = int(self.request.headers.get("totalChunks", 0))
-        except TypeError as why:
+        except (TypeError, ValueError) as why:
             return self.finish_json(
                 400, {"status": "error", "error": "TYPE ERROR", "error_data": {why}}
             )
+        if file_size < 0 or total_chunks < 0:
+            return self.finish_json(
+                400,
+                {"status": "error", "error": "TYPE ERROR", "error_data": "Negative size"},
+            )
         self.chunk_index = self.request.headers.get("chunkId")
-        self.temp_dir = os.path.join(self.controller.project_root, "temp", self.file_id)
+        self.temp_dir = None
 
         if u_type == "server_upload":
             # Check for absolute or relative path. Absolute paths should be deprecated
@@ -175,6 +199,18 @@ class ApiFilesUploadHandler(BaseApiHandler):
                         ),
                     },
                 )
+        try:
+            self._validate_upload_paths()
+        except ValueError as why:
+            logger.warning("Rejected unsafe upload path: %s", why)
+            return self.finish_json(
+                400,
+                {
+                    "status": "error",
+                    "error": "TRAVERSAL_DETECTED",
+                    "error_data": str(why),
+                },
+            )
         # Check to make sure the file type we're being sent is what we're expecting
         if (
             self.file_helper.check_mime_types(self.filename) not in accepted_types
@@ -297,7 +333,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
 
         # File paths
         file_path = os.path.join(self.upload_dir, self.filename)
-        chunk_path = os.path.join(
+        chunk_path = self.helper.validate_traversal(
             self.temp_dir, f"{self.filename}.part{self.chunk_index}"
         )
 
@@ -329,7 +365,7 @@ class ApiFilesUploadHandler(BaseApiHandler):
                                 "file_id": self.file_id,
                             },
                         )
-                        chunk_file = os.path.join(
+                        chunk_file = self.helper.validate_traversal(
                             self.temp_dir, f"{self.filename}.part{i}"
                         )
                         async with await anyio.open_file(chunk_file, "rb") as infile:

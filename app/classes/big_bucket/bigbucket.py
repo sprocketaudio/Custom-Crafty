@@ -3,6 +3,7 @@ import json
 import threading
 import time
 import logging
+import re
 from datetime import datetime
 import requests
 
@@ -184,22 +185,41 @@ class BigBucket:
             logger.error(f"An error occurred while constructing fetch URL: {e}")
             return None
 
-    def download_jar(self, jar, server, version, path, server_id):
+    @staticmethod
+    def get_loader_fetch_url(server: str, loader_version: str) -> str | None:
+        """Return the official installer URL for a validated Forge-family build."""
+        if not re.fullmatch(r"[0-9A-Za-z._-]+", loader_version):
+            return None
+        if server == "forge-installer":
+            return (
+                "https://maven.minecraftforge.net/net/minecraftforge/forge/"
+                f"{loader_version}/forge-{loader_version}-installer.jar"
+            )
+        if server == "neoforge-installer":
+            return (
+                "https://maven.neoforged.net/releases/net/neoforged/neoforge/"
+                f"{loader_version}/neoforge-{loader_version}-installer.jar"
+            )
+        return None
+
+    def download_jar(self, jar, server, version, path, server_id, fetch_url=None):
         update_thread = threading.Thread(
             name=f"server_download-{server_id}-{server}-{version}",
             target=self.a_download_jar,
             daemon=True,
-            args=(jar, server, version, path, server_id),
+            args=(jar, server, version, path, server_id, fetch_url),
         )
         update_thread.start()
 
-    def a_download_jar(self, jar, server, version, path, server_id):
+    def a_download_jar(self, jar, server, version, path, server_id, fetch_url=None):
         """
         Downloads a server JAR file and performs post-download actions including
         notifying users and setting import status.
 
         This method waits for the server registration to complete, retrieves the
-        download URL for the specified server JAR file.
+        download URL for the specified server JAR file. ``fetch_url`` can provide
+        an exact, validated Forge or NeoForge installer URL instead of the
+        catalog's default URL.
 
         Upon successful download, it either runs the installer for
         Forge servers or simply finishes the import process for other types. It
@@ -224,7 +244,7 @@ class BigBucket:
         # delaying download for server register to finish
         time.sleep(3)
 
-        fetch_url = self.get_fetch_url(jar, server, version)
+        fetch_url = fetch_url or self.get_fetch_url(jar, server, version)
         if not fetch_url:
             return False
 

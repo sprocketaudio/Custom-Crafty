@@ -35,9 +35,18 @@
 <div class="col-sm-12">
     <div class="form-group">
         <label for="server_version">{{ translate('serverWizard', 'serverVersion', data['lang']) }}</label>
-        <select required class="form-control form-control-lg select-css" id="server" name="version">
+        <select required class="form-control form-control-lg select-css" id="server" name="version" onchange="loaderVersionChange()">
             <option value="">{{ translate('serverWizard', 'selectVersion', data['lang']) }}</option>
         </select>
+    </div>
+</div>
+<div class="col-sm-12 d-none" id="loader-version-group">
+    <div class="form-group">
+        <label for="loader_version">Forge / NeoForge Build Version</label>
+        <select class="form-control form-control-lg select-css" id="loader_version" name="loader_version" disabled>
+            <option value="">Select loader build</option>
+        </select>
+        <small class="form-text text-muted">This is the exact Forge or NeoForge installer build to download.</small>
     </div>
 </div>
 <span data-html="true" class="version-hint text-center"
@@ -46,6 +55,52 @@
 <script type="text/javascript">
     const text = '{% raw data["js_server_types"] %}';
     const serverTypesLists = JSON.parse(text);
+
+    function clearLoaderVersions() {
+        const loaderSelect = document.getElementById("loader_version");
+        loaderSelect.replaceChildren(new Option("Select loader build", ""));
+        loaderSelect.disabled = true;
+        loaderSelect.required = false;
+        document.getElementById("loader-version-group").classList.add("d-none");
+    }
+
+    async function loaderVersionChange() {
+        clearLoaderVersions();
+        const typeParts = document.getElementById("server_type").value.split("|");
+        const loaderType = typeParts[1];
+        const selectedVersion = document.getElementById("server").value.split("|")[2];
+        if (!selectedVersion || !["forge-installer", "neoforge-installer"].includes(loaderType)) {
+            return;
+        }
+        const loaderSelect = document.getElementById("loader_version");
+        document.getElementById("loader-version-group").classList.remove("d-none");
+        loaderSelect.disabled = true;
+        try {
+            const params = new URLSearchParams({
+                loader_type: loaderType,
+                mc_version: selectedVersion,
+            });
+            const response = await fetch(`/api/v2/servers/?${params.toString()}`, {
+                headers: { "X-XSRFToken": getCookie("_xsrf") },
+            });
+            const responseData = await response.json();
+            const builds = responseData.data && responseData.data.build_versions;
+            const currentType = document.getElementById("server_type").value.split("|")[1];
+            const currentVersion = document.getElementById("server").value.split("|")[2];
+            if (currentType !== loaderType || currentVersion !== selectedVersion) {
+                return;
+            }
+            if (responseData.status !== "ok" || !Array.isArray(builds) || builds.length === 0) {
+                throw new Error("No compatible loader builds were returned.");
+            }
+            loaderSelect.replaceChildren(...builds.map((build) => new Option(build, build)));
+            loaderSelect.disabled = false;
+            loaderSelect.required = true;
+        } catch (error) {
+            loaderSelect.replaceChildren(new Option("Unable to load loader builds", ""));
+            console.warn("Unable to load Forge/NeoForge builds:", error);
+        }
+    }
     /* CountryChange() is called from the onchange event of a select element.
     * param selectObj - the select object which fired the on change event.
     */
@@ -64,6 +119,8 @@
             }
             return;
         }
+
+        clearLoaderVersions();
 
         $("#server option").each(function () {
             $(this).remove()
@@ -111,6 +168,7 @@
             $("#server option").each(function () {
                 $(this).remove()
             })
+            clearLoaderVersions();
             return;
         }
         let jcSelect = {};
