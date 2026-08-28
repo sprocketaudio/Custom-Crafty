@@ -34,7 +34,7 @@
 
             <div class="row">
               <div class="col-lg-4 col-md-12">
-                <label for="log-source-select">Log Source</label>
+                <label for="log-source-select">Log Source <span id="log-timezone-note" class="badge badge-info ml-1 d-none"></span></label>
                 <div class="input-group">
                   <select id="log-source-select" class="form-control"></select>
                   <div class="input-group-append">
@@ -135,6 +135,7 @@
   let words = [];
   const serverId = new URLSearchParams(document.location.search).get('id');
   const logUserDateTimeFormat = "{{ data['user_data'].get('datetime_format', 'auto') }}";
+  const logServerTimeZone = "{{ data['serverTZ'] }}";
   const logState = {
     source: "",
     folder: "",
@@ -222,9 +223,48 @@
     const virtConsole = document.getElementById("virt_console");
     if (!virtConsole) return;
     virtConsole.innerHTML = html;
+    localizeRenderedLogTimestamps(virtConsole);
     scrollToBottom();
     lines = document.querySelectorAll('.box');
     hideFilteredWords();
+  }
+
+  function localizeUtcLogTimestamp(text) {
+    if (!["UTC", "Etc/UTC"].includes(logServerTimeZone)) return text;
+
+    const monthIndexes = {
+      Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+      Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+    };
+    return text.replace(
+      /\[(\d{2})(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(\d{4}) (\d{2}):(\d{2}):(\d{2})(\.\d+)?\]/g,
+      (match, day, month, year, hour, minute, second, fraction = "") => {
+        const utcTimestamp = new Date(Date.UTC(
+          Number(year), monthIndexes[month], Number(day), Number(hour),
+          Number(minute), Number(second)
+        ));
+        const localMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return `[${String(utcTimestamp.getDate()).padStart(2, "0")}${localMonths[utcTimestamp.getMonth()]}${utcTimestamp.getFullYear()} ${String(utcTimestamp.getHours()).padStart(2, "0")}:${String(utcTimestamp.getMinutes()).padStart(2, "0")}:${String(utcTimestamp.getSeconds()).padStart(2, "0")}${fraction}]`;
+      }
+    );
+  }
+
+  function localizeRenderedLogTimestamps(container) {
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+    const textNodes = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+    textNodes.forEach((node) => {
+      node.nodeValue = localizeUtcLogTimestamp(node.nodeValue);
+    });
+  }
+
+  function updateLogTimezoneNote() {
+    const note = document.getElementById("log-timezone-note");
+    if (!note) return;
+    if (["UTC", "Etc/UTC"].includes(logServerTimeZone) && new Date().getTimezoneOffset() !== 0) {
+      note.textContent = "Timestamps converted: UTC → your local time";
+      note.classList.remove("d-none");
+    }
   }
 
   function updatePageMeta() {
@@ -593,6 +633,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    updateLogTimezoneNote();
     const hideFilterInput = document.getElementById("hide-filter-box");
     const searchInput = document.getElementById("log-search-query");
     const sourceSelect = document.getElementById("log-source-select");

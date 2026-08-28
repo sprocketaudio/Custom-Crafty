@@ -42,11 +42,13 @@
                 <select id="console-lines-limit" class="form-control">
                   <option value="200">200</option>
                   <option value="500">500</option>
-                  <option value="1000" selected>1000</option>
+                  <option value="1000">1000</option>
                   <option value="2000">2000</option>
                   <option value="5000">5000</option>
+                  <option value="10000" selected>10000</option>
                 </select>
               </div>
+              <button id="copy-console" class="btn btn-warning btn-sm" type="button">Copy Log</button>
               <button id="reload-console" class="btn btn-outline-info btn-sm" type="button">Reload Console</button>
             </div>
             <br />
@@ -250,7 +252,7 @@
 
   function getConsoleLinesLimit() {
     const linesSelect = document.getElementById("console-lines-limit");
-    const fallbackLines = 1000;
+    const fallbackLines = 10000;
     if (!linesSelect) return fallbackLines;
     const selectedLines = Number(linesSelect.value || fallbackLines);
     if (!Number.isFinite(selectedLines) || selectedLines < 1) return fallbackLines;
@@ -301,6 +303,30 @@
     console.log('Got Log From Server')
   }
 
+  async function copyConsoleLog() {
+    const logText = Array.from(document.querySelectorAll("#virt_console .box"))
+      .map((line) => line.textContent)
+      .join("\n");
+    if (!logText) return;
+
+    try {
+      await navigator.clipboard.writeText(logText);
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = logText;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      textArea.remove();
+    }
+
+    const button = $("#copy-console");
+    button.text("Copied!");
+    setTimeout(() => button.text("Copy Log"), 1500);
+  }
+
 
 
   function new_line_handler(data) {
@@ -324,6 +350,7 @@
   $(document).ready(function () {
     console.log("ready!");
     get_server_log()
+    $("#copy-console").on("click", copyConsoleLog);
     $("#reload-console").on("click", get_server_log);
     $("#console-lines-limit").on("change", get_server_log);
 

@@ -27,8 +27,8 @@ ZIP_NAME_EXAMPLE = "Server.zip"
 ARCHIVE_PATH_TITLE = "Internal zip path"
 ARCHIVE_PATH_DESCRIPTION = "Path to internal zip folder"
 ARCHIVE_PATH_EXAMPLE = "server_files/my_server/"
-MIN_MEM = "Minimum JVM memory (in GiBs)"
-MAX_MEM = "Maximum JVM memory (in GiBs)"
+MIN_MEM = "Minimum JVM memory (in MiB)"
+MAX_MEM = "Maximum JVM memory (in MiB)"
 MODDED_INSTALLERS = ("forge-installer", "neoforge-installer")
 
 new_server_schema = {
@@ -283,18 +283,18 @@ new_server_schema = {
                         },
                         "mem_min": {
                             "title": MIN_MEM,
-                            "type": "number",
-                            "examples": [1],
-                            "default": 1,
+                            "type": "integer",
+                            "examples": [1024],
+                            "default": 1024,
                             "exclusiveMinimum": 0,
                             "error": "typeInteger",
                             "fill": True,
                         },
                         "mem_max": {
                             "title": MAX_MEM,
-                            "type": "number",
-                            "examples": [2],
-                            "default": 2,
+                            "type": "integer",
+                            "examples": [2048],
+                            "default": 2048,
                             "exclusiveMinimum": 0,
                             "error": "typeInteger",
                             "fill": True,
@@ -360,18 +360,18 @@ new_server_schema = {
                         },
                         "mem_min": {
                             "title": MIN_MEM,
-                            "type": "number",
-                            "examples": [1],
-                            "default": 1,
+                            "type": "integer",
+                            "examples": [1024],
+                            "default": 1024,
                             "exclusiveMinimum": 0,
                             "error": "typeInteger",
                             "fill": True,
                         },
                         "mem_max": {
                             "title": MAX_MEM,
-                            "type": "number",
-                            "examples": [2],
-                            "default": 2,
+                            "type": "integer",
+                            "examples": [2048],
+                            "default": 2048,
                             "exclusiveMinimum": 0,
                             "error": "typeInteger",
                             "fill": True,
@@ -556,18 +556,18 @@ new_server_schema = {
                         },
                         "mem_min": {
                             "title": MIN_MEM,
-                            "type": "number",
-                            "examples": [1],
-                            "default": 1,
+                            "type": "integer",
+                            "examples": [1024],
+                            "default": 1024,
                             "exclusiveMinimum": 0,
                             "error": "typeInteger",
                             "fill": True,
                         },
                         "mem_max": {
                             "title": MAX_MEM,
-                            "type": "number",
-                            "examples": [2],
-                            "default": 2,
+                            "type": "integer",
+                            "examples": [2048],
+                            "default": 2048,
                             "exclusiveMinimum": 0,
                             "error": "typeInteger",
                             "fill": True,
@@ -626,18 +626,18 @@ new_server_schema = {
                         },
                         "mem_min": {
                             "title": MIN_MEM,
-                            "type": "number",
-                            "examples": [1],
-                            "default": 1,
+                            "type": "integer",
+                            "examples": [1024],
+                            "default": 1024,
                             "exclusiveMinimum": 0,
                             "error": "typeInteger",
                             "fill": True,
                         },
                         "mem_max": {
                             "title": MAX_MEM,
-                            "type": "number",
-                            "examples": [2],
-                            "default": 2,
+                            "type": "integer",
+                            "examples": [2048],
+                            "default": 2048,
                             "exclusiveMinimum": 0,
                             "error": "typeInteger",
                             "fill": True,
@@ -1140,6 +1140,26 @@ class ApiServersIndexHandler(BaseApiHandler):
         if data["create_type"] == "minecraft_java":
             try:
                 root_create_data = data["minecraft_java_create_data"]
+                create_data = root_create_data[
+                    root_create_data["create_type"] + "_create_data"
+                ]
+                validate_java_heap_sizes(
+                    create_data["mem_min"],
+                    create_data["mem_max"],
+                    data.get("memory_limit_mib", 0),
+                )
+            except MemoryLimitValidationError as why:
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "INVALID_JAVA_MEMORY",
+                        "error_data": str(why),
+                    },
+                )
+        if data["create_type"] == "hytale":
+            try:
+                root_create_data = data["hytale_create_data"]
                 create_data = root_create_data[
                     root_create_data["create_type"] + "_create_data"
                 ]

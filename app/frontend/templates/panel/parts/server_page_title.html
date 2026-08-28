@@ -19,8 +19,32 @@
         <span style="font-size: 1.15em;">{{ data['server_stats']['server_id']['server_name'] }}</span>
         <br />
         <small>UUID: {{ data['server_stats']['server_id']['server_id'] }}</small>
+        <small class="ml-2">Address: <span id="server-address">{{ data['server_stats']['server_id']['server_ip'] }}:{{ data['server_stats']['server_id']['server_port'] }}</span></small>
+        <button id="copy-server-address" class="btn btn-outline-secondary btn-sm ml-1" type="button">Copy</button>
       </h4>
     </div>
   </div>
 </div>
 <!-- Page Title Header Ends-->
+
+<script>
+  document.getElementById("copy-server-address").addEventListener("click", async function () {
+    const address = document.getElementById("server-address").textContent;
+    try {
+      await navigator.clipboard.writeText(address);
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = address;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      textArea.remove();
+    }
+
+    const button = this;
+    button.textContent = "Copied!";
+    setTimeout(() => button.textContent = "Copy", 1500);
+  });
+</script>

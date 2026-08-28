@@ -63,21 +63,19 @@
                 <div class="row">
                   <div class="col-sm-4">
                     <div class="form-group">
-                      <label for="min_memory">{{ translate('serverWizard', 'minMem', data['lang']) }} <small> - {{
-                          translate('serverWizard', 'sizeInGB', data['lang']) }}</small><small class="text-muted ml-1"> - JVM
+                      <label for="min_memory">{{ translate('serverWizard', 'minMem', data['lang']) }} <small> - MiB</small><small class="text-muted ml-1"> - JVM
                           -Xms</small></label>
-                      <input type="number" class="form-control" id="min_memory" name="mem_min" value="1" step="0.5"
-                        min="0.5" required>
+                      <input type="number" class="form-control" id="min_memory" name="mem_min" value="1024" step="1"
+                        min="1" required>
                     </div>
                   </div>
 
                   <div class="col-sm-4">
                     <div class="form-group">
-                      <label for="max_memory">{{ translate('serverWizard', 'maxMem', data['lang']) }} <small> - {{
-                          translate('serverWizard', 'sizeInGB', data['lang']) }}</small><small class="text-muted ml-1"> - JVM
+                      <label for="max_memory">{{ translate('serverWizard', 'maxMem', data['lang']) }} <small> - MiB</small><small class="text-muted ml-1"> - JVM
                           -Xmx</small></label>
-                      <input type="number" class="form-control" id="max_memory" name="mem_max" value="2" step="0.5"
-                        min="0.5" required>
+                      <input type="number" class="form-control" id="max_memory" name="mem_max" value="2048" step="1"
+                        min="1" required>
                     </div>
                   </div>
 
@@ -85,7 +83,7 @@
                     <div class="form-group">
                       <label for="port">{{ translate('serverWizard', 'serverPort', data['lang']) }}</label>
                       <input type="number" class="form-control" id="port" name="port" value="5520" step="1" min="1"
-                        max="65535 " required>
+                        max="65535" required>
                     </div>
                   </div>
                 </div>
@@ -214,21 +212,19 @@
               <div class="row">
                 <div class="col-sm-4">
                   <div class="form-group">
-                    <label for="min_memory1">{{ translate('serverWizard', 'minMem', data['lang']) }} <small> - {{
-                        translate('serverWizard', 'sizeInGB', data['lang']) }}</small><small class="text-muted ml-1"> - JVM
+                    <label for="min_memory1">{{ translate('serverWizard', 'minMem', data['lang']) }} <small> - MiB</small><small class="text-muted ml-1"> - JVM
                         -Xms</small></label>
-                    <input type="number" class="form-control" id="min_memory1" name="mem_min" value="1" step="0.5"
-                      min="0.5" required>
+                    <input type="number" class="form-control" id="min_memory1" name="mem_min" value="1024" step="1"
+                      min="1" required>
                   </div>
                 </div>
 
                 <div class="col-sm-4">
                   <div class="form-group">
-                    <label for="max_memory1">{{ translate('serverWizard', 'maxMem', data['lang']) }} <small> - {{
-                        translate('serverWizard', 'sizeInGB', data['lang']) }}</small><small class="text-muted ml-1"> - JVM
+                    <label for="max_memory1">{{ translate('serverWizard', 'maxMem', data['lang']) }} <small> - MiB</small><small class="text-muted ml-1"> - JVM
                         -Xmx</small></label>
-                    <input type="number" class="form-control" id="max_memory1" name="mem_max" value="2" step="0.5"
-                      min="0.5" required>
+                    <input type="number" class="form-control" id="max_memory1" name="mem_max" value="2048" step="1"
+                      min="1" required>
                   </div>
                 </div>
 
@@ -236,7 +232,7 @@
                   <div class="form-group">
                     <label for="port1">{{ translate('serverWizard', 'serverPort', data['lang']) }}</label>
                     <input type="number" class="form-control" id="port1" name="port" value="5520" step="1" min="1"
-                      max="65535 " required>
+                      max="65535" required>
                   </div>
                 </div>
               </div>
@@ -359,6 +355,15 @@
 <script>
   $(".tree-reset").on("click", function () {
     location.href = "/server/hytale_step1";
+  });
+
+  // Browsers reject number inputs when pasted ports contain invisible characters
+  // (for example, a non-breaking space copied from a web page). Keep only digits.
+  $('input[name="port"]').on('paste', function (event) {
+    const clipboardText = event.originalEvent.clipboardData.getData('text');
+    event.preventDefault();
+    this.value = clipboardText.replace(/[^0-9]/g, '');
+    $(this).trigger('input').trigger('change');
   });
 </script>
 

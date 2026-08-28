@@ -2,9 +2,11 @@
 ## --- [4.10.8] - 2026/08/20
 ### New features
 - Let operators select the exact Forge or NeoForge installer build when creating a modded server.
+- Copy and replace a server's schedules from another authorized server, preserving reaction-task links.
 ### Bug fixes
 - Clear the importing state when a Forge or NeoForge installer exits unsuccessfully.
-- Convert wizard JVM memory values from GiB to MiB and reject heaps that exceed a configured server memory cap.
+- Use MiB consistently for wizard JVM heap values and the server memory cap; reject invalid
+  heaps and heaps that exceed a configured cap.
 - Security: reject traversal attempts in server, import, background, and chunked upload paths.
 - Display Hytale ban data correctly and hide Minecraft-only moderation controls for Hytale servers.
 - Add a permission-checked “Run Now” action for scheduled tasks.

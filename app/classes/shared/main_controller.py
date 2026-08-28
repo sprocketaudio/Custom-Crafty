@@ -551,11 +551,14 @@ class Controller:
                 server_file = create_data["executable"]
             else:
                 server_file = "Server/HytaleServer.jar"
-            min_mem = create_data["mem_min"]
-            max_mem = create_data["mem_max"]
+            min_mem_mib, max_mem_mib = validate_java_heap_sizes(
+                create_data["mem_min"],
+                create_data["mem_max"],
+                int(data.get("memory_limit_mib", 0) or 0),
+            )
             server_command = (
-                f"java -Xms{Helpers.float_to_string(min_mem)}M "
-                f"-Xmx{Helpers.float_to_string(max_mem)}M -jar {server_file} "
+                f"java -Xms{min_mem_mib}M "
+                f"-Xmx{max_mem_mib}M -jar {server_file} "
                 f"--assets Assets.zip --bind 0.0.0.0:{int(monitoring_port)-3}"
             )
 

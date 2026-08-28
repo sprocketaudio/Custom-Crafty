@@ -9,7 +9,7 @@
 - **Upstream status:** up to date with `v4.10.8`; this custom fork uses equivalent custom
   implementations where an upstream refactor would conflict with local features.
 - **Ported custom release scope:** Forge/NeoForge build selection and installer recovery; JVM
-  memory validation; upload hardening; schedule Run Now; Hytale-aware player controls; player
+  memory validation; upload hardening; schedule Run Now and schedule copying; Hytale-aware player controls; player
   ordering/layout; telemetry; CPU affinity and memory caps.
 - **Intentional divergence from upstream:** shared player-management and upload-route refactors,
   translations/CI churn, and architecture-only cleanup are not merged where they would overwrite
@@ -27,8 +27,8 @@
 - NBT editor support for `.dat` files with split permissions (`NBT_READ` / `NBT_WRITE`)
   and automatic backup on NBT save.
 - CurseForge modpack updater in Update Center (API key + per-server profile).
-- Forge/NeoForge creation uses the selected loader build, safe argument-vector launches on Linux,
-  and JVM heap values entered in GiB are converted to MiB before launch.
+- Forge/NeoForge creation uses the selected loader build and safe argument-vector launches on Linux.
+  JVM heap fields and the process memory cap are all entered in MiB.
 - Upload destinations and chunk staging paths are constrained to their approved roots.
 - Player-management controls adapt to the server game type; Hytale bans use Hytale's own data and commands.
 - Schedules can be manually queued from the Schedule page, subject to the existing Schedule permission.

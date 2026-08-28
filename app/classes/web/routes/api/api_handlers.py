@@ -41,6 +41,9 @@ from app.classes.web.routes.api.servers.server.ops import ApiServersServerOpsHan
 from app.classes.web.routes.api.servers.server.tasks.index import (
     ApiServersServerTasksIndexHandler,
 )
+from app.classes.web.routes.api.servers.server.tasks.copy import (
+    ApiServersServerTasksCopyHandler,
+)
 from app.classes.web.routes.api.servers.server.backups.index import (
     ApiServersServerBackupsIndexHandler,
 )
@@ -417,6 +420,11 @@ def api_handlers(handler_args):
         (
             r"/api/v2/servers/([a-z0-9-]+)/files/(.+)/download/?$",
             ApiServersServerFileDownload,
+            handler_args,
+        ),
+        (
+            r"/api/v2/servers/([a-z0-9-]+)/tasks/copy/?",
+            ApiServersServerTasksCopyHandler,
             handler_args,
         ),
         (

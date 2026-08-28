@@ -29,17 +29,18 @@ def test_canonicalize_memory_limit_mib_invalid(raw_value):
         canonicalize_memory_limit_mib(raw_value)
 
 
-def test_java_heap_gib_values_are_converted_to_mib():
-    assert validate_java_heap_sizes("1", "8", 16_000) == (1024, 8192)
+def test_java_heap_mib_values_are_used_without_conversion():
+    assert validate_java_heap_sizes("1024", "8192", 16_000) == (1024, 8192)
 
 
 @pytest.mark.parametrize(
     ("minimum", "maximum", "limit"),
     [
-        (2, 1, 0),
-        (1, 16, 8_000),
-        (0, 1, 0),
-        (1, "not-a-number", 0),
+        (2048, 1024, 0),
+        (1024, 16_000, 8_000),
+        (0, 1024, 0),
+        (1024, "not-a-number", 0),
+        (1024.5, 2048, 0),
     ],
 )
 def test_java_heap_validation_rejects_invalid_or_unachievable_values(
