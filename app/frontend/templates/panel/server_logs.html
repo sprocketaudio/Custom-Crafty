@@ -39,6 +39,7 @@
                   <select id="log-source-select" class="form-control"></select>
                   <div class="input-group-append">
                     <button id="refresh-log-sources" class="btn btn-outline-secondary" type="button">Refresh List</button>
+                    <button id="copy-selected-log" class="btn btn-warning" type="button" title="Copy the currently displayed log lines">Copy Log</button>
                   </div>
                 </div>
                 <small class="text-muted">Name | Last Modified | Path</small>
@@ -66,6 +67,7 @@
                   <option value="200" selected>200</option>
                   <option value="500">500</option>
                   <option value="1000">1000</option>
+                  <option value="10000">10000</option>
                 </select>
               </div>
             </div>
@@ -256,6 +258,30 @@
     textNodes.forEach((node) => {
       node.nodeValue = localizeUtcLogTimestamp(node.nodeValue);
     });
+  }
+
+  async function copySelectedLog() {
+    const logText = Array.from(document.querySelectorAll("#virt_console .box:not(.is-hidden)"))
+      .map((line) => line.textContent)
+      .join("\n");
+    if (!logText) return;
+
+    try {
+      await navigator.clipboard.writeText(logText);
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = logText;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      textArea.remove();
+    }
+
+    const button = document.getElementById("copy-selected-log");
+    button.textContent = "Copied!";
+    setTimeout(() => button.textContent = "Copy Log", 1500);
   }
 
   function updateLogTimezoneNote() {
@@ -639,6 +665,13 @@
     const sourceSelect = document.getElementById("log-source-select");
     const pageSizeSelect = document.getElementById("log-page-size");
     const folderPicker = document.getElementById("log-folder-picker");
+    const copySelectedLogButton = document.getElementById("copy-selected-log");
+
+    if (copySelectedLogButton) {
+      copySelectedLogButton.addEventListener("click", () => {
+        copySelectedLog().catch(showLogError);
+      });
+    }
 
     let typingTimer;
     const typeInterval = 500;

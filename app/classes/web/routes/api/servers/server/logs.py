@@ -17,7 +17,7 @@ ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
 class ApiServersServerLogsHandler(BaseApiHandler):
     DEFAULT_PAGE_SIZE = 200
-    MAX_PAGE_SIZE = 2000
+    MAX_PAGE_SIZE = 10000
     MAX_LINES_LIMIT = 10000
     MAX_LISTED_LOGS = 1000
     LOG_FILE_SUFFIXES = {".log", ".txt", ".out", ".gz"}
