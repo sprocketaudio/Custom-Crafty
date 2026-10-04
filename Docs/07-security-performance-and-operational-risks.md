@@ -91,6 +91,8 @@ Observed behavior:
 - Live terminal payloads are only formatted after an authorised terminal viewer is found.
   They are HTML-escaped but deliberately do not use the multi-regex colour formatter; the
   explicit Logs page retains that coloured formatting.
+- Five-second live server-stat collection runs only when that server is visible on a detail
+  page, or when the dashboard is open (where all server statuses are displayed).
 
 Risk:
 - syscall-heavy behavior under high console throughput.

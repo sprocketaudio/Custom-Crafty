@@ -11,6 +11,8 @@
   option, avoiding an expensive coloured-log render whenever a server page is opened or revisited.
 - Avoid costly server-side colour formatting for every live terminal line; terminal output is
   formatted only when an authorised viewer is present, while the Logs page retains colouring.
+- Avoid serialising WebSocket payloads solely for disabled debug logs, and restrict five-second
+  live-stat collection to servers visible on the current server page or dashboard.
 - Remove server-scoped webhooks when deleting a server.
 ### Improvements
 - Refresh the terminal when returning to its tab.

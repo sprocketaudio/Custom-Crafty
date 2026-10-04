@@ -3345,9 +3345,16 @@ class ServerInstance:
     # **********************************************************************************
 
     def realtime_stats(self):
-        # only get stats if clients are connected.
-        # no point in burning cpu
-        if len(WebSocketManager().clients) > 0:
+        # Only collect live stats for a page that can display them. A websocket
+        # on one server's page must not make every server ping and process its
+        # status every five seconds.
+        websocket_manager = WebSocketManager()
+        server_detail_params = {"id": str(self.server_id)}
+        has_server_detail_viewer = websocket_manager.has_page_params_clients(
+            "/panel/server_detail", server_detail_params
+        )
+        has_dashboard_viewer = websocket_manager.has_page_clients("/panel/dashboard")
+        if has_server_detail_viewer or has_dashboard_viewer:
             total_players = 0
             max_players = 0
             servers_ping = []
@@ -3387,11 +3394,12 @@ class ServerInstance:
                 }
             )
 
-            WebSocketManager().broadcast_page_params(
-                "/panel/server_detail",
-                {"id": str(self.server_id)},
-                "update_server_details",
-                {
+            if has_server_detail_viewer:
+                websocket_manager.broadcast_page_params(
+                    "/panel/server_detail",
+                    server_detail_params,
+                    "update_server_details",
+                    {
                     "id": raw_ping_result.get("id"),
                     "started": raw_ping_result.get("started"),
                     "running": raw_ping_result.get("running"),
@@ -3418,16 +3426,16 @@ class ServerInstance:
                     "created": datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S"),
                     "players_cache": self.player_cache,
                     "server_notes": self.server_object.server_notes,
-                },
-            )
+                    },
+                )
             total_players += int(raw_ping_result.get("online"))
             max_players += int(raw_ping_result.get("max"))
 
             # self.record_server_stats()
 
-            if len(servers_ping) > 0:
+            if has_dashboard_viewer and len(servers_ping) > 0:
                 try:
-                    WebSocketManager().broadcast_page(
+                    websocket_manager.broadcast_page(
                         "/panel/dashboard", "update_server_status", servers_ping
                     )
                 except:

@@ -23,11 +23,28 @@ class WebSocketManager(metaclass=Singleton):
         else:
             logger.exception("Error caught while removing unknown WebSocket client")
 
-    def broadcast(self, event_type: str, data):
-        logger.debug(
-            f"Sending to {len(self.clients)} clients: "
-            f"{json.dumps({'event': event_type, 'data': data})}"
+    def has_page_clients(self, page: str) -> bool:
+        """Return whether a connected client is viewing a given panel page."""
+        return any(client.page == page for client in self.clients.copy())
+
+    def has_page_params_clients(self, page: str, params: dict) -> bool:
+        """Return whether a client is viewing a page with the given parameters."""
+        return any(
+            client.page == page
+            and all(
+                client.page_query_params.get(key, None) == param
+                for key, param in params.items()
+            )
+            for client in self.clients.copy()
         )
+
+    def broadcast(self, event_type: str, data):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(
+                "Sending to %s clients: %s",
+                len(self.clients),
+                json.dumps({"event": event_type, "data": data}),
+            )
         for client in self.clients:
             try:
                 client.send_message(event_type, data)
@@ -120,11 +137,13 @@ class WebSocketManager(metaclass=Singleton):
         # the set size won't change
         static_clients = self.clients
         clients = list(filter(filter_fn, static_clients.copy()))
-        logger.debug(
-            f"Sending to {len(clients)}  \
-            out of {len(self.clients)} "
-            f"clients: {json.dumps({'event': event_type, 'data': data})}"
-        )
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(
+                "Sending to %s out of %s clients: %s",
+                len(clients),
+                len(self.clients),
+                json.dumps({"event": event_type, "data": data}),
+            )
 
         # Some messages, notably high-volume terminal output, are expensive to
         # format. Do not build their payload unless at least one client will

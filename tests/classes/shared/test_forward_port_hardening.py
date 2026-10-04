@@ -297,6 +297,43 @@ def test_live_terminal_stream_does_not_apply_costly_log_colours(monkeypatch):
     assert sent == [{"line": "[12:34:56] &lt;unsafe&gt;<br />"}]
 
 
+def test_live_stats_are_not_collected_when_no_relevant_page_is_open(monkeypatch):
+    class NoRelevantViewer:
+        @staticmethod
+        def has_page_params_clients(*_args):
+            return False
+
+        @staticmethod
+        def has_page_clients(*_args):
+            return False
+
+    instance = ServerInstance.__new__(ServerInstance)
+    instance.server_id = "server-1"
+    instance.get_raw_server_stats = Mock()
+    monkeypatch.setattr(
+        "app.classes.shared.server.WebSocketManager", lambda: NoRelevantViewer()
+    )
+
+    instance.realtime_stats()
+
+    instance.get_raw_server_stats.assert_not_called()
+
+
+def test_websocket_payload_is_not_serialised_for_disabled_debug_logging(monkeypatch):
+    manager = WebSocketManager.__new__(WebSocketManager)
+    manager.clients = set()
+    dumps = Mock(side_effect=AssertionError("debug payload should not be serialised"))
+
+    monkeypatch.setattr("app.classes.shared.websocket_manager.json.dumps", dumps)
+    monkeypatch.setattr(
+        "app.classes.shared.websocket_manager.logger.isEnabledFor", lambda _level: False
+    )
+
+    manager.broadcast("update_server_status", {"server": "server-1"})
+
+    dumps.assert_not_called()
+
+
 @pytest.mark.parametrize("handler_type", [BaseHandler, WebSocketHandler])
 def test_forwarded_ip_headers_require_a_trusted_proxy(handler_type):
     handler = handler_type.__new__(handler_type)
