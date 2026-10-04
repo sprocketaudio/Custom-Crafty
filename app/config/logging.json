@@ -101,7 +101,7 @@
       "propagate": false
     },
     "apscheduler": {
-      "level": "INFO",
+      "level": "ERROR",
       "handlers": [
         "schedule_file_handler"
       ],

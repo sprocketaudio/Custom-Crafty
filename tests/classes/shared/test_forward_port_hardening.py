@@ -155,6 +155,7 @@ def test_session_log_has_a_size_ceiling():
     )
 
     assert logging_config["handlers"]["session_file_handler"]["maxBytes"] == 1_073_741_824
+    assert logging_config["loggers"]["apscheduler"]["level"] == "ERROR"
 
 
 def test_run_task_now_queues_only_the_task_owned_by_the_requested_server():

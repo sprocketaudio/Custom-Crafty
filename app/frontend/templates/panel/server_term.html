@@ -274,7 +274,9 @@
 
   async function fetchConsoleLogSnapshot(lines, preferFile = true) {
     const token = getCookie("_xsrf");
-    const colors = true;
+    // Terminal snapshots may contain thousands of mod-loader lines. They are
+    // already HTML-escaped by the API; avoid expensive server-side colouring.
+    const colors = false;
     const query = preferFile
       ? `/api/v2/servers/${serverId}/logs?file=true&colors=${colors}&lines=${lines}`
       : `/api/v2/servers/${serverId}/logs?colors=${colors}&lines=${lines}`;

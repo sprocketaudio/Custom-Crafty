@@ -97,6 +97,8 @@ Observed behavior:
   200 lines, avoiding regex work that can monopolise the Python interpreter.
 - Player-cache refresh runs every 30 seconds. This reduces permanent status-ping contention;
   Player Management may therefore take up to 30 seconds to reflect a join or leave.
+- Terminal snapshots are HTML-escaped plain text. APScheduler is configured to record only its
+  errors: routine max-instance skips are expected under load and must not create a log storm.
 
 Risk:
 - syscall-heavy behavior under high console throughput.

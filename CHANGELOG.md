@@ -15,6 +15,8 @@
   live-stat collection to servers visible on the current server page or dashboard.
 - Retain large log pages but apply server-side colour highlighting only to small views; reduce
   background player-cache polling from every 5 seconds to every 30 seconds.
+- Do not colour terminal snapshots, and keep APScheduler's expected skipped-job messages out of
+  the warning log path while retaining scheduler errors.
 - Remove server-scoped webhooks when deleting a server.
 ### Improvements
 - Refresh the terminal when returning to its tab.

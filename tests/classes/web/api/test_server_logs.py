@@ -89,3 +89,16 @@ def test_large_log_pages_skip_costly_colour_formatting(tmp_path):
     assert handler._should_apply_colours(True, 200) is True
     assert handler._should_apply_colours(True, 201) is False
     assert handler._should_apply_colours(False, 1) is False
+
+
+def test_terminal_snapshot_template_does_not_request_log_colours():
+    template = (
+        Path(__file__).resolve().parents[4]
+        / "app"
+        / "frontend"
+        / "templates"
+        / "panel"
+        / "server_term.html"
+    ).read_text(encoding="utf-8")
+
+    assert "const colors = false;" in template
