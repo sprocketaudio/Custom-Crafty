@@ -6,6 +6,8 @@
 - Prevent duplicate WebSocket reconnect warnings while the panel recovers.
 - Bound per-server scheduler worker fan-out and drop stale missed jobs instead of replaying them
   after a panel stall or restart.
+- Load 1,000 terminal or Logs-page lines by default while retaining the explicit 10,000-line
+  option, avoiding an expensive coloured-log render whenever a server page is opened or revisited.
 - Remove server-scoped webhooks when deleting a server.
 ### Improvements
 - Refresh the terminal when returning to its tab.

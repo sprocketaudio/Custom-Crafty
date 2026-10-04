@@ -64,9 +64,9 @@
                 <label for="log-page-size">Page Size</label>
                 <select id="log-page-size" class="form-control">
                   <option value="100">100</option>
-                  <option value="200" selected>200</option>
+                  <option value="200">200</option>
                   <option value="500">500</option>
-                  <option value="1000">1000</option>
+                  <option value="1000" selected>1000</option>
                   <option value="10000">10000</option>
                 </select>
               </div>
@@ -143,7 +143,7 @@
     folder: "",
     query: "",
     page: 1,
-    pageSize: 200,
+    pageSize: 1000,
     totalPages: 1,
     totalLines: 0
   };
@@ -535,7 +535,7 @@
       const legacyParams = new URLSearchParams();
       legacyParams.set("file", "true");
       legacyParams.set("colors", "true");
-      legacyParams.set("lines", String(logState.pageSize || 200));
+      legacyParams.set("lines", String(logState.pageSize || 1000));
       if (logState.source) legacyParams.set("source", logState.source);
       legacyParams.set("_ts", String(Date.now()));
       const legacyRes = await fetch(`/api/v2/servers/${serverId}/logs?${legacyParams.toString()}`, {
@@ -562,7 +562,7 @@
 
       const fallbackParams = new URLSearchParams();
       fallbackParams.set("colors", "true");
-      fallbackParams.set("lines", String(logState.pageSize || 200));
+      fallbackParams.set("lines", String(logState.pageSize || 1000));
       fallbackParams.set("_ts", String(Date.now()));
       const fallbackRes = await fetch(`/api/v2/servers/${serverId}/logs?${fallbackParams.toString()}`, {
         method: 'GET',
@@ -594,7 +594,7 @@
 
     const pagination = responseData.pagination || {};
     logState.page = Number(pagination.page || logState.page || 1);
-    logState.pageSize = Number(pagination.page_size || logState.pageSize || 200);
+    logState.pageSize = Number(pagination.page_size || logState.pageSize || 1000);
     logState.totalPages = Number(pagination.total_pages || 1);
     logState.totalLines = Number(pagination.total_lines || 0);
     logState.source = pagination.source || logState.source || "";
@@ -704,8 +704,8 @@
 
     if (pageSizeSelect) {
       pageSizeSelect.addEventListener('change', () => {
-        const value = Number(pageSizeSelect.value || 200);
-        logState.pageSize = Number.isFinite(value) ? value : 200;
+        const value = Number(pageSizeSelect.value || 1000);
+        logState.pageSize = Number.isFinite(value) ? value : 1000;
         logState.page = 1;
         loadLogPage().catch(showLogError);
       });

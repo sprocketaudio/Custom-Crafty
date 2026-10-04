@@ -274,3 +274,17 @@ def test_release_411_xss_fixes_use_text_nodes_for_untrusted_content():
     assert "row.append($('<td>').text(value.log_msg));" in activity_source
     assert "${value.log_msg}" not in activity_source
     assert webhooks_source.count('message: $("<div>").text(responseData.error_data || responseData.error)') == 2
+
+
+def test_log_views_default_to_a_bounded_snapshot_size():
+    terminal_source = (
+        PROJECT_ROOT / "app" / "frontend" / "templates" / "panel" / "server_term.html"
+    ).read_text(encoding="utf-8")
+    logs_source = (
+        PROJECT_ROOT / "app" / "frontend" / "templates" / "panel" / "server_logs.html"
+    ).read_text(encoding="utf-8")
+
+    assert '<option value="1000" selected>1000</option>' in terminal_source
+    assert '<option value="10000" selected>10000</option>' not in terminal_source
+    assert '<option value="1000" selected>1000</option>' in logs_source
+    assert "pageSize: 1000," in logs_source
