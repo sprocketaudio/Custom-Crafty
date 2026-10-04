@@ -341,7 +341,7 @@
       console.log(responseData);
       bootbox.alert({
         title: responseData.error,
-        message: responseData.error_data
+        message: $("<div>").text(responseData.error_data || responseData.error)
       });
     }
   }
@@ -361,7 +361,7 @@
     } else {
       bootbox.alert({
         title: responseData.error,
-        message: responseData.error_data
+        message: $("<div>").text(responseData.error_data || responseData.error)
       });
     }
   }

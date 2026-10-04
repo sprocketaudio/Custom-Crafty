@@ -93,4 +93,17 @@ Server-specific jobs include:
 ## Known Uncertainty
 
 - Backpressure behavior under heavy queue load is not explicitly instrumented.
+
+## Missed schedule policy
+
+User-created server schedules are intentionally non-catch-up jobs. A task that
+is missed while Crafty is stopped or its scheduler is stalled is skipped rather
+than replayed after recovery. Repeating schedules then resume at their next
+regular interval. This prevents delayed lifecycle actions, especially starts
+and restarts, from undoing an administrator's manual stop.
+
+Per-server polling and maintenance schedulers use the same policy and are
+limited to two worker threads each. This prevents concurrent server starts
+from multiplying the 5-second status/player polling into an unbounded worker
+and logging backlog.
 - There is no durable audit of queue item failures beyond logs.

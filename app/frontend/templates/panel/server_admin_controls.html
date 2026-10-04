@@ -89,6 +89,17 @@
     console.log(responseData);
   }
 
+  function ban_kick_with_reason(action, player) {
+    bootbox.prompt({
+      title: "{{ translate('serverPlayerManagement', 'reasonPrompt', data['lang']) }}",
+      callback: function (reason) {
+        if (reason === null) return;
+        const safeReason = reason.replace(/[\r\n]+/g, ' ').trim();
+        send_command_to_server(safeReason ? `${action} ${player} ${safeReason}` : `${action} ${player}`);
+      }
+    });
+  }
+
   async function autosaveOpEntry(inputEl, fieldName) {
     const token = getCookie("_xsrf");
     const payload = {

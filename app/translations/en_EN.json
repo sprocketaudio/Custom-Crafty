@@ -73,7 +73,8 @@
         "virtual_terminal_lines": "How many lines we should allow in your server terminal buffer",
         "enable_passkey_auth": "Enable passkey (WebAuthn) authentication",
         "passkey_rp_name": "Passkey relying party name (displayed in authenticator prompts)",
-        "silent_notif_fields": "User fields that log changes silently (no notification popup)"
+        "silent_notif_fields": "User fields that log changes silently (no notification popup)",
+        "trusted_proxies": "Trusted reverse-proxy IPs (comma-separated)"
     },
     "credits": {
         "developmentTeam": "Development Team",
@@ -623,7 +624,8 @@
     "serverPlayerManagement": {
         "bannedPlayers": "Banned Players",
         "loadingBannedPlayers": "Loading Banned Players",
-        "players": "Players"
+        "players": "Players",
+        "reasonPrompt": "Reason (optional)"
     },
     "serverScheduleConfig": {
         "backup": "Backup Server",

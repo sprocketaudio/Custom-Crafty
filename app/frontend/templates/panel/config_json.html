@@ -226,7 +226,7 @@
 {% block js %}
 <script>
   function replacer(key, value) {
-    if (key == "disabled_language_files" || key == "monitored_mounts" || key == "keywords" || key == "silent_notif_fields") {
+    if (key == "disabled_language_files" || key == "monitored_mounts" || key == "keywords" || key == "silent_notif_fields" || key == "trusted_proxies") {
       if (value == 0) {
         return []
       } else {
@@ -261,6 +261,7 @@
     formDataObject.disabled_language_files = $('#lang_select').val();
     formDataObject.monitored_mounts = $('#mount_select').val();
     formDataObject.keywords = $('#keywords').val().split(",");
+    formDataObject.trusted_proxies = $('#trusted_proxies').val().split(",").map(value => value.trim()).filter(Boolean);
     formDataObject.silent_notif_fields = $('#silent_notif_fields').val().split(",");
 
     // Collect time range presets

@@ -74,30 +74,24 @@ class ApiUsersUserIndexHandler(BaseApiHandler):
             user,
             _,
         ) = auth_data
-        can_delete = False
-        if (user_id in ["@me", user["user_id"]]) and self.helper.get_setting(
-            "allow_self_delete", False
-        ):
+        if user_id == "@me" or int(user_id) == int(user["user_id"]):
+            if not self.helper.get_setting("enable_user_self_delete", False):
+                return self.finish_json(
+                    400,
+                    {
+                        "status": "error",
+                        "error": "NOT_AUTHORIZED",
+                        "error_data": "Self delete is not enabled on this server.",
+                    },
+                )
             user_id = user["user_id"]
-            can_delete = True
         elif not self.can_modify_user(exec_user_crafty_permissions, auth_data, user_id):
             return self.finish_json(
                 400,
                 {
                     "status": "error",
                     "error": "NOT_AUTHORIZED",
-                },
-            )
-        else:
-            # has User_Config permission
-            can_delete = True
-
-        if not can_delete:
-            return self.finish_json(
-                400,
-                {
-                    "status": "error",
-                    "error": "NOT_AUTHORIZED",
+                    "error_data": "Not authorized to delete user",
                 },
             )
         user_model = self.controller.users.get_user_object(user_id)

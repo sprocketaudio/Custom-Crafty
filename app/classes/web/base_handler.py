@@ -1,4 +1,5 @@
 import logging
+import ipaddress
 import re
 import typing as t
 import orjson
@@ -66,13 +67,24 @@ class BaseHandler(tornado.web.RequestHandler):
         self.set_status(204)
         self.finish()
 
-    def get_remote_ip(self):
-        remote_ip = (
-            self.request.headers.get("X-Real-IP")
-            or self.request.headers.get("X-Forwarded-For")
-            or self.request.remote_ip
-        )
-        return remote_ip
+    def get_remote_ip(self) -> str:
+        """Return a validated client IP, trusting proxy headers only by policy."""
+        trusted_proxies = self.helper.get_setting("trusted_proxies", []) or []
+        remote_ip = self.request.remote_ip
+        candidate = remote_ip
+
+        if remote_ip in trusted_proxies:
+            forwarded = (
+                self.request.headers.get("X-Real-IP")
+                or self.request.headers.get("X-Forwarded-For")
+            )
+            if forwarded:
+                candidate = forwarded.split(",", 1)[0].strip()
+
+        try:
+            return str(ipaddress.ip_address(candidate))
+        except ValueError:
+            return "0.0.0.0"
 
     current_user: t.Tuple[t.Optional[ApiKeys], t.Dict[str, t.Any], t.Dict[str, t.Any]]
     """

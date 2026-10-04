@@ -164,12 +164,12 @@
                                     <button onclick="send_command_to_server(`deop {{ player['name'] }}`)"
                                             type="button" class="btn btn-outline-warning">De-OP</button>
                                     {% end %}
-                                    <button onclick="send_command_to_server(`ban {{ player['name'] }}`)"
+                                    <button onclick="ban_kick_with_reason('ban', '{{ player['name'] }}')"
                                             type="button" class="btn btn-danger">Ban</button>
                                     {% if data['server_stats']['server_type'] != "hytale" %}
                                     <button onclick="send_command_to_server(`ban-ip {{ player['name'] }}`)"
                                             type="button" class="btn btn-outline-danger">IP Ban</button>
-                                    <button onclick="send_command_to_server(`kick {{ player['name'] }}`)"
+                                    <button onclick="ban_kick_with_reason('kick', '{{ player['name'] }}')"
                                             type="button" class="btn btn-outline-danger">Kick</button>
                                     <button
                                             onclick="send_command_to_server(`whitelist add {{ player['name'] }}`)"

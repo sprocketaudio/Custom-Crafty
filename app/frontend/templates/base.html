@@ -210,12 +210,17 @@
     const wsPageQueryParams = 'page_query_params=' + encodeURIComponent(location.search)
     const wsPage = 'page=' + encodeURIComponent(location.pathname)
 
-    const sendWssError = () => wsOpen || document.hidden || warn(
-      'Crafty is reconnecting its live connection. If this does not clear shortly, check your reverse proxy WebSocket settings.',
-      link = 'https://docs.craftycontrol.com/pages/getting-started/proxies/',
-      link_msg = "See our documentation for details",
-      className = 'wssError'
-    )
+    function sendWssError() {
+      // A connection may close repeatedly while the panel is recovering. Keep
+      // one actionable warning rather than filling the page with duplicates.
+      if (wsOpen || document.hidden || document.querySelector('.wssError')) return;
+      warn(
+        'Crafty is reconnecting its live connection. If this does not clear shortly, check your reverse proxy WebSocket settings.',
+        'https://docs.craftycontrol.com/pages/getting-started/proxies/',
+        "See our documentation for details",
+        'wssError'
+      );
+    }
 
     function clearReconnectTimer() {
       if (reconnectorId !== null) {

@@ -2,11 +2,20 @@ import json
 import queue
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 
-from app.classes.shared.server import ServerInstance
-from app.classes.shared.tasks import TasksManager
+from app.classes.shared.server import (
+    SERVER_SCHEDULER_JOB_DEFAULTS,
+    SERVER_SCHEDULER_MAX_WORKERS,
+    ServerInstance,
+    _server_scheduler_executors,
+)
+from app.classes.shared.tasks import SCHEDULE_JOB_DEFAULTS, TasksManager
+from app.classes.web.base_handler import BaseHandler
+from app.classes.web.websocket_handler import WebSocketHandler
+from app.classes.web.routes.api.crafty.config.index import config_json_schema
 from app.classes.web.routes.api.crafty.upload.index import IMAGE_MIME_TYPES
 
 
@@ -179,3 +188,89 @@ def test_run_task_now_rejects_a_schedule_from_another_server():
 
     with pytest.raises(ValueError, match="does not belong"):
         manager.run_task_now(7, 12, "server-2")
+
+
+def test_server_schedules_do_not_catch_up_after_a_stall():
+    assert SCHEDULE_JOB_DEFAULTS == {
+        "coalesce": True,
+        "max_instances": 1,
+        "misfire_grace_time": 1,
+    }
+
+
+def test_per_server_maintenance_schedulers_are_bounded():
+    assert SERVER_SCHEDULER_JOB_DEFAULTS == SCHEDULE_JOB_DEFAULTS
+    executors = _server_scheduler_executors()
+    assert SERVER_SCHEDULER_MAX_WORKERS == 2
+    assert executors["default"]._pool._max_workers == SERVER_SCHEDULER_MAX_WORKERS
+
+
+def test_start_request_for_a_running_server_does_not_create_a_launch_thread(monkeypatch):
+    instance = ServerInstance.__new__(ServerInstance)
+    instance.server_id = "server-1"
+    instance.check_running = lambda: True
+    thread = Mock()
+    monkeypatch.setattr("app.classes.shared.server.threading.Thread", thread)
+
+    assert instance.run_threaded_server(user_id=1) is False
+    thread.assert_not_called()
+
+
+def test_statistics_jobs_are_replaced_after_a_confirmed_server_start():
+    instance = ServerInstance.__new__(ServerInstance)
+    instance.server_id = "server-1"
+    instance.name = "Example Server"
+    instance.server_scheduler = SimpleNamespace(add_job=Mock())
+
+    instance._ensure_statistics_jobs()
+
+    assert instance.server_scheduler.add_job.call_count == 2
+    stats_call, save_call = instance.server_scheduler.add_job.call_args_list
+    assert stats_call.kwargs == {
+        "seconds": 5,
+        "id": "stats_server-1",
+        "replace_existing": True,
+    }
+    assert save_call.kwargs == {
+        "seconds": 30,
+        "id": "save_stats_server-1",
+        "replace_existing": True,
+    }
+
+
+@pytest.mark.parametrize("handler_type", [BaseHandler, WebSocketHandler])
+def test_forwarded_ip_headers_require_a_trusted_proxy(handler_type):
+    handler = handler_type.__new__(handler_type)
+    handler.helper = SimpleNamespace(
+        get_setting=lambda key, default: ["127.0.0.1"] if key == "trusted_proxies" else default
+    )
+    handler.request = SimpleNamespace(
+        remote_ip="198.51.100.20",
+        headers={"X-Forwarded-For": "203.0.113.10"},
+    )
+
+    assert handler.get_remote_ip() == "198.51.100.20"
+
+    handler.request.remote_ip = "127.0.0.1"
+    handler.request.headers = {"X-Forwarded-For": "203.0.113.10, 127.0.0.1"}
+
+    assert handler.get_remote_ip() == "203.0.113.10"
+
+
+def test_trusted_proxy_config_is_validated_as_a_list():
+    trusted_proxies = config_json_schema["properties"]["trusted_proxies"]
+    assert trusted_proxies["type"] == "array"
+    assert trusted_proxies["items"] == {"type": "string", "format": "ip"}
+
+
+def test_release_411_xss_fixes_use_text_nodes_for_untrusted_content():
+    activity_source = (
+        PROJECT_ROOT / "app" / "frontend" / "templates" / "panel" / "activity_logs.html"
+    ).read_text(encoding="utf-8")
+    webhooks_source = (
+        PROJECT_ROOT / "app" / "frontend" / "templates" / "panel" / "server_webhooks.html"
+    ).read_text(encoding="utf-8")
+
+    assert "row.append($('<td>').text(value.log_msg));" in activity_source
+    assert "${value.log_msg}" not in activity_source
+    assert webhooks_source.count('message: $("<div>").text(responseData.error_data || responseData.error)') == 2

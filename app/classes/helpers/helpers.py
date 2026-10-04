@@ -93,6 +93,9 @@ MASTER_CONFIG = {
         {"max_hours": 72, "sample_rate": 6},
     ],
     "sampling_fallback_divisor": 12,
+    # Forwarded client-IP headers are ignored unless the connecting proxy is
+    # explicitly listed here. Add 127.0.0.1/::1 for a local nginx proxy.
+    "trusted_proxies": [],
 }
 
 CONFIG_CATEGORIES = {
@@ -116,6 +119,7 @@ CONFIG_CATEGORIES = {
         "max_login_attempts",
         "enable_passkey_auth",
         "passkey_rp_name",
+        "trusted_proxies",
     ],
     "logs": [
         "max_log_lines",

@@ -1,16 +1,18 @@
 [![Crafty Logo](app/frontend/static/assets/images/logo_long.svg)](https://craftycontrol.com)
-# Custom Crafty Controller 4.10.8
+# Custom Crafty Controller 4.11.0
 > Private custom build for local server management.
 
 ## Version Lineage
-- **Current custom release:** `4.10.8` — up to date with official Crafty `v4.10.8`.
+- **Current custom release:** `4.11.0` — aligned with official Crafty `v4.11.0`.
 - **Historical upstream merge base:** `Crafty v4.10.3` (`0443b939`). This is the shared
   ancestry of the custom line, not the effective feature/fix level.
-- **Upstream status:** up to date with `v4.10.8`; this custom fork uses equivalent custom
-  implementations where an upstream refactor would conflict with local features.
+- **Upstream status:** compatible fixes through `v4.11.0` are ported; this custom fork uses
+  equivalent custom implementations where an upstream refactor would conflict with local features.
 - **Ported custom release scope:** Forge/NeoForge build selection and installer recovery; JVM
   memory validation; upload hardening; schedule Run Now and schedule copying; Hytale-aware player controls; player
-  ordering/layout; telemetry; CPU affinity and memory caps.
+  ordering/layout; telemetry; CPU affinity and memory caps; 4.11 security hardening for activity
+  logs, webhooks, and trusted reverse proxies; scheduler overload protection; server-webhook cleanup;
+  terminal refresh; and optional ban/kick reasons.
 - **Intentional divergence from upstream:** shared player-management and upload-route refactors,
   translations/CI churn, and architecture-only cleanup are not merged where they would overwrite
   or complicate custom behavior.

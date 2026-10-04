@@ -22,6 +22,7 @@ import requests
 
 # TZLocal is set as a hidden import on win pipeline
 from tzlocal import get_localzone
+from apscheduler.executors.pool import ThreadPoolExecutor as APSchedulerThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.base import JobLookupError, ConflictingIdError
 
@@ -66,6 +67,26 @@ logger = logging.getLogger(__name__)
 SUCCESSMSG = "SUCCESS! Forge install completed"
 CURSEFORGE_API_BASE = "https://api.curseforge.com/v1"
 DEFAULT_CURSEFORGE_PURGE_PATHS = ("mods", "config", "defaultconfigs", "kubejs")
+
+# Each managed server owns two APScheduler instances. APScheduler otherwise
+# gives every instance a ten-worker executor, so starting several servers can
+# create dozens of simultaneous ping, player-cache and stats jobs. Bound that
+# fan-out per server and drop stale maintenance work after a stall.
+SERVER_SCHEDULER_JOB_DEFAULTS = {
+    "coalesce": True,
+    "max_instances": 1,
+    "misfire_grace_time": 1,
+}
+SERVER_SCHEDULER_MAX_WORKERS = 2
+
+
+def _server_scheduler_executors():
+    """Return executor instances that are not shared between schedulers."""
+    return {
+        "default": APSchedulerThreadPoolExecutor(
+            max_workers=SERVER_SCHEDULER_MAX_WORKERS
+        )
+    }
 
 
 def extract_backup_info(res) -> dict:
@@ -280,8 +301,16 @@ class ServerInstance:
                 f" error: {e}"
             )
             self.tz = ZoneInfo("Europe/London")
-        self.server_scheduler = BackgroundScheduler(timezone=str(self.tz))
-        self.dir_scheduler = BackgroundScheduler(timezone=str(self.tz))
+        self.server_scheduler = BackgroundScheduler(
+            timezone=str(self.tz),
+            job_defaults=SERVER_SCHEDULER_JOB_DEFAULTS,
+            executors=_server_scheduler_executors(),
+        )
+        self.dir_scheduler = BackgroundScheduler(
+            timezone=str(self.tz),
+            job_defaults=SERVER_SCHEDULER_JOB_DEFAULTS,
+            executors=_server_scheduler_executors(),
+        )
         self.init_registries()
         self.server_scheduler.start()
         self.dir_scheduler.start()
@@ -365,7 +394,18 @@ class ServerInstance:
         return self.server_scheduler.remove_job(str(self.server_id))
 
     def run_threaded_server(self, user_id, forge_install=False):
-        # start the server
+        # A repeated scheduled/manual start for an already-running server must
+        # be a no-op. Previously it spawned a start thread and registered the
+        # periodic stats jobs before that thread noticed the process was live.
+        # Repeated Start schedules therefore churned the scheduler and panel.
+        if self.check_running():
+            logger.info(
+                "Ignoring start request for already-running server %s", self.server_id
+            )
+            return False
+
+        # Start the server. Statistics jobs are registered only after the
+        # spawned process has been confirmed alive in start_server().
         self._intentional_stop = False
         self.server_thread = threading.Thread(
             target=self.start_server,
@@ -378,41 +418,28 @@ class ServerInstance:
         )
         self.server_thread.start()
 
-        # Register an shedule for polling server stats when running
+        return True
+
+    def _ensure_statistics_jobs(self):
+        """Register one stats poller and writer for a confirmed running server."""
         logger.info(f"Polling server statistics {self.name} every {5} seconds")
         Console.info(f"Polling server statistics {self.name} every {5} seconds")
-        try:
-            self.server_scheduler.add_job(
-                self.realtime_stats,
-                "interval",
-                seconds=5,
-                id="stats_" + str(self.server_id),
-            )
-        except:
-            self.server_scheduler.remove_job("stats_" + str(self.server_id))
-            self.server_scheduler.add_job(
-                self.realtime_stats,
-                "interval",
-                seconds=5,
-                id="stats_" + str(self.server_id),
-            )
+        self.server_scheduler.add_job(
+            self.realtime_stats,
+            "interval",
+            seconds=5,
+            id="stats_" + str(self.server_id),
+            replace_existing=True,
+        )
         logger.info(f"Saving server statistics {self.name} every {30} seconds")
         Console.info(f"Saving server statistics {self.name} every {30} seconds")
-        try:
-            self.server_scheduler.add_job(
-                self.record_server_stats,
-                "interval",
-                seconds=30,
-                id="save_stats_" + str(self.server_id),
-            )
-        except ConflictingIdError:
-            self.server_scheduler.remove_job("save_stats_" + str(self.server_id))
-            self.server_scheduler.add_job(
-                self.record_server_stats,
-                "interval",
-                seconds=30,
-                id="save_stats_" + str(self.server_id),
-            )
+        self.server_scheduler.add_job(
+            self.record_server_stats,
+            "interval",
+            seconds=30,
+            id="save_stats_" + str(self.server_id),
+            replace_existing=True,
+        )
 
     def setup_server_run_command(self):
         # configure the server
@@ -1387,6 +1414,7 @@ class ServerInstance:
             )
             self.is_crashed = False
             self.stats_helper.server_crash_reset()
+            self._ensure_statistics_jobs()
             self.record_server_stats()
             check_internet_thread = threading.Thread(
                 target=self.check_internet_thread,

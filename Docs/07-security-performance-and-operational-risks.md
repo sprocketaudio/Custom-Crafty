@@ -162,3 +162,10 @@ Telemetry follow-up:
 - Treat DB schema/config fields as privileged surfaces.
 - Validate and canonicalize all operator-provided runtime controls.
 - When adding host-resource controls, include runtime verification commands and deterministic failure semantics in docs.
+
+## Trusted reverse proxies
+
+Crafty ignores `X-Real-IP` and `X-Forwarded-For` unless the direct peer is
+listed in `trusted_proxies` in `app/config/config.json`. For nginx on the same
+host, set the value to `["127.0.0.1", "::1"]` and ensure nginx itself sets the
+forwarded headers. Do not add public client addresses to this list.

@@ -357,6 +357,12 @@
     webSocket.on('vterm_new_line', new_line_handler)
   });
 
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      get_server_log();
+    }
+  });
+
   $('#server_command').on('keydown', function (e) {
     if (e.which == 13) {
       $(this).attr("disabled", "disabled"); //Disable textbox to prevent multiple submit

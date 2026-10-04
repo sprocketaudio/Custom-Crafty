@@ -1,4 +1,19 @@
 # Changelog
+## --- [4.11.0] - 2026/10/04
+### Security and reliability
+- Port compatible Crafty 4.11 security fixes: render activity-log and webhook error data as text,
+  and trust forwarded client-IP headers only from explicitly configured reverse proxies.
+- Prevent duplicate WebSocket reconnect warnings while the panel recovers.
+- Bound per-server scheduler worker fan-out and drop stale missed jobs instead of replaying them
+  after a panel stall or restart.
+- Remove server-scoped webhooks when deleting a server.
+### Improvements
+- Refresh the terminal when returning to its tab.
+- Prompt for an optional reason when banning or kicking a player.
+- Correct self-delete configuration handling, preserve numeric usernames, and hide Update Center
+  for Steam-managed servers.
+<br><br>
+
 ## --- [4.10.8] - 2026/08/20
 ### New features
 - Let operators select the exact Forge or NeoForge installer build when creating a modded server.

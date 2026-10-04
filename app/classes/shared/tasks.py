@@ -47,6 +47,16 @@ scheduler_intervals = {
 
 FAILED_DB_IMPORT_MESSAGE = "Removing failed task from DB."
 SCHEDULE_DATE_STRING_FORMAT = "%m/%d/%Y, %H:%M:%S"
+# A schedule is an instruction for a specific time, not a backlog to replay.
+# In particular, replaying a delayed ``start_server`` action after Crafty has
+# recovered can bring a server back online after an operator deliberately
+# stopped it.  One second allows normal scheduler jitter while dropping work
+# that was missed during a stall or restart.
+SCHEDULE_JOB_DEFAULTS = {
+    "coalesce": True,
+    "max_instances": 1,
+    "misfire_grace_time": 1,
+}
 
 
 class ScheduleJobData(TypedDict):
@@ -87,7 +97,9 @@ class TasksManager:
                 f" error: {e}"
             )
             self.tz = "Europe/London"
-        self.scheduler = BackgroundScheduler(timezone=str(self.tz))
+        self.scheduler = BackgroundScheduler(
+            timezone=str(self.tz), job_defaults=SCHEDULE_JOB_DEFAULTS
+        )
 
         self.users_controller: UsersController = self.controller.users
 
@@ -812,6 +824,7 @@ class TasksManager:
                     "date",
                     run_date=delay_time,
                     id=str(schedule.schedule_id),
+                    **SCHEDULE_JOB_DEFAULTS,
                     args=[
                         {
                             "server_id": schedule.server_id.server_id,
