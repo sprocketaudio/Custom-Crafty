@@ -7,6 +7,7 @@ from unittest.mock import Mock
 import pytest
 
 from app.classes.shared.server import (
+    PLAYER_CACHE_POLL_SECONDS,
     SERVER_SCHEDULER_JOB_DEFAULTS,
     SERVER_SCHEDULER_MAX_WORKERS,
     ServerOutBuf,
@@ -205,6 +206,10 @@ def test_per_server_maintenance_schedulers_are_bounded():
     executors = _server_scheduler_executors()
     assert SERVER_SCHEDULER_MAX_WORKERS == 2
     assert executors["default"]._pool._max_workers == SERVER_SCHEDULER_MAX_WORKERS
+
+
+def test_player_cache_polling_does_not_compete_with_live_stats_every_five_seconds():
+    assert PLAYER_CACHE_POLL_SECONDS == 30
 
 
 def test_start_request_for_a_running_server_does_not_create_a_launch_thread(monkeypatch):

@@ -13,6 +13,8 @@
   formatted only when an authorised viewer is present, while the Logs page retains colouring.
 - Avoid serialising WebSocket payloads solely for disabled debug logs, and restrict five-second
   live-stat collection to servers visible on the current server page or dashboard.
+- Retain large log pages but apply server-side colour highlighting only to small views; reduce
+  background player-cache polling from every 5 seconds to every 30 seconds.
 - Remove server-scoped webhooks when deleting a server.
 ### Improvements
 - Refresh the terminal when returning to its tab.

@@ -21,6 +21,7 @@ class ApiServersServerLogsHandler(BaseApiHandler):
     MAX_PAGE_SIZE = 10000
     MAX_LINES_LIMIT = 10000
     MAX_LISTED_LOGS = 1000
+    MAX_COLORED_LINES = 200
     LOG_FILE_SUFFIXES = {".log", ".txt", ".out", ".gz"}
 
     def _server_root_path(self, server_data: t.Dict[str, t.Any]) -> pathlib.Path:
@@ -171,6 +172,10 @@ class ApiServersServerLogsHandler(BaseApiHandler):
             except Exception as ex:
                 logger.warning("Skipping log line due to error: %s", ex)
         return lines
+
+    def _should_apply_colours(self, colored_output: bool, line_count: int) -> bool:
+        """Keep large log reads responsive despite Python regex/GIL contention."""
+        return colored_output and line_count <= self.MAX_COLORED_LINES
 
     async def get(self, server_id: str):
         auth_data = self.authenticate_user()
@@ -356,20 +361,25 @@ class ApiServersServerLogsHandler(BaseApiHandler):
             query = ""
             log_source_path = None
 
-        user_keywords = self.helper.get_setting("keywords") if colored_output else []
+        colours_applied = self._should_apply_colours(colored_output, len(raw_lines))
+        user_keywords = self.helper.get_setting("keywords") if colours_applied else []
         lines = await asyncio.get_running_loop().run_in_executor(
             executor,
             self._format_log_lines,
             raw_lines,
             disable_ansi_strip,
-            colored_output,
+            colours_applied,
             user_keywords,
         )
 
         if use_html:
             lines = [f"{line}<br />" for line in lines]
 
-        response: t.Dict[str, t.Any] = {"status": "ok", "data": lines}
+        response: t.Dict[str, t.Any] = {
+            "status": "ok",
+            "data": lines,
+            "colours_applied": colours_applied,
+        }
         if read_log_file:
             response["pagination"] = {
                 "page": page,

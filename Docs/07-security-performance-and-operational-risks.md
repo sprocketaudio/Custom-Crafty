@@ -93,6 +93,10 @@ Observed behavior:
   explicit Logs page retains that coloured formatting.
 - Five-second live server-stat collection runs only when that server is visible on a detail
   page, or when the dashboard is open (where all server statuses are displayed).
+- Large log pages retain all requested lines but omit server-side colour highlighting after
+  200 lines, avoiding regex work that can monopolise the Python interpreter.
+- Player-cache refresh runs every 30 seconds. This reduces permanent status-ping contention;
+  Player Management may therefore take up to 30 seconds to reflect a join or leave.
 
 Risk:
 - syscall-heavy behavior under high console throughput.

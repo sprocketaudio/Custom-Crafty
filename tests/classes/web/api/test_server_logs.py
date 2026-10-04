@@ -81,3 +81,11 @@ def test_log_formatting_reuses_the_preloaded_keyword_list(tmp_path):
 
     assert lines == ["first", "second"]
     assert calls == [["important"], ["important"]]
+
+
+def test_large_log_pages_skip_costly_colour_formatting(tmp_path):
+    handler = build_handler(tmp_path)
+
+    assert handler._should_apply_colours(True, 200) is True
+    assert handler._should_apply_colours(True, 201) is False
+    assert handler._should_apply_colours(False, 1) is False

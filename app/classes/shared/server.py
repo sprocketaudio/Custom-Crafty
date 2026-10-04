@@ -78,6 +78,7 @@ SERVER_SCHEDULER_JOB_DEFAULTS = {
     "misfire_grace_time": 1,
 }
 SERVER_SCHEDULER_MAX_WORKERS = 2
+PLAYER_CACHE_POLL_SECONDS = 30
 
 
 def _server_scheduler_executors():
@@ -3330,7 +3331,7 @@ class ServerInstance:
         self.dir_scheduler.add_job(
             self.cache_players,
             "interval",
-            seconds=5,
+            seconds=PLAYER_CACHE_POLL_SECONDS,
             id=str(self.server_id) + "_players_poll",
         )
 
