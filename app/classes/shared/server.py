@@ -243,6 +243,7 @@ class ServerInstance:
         self.jar_update_url = None
         self.name = None
         self.is_crashed = False
+        self._intentional_stop = False
         self.restart_count = 0
         self._game_port_cache = None
         self.stats = stats
@@ -365,6 +366,7 @@ class ServerInstance:
 
     def run_threaded_server(self, user_id, forge_install=False):
         # start the server
+        self._intentional_stop = False
         self.server_thread = threading.Thread(
             target=self.start_server,
             daemon=True,
@@ -414,9 +416,40 @@ class ServerInstance:
 
     def setup_server_run_command(self):
         # configure the server
+        self.server_path = Helpers.get_os_understandable_path(self.settings["path"])
         server_exec_path = Helpers.get_os_understandable_path(
             self.settings["executable"]
         )
+        full_path = os.path.join(self.server_path, server_exec_path)
+        if not Helpers.check_file_exists(full_path):
+            loader_info = self._loader_info_from_installer_name(
+                Path(self.settings["executable"]).name
+            )
+            if loader_info:
+                loader_kind, loader_version = loader_info
+                try:
+                    self._update_loader_launch_config(
+                        Path(self.server_path), loader_kind, loader_version
+                    )
+                    server_exec_path = Helpers.get_os_understandable_path(
+                        self.settings["executable"]
+                    )
+                    full_path = os.path.join(self.server_path, server_exec_path)
+                    logger.info(
+                        "Recovered generated %s launcher configuration for "
+                        "server %s.",
+                        loader_kind,
+                        self.server_id,
+                    )
+                except (OSError, RuntimeError) as ex:
+                    logger.warning(
+                        "Could not recover generated %s launcher configuration "
+                        "for server %s: %s",
+                        loader_kind,
+                        self.server_id,
+                        ex,
+                    )
+
         self.server_command = Helpers.cmdparse(self.settings["execution_command"])
         if self.helper.is_os_windows() and self.server_command[0] == "java":
             logger.info(
@@ -452,10 +485,7 @@ class ServerInstance:
                             "java binary from server directory."
                         )
                         return
-        self.server_path = Helpers.get_os_understandable_path(self.settings["path"])
-
         # let's do some quick checking to make sure things actually exists
-        full_path = os.path.join(self.server_path, server_exec_path)
         if not Helpers.check_file_exists(full_path):
             error = f"Server executable path: {full_path} does not seem to exist"
             logger.critical(error)
@@ -1446,196 +1476,58 @@ class ServerInstance:
                 )
 
     def forge_install_watcher(self):
-        # Enter for install if that parameter is true
+        """Finalize a Forge-family installer run with its generated launcher."""
         while True:
-            # We'll watch the process
             if self.process.poll() is None:
-                # IF process still has not exited we'll keep looping
                 time.sleep(5)
-                Console.debug("Installing Forge...")
+                Console.debug("Installing Forge/NeoForge...")
+                continue
+
+            exit_code = self.process.poll()
+            if exit_code != 0:
+                logger.error(
+                    "Forge/NeoForge installer for server %s exited with code %s.",
+                    self.server_id,
+                    exit_code,
+                )
+                Console.error(
+                    "Forge/NeoForge installer failed with exit code " f"{exit_code}."
+                )
             else:
-                # Process has exited. Lets do some work to setup the new
-                # run command.
-                exit_code = self.process.poll()
-                if exit_code != 0:
-                    # An installer failure must not be reported as a completed
-                    # import. In particular, keep the installer in place so the
-                    # operator can inspect its output and retry after fixing the
-                    # underlying problem.
-                    logger.error(
-                        "Forge/NeoForge installer for server %s exited with code %s.",
-                        self.server_id,
-                        exit_code,
-                    )
-                    Console.error(
-                        "Forge/NeoForge installer failed with exit code "
-                        f"{exit_code}."
-                    )
-                    self.stats_helper.finish_import()
-                    server_users = PermissionsServers.get_server_user_list(
-                        self.server_id
-                    )
-                    for user in server_users:
-                        WebSocketManager().broadcast_user(
-                            user, "send_start_reload", {}
-                        )
-                    break
-
-                # Let's grab the server object we're going to update.
                 server_obj: Servers = HelperServers.get_server_obj(self.server_id)
-
-                # The forge install is done so we can delete that install file.
-                os.remove(os.path.join(server_obj.path, server_obj.executable))
-
-                # We need to grab the exact forge version number.
-                # We know we can find it here in the run.sh/bat script.
-                try:
-                    # Getting the forge version from the executable command
-                    version = re.findall(
-                        r"(?:forge|neoforge)-installer-([0-9\.]+)((?:)|"
-                        r"(?:-([0-9\.]+)-[a-zA-Z]+)).jar",
-                        server_obj.execution_command,
+                loader_info = self._loader_info_from_installer_name(
+                    Path(server_obj.executable).name
+                )
+                if not loader_info:
+                    logger.error(
+                        "Cannot identify Forge-family installer for server %s: %s",
+                        self.server_id,
+                        server_obj.executable,
                     )
-                    version_info = re.findall(
-                        r"(forge|neoforge)-installer-([0-9\.]+)((?:)|"
-                        r"(?:-([0-9\.]+)-[a-zA-Z]+)).jar",
-                        server_obj.execution_command,
-                    )
-                    version_param = version_info[0][1].split(".")
-                    version_major = int(version_param[0])
-                    version_minor = int(version_param[1])
-                    if len(version_param) > 2:
-                        version_sub = int(version_param[2])
-                    else:
-                        version_sub = 0
-
-                    # Checking which version we are with
-                    if version_major <= 1 and version_minor < 17:
-                        # OLD VERSION < 1.17
-
-                        # Retrieving the executable jar filename
-                        file_path = glob.glob(
-                            f"{server_obj.path}/"
-                            f"{version_info[0][0]}-{version[0][1]}*.jar"
-                        )[0]
-                        file_name = re.findall(
-                            r"(forge[-0-9.]+.jar)",
-                            file_path,
-                        )[0]
-
-                        # Let's set the proper server executable
-                        server_obj.executable = os.path.join(file_name)
-
-                        # Get memory values
-                        memory_values = re.findall(
-                            r"-Xms([A-Z0-9\.]+) -Xmx([A-Z0-9\.]+)",
-                            server_obj.execution_command,
+                    Console.error("Could not determine the installed Forge/NeoForge version.")
+                else:
+                    loader_kind, loader_version = loader_info
+                    try:
+                        self._update_loader_launch_config(
+                            Path(server_obj.path), loader_kind, loader_version
                         )
-
-                        # Now lets set up the new run command.
-                        # This is based off the run.sh/bat that
-                        # Forge uses in 1.17 and <
-                        execution_command = (
-                            f"java -Xms{memory_values[0][0]} -Xmx{memory_values[0][1]}"
-                            f' -jar "{file_name}" nogui'
-                        )
-                        server_obj.execution_command = execution_command
+                        installer_path = Path(server_obj.path, server_obj.executable)
+                        installer_path.unlink(missing_ok=True)
                         Console.debug(SUCCESSMSG)
-
-                    elif (
-                        version_major <= 1 and version_minor <= 20 and version_sub < 3
-                    ) or version_info[0][0] == "neoforge":
-                        # NEW VERSION >= 1.17 and <= 1.20.2
-                        # (no jar file in server dir, only run.bat and run.sh)
-
-                        run_file_path = ""
-                        if self.helper.is_os_windows():
-                            run_file_path = os.path.join(server_obj.path, "run.bat")
-                        else:
-                            run_file_path = os.path.join(server_obj.path, "run.sh")
-
-                        if Helpers.check_file_perms(run_file_path) and os.path.isfile(
-                            run_file_path
-                        ):
-                            run_file = open(run_file_path, "r", encoding="utf-8")
-                            run_file_text = run_file.read()
-                        else:
-                            Console.error(
-                                "ERROR ! Forge install can't read the scripts files."
-                                " Aborting ..."
-                            )
-                            return
-
-                        # We get the server command parameters from forge script
-                        server_command = re.findall(
-                            r"java @([a-zA-Z0-9_\.]+)"
-                            r" @([a-z./\-]+)"
-                            r"([0-9.\-]+(?:-[a-zA-Z0-9]+)?)"
-                            r"\/\b([a-z_0-9]+\.txt)\b"
-                            r"( .{2,4})?",
-                            run_file_text,
-                        )[0]
-
-                        version = server_command[2]
-                        executable_path = f"{server_command[1]}{server_command[2]}/"
-                        # Let's set the proper server executable
-                        server_obj.executable = os.path.join(
-                            f"{executable_path}{version_info[0][0]}-{version}"
-                            "-server.jar"
+                    except (OSError, RuntimeError) as ex:
+                        logger.exception(
+                            "Unable to save generated %s launch configuration for "
+                            "server %s.",
+                            loader_kind,
+                            self.server_id,
                         )
-                        # Now lets set up the new run command.
-                        # This is based off the run.sh/bat that
-                        # Forge uses in 1.17 and <
-                        execution_command = (
-                            f"java @{server_command[0]}"
-                            f" @{executable_path}{server_command[3]} nogui"
-                            f" {server_command[4]}"
-                        )
-                        server_obj.execution_command = execution_command
-                        Console.debug(SUCCESSMSG)
-                    else:
-                        # NEW VERSION >= 1.20.3
-                        # (executable jar is back in server dir)
+                        Console.error(f"Could not configure {loader_kind}: {ex}")
 
-                        # Retrieving the executable jar filename
-                        file_path = glob.glob(
-                            f"{server_obj.path}/forge-{version[0][0]}*.jar"
-                        )[0]
-                        file_name = re.findall(
-                            r"(forge-[\-0-9.]+-shim.jar)",
-                            file_path,
-                        )[0]
-
-                        # Let's set the proper server executable
-                        server_obj.executable = os.path.join(file_name)
-
-                        # Get memory values
-                        memory_values = re.findall(
-                            r"-Xms([A-Z0-9\.]+) -Xmx([A-Z0-9\.]+)",
-                            server_obj.execution_command,
-                        )
-
-                        # Now lets set up the new run command.
-                        # This is based off the run.sh/bat that
-                        # Forge uses in 1.17 and <
-                        execution_command = (
-                            f"java -Xms{memory_values[0][0]} -Xmx{memory_values[0][1]}"
-                            f' -jar "{file_name}" nogui'
-                        )
-                        server_obj.execution_command = execution_command
-                        Console.debug(SUCCESSMSG)
-                except:
-                    logger.debug("Could not find run file.")
-                    # TODO Use regex to get version and rebuild simple execution
-
-                # We'll update the server with the new information now.
-                HelperServers.update_server(server_obj)
-                self.stats_helper.finish_import()
-                server_users = PermissionsServers.get_server_user_list(self.server_id)
-
-                for user in server_users:
-                    WebSocketManager().broadcast_user(user, "send_start_reload", {})
-                break
+            self.stats_helper.finish_import()
+            server_users = PermissionsServers.get_server_user_list(self.server_id)
+            for user in server_users:
+                WebSocketManager().broadcast_user(user, "send_start_reload", {})
+            break
 
     def stop_crash_detection(self):
         # This is only used if the crash detection settings change
@@ -1683,6 +1575,10 @@ class ServerInstance:
 
     @callback
     def stop_server(self):
+        # A crash-detection run may already be in progress while the Stop button
+        # removes its watcher. Mark this before signalling the process so that such
+        # a race cannot interpret an intentional shutdown as a crash and relaunch it.
+        self._intentional_stop = True
         running = self.check_running()
         if not running:
             logger.info(f"Can't stop server {self.name} if it's not running")
@@ -1906,6 +1802,16 @@ class ServerInstance:
         if running:
             Console.debug("Successfully found process. Resetting crash counter to 0")
             self.restart_count = 0
+            return
+        if self._intentional_stop:
+            logger.info(
+                "Server %s exited after an intentional stop; suppressing crash restart.",
+                self.name,
+            )
+            try:
+                self.server_scheduler.remove_job("c_" + str(self.server_id))
+            except JobLookupError:
+                pass
             return
         # check the exit code -- This could be a fix for /stop
         if str(self.process.returncode) in self.settings["ignored_exits"].split(","):
@@ -2945,6 +2851,20 @@ class ServerInstance:
         )
         HelperServers.update_server(server_obj)
         self.reload_server_settings()
+
+    @staticmethod
+    def _loader_info_from_installer_name(
+        installer_name: str,
+    ) -> tuple[str, str] | None:
+        """Return the loader and exact build encoded in known installer names."""
+        for pattern in (
+            r"^(forge|neoforge)-installer-([0-9A-Za-z._-]+)\.jar$",
+            r"^(forge|neoforge)-([0-9A-Za-z._-]+)-installer\.jar$",
+        ):
+            match = re.fullmatch(pattern, installer_name)
+            if match:
+                return match.group(1), match.group(2)
+        return None
 
     @staticmethod
     def _detect_forge_executable_rel(server_root: Path, version: str) -> str:

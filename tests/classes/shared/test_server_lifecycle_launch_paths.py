@@ -1,5 +1,7 @@
 import ast
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 
@@ -98,6 +100,23 @@ def test_command_watcher_dispatches_start_and_restart_to_lifecycle_methods():
 
     assert "run_threaded_server" in dispatch_found.get("start_server", set())
     assert "restart_threaded_server" in dispatch_found.get("restart_server", set())
+
+
+def test_crash_detection_does_not_restart_an_intentionally_stopped_server():
+    instance = ServerInstance.__new__(ServerInstance)
+    instance.server_id = "server-1"
+    instance.name = "Stopped Server"
+    instance._intentional_stop = True
+    instance.server_scheduler = SimpleNamespace(remove_job=Mock())
+    instance.check_running = lambda: False
+    instance.crash_detected = Mock()
+    instance.settings = {"ignored_exits": "", "crash_detection": True}
+    instance.process = SimpleNamespace(returncode=1, pid=42)
+
+    instance.detect_crash()
+
+    instance.crash_detected.assert_not_called()
+    instance.server_scheduler.remove_job.assert_called_once_with("c_server-1")
 
 
 def test_setup_server_run_command_raises_when_executable_missing(monkeypatch):

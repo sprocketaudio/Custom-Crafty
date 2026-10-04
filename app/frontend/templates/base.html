@@ -197,42 +197,75 @@
     let usingWebSockets = false;
     let webSocket = null;
     let websocketTimeoutId = null;
+    let websocketWarningTimeoutId = null;
+    let wsInternal = null;
     // {% if request.protocol == 'https' %}
     usingWebSockets = true;
 
     let listenEvents = [];
     let wsOpen = false;
-    /**
-      * @type {number | null} reconnectorId An interval ID for the reconnector.
-      */
     let reconnectorId = null;
-    let failedConnectionCounter = 0; // https://stackoverflow.com/a/37038217/15388424
+    let failedConnectionCounter = 0;
 
     const wsPageQueryParams = 'page_query_params=' + encodeURIComponent(location.search)
     const wsPage = 'page=' + encodeURIComponent(location.pathname)
 
-    const sendWssError = () => wsOpen || warn(
-      'WebSockets are required for Crafty to work. This websocket connection has been closed. Are you using a reverse proxy?',
+    const sendWssError = () => wsOpen || document.hidden || warn(
+      'Crafty is reconnecting its live connection. If this does not clear shortly, check your reverse proxy WebSocket settings.',
       link = 'https://docs.craftycontrol.com/pages/getting-started/proxies/',
       link_msg = "See our documentation for details",
       className = 'wssError'
     )
 
+    function clearReconnectTimer() {
+      if (reconnectorId !== null) {
+        clearTimeout(reconnectorId);
+        reconnectorId = null;
+      }
+    }
+
+    function clearWebSocketWarning() {
+      if (websocketWarningTimeoutId !== null) {
+        clearTimeout(websocketWarningTimeoutId);
+        websocketWarningTimeoutId = null;
+      }
+      document.querySelectorAll('.wssError').forEach(el => el.remove());
+    }
+
+    function scheduleWebSocketReconnect() {
+      if (document.hidden || reconnectorId !== null) return;
+      const exponentialDelay = Math.min(30000, 1000 * (2 ** Math.min(failedConnectionCounter, 5)));
+      const retryDelay = exponentialDelay + getRandomInt(0, 1000);
+      console.info("Reconnecting WebSocket in", retryDelay, "milliseconds");
+      reconnectorId = setTimeout(() => {
+        reconnectorId = null;
+        startWebSocket();
+      }, retryDelay);
+      failedConnectionCounter += 1;
+    }
+
     function startWebSocket() {
+      if (wsInternal && (
+        wsInternal.readyState === WebSocket.OPEN ||
+        wsInternal.readyState === WebSocket.CONNECTING
+      )) {
+        return;
+      }
+
+      clearReconnectTimer();
       console.log('%c[Crafty Controller] %cConnecting the WebSocket', 'font-weight: 900; color: #800080;', 'font-weight: 900; color: #eee;');
       try {
-        var wsInternal = new WebSocket('wss://' + location.host + '/ws?' + wsPage + '&' + wsPageQueryParams);
-        wsInternal.onopen = function () {
-          console.log('opened WebSocket connection:', wsInternal)
+        const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const socket = new WebSocket(protocol + '//' + location.host + '/ws?' + wsPage + '&' + wsPageQueryParams);
+        wsInternal = socket;
+        socket.onopen = function () {
+          if (socket !== wsInternal) return;
+          console.log('opened WebSocket connection:', socket)
           wsOpen = true;
           failedConnectionCounter = 0;
-          if (typeof reconnectorId === 'number') {
-            document.querySelectorAll('.wssError').forEach(el => el.remove())
-            clearInterval(reconnectorId);
-            reconnectorId = null;
-          }
+          clearWebSocketWarning();
         };
-        wsInternal.onmessage = function (rawMessage) {
+        socket.onmessage = function (rawMessage) {
           var message = JSON.parse(rawMessage.data);
 
           console.log('got message: ', message)
@@ -241,24 +274,21 @@
             .filter(listenedEvent => listenedEvent.event == message.event)
             .forEach(listenedEvent => listenedEvent.callback(message.data))
         };
-        wsInternal.onerror = function (errorEvent) {
+        socket.onerror = function (errorEvent) {
           console.error('WebSocket Error', errorEvent);
         };
-        wsInternal.onclose = function (closeEvent) {
+        socket.onclose = function (closeEvent) {
+          if (socket !== wsInternal) return;
           wsOpen = false;
           console.log('Closed WebSocket', closeEvent);
-
-          if (!document.hidden) {
-            if (typeof reconnectorId !== 'number') {
-              setTimeout(sendWssError, 7000);
-            }
-            console.info("Reconnecting with a timeout of", (getRandomArbitrary(0, 2 ** failedConnectionCounter - 1) + 5) * 1000, "milliseconds");
-            // Discard old websocket and create a new one in 5 seconds
-            wsInternal = null
-            reconnectorId = setTimeout(startWebSocket, (getRandomArbitrary(0, 2 ** failedConnectionCounter - 1) + 5) * 1000)
-
-            failedConnectionCounter++;
+          wsInternal = null;
+          if (!document.hidden && websocketWarningTimeoutId === null) {
+            websocketWarningTimeoutId = setTimeout(() => {
+              websocketWarningTimeoutId = null;
+              sendWssError();
+            }, 7000);
           }
+          scheduleWebSocketReconnect();
         };
 
         webSocket = {
@@ -272,13 +302,15 @@
               data: data
             }
 
-            wsInternal.send(JSON.stringify(message));
+            if (wsInternal && wsInternal.readyState === WebSocket.OPEN) {
+              wsInternal.send(JSON.stringify(message));
+            }
           },
           close: function (code, reason) {
-            wsInternal.close(code, reason);
+            if (wsInternal) wsInternal.close(code, reason);
           },
           getStatus: function () {
-            return wsInternal.readyState;
+            return wsInternal ? wsInternal.readyState : WebSocket.CLOSED;
           }
         }
       } catch (error) {
@@ -295,17 +327,20 @@
     // Managing Connexions for Multi Tab opened to reduce bandwith usage
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState == "hidden") {
+        clearReconnectTimer();
         websocketTimeoutId = setTimeout(() => {
-          webSocket.close(1000, "Closed due to Inactivity");
+          if (webSocket) webSocket.close(1000, "Closed due to Inactivity");
           console.log('%c[Crafty Controller] %cClose Websocket due to Tab not active after 5s', 'font-weight: 900; color: #800080;', 'font-weight: 900; color: #eee;');
         }, 10000);
       } else {
         clearTimeout(websocketTimeoutId)
-        if (webSocket.getStatus() == WebSocket.CLOSED) {
+        if (!webSocket || webSocket.getStatus() === WebSocket.CLOSED) {
           startWebSocket();
         }
       }
     });
+
+    window.addEventListener("online", startWebSocket);
 
     if (webSocket) {
       webSocket.on('send_error', function (start_error) {

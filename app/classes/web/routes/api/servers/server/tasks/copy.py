@@ -10,6 +10,27 @@ from app.classes.web.base_api_handler import BaseApiHandler
 class ApiServersServerTasksCopyHandler(BaseApiHandler):
     """Replace a server's schedules with a copy from another server."""
 
+    @staticmethod
+    def _split_copyable_schedules(source_schedules):
+        """Exclude reaction rows whose parent no longer exists on the source.
+
+        A reaction without a parent has no trigger and cannot run. These rows were
+        left behind by the previous whole-server replacement path, so copying them
+        would only reproduce stale, misleading schedule entries on the target.
+        """
+        source_ids = {schedule.schedule_id for schedule in source_schedules}
+        copyable = []
+        orphaned_reactions = []
+        for schedule in source_schedules:
+            if (
+                schedule.interval_type == "reaction"
+                and schedule.parent not in source_ids
+            ):
+                orphaned_reactions.append(schedule)
+            else:
+                copyable.append(schedule)
+        return copyable, orphaned_reactions
+
     def _has_schedule_permission(self, auth_data, server_id: str) -> bool:
         if server_id not in [str(server["server_id"]) for server in auth_data[0]]:
             return False
@@ -69,6 +90,9 @@ class ApiServersServerTasksCopyHandler(BaseApiHandler):
 
         source_schedules = list(
             self.controller.management.get_schedules_by_server(source_server_id)
+        )
+        source_schedules, orphaned_reactions = self._split_copyable_schedules(
+            source_schedules
         )
         if any(schedule.action == "backup_server" for schedule in source_schedules):
             return self.finish_json(
@@ -135,12 +159,19 @@ class ApiServersServerTasksCopyHandler(BaseApiHandler):
         self.controller.management.add_to_audit_log(
             auth_data[4]["user_id"],
             f"Edited server {server_id}: copied {len(copied_schedules)} schedules "
-            f"from server {source_server_id}",
+            f"from server {source_server_id}; skipped {len(orphaned_reactions)} "
+            "orphaned reaction schedules",
             server_id,
             self.get_remote_ip(),
         )
         self.tasks_manager.reload_schedule_from_db()
         return self.finish_json(
             200,
-            {"status": "ok", "data": {"copied": len(copied_schedules)}},
+            {
+                "status": "ok",
+                "data": {
+                    "copied": len(copied_schedules),
+                    "skipped_orphaned_reactions": len(orphaned_reactions),
+                },
+            },
         )

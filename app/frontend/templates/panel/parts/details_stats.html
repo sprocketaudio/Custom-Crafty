@@ -302,32 +302,52 @@
 
     initParser('input_motd', 'input_motd');
     let text = ""
-    let players = server.players_cache;
+    const playerLastSeenTimestamp = (player) => {
+      const match = String(player.last_seen || "").match(
+        /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})$/
+      );
+      if (!match) return Number.NEGATIVE_INFINITY;
+      const timestamp = new Date(
+        Number(match[3]), Number(match[2]) - 1, Number(match[1]),
+        Number(match[4]), Number(match[5])
+      ).getTime();
+      return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp;
+    };
+    const players = [...(server.players_cache || [])].sort((left, right) => {
+      const statusOrder =
+        (left.status === "Online" ? 0 : 1) - (right.status === "Online" ? 0 : 1);
+      if (statusOrder !== 0) return statusOrder;
+      const lastSeenOrder = playerLastSeenTimestamp(right) - playerLastSeenTimestamp(left);
+      if (lastSeenOrder !== 0) return lastSeenOrder;
+      return String(left.name || "").localeCompare(String(right.name || ""));
+    });
     for (let i = 0; i < players.length; i++) {
       const playerName = players[i]["name"] || "Unknown";
       const playerHeadUrl = `https://mc-heads.net/avatar/${encodeURIComponent(playerName)}/20`;
-      text += `<tr id="playerItem-${players[i]["name"]}" class="playerItem-- text-center">`;
-      text += `<td class="no-scroll col-5"><strong><img class="player-head" src="${playerHeadUrl}" alt="${playerName}" onerror="this.style.display='none';">${playerName}</strong></td>`;
+      text += `<tr id="playerItem-${players[i]["name"]}" class="playerItem--">`;
+      text += `<td class="no-scroll player-cell"><strong><img class="player-head" src="${playerHeadUrl}" alt="${playerName}" onerror="this.style.display='none';">${playerName}</strong></td>`;
       if (players[i]["status"] === "Online") {
-        text += `<td class="col-4"><span class="text-success"><i class="ph ph-cell-signal-full"></i> ${players[i]['status']}</span></td>`
+        text += `<td class="player-status-cell"><span class="text-success"><i class="ph ph-cell-signal-full"></i> ${players[i]['status']}</span></td>`
       } else {
-        text += `<td class="col-4"><span class="text-warning"><i class="ph-fill ph-x-circle"></i><span class="offline-status">&nbsp;${players[i]['status']}</span><span class="conn-break"> Last connection :<br> ${players[i]['last_seen']}</span></td>`
+        text += `<td class="player-status-cell"><span class="text-warning"><i class="ph-fill ph-x-circle"></i><span class="offline-status">&nbsp;${players[i]['status']}</span><span class="conn-break"> Last connection :<br> ${players[i]['last_seen']}</span></td>`
       }
       if (server["running"]) {
-        text += `<td class="col-3">
-                    <div class="row">
+        text += `<td class="player-actions-cell">
+                    <div class="player-actions">
                       {% if data['server_stats']['server_type'] == "hytale" %}
-                                  <div class="col"><button onclick="send_command_to_server('op add ${players[i]['name']}')" type="button" class="btn btn-warning">OP</button></div>
-                                  <div class="col"><button onclick="send_command_to_server('op remove ${players[i]['name']}')" type="button" class="btn btn-outline-warning">De-OP</button></div>
+                                  <button onclick="send_command_to_server('op add ${players[i]['name']}')" type="button" class="btn btn-warning">OP</button>
+                                  <button onclick="send_command_to_server('op remove ${players[i]['name']}')" type="button" class="btn btn-outline-warning">De-OP</button>
                       {% else %}
-                                  <div class="col"><button onclick="send_command_to_server('op ${players[i]['name']}')" type="button" class="btn btn-warning">OP</button></div>
-                                  <div class="col"><button onclick="send_command_to_server('deop ${players[i]['name']}')" type="button" class="btn btn-outline-warning">De-OP</button></div>
+                                  <button onclick="send_command_to_server('op ${players[i]['name']}')" type="button" class="btn btn-warning">OP</button>
+                                  <button onclick="send_command_to_server('deop ${players[i]['name']}')" type="button" class="btn btn-outline-warning">De-OP</button>
                       {% end %}
-                      <div class="col"><button onclick="send_command_to_server('ban ${players[i]['name']}')" type="button" class="btn btn-danger">Ban</button></div>
-                      <div class="col"><button onclick="send_command_to_server('ban-ip ${players[i]['name']}')" type="button" class="btn btn-outline-danger">IP Ban</button></div>
-                      <div class="col"><button onclick="send_command_to_server('kick ${players[i]['name']}')" type="button" class="btn btn-outline-danger">Kick</button></div>
-                      <div class="col"><button onclick="send_command_to_server('whitelist add ${players[i]['name']}')" type="button" class="btn btn-info">Whitelist +</button></div>
-                      <div class="col"><button onclick="send_command_to_server('whitelist remove ${players[i]['name']}')" type="button" class="btn btn-outline-info">Whitelist -</button></div>
+                      <button onclick="send_command_to_server('ban ${players[i]['name']}')" type="button" class="btn btn-danger">Ban</button>
+                      {% if data['server_stats']['server_type'] != "hytale" %}
+                      <button onclick="send_command_to_server('ban-ip ${players[i]['name']}')" type="button" class="btn btn-outline-danger">IP Ban</button>
+                      <button onclick="send_command_to_server('kick ${players[i]['name']}')" type="button" class="btn btn-outline-danger">Kick</button>
+                      <button onclick="send_command_to_server('whitelist add ${players[i]['name']}')" type="button" class="btn btn-info">Whitelist +</button>
+                      <button onclick="send_command_to_server('whitelist remove ${players[i]['name']}')" type="button" class="btn btn-outline-info">Whitelist -</button>
+                      {% end %}
                     </div>
                   </td>`
       } else {

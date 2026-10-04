@@ -34,7 +34,12 @@ def test_copy_schedules_rejects_backup_schedules_before_replacing_target():
     handler.controller = SimpleNamespace(
         management=SimpleNamespace(
             get_schedules_by_server=lambda _server_id: [
-                SimpleNamespace(action="backup_server")
+                SimpleNamespace(
+                    schedule_id=1,
+                    action="backup_server",
+                    interval_type="hours",
+                    parent=None,
+                )
             ]
         )
     )
@@ -44,3 +49,16 @@ def test_copy_schedules_rejects_backup_schedules_before_replacing_target():
     assert status == 409
     assert body["error"] == "SERVER_SPECIFIC_BACKUP_SCHEDULE"
     remove_all_server_tasks.assert_not_called()
+
+
+def test_schedule_copy_excludes_reactions_without_a_source_parent():
+    parent = SimpleNamespace(schedule_id=10, interval_type="minutes", parent=None)
+    child = SimpleNamespace(schedule_id=11, interval_type="reaction", parent=10)
+    orphan = SimpleNamespace(schedule_id=12, interval_type="reaction", parent=None)
+
+    copyable, orphaned = ApiServersServerTasksCopyHandler._split_copyable_schedules(
+        [parent, child, orphan]
+    )
+
+    assert copyable == [parent, child]
+    assert orphaned == [orphan]

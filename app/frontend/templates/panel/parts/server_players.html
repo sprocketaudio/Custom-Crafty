@@ -80,6 +80,37 @@
         vertical-align: middle;
         image-rendering: pixelated;
     }
+
+    .player-management-table th,
+    .player-management-table td {
+        padding: 0.75rem 1rem;
+        vertical-align: middle;
+    }
+
+    .player-management-table .player-cell {
+        text-align: left;
+    }
+
+    .player-management-table .player-status-cell {
+        text-align: center;
+    }
+
+    .player-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.45rem;
+    }
+
+    .player-actions .btn {
+        min-width: 4.4rem;
+    }
+
+    @media (max-width: 991.98px) {
+        .player-management-table .player-actions {
+            justify-content: flex-start;
+        }
+    }
 </style>
 
 <div class="col-12">
@@ -87,7 +118,12 @@
         <div class="col-12">
             <h2>{{ translate('serverPlayerManagement', 'players', data['lang']) }}:</h2>
             <div class="table-responsive">
-                <table class="table no-scroll">
+                <table class="table no-scroll player-management-table">
+                    <colgroup>
+                        <col style="width: 40%;">
+                        <col style="width: 23%;">
+                        <col style="width: 37%;">
+                    </colgroup>
                     <thead class="thead">
                         <tr>
                             <th scope="col-5">Player</th>
@@ -97,8 +133,8 @@
                     </thead>
                     <tbody id="player-body">
                         {% for player in data['cached_players'] %}
-                        <tr id="playerItem-{{ player['name'] }}" class="playerItem-- text-center">
-                            <td class="no-scroll">
+                        <tr id="playerItem-{{ player['name'] }}" class="playerItem--">
+                            <td class="no-scroll player-cell">
                                 <strong>
                                     <img class="player-head" src="https://mc-heads.net/avatar/{{ player.get('name', '') }}/20"
                                         alt="{{ player.get('name', 'Player') }}" loading="lazy"
@@ -107,40 +143,40 @@
                                 </strong>
                             </td>
                             {% if player['status'] == 'Online' %}
-                            <td class="no-scroll col-5"><span class="text-success"><i class="ph ph-cell-signal-full"></i>
+                            <td class="no-scroll player-status-cell"><span class="text-success"><i class="ph ph-cell-signal-full"></i>
                                     {{ player['status'] }}</span></td>
                             {% elif player['status'] == 'Offline' %}
-                            <td class="no-scroll col-4"><span class="text-warning"><i class="ph ph-x-circle"></i><span
+                            <td class="no-scroll player-status-cell"><span class="text-warning"><i class="ph ph-x-circle"></i><span
                                         class="d-md-none">&nbsp;{{ player['status'] }}</span><span class="d-none d-md-inline">
                                         Last connection :<br>{{ player['last_seen'] }}</span></span></td>
                             {% end %}
-                            <td class="no-scroll col-3">
+                            <td class="no-scroll player-actions-cell">
                                 {% if data['server_stats']['running'] %}
-                                <div class="row">
+                                <div class="player-actions">
                                     {% if data['server_stats']['server_type'] == "hytale" %}
-                                    <div class="col"><button onclick="send_command_to_server(`op add {{ player['name'] }}`)"
-                                            type="button" class="btn btn-warning">OP</button></div>
-                                    <div class="col"><button onclick="send_command_to_server(`op remove {{ player['name'] }}`)"
-                                            type="button" class="btn btn-outline-warning">De-OP</button></div>
+                                    <button onclick="send_command_to_server(`op add {{ player['name'] }}`)"
+                                            type="button" class="btn btn-warning">OP</button>
+                                    <button onclick="send_command_to_server(`op remove {{ player['name'] }}`)"
+                                            type="button" class="btn btn-outline-warning">De-OP</button>
                                     {% else %}
-                                    <div class="col"><button onclick="send_command_to_server(`op {{ player['name'] }}`)"
-                                            type="button" class="btn btn-warning">OP</button></div>
-                                    <div class="col"><button onclick="send_command_to_server(`deop {{ player['name'] }}`)"
-                                            type="button" class="btn btn-outline-warning">De-OP</button></div>
+                                    <button onclick="send_command_to_server(`op {{ player['name'] }}`)"
+                                            type="button" class="btn btn-warning">OP</button>
+                                    <button onclick="send_command_to_server(`deop {{ player['name'] }}`)"
+                                            type="button" class="btn btn-outline-warning">De-OP</button>
                                     {% end %}
-                                    <div class="col"><button onclick="send_command_to_server(`ban {{ player['name'] }}`)"
-                                            type="button" class="btn btn-danger">Ban</button></div>
+                                    <button onclick="send_command_to_server(`ban {{ player['name'] }}`)"
+                                            type="button" class="btn btn-danger">Ban</button>
                                     {% if data['server_stats']['server_type'] != "hytale" %}
-                                    <div class="col"><button onclick="send_command_to_server(`ban-ip {{ player['name'] }}`)"
-                                            type="button" class="btn btn-outline-danger">IP Ban</button></div>
-                                    <div class="col"><button onclick="send_command_to_server(`kick {{ player['name'] }}`)"
-                                            type="button" class="btn btn-outline-danger">Kick</button></div>
-                                    <div class="col"><button
+                                    <button onclick="send_command_to_server(`ban-ip {{ player['name'] }}`)"
+                                            type="button" class="btn btn-outline-danger">IP Ban</button>
+                                    <button onclick="send_command_to_server(`kick {{ player['name'] }}`)"
+                                            type="button" class="btn btn-outline-danger">Kick</button>
+                                    <button
                                             onclick="send_command_to_server(`whitelist add {{ player['name'] }}`)"
-                                            type="button" class="btn btn-info">Whitelist +</button></div>
-                                    <div class="col"><button
+                                            type="button" class="btn btn-info">Whitelist +</button>
+                                    <button
                                             onclick="send_command_to_server(`whitelist remove {{ player['name'] }}`)"
-                                            type="button" class="btn btn-outline-info">Whitelist -</button></div>
+                                            type="button" class="btn btn-outline-info">Whitelist -</button>
                                     {% end %}
                                 </div>
                                 {% else %}

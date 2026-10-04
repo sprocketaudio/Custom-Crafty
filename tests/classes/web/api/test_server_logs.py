@@ -61,3 +61,23 @@ def test_list_available_logs_skips_unreadable_entries(tmp_path, monkeypatch):
     sources = handler._list_available_logs({"path": str(tmp_path), "log_path": "./logs/latest.log"})
 
     assert [entry["path"] for entry in sources] == ["logs/latest.log"]
+
+
+def test_log_formatting_reuses_the_preloaded_keyword_list(tmp_path):
+    handler = build_handler(tmp_path)
+    calls = []
+    handler.helper = type(
+        "Helper",
+        (),
+        {"log_colors": staticmethod(lambda line, keywords: calls.append(keywords) or line)},
+    )()
+
+    lines = handler._format_log_lines(
+        ["first", "second"],
+        disable_ansi_strip=False,
+        colored_output=True,
+        user_keywords=["important"],
+    )
+
+    assert lines == ["first", "second"]
+    assert calls == [["important"], ["important"]]

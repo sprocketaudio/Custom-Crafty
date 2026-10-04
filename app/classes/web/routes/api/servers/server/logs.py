@@ -1,3 +1,4 @@
+import asyncio
 import html
 import gzip
 import logging
@@ -8,7 +9,7 @@ import re
 import typing as t
 from app.classes.models.server_permissions import EnumPermissionsServer
 from app.classes.shared.server import ServerOutBuf
-from app.classes.web.base_api_handler import BaseApiHandler
+from app.classes.web.base_api_handler import BaseApiHandler, executor
 
 logger = logging.getLogger(__name__)
 
@@ -143,7 +144,35 @@ class ApiServersServerLogsHandler(BaseApiHandler):
         total_pages = max(1, math.ceil(total_lines / page_size)) if total_lines else 1
         return page_lines, total_lines, total_pages
 
-    def get(self, server_id: str):
+    def _format_log_lines(
+        self,
+        raw_lines: t.List[str],
+        disable_ansi_strip: bool,
+        colored_output: bool,
+        user_keywords: t.Any,
+    ) -> t.List[str]:
+        """Format log output outside Tornado's event-loop thread.
+
+        Colouring a 10,000-line log runs several regular expressions per line. It
+        must not delay WebSocket pings, status updates, or unrelated panel requests.
+        """
+        lines = []
+        for line in raw_lines:
+            try:
+                if not disable_ansi_strip:
+                    line = ansi_escape.sub("", line)
+                    line = re.sub("[A-z]{2}\b\b", "", line)
+                    line = html.escape(line)
+
+                if colored_output:
+                    line = self.helper.log_colors(line, user_keywords)
+
+                lines.append(line)
+            except Exception as ex:
+                logger.warning("Skipping log line due to error: %s", ex)
+        return lines
+
+    async def get(self, server_id: str):
         auth_data = self.authenticate_user()
         if not auth_data:
             return
@@ -226,7 +255,9 @@ class ApiServersServerLogsHandler(BaseApiHandler):
         server_root = self._server_root_path(server_data)
 
         if read_log_file and list_sources:
-            sources = self._list_available_logs(server_data)
+            sources = await asyncio.get_running_loop().run_in_executor(
+                executor, self._list_available_logs, server_data
+            )
             try:
                 active_path = self._resolve_log_source(server_data, "")
                 active_source = self._relative_log_path(server_root, active_path)
@@ -286,8 +317,13 @@ class ApiServersServerLogsHandler(BaseApiHandler):
                 query = self.get_query_argument("query", "")
 
                 try:
-                    raw_lines, total_lines, total_pages = self._paginate_log_file(
-                        log_source_path, page, page_size, query
+                    raw_lines, total_lines, total_pages = await asyncio.get_running_loop().run_in_executor(
+                        executor,
+                        self._paginate_log_file,
+                        log_source_path,
+                        page,
+                        page_size,
+                        query,
                     )
                 except OSError as ex:
                     return self.finish_json(
@@ -300,7 +336,9 @@ class ApiServersServerLogsHandler(BaseApiHandler):
                     )
             else:
                 log_lines = requested_lines or self.helper.get_setting("max_log_lines")
-                raw_lines = self.helper.tail_file(log_source_path, log_lines)
+                raw_lines = await asyncio.get_running_loop().run_in_executor(
+                    executor, self.helper.tail_file, log_source_path, log_lines
+                )
                 raw_lines = [line.rstrip("\r\n") for line in raw_lines]
                 total_lines = len(raw_lines)
                 total_pages = 1
@@ -318,21 +356,15 @@ class ApiServersServerLogsHandler(BaseApiHandler):
             query = ""
             log_source_path = None
 
-        lines = []
-
-        for line in raw_lines:
-            try:
-                if not disable_ansi_strip:
-                    line = ansi_escape.sub("", line)
-                    line = re.sub("[A-z]{2}\b\b", "", line)
-                    line = html.escape(line)
-
-                if colored_output:
-                    line = self.helper.log_colors(line)
-
-                lines.append(line)
-            except Exception as e:
-                logger.warning(f"Skipping Log Line due to error: {e}")
+        user_keywords = self.helper.get_setting("keywords") if colored_output else []
+        lines = await asyncio.get_running_loop().run_in_executor(
+            executor,
+            self._format_log_lines,
+            raw_lines,
+            disable_ansi_strip,
+            colored_output,
+            user_keywords,
+        )
 
         if use_html:
             lines = [f"{line}<br />" for line in lines]

@@ -836,11 +836,12 @@ class Helpers:
         except:
             return False
 
-    def log_colors(self, line):
+    def log_colors(self, line, user_keywords=None):
         # our regex replacements
         # note these are in a tuple
 
-        user_keywords = self.get_setting("keywords")
+        if user_keywords is None:
+            user_keywords = self.get_setting("keywords")
 
         replacements = [
             (r"(\[.+?/INFO\])", r'<span class="mc-log-info">\1</span>'),

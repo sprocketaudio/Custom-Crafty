@@ -175,6 +175,7 @@ class TasksManager:
                 case "start_server":
                     svr.run_threaded_server(user_id)
                 case "stop_server":
+                    self.cancel_pending_lifecycle_starts(cmd["server_id"])
                     svr.stop_threaded_server()
                 case "restart_server":
                     svr.restart_threaded_server(user_id)
@@ -204,6 +205,59 @@ class TasksManager:
                     svr.send_command(command)
 
             time.sleep(1)
+
+    def cancel_pending_lifecycle_starts(self, server_id: str) -> int:
+        """Cancel delayed starts/restarts that would undo an intentional stop.
+
+        Schedule reactions are stored as one-shot APScheduler jobs before they enter
+        the command queue. Disabling their parent schedule does not remove a reaction
+        that has already been created, and the old implementation also allowed an
+        already queued ``start_server`` or ``restart_server`` command to run after a
+        stop. Both cases made a stopped server immediately come back online.
+        """
+        command_queue = self.controller.management.command_queue
+        removed_commands = 0
+        with command_queue.mutex:
+            pending_commands = list(command_queue.queue)
+            retained_commands = [
+                command
+                for command in pending_commands
+                if not (
+                    str(command.get("server_id")) == str(server_id)
+                    and command.get("command") in {"start_server", "restart_server"}
+                )
+            ]
+            removed_commands = len(pending_commands) - len(retained_commands)
+            if removed_commands:
+                command_queue.queue.clear()
+                command_queue.queue.extend(retained_commands)
+                command_queue.unfinished_tasks = max(
+                    0, command_queue.unfinished_tasks - removed_commands
+                )
+                if command_queue.unfinished_tasks == 0:
+                    command_queue.all_tasks_done.notify_all()
+
+        cancelled_reactions = 0
+        for schedule in HelpersManagement.get_schedules_by_server(server_id):
+            if (
+                schedule.interval_type == "reaction"
+                and (
+                    schedule.command in {"start_server", "restart_server"}
+                    or schedule.action in {"start", "restart"}
+                )
+            ):
+                if self._remove_scheduler_job_if_present(schedule.schedule_id):
+                    cancelled_reactions += 1
+
+        if removed_commands or cancelled_reactions:
+            logger.info(
+                "Cancelled %s queued lifecycle command(s) and %s pending reaction "
+                "job(s) for stopped server %s",
+                removed_commands,
+                cancelled_reactions,
+                server_id,
+            )
+        return removed_commands + cancelled_reactions
 
     def _main_graceful_exit(self) -> None:
         """Shutdown all servers and remove all temporary/runtime files
@@ -550,10 +604,22 @@ class TasksManager:
         return sch_id
 
     def remove_all_server_tasks(self, server_id):
-        schedules = HelpersManagement.get_schedules_by_server(server_id)
+        """Remove every persisted and active schedule owned by a server.
+
+        This is intentionally different from :meth:`remove_job`, which preserves
+        child reaction tasks when an administrator deletes one parent schedule.
+        A whole-server replacement (or server deletion) must not preserve those
+        children: doing so leaves orphaned reaction tasks that can never run and
+        used to make repeated schedule copies accumulate stale rows.
+        """
+        schedules = list(HelpersManagement.get_schedules_by_server(server_id))
         for schedule in schedules:
-            if schedule.interval != "reaction":
-                self.remove_job(schedule.schedule_id)
+            # Reaction tasks normally have no persistent APScheduler job, but a
+            # parent may have fired just before the replacement and created its
+            # one-shot delayed job. Remove either case safely.
+            self._remove_scheduler_job_if_present(schedule.schedule_id)
+
+        HelpersManagement.delete_scheduled_task_by_server(server_id)
 
     def remove_job(self, sch_id):
         job = HelpersManagement.get_scheduled_task_model(sch_id)

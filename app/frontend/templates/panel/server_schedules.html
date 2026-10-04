@@ -356,17 +356,37 @@
     })
   });
   $(() => {
-    $('.schedule-custom-toggle').click(function () {
+    $('.schedule-custom-toggle').click(async function (event) {
+      event.preventDefault();
       const id = this.dataset.scheduleId;
       const enabled = !JSON.parse(this.dataset.scheduleEnabled);
+      const toggle = this;
+      toggle.disabled = true;
 
-      fetch(`/api/v2/servers/{{data['server_id']}}/tasks/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ enabled }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      try {
+        const response = await fetch(`/api/v2/servers/{{data['server_id']}}/tasks/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ enabled }),
+          headers: {
+            'Content-Type': 'application/json',
+            'X-XSRFToken': getCookie('_xsrf'),
+          },
+        });
+        const result = await response.json();
+        if (!response.ok || result.status !== 'ok') {
+          throw new Error(result.error_data || result.error || 'Unable to update schedule.');
+        }
+
+        toggle.dataset.scheduleEnabled = String(enabled);
+        toggle.classList.toggle('active', enabled);
+        toggle.setAttribute('aria-pressed', String(enabled));
+      } catch (error) {
+        toggle.classList.toggle('active', !enabled);
+        toggle.setAttribute('aria-pressed', String(!enabled));
+        bootbox.alert({ title: 'Schedule not updated', message: error.message || 'Unable to update schedule.' });
+      } finally {
+        toggle.disabled = false;
+      }
     });
   })
 
@@ -391,6 +411,15 @@
         const result = await response.json();
         if (result.status !== 'ok') {
           bootbox.alert({ title: result.error || 'Copy failed', message: result.error_data || 'Unable to copy schedules.' });
+          return;
+        }
+        const skipped = Number(result.data && result.data.skipped_orphaned_reactions || 0);
+        if (skipped > 0) {
+          bootbox.alert({
+            title: 'Copied with cleanup',
+            message: `${skipped} orphaned reaction schedule${skipped === 1 ? '' : 's'} could never run and ${skipped === 1 ? 'was' : 'were'} removed from the copy.`,
+            callback: function () { location.reload(); }
+          });
           return;
         }
         location.reload();

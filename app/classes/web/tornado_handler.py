@@ -3,6 +3,9 @@ import sys
 import json
 import asyncio
 import logging
+import time
+import threading
+import faulthandler
 import tornado.web
 import tornado.ioloop
 import tornado.log
@@ -46,7 +49,47 @@ class Webserver:
         self.controller = controller
         self.tasks_manager = tasks_manager
         self.file_helper = file_helper
+        self._ioloop_heartbeat_at = 0.0
+        self._ioloop_stall_reported = False
+        self._ioloop_watchdog_stop = threading.Event()
+        self._ioloop_watchdog_thread = None
+        self._ioloop_heartbeat_callback = None
         self._asyncio_patch()
+
+    def _record_ioloop_heartbeat(self) -> None:
+        """Record that Tornado's event loop is processing callbacks."""
+        self._ioloop_heartbeat_at = time.monotonic()
+        self._ioloop_stall_reported = False
+
+    def _start_ioloop_watchdog(self) -> None:
+        """Log all thread stacks when the web event loop becomes unresponsive."""
+        self._ioloop_watchdog_stop.set()
+        stop_event = threading.Event()
+        self._ioloop_watchdog_stop = stop_event
+        self._record_ioloop_heartbeat()
+
+        def monitor() -> None:
+            while not stop_event.wait(5):
+                stalled_for = time.monotonic() - self._ioloop_heartbeat_at
+                if stalled_for < 30 or self._ioloop_stall_reported:
+                    continue
+                self._ioloop_stall_reported = True
+                logger.error(
+                    "Crafty web event loop has not processed callbacks for %.1f "
+                    "seconds. Dumping all thread stacks.",
+                    stalled_for,
+                )
+                try:
+                    faulthandler.dump_traceback(file=sys.stderr, all_threads=True)
+                except OSError:
+                    logger.exception("Unable to write Crafty web-loop thread dump.")
+
+        self._ioloop_watchdog_thread = threading.Thread(
+            target=monitor,
+            daemon=True,
+            name="crafty_web_watchdog",
+        )
+        self._ioloop_watchdog_thread.start()
 
     @staticmethod
     def log_function(handler):
@@ -163,6 +206,8 @@ class Webserver:
             default_handler_class=PublicHandler,
             static_handler_class=CustomStaticHandler,
             serve_traceback=debug_errors,
+            websocket_ping_interval=30,
+            websocket_ping_timeout=30,
         )
         self.https_server = tornado.httpserver.HTTPServer(app, ssl_options=cert_objects)
         self.https_server.listen(https_port)
@@ -179,11 +224,22 @@ class Webserver:
         Console.info("Server Init Complete: Listening For Connections!")
 
         self.ioloop = tornado.ioloop.IOLoop.current()
-        self.ioloop.start()
+        self._ioloop_heartbeat_callback = tornado.ioloop.PeriodicCallback(
+            self._record_ioloop_heartbeat, 1000
+        )
+        self._ioloop_heartbeat_callback.start()
+        self._start_ioloop_watchdog()
+        try:
+            self.ioloop.start()
+        finally:
+            self._ioloop_watchdog_stop.set()
+            if self._ioloop_heartbeat_callback:
+                self._ioloop_heartbeat_callback.stop()
 
     def stop_web_server(self):
         logger.info("Shutting Down Web Server")
         Console.info("Shutting Down Web Server")
+        self._ioloop_watchdog_stop.set()
         self.ioloop.stop()
         self.https_server.stop()
         logger.info("Web Server Stopped")

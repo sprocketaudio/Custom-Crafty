@@ -1,4 +1,5 @@
 import json
+import queue
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -67,6 +68,73 @@ def test_reaction_schedule_update_uses_interval_type(monkeypatch):
     manager.update_job(17, {"interval_type": "reaction", "parent": None})
 
     assert len(removed) == 1
+
+
+def test_removing_all_server_tasks_removes_reactions_and_pending_jobs(monkeypatch):
+    manager = TasksManager.__new__(TasksManager)
+    schedules = [
+        SimpleNamespace(schedule_id=10, interval_type="minutes"),
+        SimpleNamespace(schedule_id=11, interval_type="reaction"),
+    ]
+    removed_jobs = []
+    deleted_servers = []
+
+    monkeypatch.setattr(
+        "app.classes.shared.tasks.HelpersManagement.get_schedules_by_server",
+        lambda _server_id: schedules,
+    )
+    monkeypatch.setattr(
+        "app.classes.shared.tasks.HelpersManagement.delete_scheduled_task_by_server",
+        deleted_servers.append,
+    )
+    manager._remove_scheduler_job_if_present = removed_jobs.append
+
+    manager.remove_all_server_tasks("server-1")
+
+    assert removed_jobs == [10, 11]
+    assert deleted_servers == ["server-1"]
+
+
+def test_stopping_server_cancels_pending_lifecycle_starts(monkeypatch):
+    manager = TasksManager.__new__(TasksManager)
+    command_queue = queue.Queue()
+    command_queue.put({"server_id": "server-1", "command": "start_server"})
+    command_queue.put({"server_id": "server-2", "command": "restart_server"})
+    command_queue.put({"server_id": "server-1", "command": "save-all"})
+    command_queue.put({"server_id": "server-1", "command": "restart_server"})
+    removed_reaction_jobs = []
+    manager.controller = SimpleNamespace(
+        management=SimpleNamespace(command_queue=command_queue)
+    )
+    manager._remove_scheduler_job_if_present = lambda schedule_id: (
+        removed_reaction_jobs.append(schedule_id) or True
+    )
+    monkeypatch.setattr(
+        "app.classes.shared.tasks.HelpersManagement.get_schedules_by_server",
+        lambda _server_id: [
+            SimpleNamespace(
+                schedule_id=20,
+                interval_type="reaction",
+                command="restart_server",
+                action="restart",
+            ),
+            SimpleNamespace(
+                schedule_id=21,
+                interval_type="reaction",
+                command="tellraw @a hi",
+                action="command",
+            ),
+        ],
+    )
+
+    cancelled = manager.cancel_pending_lifecycle_starts("server-1")
+
+    assert cancelled == 3
+    assert list(command_queue.queue) == [
+        {"server_id": "server-2", "command": "restart_server"},
+        {"server_id": "server-1", "command": "save-all"},
+    ]
+    assert removed_reaction_jobs == [20]
 
 
 def test_session_log_has_a_size_ceiling():
