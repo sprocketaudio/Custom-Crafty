@@ -9,9 +9,11 @@ import pytest
 from app.classes.shared.server import (
     SERVER_SCHEDULER_JOB_DEFAULTS,
     SERVER_SCHEDULER_MAX_WORKERS,
+    ServerOutBuf,
     ServerInstance,
     _server_scheduler_executors,
 )
+from app.classes.shared.websocket_manager import WebSocketManager
 from app.classes.shared.tasks import SCHEDULE_JOB_DEFAULTS, TasksManager
 from app.classes.web.base_handler import BaseHandler
 from app.classes.web.websocket_handler import WebSocketHandler
@@ -236,6 +238,63 @@ def test_statistics_jobs_are_replaced_after_a_confirmed_server_start():
         "id": "save_stats_server-1",
         "replace_existing": True,
     }
+
+
+def test_page_broadcast_does_not_build_a_deferred_payload_without_recipients():
+    manager = WebSocketManager.__new__(WebSocketManager)
+    manager.clients = set()
+    payload_factory = Mock()
+
+    manager.broadcast_page_params(
+        "/panel/server_detail",
+        {"id": "server-1"},
+        "vterm_new_line",
+        data_factory=payload_factory,
+    )
+
+    payload_factory.assert_not_called()
+
+
+def test_page_broadcast_filters_page_before_checking_server_permission():
+    manager = WebSocketManager.__new__(WebSocketManager)
+
+    class UnrelatedClient:
+        page = "/panel/dashboard"
+        page_query_params = {}
+        get_user_id = Mock(side_effect=AssertionError("should not check permission"))
+
+    unrelated_client = UnrelatedClient()
+    manager.clients = {unrelated_client}
+
+    manager.broadcast_page_params(
+        "/panel/server_detail",
+        {"id": "server-1"},
+        "vterm_new_line",
+        data_factory=Mock(),
+        required_permission="terminal",
+    )
+
+    unrelated_client.get_user_id.assert_not_called()
+
+
+def test_live_terminal_stream_does_not_apply_costly_log_colours(monkeypatch):
+    sent = []
+
+    class TerminalViewer:
+        def broadcast_page_params(self, *_args, **kwargs):
+            sent.append(kwargs["data_factory"]())
+
+    monkeypatch.setattr(
+        "app.classes.shared.server.WebSocketManager", lambda: TerminalViewer()
+    )
+    output_buffer = ServerOutBuf.__new__(ServerOutBuf)
+    output_buffer.server_id = "server-1"
+    output_buffer.helper = SimpleNamespace(log_colors=Mock())
+
+    output_buffer.new_line_handler("[12:34:56] <unsafe>")
+
+    output_buffer.helper.log_colors.assert_not_called()
+    assert sent == [{"line": "[12:34:56] &lt;unsafe&gt;<br />"}]
 
 
 @pytest.mark.parametrize("handler_type", [BaseHandler, WebSocketHandler])

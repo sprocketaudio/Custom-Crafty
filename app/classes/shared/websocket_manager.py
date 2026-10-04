@@ -91,9 +91,16 @@ class WebSocketManager(metaclass=Singleton):
         self.broadcast_with_fn(filter_fn, event_type, data)
 
     def broadcast_page_params(
-        self, page: str, params: dict, event_type: str, data, **kwargs
+        self, page: str, params: dict, event_type: str, data=None, **kwargs
     ):
+        data_factory = kwargs.pop("data_factory", None)
+
         def filter_fn(client):
+            if client.page != page:
+                return False
+            for key, param in params.items():
+                if param != client.page_query_params.get(key, None):
+                    return False
             required_permission = kwargs.get("required_permission")
             if required_permission:
                 try:
@@ -104,16 +111,11 @@ class WebSocketManager(metaclass=Singleton):
                     user_perms = []
                 if required_permission not in user_perms:
                     return False
-            if client.page != page:
-                return False
-            for key, param in params.items():
-                if param != client.page_query_params.get(key, None):
-                    return False
             return True
 
-        self.broadcast_with_fn(filter_fn, event_type, data)
+        self.broadcast_with_fn(filter_fn, event_type, data, data_factory=data_factory)
 
-    def broadcast_with_fn(self, filter_fn, event_type: str, data):
+    def broadcast_with_fn(self, filter_fn, event_type: str, data, data_factory=None):
         # assign self.clients to a static variable here so hopefully
         # the set size won't change
         static_clients = self.clients
@@ -123,6 +125,14 @@ class WebSocketManager(metaclass=Singleton):
             out of {len(self.clients)} "
             f"clients: {json.dumps({'event': event_type, 'data': data})}"
         )
+
+        # Some messages, notably high-volume terminal output, are expensive to
+        # format. Do not build their payload unless at least one client will
+        # actually receive it.
+        if not clients:
+            return
+        if data_factory is not None:
+            data = data_factory()
 
         for client in clients[:]:
             try:

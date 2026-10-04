@@ -207,22 +207,22 @@ class ServerOutBuf:
                 break
 
     def new_line_handler(self, new_line):
-        new_line = re.sub("(\033\\[(0;)?[0-9]*[A-z]?(;[0-9])?m?)", " ", new_line)
-        new_line = re.sub("[A-z]{2}\b\b", "", new_line)
-        highlighted = self.helper.log_colors(html.escape(new_line))
-
-        logger.debug("Broadcasting new virtual terminal line")
-
-        # TODO: Do not send data to clients who do not have permission to view
-        # this server's console
-        if len(WebSocketManager().clients) > 0:
-            WebSocketManager().broadcast_page_params(
-                "/panel/server_detail",
-                {"id": self.server_id},
-                "vterm_new_line",
-                {"line": highlighted + "<br />"},
-                required_permission=EnumPermissionsServer.TERMINAL,
+        def format_terminal_line():
+            clean_line = re.sub(
+                "(\033\\[(0;)?[0-9]*[A-z]?(;[0-9])?m?)", " ", new_line
             )
+            clean_line = re.sub("[A-z]{2}\b\b", "", clean_line)
+            # The virtual terminal receives untrusted server output. Escape it
+            # here, but leave costly colour highlighting to the Logs page.
+            return {"line": html.escape(clean_line) + "<br />"}
+
+        WebSocketManager().broadcast_page_params(
+            "/panel/server_detail",
+            {"id": self.server_id},
+            "vterm_new_line",
+            required_permission=EnumPermissionsServer.TERMINAL,
+            data_factory=format_terminal_line,
+        )
 
 
 # **********************************************************************************

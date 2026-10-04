@@ -88,9 +88,14 @@ File:
 
 Observed behavior:
 - reads stdout one character at a time.
+- Live terminal payloads are only formatted after an authorised terminal viewer is found.
+  They are HTML-escaped but deliberately do not use the multi-regex colour formatter; the
+  explicit Logs page retains that coloured formatting.
 
 Risk:
 - syscall-heavy behavior under high console throughput.
+- A viewer can still generate substantial browser work during a high-volume server start,
+  so terminal snapshot size remains bounded by default.
 
 ### 3) File operations in main process
 Files:

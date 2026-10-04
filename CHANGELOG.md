@@ -1,4 +1,5 @@
 # Changelog
+
 ## --- [4.11.0] - 2026/10/04
 ### Security and reliability
 - Port compatible Crafty 4.11 security fixes: render activity-log and webhook error data as text,
@@ -8,6 +9,8 @@
   after a panel stall or restart.
 - Load 1,000 terminal or Logs-page lines by default while retaining the explicit 10,000-line
   option, avoiding an expensive coloured-log render whenever a server page is opened or revisited.
+- Avoid costly server-side colour formatting for every live terminal line; terminal output is
+  formatted only when an authorised viewer is present, while the Logs page retains colouring.
 - Remove server-scoped webhooks when deleting a server.
 ### Improvements
 - Refresh the terminal when returning to its tab.
