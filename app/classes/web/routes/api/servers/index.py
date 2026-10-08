@@ -973,11 +973,34 @@ class ApiServersIndexHandler(BaseApiHandler):
                 if node.text and node.text.strip()
             ]
             if jar_type == "forge-installer":
-                prefix = f"{mc_version}-"
-            else:
-                version_parts = mc_version.split(".")
-                prefix = ".".join(version_parts[1:]) + "."
-            return [version for version in reversed(versions) if version.startswith(prefix)]
+                return [
+                    version
+                    for version in reversed(versions)
+                    if version.startswith(f"{mc_version}-")
+                ]
+
+            # NeoForge used a loader-derived version before 1.21.11 (for example,
+            # Minecraft 1.21.1 maps to NeoForge 21.1.140).  Newer Minecraft
+            # releases use the full Minecraft version as the loader prefix (for
+            # example, 26.1.2.109 or 26.1.2-64.1.3).  Prefer the explicit modern
+            # forms, then retain the old mapping for the existing releases.
+            if int(mc_version.split(".", maxsplit=1)[0]) >= 26:
+                modern_prefixes = (f"{mc_version}.", f"{mc_version}-")
+                modern_versions = [
+                    version
+                    for version in versions
+                    if version.startswith(modern_prefixes)
+                ]
+                if modern_versions:
+                    return list(reversed(modern_versions))
+
+            version_parts = mc_version.split(".")
+            legacy_prefix = ".".join(version_parts[1:]) + "."
+            return [
+                version
+                for version in reversed(versions)
+                if version.startswith(legacy_prefix)
+            ]
         except (requests.RequestException, ET.ParseError) as why:
             logger.warning("Unable to retrieve %s builds: %s", jar_type, why)
             return []

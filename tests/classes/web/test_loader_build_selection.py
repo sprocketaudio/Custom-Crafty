@@ -26,6 +26,8 @@ def test_loader_build_list_filters_forge_and_neoforge_by_minecraft_version(monke
           <version>21.1.138</version>
           <version>21.1.140</version>
           <version>21.0.167</version>
+          <version>26.1.2.109</version>
+          <version>26.1.2-64.1.3</version>
         </versions></versioning></metadata>
     """
     monkeypatch.setattr(
@@ -43,4 +45,8 @@ def test_loader_build_list_filters_forge_and_neoforge_by_minecraft_version(monke
     assert ApiServersIndexHandler._loader_versions("neoforge-installer", "1.21.1") == [
         "21.1.140",
         "21.1.138",
+    ]
+    assert ApiServersIndexHandler._loader_versions("neoforge-installer", "26.1.2") == [
+        "26.1.2-64.1.3",
+        "26.1.2.109",
     ]

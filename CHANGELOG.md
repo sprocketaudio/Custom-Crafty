@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Fix current NeoForge installer builds, such as Minecraft `26.1.2`, not appearing
+  in the server-creation wizard.
+
 ## --- [4.11.0] - 2026/10/04
 ### Security and reliability
 - Port compatible Crafty 4.11 security fixes: render activity-log and webhook error data as text,
